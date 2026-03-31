@@ -1,0 +1,152 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --font-inter: 'Inter', sans-serif;
+  --font-space-grotesk: 'Space Grotesk', sans-serif;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+    box-sizing: border-box;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-bg-base text-text-primary;
+    font-family: var(--font-inter);
+    overflow-x: hidden;
+  }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar {
+    width: 4px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #09090b;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #27272a;
+    border-radius: 2px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #22d3ee40;
+  }
+
+  /* Selection */
+  ::selection {
+    background: #22d3ee30;
+    color: #22d3ee;
+  }
+}
+
+@layer utilities {
+  /* Dot grid background */
+  .bg-dot-grid {
+    background-image: radial-gradient(circle, #22d3ee18 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  /* Noise texture */
+  .bg-noise {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  /* Text gradient */
+  .text-gradient-cyan {
+    @apply bg-gradient-to-r from-accent-cyan to-accent-cyan-light bg-clip-text text-transparent;
+  }
+
+  .text-gradient-primary {
+    @apply bg-gradient-to-r from-accent-cyan via-white to-accent-purple bg-clip-text text-transparent;
+  }
+
+  .text-gradient-purple {
+    @apply bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent;
+  }
+
+  /* Glass card */
+  .glass {
+    @apply bg-bg-elevated/60 backdrop-blur-md border border-border;
+  }
+
+  .glass-strong {
+    @apply bg-bg-elevated/80 backdrop-blur-xl border border-border;
+  }
+
+  /* Glow border */
+  .border-glow {
+    border: 1px solid #22d3ee30;
+    box-shadow: inset 0 0 20px #22d3ee05, 0 0 20px #22d3ee10;
+  }
+
+  .border-glow-hover {
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .border-glow-hover:hover {
+    border-color: #22d3ee60;
+    box-shadow: inset 0 0 30px #22d3ee08, 0 0 30px #22d3ee20;
+  }
+
+  /* Section spacing */
+  .section-padding {
+    @apply py-24 md:py-32;
+  }
+
+  .container-max {
+    @apply max-w-7xl mx-auto px-6 md:px-12;
+  }
+
+  /* Animated underline */
+  .link-underline {
+    @apply relative;
+  }
+  .link-underline::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-0 h-px bg-accent-cyan transition-all duration-300;
+  }
+  .link-underline:hover::after {
+    @apply w-full;
+  }
+}
+
+/* Hero gradient orbs */
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  pointer-events: none;
+}
+
+/* Network diagram animations */
+@keyframes dataPulse {
+  0% { opacity: 0; stroke-dashoffset: 60; }
+  50% { opacity: 1; }
+  100% { opacity: 0; stroke-dashoffset: 0; }
+}
+
+@keyframes nodePulse {
+  0%, 100% { r: 4; opacity: 0.6; }
+  50% { r: 6; opacity: 1; }
+}
+
+.data-flow {
+  animation: dataPulse 2s ease-in-out infinite;
+  stroke-dasharray: 8 4;
+}
+
+.node-pulse {
+  animation: nodePulse 2s ease-in-out infinite;
+}
+
+/* Page transition */
+.page-enter {
+  animation: fadeUp 0.5s ease-out forwards;
+}
