@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useSession, signOut } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, User, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
 
@@ -50,6 +51,7 @@ export function Navbar() {
   const navLinks = [
     { href: '/', label: t.nav.home },
     { href: '/services', label: t.nav.services },
+    { href: '/pricing', label: t.nav.pricing },
     { href: '/about', label: t.nav.about },
     { href: '/contact', label: t.nav.contact },
   ]
@@ -123,15 +125,10 @@ export function Navbar() {
             ))}
           </ul>
 
-          {/* Desktop: Lang Toggle + CTA */}
+          {/* Desktop: Lang Toggle + Auth + CTA */}
           <div className="hidden md:flex items-center gap-3">
             <LangToggle />
-            <Link
-              href="/contact"
-              className="px-5 py-2.5 text-sm font-medium bg-accent-cyan text-bg-base rounded-lg hover:bg-accent-cyan-light transition-all duration-200 shadow-glow-cyan-sm hover:shadow-glow-cyan"
-            >
-              {t.nav.cta}
-            </Link>
+            <AuthButtons />
           </div>
 
           {/* Mobile: Lang Toggle + Hamburger */}
@@ -179,18 +176,105 @@ export function Navbar() {
                   </Link>
                 </motion.div>
               ))}
-              <div className="pt-3 border-t border-border mt-2">
-                <Link
-                  href="/contact"
-                  className="block w-full text-center px-5 py-3 text-sm font-medium bg-accent-cyan text-bg-base rounded-lg hover:bg-accent-cyan-light transition-colors duration-200"
-                >
-                  {t.nav.cta}
-                </Link>
+              <div className="pt-3 border-t border-border mt-2 space-y-2">
+                <MobileAuthButtons />
               </div>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
     </motion.header>
+  )
+}
+
+function AuthButtons() {
+  const { data: session, status } = useSession()
+  const { t } = useLanguage()
+
+  if (status === 'loading') {
+    return (
+      <div className="w-20 h-9 rounded-lg bg-bg-elevated animate-pulse" />
+    )
+  }
+
+  if (session) {
+    return (
+      <div className="flex items-center gap-2">
+        <Link
+          href="/dashboard"
+          className="px-4 py-2 text-sm font-medium rounded-lg border border-border text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors"
+        >
+          <span className="flex items-center gap-1.5">
+            <User size={14} />
+            Dashboard
+          </span>
+        </Link>
+        <button
+          onClick={() => signOut({ callbackUrl: '/' })}
+          className="p-2 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-500/10 transition-colors"
+          aria-label="Sign out"
+        >
+          <LogOut size={16} />
+        </button>
+      </div>
+    )
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <Link
+        href="/login"
+        className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
+      >
+        Sign in
+      </Link>
+      <Link
+        href="/contact"
+        className="px-5 py-2.5 text-sm font-medium bg-accent-cyan text-bg-base rounded-lg hover:bg-accent-cyan-light transition-all duration-200 shadow-glow-cyan-sm hover:shadow-glow-cyan"
+      >
+        {t.nav.cta}
+      </Link>
+    </div>
+  )
+}
+
+function MobileAuthButtons() {
+  const { data: session } = useSession()
+  const { t } = useLanguage()
+
+  if (session) {
+    return (
+      <>
+        <Link
+          href="/dashboard"
+          className="block w-full text-center px-5 py-3 text-sm font-medium bg-accent-cyan text-bg-base rounded-lg hover:bg-accent-cyan-light transition-colors"
+        >
+          Dashboard
+        </Link>
+        <button
+          onClick={() => signOut({ callbackUrl: '/' })}
+          className="block w-full text-center px-5 py-3 text-sm font-medium text-red-400 border border-red-500/25 rounded-lg hover:bg-red-500/10 transition-colors"
+        >
+          Sign out
+        </button>
+      </>
+    )
+  }
+
+  return (
+    <>
+      <Link
+        href="/login"
+        className="block w-full text-center px-5 py-3 text-sm font-medium border border-border text-text-secondary rounded-lg hover:text-text-primary hover:bg-bg-elevated transition-colors"
+      >
+        Sign in
+      </Link>
+      <Link
+        href="/contact"
+        className="block w-full text-center px-5 py-3 text-sm font-medium bg-accent-cyan text-bg-base rounded-lg hover:bg-accent-cyan-light transition-colors"
+      >
+        {t.nav.cta}
+      </Link>
+    </>
   )
 }

@@ -19,6 +19,7 @@ interface FormData {
 export function ContactForm() {
   const { t } = useLanguage()
   const [formState, setFormState] = useState<FormState>('idle')
+  const [errorMessage, setErrorMessage] = useState('')
   const [data, setData] = useState<FormData>({
     name: '',
     email: '',
@@ -36,8 +37,28 @@ export function ContactForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setFormState('loading')
-    await new Promise((resolve) => setTimeout(resolve, 1500))
-    setFormState('success')
+    setErrorMessage('')
+
+    try {
+      const res = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      })
+
+      const result = await res.json()
+
+      if (!res.ok || !result.success) {
+        throw new Error(result.error?.message || 'Something went wrong')
+      }
+
+      setFormState('success')
+    } catch (err) {
+      setErrorMessage(
+        err instanceof Error ? err.message : 'An unexpected error occurred'
+      )
+      setFormState('error')
+    }
   }
 
   if (formState === 'success') {
@@ -151,7 +172,7 @@ export function ContactForm() {
       {formState === 'error' && (
         <div className="flex items-center gap-2.5 p-3 rounded-xl border border-red-500/25 bg-red-500/8 text-red-400 text-sm">
           <AlertCircle size={15} className="flex-shrink-0" />
-          {t.contactForm.errorMsg}
+          {errorMessage || t.contactForm.errorMsg}
         </div>
       )}
 

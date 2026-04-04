@@ -1,9 +1,9 @@
 import type { Metadata } from 'next'
 import { Inter, Space_Grotesk } from 'next/font/google'
 import './globals.css'
-import { Navbar } from '@/components/layout/Navbar'
-import { Footer } from '@/components/layout/Footer'
 import { LanguageProvider } from '@/context/LanguageContext'
+import { SessionProvider } from '@/components/providers/SessionProvider'
+import { OrganizationJsonLd, WebSiteJsonLd } from '@/components/seo/JsonLd'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -75,11 +75,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="bg-bg-base text-text-primary antialiased">
-        <LanguageProvider>
-          <Navbar />
-          <main className="min-h-screen">{children}</main>
-          <Footer />
-        </LanguageProvider>
+        <OrganizationJsonLd />
+        <WebSiteJsonLd />
+        <SessionProvider>
+          <LanguageProvider>{children}</LanguageProvider>
+        </SessionProvider>
       </body>
     </html>
   )

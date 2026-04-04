@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 
 interface AnimatedSectionProps {
@@ -16,11 +16,17 @@ export function AnimatedSection({
   delay = 0,
   direction = 'up',
 }: AnimatedSectionProps) {
+  const shouldReduceMotion = useReducedMotion()
+
   const directionMap = {
     up: { y: 30, x: 0 },
     left: { y: 0, x: -30 },
     right: { y: 0, x: 30 },
     none: { y: 0, x: 0 },
+  }
+
+  if (shouldReduceMotion) {
+    return <div className={cn(className)}>{children}</div>
   }
 
   return (
@@ -54,6 +60,12 @@ export function StaggerContainer({
   className,
   staggerDelay = 0.1,
 }: StaggerContainerProps) {
+  const shouldReduceMotion = useReducedMotion()
+
+  if (shouldReduceMotion) {
+    return <div className={cn(className)}>{children}</div>
+  }
+
   return (
     <motion.div
       initial="hidden"
@@ -81,6 +93,12 @@ export function StaggerItem({
   children: React.ReactNode
   className?: string
 }) {
+  const shouldReduceMotion = useReducedMotion()
+
+  if (shouldReduceMotion) {
+    return <div className={cn(className)}>{children}</div>
+  }
+
   return (
     <motion.div
       variants={{

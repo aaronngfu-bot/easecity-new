@@ -4,6 +4,7 @@ const en = {
   nav: {
     home: 'Home',
     services: 'Services',
+    pricing: 'Pricing',
     about: 'About',
     contact: 'Contact',
     cta: 'Get in Touch',
@@ -387,6 +388,7 @@ const zh: typeof en = {
   nav: {
     home: '主頁',
     services: '服務',
+    pricing: '方案價格',
     about: '關於我們',
     contact: '聯絡我們',
     cta: '立即聯絡',
