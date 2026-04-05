@@ -1,3 +1,5 @@
+export const revalidate = 0
+
 import { prisma } from '@/lib/db'
 
 export default async function AdminLogsPage() {
