@@ -5,9 +5,9 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 export const maxDuration = 30
 
-const openrouter = createOpenAI({
-  baseURL: 'https://openrouter.ai/api/v1',
-  apiKey: process.env.OPENROUTER_API_KEY ?? '',
+const deepseek = createOpenAI({
+  baseURL: 'https://api.deepseek.com',
+  apiKey: process.env.DEEPSEEK_API_KEY ?? '',
 })
 
 const SYSTEM_PROMPT = `You are easecity's AI assistant, specializing in stream control infrastructure services.
@@ -28,7 +28,7 @@ Guidelines:
 - Keep responses under 300 words unless more detail is specifically requested`
 
 export async function POST(req: Request) {
-  if (!process.env.OPENROUTER_API_KEY) {
+  if (!process.env.DEEPSEEK_API_KEY) {
     return new Response(
       JSON.stringify({ error: 'Chatbot is not configured' }),
       { status: 503, headers: { 'Content-Type': 'application/json' } }
@@ -45,30 +45,38 @@ export async function POST(req: Request) {
     )
   }
 
-  const { messages, conversationId } = await req.json()
+  try {
+    const { messages, conversationId } = await req.json()
 
-  const result = streamText({
-    model: openrouter('meta-llama/llama-3.3-70b-instruct:free'),
-    system: SYSTEM_PROMPT,
-    messages,
-    maxOutputTokens: 1000,
-    async onFinish({ text, usage }) {
-      if (conversationId) {
-        try {
-          await prisma.message.create({
-            data: {
-              conversationId,
-              role: 'assistant',
-              content: text,
-              tokenCount: usage.totalTokens,
-            },
-          })
-        } catch (e) {
-          console.error('[Chat] Failed to save message:', e)
+    const result = streamText({
+      model: deepseek('deepseek-chat'),
+      system: SYSTEM_PROMPT,
+      messages,
+      maxOutputTokens: 1000,
+      async onFinish({ text, usage }) {
+        if (conversationId) {
+          try {
+            await prisma.message.create({
+              data: {
+                conversationId,
+                role: 'assistant',
+                content: text,
+                tokenCount: usage.totalTokens,
+              },
+            })
+          } catch (e) {
+            console.error('[Chat] Failed to save message:', e)
+          }
         }
-      }
-    },
-  })
+      },
+    })
 
-  return result.toTextStreamResponse()
+    return result.toDataStreamResponse()
+  } catch (err) {
+    console.error('[Chat] API error:', err)
+    return new Response(
+      JSON.stringify({ error: 'Failed to get AI response' }),
+      { status: 500, headers: { 'Content-Type': 'application/json' } }
+    )
+  }
 }
