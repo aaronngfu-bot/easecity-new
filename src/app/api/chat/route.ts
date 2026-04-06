@@ -1,5 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai'
-import { streamText } from 'ai'
+import { streamText, convertToModelMessages } from 'ai'
 import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     const result = streamText({
       model: provider('meta-llama/llama-3.3-70b-instruct:free'),
       system: SYSTEM_PROMPT,
-      messages,
+      messages: convertToModelMessages(messages),
       maxOutputTokens: 1000,
       async onFinish({ text, usage }) {
         if (conversationId) {
