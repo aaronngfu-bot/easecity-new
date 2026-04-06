@@ -5,9 +5,9 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 export const maxDuration = 30
 
-const groq = createOpenAI({
-  baseURL: 'https://api.groq.com/openai/v1',
-  apiKey: process.env.GROQ_API_KEY ?? '',
+const openrouter = createOpenAI({
+  baseURL: 'https://openrouter.ai/api/v1',
+  apiKey: process.env.OPENROUTER_API_KEY ?? '',
 })
 
 const SYSTEM_PROMPT = `You are easecity's AI assistant, specializing in stream control infrastructure services.
@@ -28,7 +28,7 @@ Guidelines:
 - Keep responses under 300 words unless more detail is specifically requested`
 
 export async function POST(req: Request) {
-  if (!process.env.GROQ_API_KEY) {
+  if (!process.env.OPENROUTER_API_KEY) {
     return new Response(
       JSON.stringify({ error: 'Chatbot is not configured' }),
       { status: 503, headers: { 'Content-Type': 'application/json' } }
@@ -48,7 +48,7 @@ export async function POST(req: Request) {
   const { messages, conversationId } = await req.json()
 
   const result = streamText({
-    model: groq('llama-3.3-70b-versatile'),
+    model: openrouter('meta-llama/llama-3.3-70b-instruct:free'),
     system: SYSTEM_PROMPT,
     messages,
     maxOutputTokens: 1000,
