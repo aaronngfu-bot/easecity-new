@@ -206,7 +206,7 @@ function AuthButtons() {
         >
           <span className="flex items-center gap-1.5">
             <User size={14} />
-            Dashboard
+            {t.auth.dashboard}
           </span>
         </Link>
         <button
@@ -226,7 +226,7 @@ function AuthButtons() {
         href="/login"
         className="px-4 py-2 text-sm font-medium text-text-secondary hover:text-text-primary transition-colors"
       >
-        Sign in
+        {t.auth.signIn}
       </Link>
       <Link
         href="/contact"
@@ -249,13 +249,13 @@ function MobileAuthButtons() {
           href="/dashboard"
           className="block w-full text-center px-5 py-3 text-sm font-medium bg-accent-cyan text-bg-base rounded-lg hover:bg-accent-cyan-light transition-colors"
         >
-          Dashboard
+          {t.auth.dashboard}
         </Link>
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
           className="block w-full text-center px-5 py-3 text-sm font-medium text-red-400 border border-red-500/25 rounded-lg hover:bg-red-500/10 transition-colors"
         >
-          Sign out
+          {t.auth.signOut}
         </button>
       </>
     )
@@ -267,7 +267,7 @@ function MobileAuthButtons() {
         href="/login"
         className="block w-full text-center px-5 py-3 text-sm font-medium border border-border text-text-secondary rounded-lg hover:text-text-primary hover:bg-bg-elevated transition-colors"
       >
-        Sign in
+        {t.auth.signIn}
       </Link>
       <Link
         href="/contact"

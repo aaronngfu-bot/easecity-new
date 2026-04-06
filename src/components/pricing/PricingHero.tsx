@@ -2,8 +2,11 @@
 
 import { motion } from 'framer-motion'
 import { Zap } from 'lucide-react'
+import { useLanguage } from '@/context/LanguageContext'
 
 export function PricingHero() {
+  const { t } = useLanguage()
+
   return (
     <section
       className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden"
@@ -34,7 +37,7 @@ export function PricingHero() {
           >
             <Zap size={12} className="text-accent-cyan" />
             <span className="text-accent-cyan text-xs font-mono tracking-wider">
-              TRANSPARENT PRICING
+              {t.pricingPage.badge}
             </span>
           </motion.div>
 
@@ -44,8 +47,8 @@ export function PricingHero() {
             transition={{ duration: 0.7, delay: 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
             className="font-display text-4xl sm:text-5xl lg:text-6xl font-bold leading-[1.1] tracking-tight mb-6"
           >
-            <span className="text-text-primary">Infrastructure that </span>
-            <span className="text-gradient-primary">scales with you</span>
+            <span className="text-text-primary">{t.pricingPage.heading1}</span>
+            <span className="text-gradient-primary">{t.pricingPage.headingHighlight}</span>
           </motion.h1>
 
           <motion.p
@@ -54,9 +57,7 @@ export function PricingHero() {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="text-text-secondary text-lg md:text-xl leading-relaxed mb-10 max-w-2xl mx-auto"
           >
-            From startups to enterprise — choose the plan that fits your
-            operational needs. Every plan includes core stream control
-            capabilities with zero hidden fees.
+            {t.pricingPage.desc}
           </motion.p>
 
           <motion.div
@@ -65,11 +66,7 @@ export function PricingHero() {
             transition={{ delay: 0.4 }}
             className="flex flex-wrap justify-center gap-6 text-sm text-text-muted"
           >
-            {[
-              'No setup fees',
-              '14-day free trial',
-              'Cancel anytime',
-            ].map((item) => (
+            {[t.pricingPage.benefit1, t.pricingPage.benefit2, t.pricingPage.benefit3].map((item) => (
               <div key={item} className="flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-accent-cyan" />
                 {item}

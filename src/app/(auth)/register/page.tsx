@@ -7,9 +7,11 @@ import { signIn } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function RegisterPage() {
   const router = useRouter()
+  const { t } = useLanguage()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -28,21 +30,13 @@ export default function RegisterPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       })
-
       const result = await res.json()
-
       if (!res.ok || !result.success) {
         setError(result.error?.message || 'Registration failed')
         setLoading(false)
         return
       }
-
-      const signInResult = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      })
-
+      const signInResult = await signIn('credentials', { email, password, redirect: false })
       if (signInResult?.error) {
         router.push('/login')
       } else {
@@ -50,7 +44,7 @@ export default function RegisterPage() {
         router.refresh()
       }
     } catch {
-      setError('An unexpected error occurred')
+      setError(t.auth.unexpectedError)
     } finally {
       setLoading(false)
     }
@@ -64,12 +58,7 @@ export default function RegisterPage() {
   )
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-8"
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="space-y-8">
       <div className="text-center">
         <Link href="/" className="inline-flex items-center gap-2 mb-8">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-cyan to-accent-purple flex items-center justify-center">
@@ -82,12 +71,8 @@ export default function RegisterPage() {
             </svg>
           </div>
         </Link>
-        <h1 className="font-display text-2xl font-bold text-text-primary">
-          Create an account
-        </h1>
-        <p className="text-text-secondary text-sm mt-2">
-          Get started with easecity
-        </p>
+        <h1 className="font-display text-2xl font-bold text-text-primary">{t.auth.createAccount}</h1>
+        <p className="text-text-secondary text-sm mt-2">{t.auth.getStarted}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 rounded-2xl border border-border bg-bg-surface space-y-5">
@@ -99,64 +84,33 @@ export default function RegisterPage() {
         )}
 
         <div>
-          <label htmlFor="name" className="block text-xs font-medium text-text-secondary mb-1.5">
-            Full name
-          </label>
-          <input
-            id="name" type="text" required
-            value={name} onChange={(e) => setName(e.target.value)}
-            placeholder="John Doe"
-            className={inputClass}
-          />
+          <label htmlFor="name" className="block text-xs font-medium text-text-secondary mb-1.5">{t.auth.nameLabel}</label>
+          <input id="name" type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder={t.auth.namePlaceholder} className={inputClass} />
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-xs font-medium text-text-secondary mb-1.5">
-            Email
-          </label>
-          <input
-            id="email" type="email" required
-            value={email} onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            className={inputClass}
-          />
+          <label htmlFor="email" className="block text-xs font-medium text-text-secondary mb-1.5">{t.auth.emailLabel}</label>
+          <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={inputClass} />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-xs font-medium text-text-secondary mb-1.5">
-            Password
-          </label>
+          <label htmlFor="password" className="block text-xs font-medium text-text-secondary mb-1.5">{t.auth.passwordLabel}</label>
           <div className="relative">
-            <input
-              id="password" type={showPassword ? 'text' : 'password'} required
-              value={password} onChange={(e) => setPassword(e.target.value)}
-              placeholder="Min 8 chars, 1 uppercase, 1 number"
-              className={inputClass}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
-            >
+            <input id="password" type={showPassword ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t.auth.passwordPlaceholder} className={inputClass} />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors">
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          <p className="text-text-muted text-xs mt-1.5">
-            Must contain at least 8 characters, one uppercase letter, and one number
-          </p>
+          <p className="text-text-muted text-xs mt-1.5">{t.auth.passwordHint}</p>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className={cn(
-            'w-full inline-flex items-center justify-center gap-2.5 px-6 py-3',
-            'bg-accent-cyan text-bg-base font-semibold text-sm rounded-xl',
-            'hover:bg-accent-cyan-light transition-all duration-200',
-            'shadow-glow-cyan-sm hover:shadow-glow-cyan',
-            'disabled:opacity-60 disabled:cursor-not-allowed'
-          )}
-        >
+        <button type="submit" disabled={loading} className={cn(
+          'w-full inline-flex items-center justify-center gap-2.5 px-6 py-3',
+          'bg-accent-cyan text-bg-base font-semibold text-sm rounded-xl',
+          'hover:bg-accent-cyan-light transition-all duration-200',
+          'shadow-glow-cyan-sm hover:shadow-glow-cyan',
+          'disabled:opacity-60 disabled:cursor-not-allowed'
+        )}>
           {loading ? (
             <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -165,15 +119,13 @@ export default function RegisterPage() {
           ) : (
             <UserPlus size={16} />
           )}
-          {loading ? 'Creating account...' : 'Create account'}
+          {loading ? t.auth.creatingAccount : t.auth.createBtn}
         </button>
       </form>
 
       <p className="text-center text-sm text-text-secondary">
-        Already have an account?{' '}
-        <Link href="/login" className="text-accent-cyan hover:text-accent-cyan-light transition-colors">
-          Sign in
-        </Link>
+        {t.auth.haveAccount}{' '}
+        <Link href="/login" className="text-accent-cyan hover:text-accent-cyan-light transition-colors">{t.auth.signIn}</Link>
       </p>
     </motion.div>
   )

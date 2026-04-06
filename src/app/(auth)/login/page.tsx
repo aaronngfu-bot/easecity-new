@@ -7,9 +7,11 @@ import { signIn } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { LogIn, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { useLanguage } from '@/context/LanguageContext'
 
 export default function LoginPage() {
   const router = useRouter()
+  const { t } = useLanguage()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
@@ -22,12 +24,7 @@ export default function LoginPage() {
     setLoading(true)
 
     try {
-      const result = await signIn('credentials', {
-        email,
-        password,
-        redirect: false,
-      })
-
+      const result = await signIn('credentials', { email, password, redirect: false })
       if (result?.error) {
         setError(result.error)
       } else {
@@ -35,7 +32,7 @@ export default function LoginPage() {
         router.refresh()
       }
     } catch {
-      setError('An unexpected error occurred')
+      setError(t.auth.unexpectedError)
     } finally {
       setLoading(false)
     }
@@ -49,12 +46,7 @@ export default function LoginPage() {
   )
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
-      className="space-y-8"
-    >
+    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="space-y-8">
       <div className="text-center">
         <Link href="/" className="inline-flex items-center gap-2 mb-8">
           <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-cyan to-accent-purple flex items-center justify-center">
@@ -67,12 +59,8 @@ export default function LoginPage() {
             </svg>
           </div>
         </Link>
-        <h1 className="font-display text-2xl font-bold text-text-primary">
-          Welcome back
-        </h1>
-        <p className="text-text-secondary text-sm mt-2">
-          Sign in to your account to continue
-        </p>
+        <h1 className="font-display text-2xl font-bold text-text-primary">{t.auth.welcomeBack}</h1>
+        <p className="text-text-secondary text-sm mt-2">{t.auth.signInDesc}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="p-6 rounded-2xl border border-border bg-bg-surface space-y-5">
@@ -84,49 +72,27 @@ export default function LoginPage() {
         )}
 
         <div>
-          <label htmlFor="email" className="block text-xs font-medium text-text-secondary mb-1.5">
-            Email
-          </label>
-          <input
-            id="email" type="email" required
-            value={email} onChange={(e) => setEmail(e.target.value)}
-            placeholder="you@example.com"
-            className={inputClass}
-          />
+          <label htmlFor="email" className="block text-xs font-medium text-text-secondary mb-1.5">{t.auth.emailLabel}</label>
+          <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={inputClass} />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-xs font-medium text-text-secondary mb-1.5">
-            Password
-          </label>
+          <label htmlFor="password" className="block text-xs font-medium text-text-secondary mb-1.5">{t.auth.passwordLabel}</label>
           <div className="relative">
-            <input
-              id="password" type={showPassword ? 'text' : 'password'} required
-              value={password} onChange={(e) => setPassword(e.target.value)}
-              placeholder="••••••••"
-              className={inputClass}
-            />
-            <button
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors"
-            >
+            <input id="password" type={showPassword ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" className={inputClass} />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors">
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
         </div>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className={cn(
-            'w-full inline-flex items-center justify-center gap-2.5 px-6 py-3',
-            'bg-accent-cyan text-bg-base font-semibold text-sm rounded-xl',
-            'hover:bg-accent-cyan-light transition-all duration-200',
-            'shadow-glow-cyan-sm hover:shadow-glow-cyan',
-            'disabled:opacity-60 disabled:cursor-not-allowed'
-          )}
-        >
+        <button type="submit" disabled={loading} className={cn(
+          'w-full inline-flex items-center justify-center gap-2.5 px-6 py-3',
+          'bg-accent-cyan text-bg-base font-semibold text-sm rounded-xl',
+          'hover:bg-accent-cyan-light transition-all duration-200',
+          'shadow-glow-cyan-sm hover:shadow-glow-cyan',
+          'disabled:opacity-60 disabled:cursor-not-allowed'
+        )}>
           {loading ? (
             <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -135,15 +101,13 @@ export default function LoginPage() {
           ) : (
             <LogIn size={16} />
           )}
-          {loading ? 'Signing in...' : 'Sign in'}
+          {loading ? t.auth.signingIn : t.auth.signIn}
         </button>
       </form>
 
       <p className="text-center text-sm text-text-secondary">
-        Don&apos;t have an account?{' '}
-        <Link href="/register" className="text-accent-cyan hover:text-accent-cyan-light transition-colors">
-          Sign up
-        </Link>
+        {t.auth.noAccount}{' '}
+        <Link href="/register" className="text-accent-cyan hover:text-accent-cyan-light transition-colors">{t.auth.signUp}</Link>
       </p>
     </motion.div>
   )

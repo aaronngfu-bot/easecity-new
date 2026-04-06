@@ -5,45 +5,29 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { SectionTitle } from '@/components/ui/SectionTitle'
-
-const faqs = [
-  {
-    q: 'What happens after the 14-day trial?',
-    a: 'Your account transitions to the plan you selected. No charges are made during the trial period. If you choose not to continue, your account is simply deactivated — no hidden fees.',
-  },
-  {
-    q: 'Can I switch plans later?',
-    a: 'Absolutely. Upgrade or downgrade at any time from your dashboard. Changes take effect immediately, and billing is prorated for the remaining cycle.',
-  },
-  {
-    q: 'What payment methods do you accept?',
-    a: 'We accept all major credit cards (Visa, Mastercard, Amex) via Stripe. Enterprise plans can be invoiced with NET-30 terms.',
-  },
-  {
-    q: 'Is there a setup fee?',
-    a: 'No. All standard plans are self-service with zero setup fees. Enterprise plans include complimentary onboarding and integration assistance.',
-  },
-  {
-    q: 'What does "unlimited endpoints" mean?',
-    a: 'You can connect as many remote devices as needed to your control hubs. There are no per-endpoint charges on Professional and above plans.',
-  },
-  {
-    q: 'Do you offer annual billing discounts?',
-    a: 'Yes. Annual billing saves 20% compared to monthly pricing. Contact our sales team for multi-year commitments with additional discounts.',
-  },
-]
+import { useLanguage } from '@/context/LanguageContext'
 
 export function PricingFAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
+  const { t } = useLanguage()
+
+  const faqs = [
+    { q: t.pricingPage.faq1Q, a: t.pricingPage.faq1A },
+    { q: t.pricingPage.faq2Q, a: t.pricingPage.faq2A },
+    { q: t.pricingPage.faq3Q, a: t.pricingPage.faq3A },
+    { q: t.pricingPage.faq4Q, a: t.pricingPage.faq4A },
+    { q: t.pricingPage.faq5Q, a: t.pricingPage.faq5A },
+    { q: t.pricingPage.faq6Q, a: t.pricingPage.faq6A },
+  ]
 
   return (
     <section className="section-padding relative">
       <div className="container-max">
         <SectionTitle
-          eyebrow="FAQ"
-          title="Frequently asked"
-          titleHighlight="questions"
-          description="Everything you need to know about our plans and pricing."
+          eyebrow={t.pricingPage.faqEyebrow}
+          title={t.pricingPage.faqTitle}
+          titleHighlight={t.pricingPage.faqHighlight}
+          description={t.pricingPage.faqDesc}
         />
 
         <div className="max-w-3xl mx-auto space-y-3">
@@ -60,9 +44,7 @@ export function PricingFAQ() {
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
                 className="w-full flex items-center justify-between px-6 py-4 text-left"
               >
-                <span className="text-sm font-medium text-text-primary pr-4">
-                  {faq.q}
-                </span>
+                <span className="text-sm font-medium text-text-primary pr-4">{faq.q}</span>
                 <ChevronDown
                   size={16}
                   className={cn(
@@ -81,9 +63,7 @@ export function PricingFAQ() {
                     className="overflow-hidden"
                   >
                     <div className="px-6 pb-5 pt-0">
-                      <p className="text-text-secondary text-sm leading-relaxed">
-                        {faq.a}
-                      </p>
+                      <p className="text-text-secondary text-sm leading-relaxed">{faq.a}</p>
                     </div>
                   </motion.div>
                 )}
