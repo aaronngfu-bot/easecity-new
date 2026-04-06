@@ -5,9 +5,9 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 export const maxDuration = 30
 
-const deepseek = createOpenAI({
-  baseURL: 'https://api.deepseek.com',
-  apiKey: process.env.DEEPSEEK_API_KEY ?? '',
+const provider = createOpenAI({
+  baseURL: 'https://openrouter.ai/api/v1',
+  apiKey: process.env.OPENROUTER_API_KEY ?? '',
 })
 
 const SYSTEM_PROMPT = `You are easecity's AI assistant, specializing in stream control infrastructure services.
@@ -28,7 +28,7 @@ Guidelines:
 - Keep responses under 300 words unless more detail is specifically requested`
 
 export async function POST(req: Request) {
-  if (!process.env.DEEPSEEK_API_KEY) {
+  if (!process.env.OPENROUTER_API_KEY) {
     return new Response(
       JSON.stringify({ error: 'Chatbot is not configured' }),
       { status: 503, headers: { 'Content-Type': 'application/json' } }
@@ -49,7 +49,7 @@ export async function POST(req: Request) {
     const { messages, conversationId } = await req.json()
 
     const result = streamText({
-      model: deepseek('deepseek-chat'),
+      model: provider('meta-llama/llama-3.3-70b-instruct:free'),
       system: SYSTEM_PROMPT,
       messages,
       maxOutputTokens: 1000,
@@ -71,7 +71,7 @@ export async function POST(req: Request) {
       },
     })
 
-    return result.toTextStreamResponse()
+    return result.toUIMessageStreamResponse()
   } catch (err) {
     console.error('[Chat] API error:', err)
     return new Response(
