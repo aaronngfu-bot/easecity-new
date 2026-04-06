@@ -1,4 +1,4 @@
-import { openai } from '@ai-sdk/openai'
+import { google } from '@ai-sdk/google'
 import { streamText } from 'ai'
 import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
@@ -8,11 +8,11 @@ export const maxDuration = 30
 const SYSTEM_PROMPT = `You are easecity's AI assistant, specializing in stream control infrastructure services.
 
 Key information about easecity:
-- Hong Kong-based technology company
+- Hong Kong-based technology company founded in 2026
 - Builds enterprise-grade stream control infrastructure
 - Enables one hub to manage unlimited remote endpoints
 - Services include real-time streaming, IoT control, remote device management
-- Expanding into AI-powered services
+- Currently in Phase 01 (Stream Control Infrastructure), expanding into online services (Phase 02, 2027) and AI-powered services (Phase 03, 2028)
 
 Guidelines:
 - Be professional, friendly, and concise
@@ -22,7 +22,7 @@ Guidelines:
 - Keep responses under 300 words unless more detail is specifically requested`
 
 export async function POST(req: Request) {
-  if (!process.env.OPENAI_API_KEY) {
+  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
     return new Response(
       JSON.stringify({ error: 'Chatbot is not configured' }),
       { status: 503, headers: { 'Content-Type': 'application/json' } }
@@ -42,7 +42,7 @@ export async function POST(req: Request) {
   const { messages, conversationId } = await req.json()
 
   const result = streamText({
-    model: openai('gpt-4o-mini'),
+    model: google('gemini-2.0-flash'),
     system: SYSTEM_PROMPT,
     messages,
     maxOutputTokens: 1000,
