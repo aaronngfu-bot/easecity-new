@@ -1,5 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai'
-import { generateText, convertToModelMessages } from 'ai'
+import { generateText } from 'ai'
 import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
@@ -56,7 +56,6 @@ export async function POST(req: Request) {
 
   try {
     const { messages, conversationId } = await req.json()
-    const modelMessages = await convertToModelMessages(messages)
 
     let responseText = ''
     let totalTokens = 0
@@ -66,7 +65,10 @@ export async function POST(req: Request) {
         const result = await generateText({
           model: provider(modelId),
           system: SYSTEM_PROMPT,
-          messages: modelMessages,
+          messages: messages.map((m: { role: string; content: string }) => ({
+            role: m.role as 'user' | 'assistant',
+            content: m.content,
+          })),
           maxOutputTokens: 1000,
           maxRetries: 1,
         })
@@ -74,7 +76,7 @@ export async function POST(req: Request) {
         totalTokens = result.usage?.totalTokens ?? 0
         break
       } catch (err) {
-        console.error(`[Chat] ${modelId} failed, trying next...`)
+        console.error(`[Chat] ${modelId} failed:`, err instanceof Error ? err.message : err)
         continue
       }
     }
