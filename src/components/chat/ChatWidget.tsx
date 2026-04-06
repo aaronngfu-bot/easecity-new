@@ -1,46 +1,78 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
-import { useChat } from '@ai-sdk/react'
-import { DefaultChatTransport } from 'ai'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
 
-const chatTransport = new DefaultChatTransport({ api: '/api/chat' })
+interface ChatMessage {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+}
 
 export function ChatWidget() {
   const { t } = useLanguage()
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState('')
+  const [messages, setMessages] = useState<ChatMessage[]>([])
+  const [isLoading, setIsLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
-
-  const { messages, sendMessage, status, error } = useChat({ transport: chatTransport })
-  const isLoading = status === 'submitted' || status === 'streaming'
 
   useEffect(() => {
     if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight
   }, [messages, isLoading])
 
+  const sendMessage = useCallback(async (text: string) => {
+    const userMsg: ChatMessage = { id: `u-${Date.now()}`, role: 'user', content: text }
+    setMessages(prev => [...prev, userMsg])
+    setIsLoading(true)
+    setError(null)
+
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: [...messages, userMsg].map(m => ({
+            role: m.role,
+            content: m.content,
+          })),
+        }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => ({}))
+        throw new Error(data.error || 'Failed to get response')
+      }
+
+      const data = await res.json()
+      const assistantMsg: ChatMessage = {
+        id: data.id || `a-${Date.now()}`,
+        role: 'assistant',
+        content: data.content,
+      }
+      setMessages(prev => [...prev, assistantMsg])
+    } catch (err) {
+      setError(err instanceof Error ? err.message : t.chat.error)
+    } finally {
+      setIsLoading(false)
+    }
+  }, [messages, t.chat.error])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || isLoading) return
-    sendMessage({ text: input })
+    const text = input.trim()
     setInput('')
+    sendMessage(text)
   }
 
-  const getContent = (parts: Array<{ type: string; text?: string }>): string => {
-    return parts.filter((p) => p.type === 'text' && p.text).map((p) => p.text).join('')
-  }
-
-  const allMessages = [
-    { id: 'welcome', role: 'assistant' as const, content: t.chat.welcome },
-    ...messages.map((m) => ({
-      id: m.id,
-      role: m.role,
-      content: getContent(m.parts as Array<{ type: string; text?: string }>),
-    })),
+  const allMessages: ChatMessage[] = [
+    { id: 'welcome', role: 'assistant', content: t.chat.welcome },
+    ...messages,
   ]
 
   return (
@@ -80,7 +112,7 @@ export function ChatWidget() {
                   </div>
                 </div>
               ))}
-              {isLoading && allMessages[allMessages.length - 1]?.role === 'user' && (
+              {isLoading && (
                 <div className="flex gap-2.5">
                   <div className="w-6 h-6 rounded-full bg-accent-cyan/15 flex items-center justify-center">
                     <Bot size={12} className="text-accent-cyan" />
@@ -94,7 +126,7 @@ export function ChatWidget() {
                   </div>
                 </div>
               )}
-              {error && <div className="text-xs text-red-400 text-center py-2">{error.message || t.chat.error}</div>}
+              {error && <div className="text-xs text-red-400 text-center py-2">{error}</div>}
             </div>
 
             <form onSubmit={handleSubmit} className="p-3 border-t border-border bg-bg-elevated flex gap-2">

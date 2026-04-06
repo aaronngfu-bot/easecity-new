@@ -1,5 +1,5 @@
 import { createOpenAI } from '@ai-sdk/openai'
-import { streamText, convertToModelMessages } from 'ai'
+import { generateText, convertToModelMessages } from 'ai'
 import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
@@ -9,6 +9,16 @@ const provider = createOpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
   apiKey: process.env.OPENROUTER_API_KEY ?? '',
 })
+
+const FREE_MODELS = [
+  'meta-llama/llama-3.3-70b-instruct:free',
+  'qwen/qwen3-coder:free',
+  'google/gemma-3-27b-it:free',
+  'nvidia/nemotron-3-super-120b-a12b:free',
+  'nousresearch/hermes-3-llama-3.1-405b:free',
+  'meta-llama/llama-3.2-3b-instruct:free',
+  'google/gemma-3-12b-it:free',
+]
 
 const SYSTEM_PROMPT = `You are easecity's AI assistant, specializing in stream control infrastructure services.
 
@@ -37,7 +47,6 @@ export async function POST(req: Request) {
 
   const ip = getClientIp(req)
   const { allowed } = rateLimit(`chat:${ip}`, 20, 60_000)
-
   if (!allowed) {
     return new Response(
       JSON.stringify({ error: 'Too many requests. Please slow down.' }),
@@ -47,31 +56,54 @@ export async function POST(req: Request) {
 
   try {
     const { messages, conversationId } = await req.json()
+    const modelMessages = await convertToModelMessages(messages)
 
-    const result = streamText({
-      model: provider('meta-llama/llama-3.3-70b-instruct:free'),
-      system: SYSTEM_PROMPT,
-      messages: await convertToModelMessages(messages),
-      maxOutputTokens: 1000,
-      async onFinish({ text, usage }) {
-        if (conversationId) {
-          try {
-            await prisma.message.create({
-              data: {
-                conversationId,
-                role: 'assistant',
-                content: text,
-                tokenCount: usage.totalTokens,
-              },
-            })
-          } catch (e) {
-            console.error('[Chat] Failed to save message:', e)
-          }
-        }
-      },
-    })
+    let responseText = ''
+    let totalTokens = 0
 
-    return result.toUIMessageStreamResponse()
+    for (const modelId of FREE_MODELS) {
+      try {
+        const result = await generateText({
+          model: provider(modelId),
+          system: SYSTEM_PROMPT,
+          messages: modelMessages,
+          maxOutputTokens: 1000,
+          maxRetries: 1,
+        })
+        responseText = result.text
+        totalTokens = result.usage?.totalTokens ?? 0
+        break
+      } catch (err) {
+        console.error(`[Chat] ${modelId} failed, trying next...`)
+        continue
+      }
+    }
+
+    if (!responseText) {
+      return new Response(
+        JSON.stringify({ error: 'All AI models are temporarily busy. Please try again in a moment.' }),
+        { status: 503, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+
+    if (conversationId) {
+      try {
+        await prisma.message.create({
+          data: { conversationId, role: 'assistant', content: responseText, tokenCount: totalTokens },
+        })
+      } catch (e) {
+        console.error('[Chat] Failed to save message:', e)
+      }
+    }
+
+    return new Response(
+      JSON.stringify({
+        id: `msg-${Date.now()}`,
+        role: 'assistant',
+        content: responseText,
+      }),
+      { headers: { 'Content-Type': 'application/json' } }
+    )
   } catch (err) {
     console.error('[Chat] API error:', err)
     return new Response(
