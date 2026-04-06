@@ -1,9 +1,14 @@
-import { google } from '@ai-sdk/google'
+import { createOpenAI } from '@ai-sdk/openai'
 import { streamText } from 'ai'
 import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 export const maxDuration = 30
+
+const groq = createOpenAI({
+  baseURL: 'https://api.groq.com/openai/v1',
+  apiKey: process.env.GROQ_API_KEY ?? '',
+})
 
 const SYSTEM_PROMPT = `You are easecity's AI assistant, specializing in stream control infrastructure services.
 
@@ -13,6 +18,7 @@ Key information about easecity:
 - Enables one hub to manage unlimited remote endpoints
 - Services include real-time streaming, IoT control, remote device management
 - Currently in Phase 01 (Stream Control Infrastructure), expanding into online services (Phase 02, 2027) and AI-powered services (Phase 03, 2028)
+- Pricing plans: Starter ($49/mo), Professional ($149/mo), Business ($399/mo), Enterprise (custom)
 
 Guidelines:
 - Be professional, friendly, and concise
@@ -22,7 +28,7 @@ Guidelines:
 - Keep responses under 300 words unless more detail is specifically requested`
 
 export async function POST(req: Request) {
-  if (!process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+  if (!process.env.GROQ_API_KEY) {
     return new Response(
       JSON.stringify({ error: 'Chatbot is not configured' }),
       { status: 503, headers: { 'Content-Type': 'application/json' } }
@@ -42,7 +48,7 @@ export async function POST(req: Request) {
   const { messages, conversationId } = await req.json()
 
   const result = streamText({
-    model: google('gemini-2.0-flash'),
+    model: groq('llama-3.3-70b-versatile'),
     system: SYSTEM_PROMPT,
     messages,
     maxOutputTokens: 1000,
