@@ -51,7 +51,7 @@ export async function POST(req: Request) {
     const result = streamText({
       model: provider('meta-llama/llama-3.3-70b-instruct:free'),
       system: SYSTEM_PROMPT,
-      messages: convertToModelMessages(messages),
+      messages: await convertToModelMessages(messages),
       maxOutputTokens: 1000,
       async onFinish({ text, usage }) {
         if (conversationId) {
