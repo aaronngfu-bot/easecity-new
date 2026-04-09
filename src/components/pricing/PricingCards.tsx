@@ -2,10 +2,13 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { Check, ArrowRight, Star, Shield, Cpu, Building2 } from 'lucide-react'
+import { Check, ArrowRight, Star, Shield, Cpu, Building2, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import type { T } from '@/i18n/translations'
+import { useState, useTransition } from 'react'
+import { createCheckoutSession } from '@/actions/stripe'
+import { useRouter } from 'next/navigation'
 
 function getPlans(t: T) {
   return [
@@ -18,7 +21,7 @@ function getPlans(t: T) {
       description: t.pricingPage.starterDesc,
       features: [t.pricingPage.starterF1, t.pricingPage.starterF2, t.pricingPage.starterF3, t.pricingPage.starterF4, t.pricingPage.starterF5, t.pricingPage.starterF6, t.pricingPage.starterF7],
       cta: t.pricingPage.startTrial,
-      href: '/contact',
+      priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || 'price_starter_mock',
       highlighted: false,
       glowColor: 'from-text-muted/5 to-transparent',
     },
@@ -31,7 +34,7 @@ function getPlans(t: T) {
       description: t.pricingPage.proDesc,
       features: [t.pricingPage.proF1, t.pricingPage.proF2, t.pricingPage.proF3, t.pricingPage.proF4, t.pricingPage.proF5, t.pricingPage.proF6, t.pricingPage.proF7, t.pricingPage.proF8],
       cta: t.pricingPage.startTrial,
-      href: '/contact',
+      priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || 'price_pro_mock',
       highlighted: true,
       badge: t.pricingPage.mostPopular,
       glowColor: 'from-accent-cyan/10 to-transparent',
@@ -45,7 +48,7 @@ function getPlans(t: T) {
       description: t.pricingPage.bizDesc,
       features: [t.pricingPage.bizF1, t.pricingPage.bizF2, t.pricingPage.bizF3, t.pricingPage.bizF4, t.pricingPage.bizF5, t.pricingPage.bizF6, t.pricingPage.bizF7, t.pricingPage.bizF8, t.pricingPage.bizF9],
       cta: t.pricingPage.startTrial,
-      href: '/contact',
+      priceId: process.env.NEXT_PUBLIC_STRIPE_BIZ_PRICE_ID || 'price_biz_mock',
       highlighted: false,
       glowColor: 'from-accent-purple/8 to-transparent',
     },
@@ -74,7 +77,8 @@ interface PlanData {
   description: string
   features: string[]
   cta: string
-  href: string
+  priceId?: string
+  href?: string
   highlighted: boolean
   badge?: string
   glowColor: string
@@ -120,6 +124,33 @@ export function PricingCards() {
 }
 
 function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: number; whatsIncluded: string }) {
+  const [isPending, startTransition] = useTransition()
+  const router = useRouter()
+  const { t } = useLanguage()
+
+  const handleSubscribe = () => {
+    if (plan.href) {
+      router.push(plan.href)
+      return
+    }
+
+    if (!plan.priceId) return
+
+    startTransition(async () => {
+      try {
+        await createCheckoutSession(plan.priceId!)
+      } catch (err) {
+        // If unauthorized, redirect to login
+        if (err instanceof Error && err.message === 'Unauthorized') {
+          router.push('/login?callbackUrl=/pricing')
+        } else {
+          console.error(err)
+          alert(t.errors?.unexpectedError || 'An error occurred. Please try again.')
+        }
+      }
+    })
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -165,18 +196,25 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
         </div>
         <p className="text-text-secondary text-sm leading-relaxed mb-6">{plan.description}</p>
 
-        <Link
-          href={plan.href}
+        <button
+          onClick={handleSubscribe}
+          disabled={isPending}
           className={cn(
-            'group/cta w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold rounded-xl transition-all duration-200 mb-7',
+            'group/cta w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold rounded-xl transition-all duration-200 mb-7 disabled:opacity-70 disabled:cursor-not-allowed',
             plan.highlighted
               ? 'bg-accent-cyan text-bg-base hover:bg-accent-cyan-light shadow-glow-cyan-sm hover:shadow-glow-cyan'
               : 'border border-border text-text-primary hover:border-accent-cyan/40 hover:bg-accent-cyan/5'
           )}
         >
-          {plan.cta}
-          <ArrowRight size={14} className="group-hover/cta:translate-x-1 transition-transform duration-200" />
-        </Link>
+          {isPending ? (
+            <Loader2 size={16} className="animate-spin" />
+          ) : (
+            <>
+              {plan.cta}
+              <ArrowRight size={14} className="group-hover/cta:translate-x-1 transition-transform duration-200" />
+            </>
+          )}
+        </button>
 
         <div className="border-t border-border pt-6 flex-1">
           <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-4">{whatsIncluded}</p>

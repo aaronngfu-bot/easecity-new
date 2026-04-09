@@ -39,6 +39,18 @@ export async function POST(req: Request) {
 
   try {
     switch (event.type) {
+      case 'customer.subscription.created':
+      case 'customer.subscription.updated': {
+        const subscription = event.data.object as Stripe.Subscription
+        await handleSubscriptionUpsert(subscription)
+        break
+      }
+      case 'customer.subscription.deleted': {
+        const subscription = event.data.object as Stripe.Subscription
+        await handleSubscriptionDeleted(subscription)
+        break
+      }
+      // Preserve old checkout handling for backward compatibility if needed temporarily
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         await handleCheckoutCompleted(session)
@@ -52,11 +64,6 @@ export async function POST(req: Request) {
       case 'invoice.payment_succeeded': {
         const invoice = event.data.object as Stripe.Invoice
         await handleInvoicePaid(invoice)
-        break
-      }
-      case 'customer.subscription.deleted': {
-        const subscription = event.data.object as Stripe.Subscription
-        await handleSubscriptionCancelled(subscription)
         break
       }
       case 'charge.refunded': {
@@ -78,12 +85,53 @@ export async function POST(req: Request) {
   return NextResponse.json({ received: true })
 }
 
-async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
-  const orderId = session.metadata?.orderId
-  if (!orderId) {
-    console.error('[Stripe Webhook] No orderId in session metadata')
+// --- NEW SUBSCRIPTION LOGIC ---
+
+async function handleSubscriptionUpsert(subscription: Stripe.Subscription) {
+  const customerId = subscription.customer as string
+  const user = await prisma.user.findUnique({
+    where: { stripeCustomerId: customerId },
+  })
+
+  if (!user) {
+    console.error(`[Stripe Webhook] User not found for customer: ${customerId}`)
     return
   }
+
+  const priceId = subscription.items.data[0].price.id
+
+  await prisma.subscription.upsert({
+    where: { stripeSubscriptionId: subscription.id },
+    create: {
+      userId: user.id,
+      stripeSubscriptionId: subscription.id,
+      stripePriceId: priceId,
+      status: subscription.status,
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    },
+    update: {
+      stripePriceId: priceId,
+      status: subscription.status,
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    },
+  })
+}
+
+async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
+  await prisma.subscription.update({
+    where: { stripeSubscriptionId: subscription.id },
+    data: {
+      status: subscription.status, // will be 'canceled'
+      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+    },
+  })
+}
+
+// --- LEGACY ORDER LOGIC (Kept for backward compatibility) ---
+
+async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+  const orderId = session.metadata?.orderId
+  if (!orderId) return
 
   await prisma.order.update({
     where: { id: orderId },
@@ -125,19 +173,6 @@ async function handleInvoicePaid(invoice: Stripe.Invoice) {
           invoiceId: invoice.id,
         }),
       },
-    })
-  }
-}
-
-async function handleSubscriptionCancelled(subscription: Stripe.Subscription) {
-  const order = await prisma.order.findFirst({
-    where: { stripePaymentIntentId: subscription.id },
-  })
-
-  if (order) {
-    await prisma.order.update({
-      where: { id: order.id },
-      data: { status: 'cancelled' },
     })
   }
 }
