@@ -42,9 +42,10 @@ export async function createCheckoutSession(priceId: string) {
     })
   }
 
-  // 2. Check if eligible for trial (never had a subscription)
+  // 2. Check if eligible for trial (only for Starter plan & never had a subscription)
+  const isStarterPlan = priceId === process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID
   const hasHadSubscription = user.subscriptions && user.subscriptions.length > 0
-  const isEligibleForTrial = !hasHadSubscription
+  const isEligibleForTrial = isStarterPlan && !hasHadSubscription
 
   const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
 

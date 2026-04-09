@@ -741,6 +741,19 @@ npm run test:e2e:ui       # UI 模式
 | 錯誤追蹤模組（可替換 Sentry） | ✅ 完成 |
 | DB Seed（Admin + Demo User） | ✅ 完成 |
 
+### Phase 5：訂閱制金流系統 ✅
+
+| 任務 | 狀態 |
+|------|------|
+| Prisma Schema 升級（新增 `stripeCustomerId` 與 `Subscription`） | ✅ 完成 |
+| 實作 Server Action 建立 Checkout Session | ✅ 完成 |
+| 限定 Starter 方案享有 3 天免費試用 | ✅ 完成 |
+| 防止重複申請試用（檢查曾有訂閱記錄） | ✅ 完成 |
+| 實作 Server Action 建立 Billing Portal | ✅ 完成 |
+| 升級 Webhook 處理 `customer.subscription.*` 狀態流轉 | ✅ 完成 |
+| Pricing 頁面串接金流 Server Action | ✅ 完成 |
+| 會員 Dashboard 整合管理訂閱入口 | ✅ 完成 |
+
 ---
 
 ## 10. 環境變數與部署指南
