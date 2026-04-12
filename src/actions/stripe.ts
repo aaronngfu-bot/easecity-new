@@ -108,3 +108,31 @@ export async function createPortalSession() {
 
   redirect(portalSession.url)
 }
+
+/** Returns the Stripe Billing Portal URL so the caller can open it in a new tab. */
+export async function getPortalSessionUrl(): Promise<string> {
+  const session = await getServerSession(authOptions)
+  if (!session?.user) {
+    throw new Error('Unauthorized')
+  }
+
+  const userId = session.user.id
+  const stripe = getStripe()
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  })
+
+  if (!user || !user.stripeCustomerId) {
+    throw new Error('User has no active subscriptions')
+  }
+
+  const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
+
+  const portalSession = await stripe.billingPortal.sessions.create({
+    customer: user.stripeCustomerId,
+    return_url: `${baseUrl}/dashboard/settings`,
+  })
+
+  return portalSession.url
+}

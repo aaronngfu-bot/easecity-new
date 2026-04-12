@@ -100,6 +100,22 @@ async function handleSubscriptionUpsert(subscription: Stripe.Subscription) {
 
   const priceId = subscription.items.data[0].price.id
 
+  const trialEnd = subscription.trial_end
+    ? new Date(subscription.trial_end * 1000)
+    : null
+
+  // In Stripe API 2026-03-25.dahlia, current_period_end moved to items.data[0]
+  const itemPeriodEnd = subscription.items?.data?.[0]?.current_period_end
+  const currentPeriodEnd =
+    typeof itemPeriodEnd === 'number' && itemPeriodEnd > 0
+      ? new Date(itemPeriodEnd * 1000)
+      : trialEnd
+
+  // In newer Stripe API, scheduled cancellation uses cancel_at instead of cancel_at_period_end
+  const sub = subscription as unknown as Record<string, unknown>
+  const hasCancelAt = typeof sub.cancel_at === 'number' && sub.cancel_at > 0
+  const cancelAtPeriodEnd = subscription.cancel_at_period_end || hasCancelAt
+
   await prisma.subscription.upsert({
     where: { stripeSubscriptionId: subscription.id },
     create: {
@@ -107,18 +123,22 @@ async function handleSubscriptionUpsert(subscription: Stripe.Subscription) {
       stripeSubscriptionId: subscription.id,
       stripePriceId: priceId,
       status: subscription.status,
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      cancelAtPeriodEnd,
+      trialEnd,
+      currentPeriodEnd,
     },
     update: {
       stripePriceId: priceId,
       status: subscription.status,
-      cancelAtPeriodEnd: subscription.cancel_at_period_end,
+      cancelAtPeriodEnd,
+      trialEnd,
+      currentPeriodEnd,
     },
   })
 }
 
 async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
-  await prisma.subscription.update({
+  await prisma.subscription.updateMany({
     where: { stripeSubscriptionId: subscription.id },
     data: {
       status: subscription.status, // will be 'canceled'

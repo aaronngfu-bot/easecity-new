@@ -90,6 +90,12 @@ export function Footer() {
             © {new Date().getFullYear()} easecity. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
+            <Link href="/legal/privacy" className="text-xs text-text-muted hover:text-text-secondary transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/legal/terms" className="text-xs text-text-muted hover:text-text-secondary transition-colors">
+              Terms of Service
+            </Link>
             <span className="text-xs text-text-muted font-mono">v1.0.0</span>
             <div className="flex items-center gap-1.5">
               <div className="w-1.5 h-1.5 rounded-full bg-accent-cyan/60" />

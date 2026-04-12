@@ -199,16 +199,16 @@ export function Hero() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.7, delay: 0.7 }}
-              className="mt-12 flex gap-8 pt-8 border-t border-border"
+              className="mt-12 pt-8 border-t border-border grid grid-cols-3 gap-4"
             >
               {[
-                { value: t.hero.stat1Value, label: t.hero.stat1Label },
-                { value: t.hero.stat2Value, label: t.hero.stat2Label },
-                { value: t.hero.stat3Value, label: t.hero.stat3Label },
+                { value: t.hero.stat1Value, label: t.hero.stat1Label, color: 'text-accent-cyan', bg: 'bg-accent-cyan/5 border-accent-cyan/15' },
+                { value: t.hero.stat2Value, label: t.hero.stat2Label, color: 'text-accent-purple', bg: 'bg-accent-purple/5 border-accent-purple/15' },
+                { value: t.hero.stat3Value, label: t.hero.stat3Label, color: 'text-text-primary', bg: 'bg-bg-elevated border-border' },
               ].map((stat) => (
-                <div key={stat.label}>
-                  <p className="font-display text-xl font-bold text-text-primary">{stat.value}</p>
-                  <p className="text-text-muted text-xs mt-0.5">{stat.label}</p>
+                <div key={stat.label} className={`px-4 py-3 rounded-xl border ${stat.bg}`}>
+                  <p className={`font-display text-xl font-bold ${stat.color}`}>{stat.value}</p>
+                  <p className="text-text-muted text-xs mt-0.5 leading-snug">{stat.label}</p>
                 </div>
               ))}
             </motion.div>

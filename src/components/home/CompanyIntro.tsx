@@ -1,8 +1,17 @@
 'use client'
 
 import { motion } from 'framer-motion'
+import { Activity, Globe, Cpu, Clock } from 'lucide-react'
 import { AnimatedSection } from '@/components/ui/AnimatedSection'
 import { useLanguage } from '@/context/LanguageContext'
+
+const metricIcons = [Activity, Globe, Cpu, Clock]
+const metricColors = [
+  { icon: 'text-accent-cyan', bg: 'bg-accent-cyan/8 group-hover:bg-accent-cyan/15', border: 'group-hover:border-accent-cyan/30', value: 'text-accent-cyan' },
+  { icon: 'text-accent-purple', bg: 'bg-accent-purple/8 group-hover:bg-accent-purple/15', border: 'group-hover:border-accent-purple/25', value: 'text-accent-purple' },
+  { icon: 'text-accent-cyan', bg: 'bg-accent-cyan/8 group-hover:bg-accent-cyan/15', border: 'group-hover:border-accent-cyan/30', value: 'text-accent-cyan' },
+  { icon: 'text-green-400', bg: 'bg-green-400/8 group-hover:bg-green-400/15', border: 'group-hover:border-green-400/25', value: 'text-green-400' },
+]
 
 export function CompanyIntro() {
   const { t } = useLanguage()
@@ -46,22 +55,31 @@ export function CompanyIntro() {
 
           <AnimatedSection direction="right">
             <div className="grid grid-cols-2 gap-4">
-              {metrics.map((metric, i) => (
-                <motion.div
-                  key={metric.label}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="p-5 rounded-2xl bg-bg-surface border border-border hover:border-accent-cyan/30 transition-all duration-300 group"
-                >
-                  <p className="font-display text-2xl font-bold text-accent-cyan mb-1 group-hover:text-accent-cyan-light transition-colors">
-                    {metric.value}
-                  </p>
-                  <p className="text-text-primary text-sm font-medium mb-1">{metric.label}</p>
-                  <p className="text-text-muted text-xs leading-snug">{metric.desc}</p>
-                </motion.div>
-              ))}
+              {metrics.map((metric, i) => {
+                const Icon = metricIcons[i]
+                const colors = metricColors[i]
+                return (
+                  <motion.div
+                    key={metric.label}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: i * 0.1 }}
+                    className={`p-5 rounded-2xl bg-bg-surface border border-border ${colors.border} transition-all duration-300 group`}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <p className={`font-display text-2xl font-bold ${colors.value} transition-colors`}>
+                        {metric.value}
+                      </p>
+                      <div className={`w-8 h-8 rounded-lg ${colors.bg} ${colors.icon} flex items-center justify-center transition-all duration-300`}>
+                        <Icon size={16} />
+                      </div>
+                    </div>
+                    <p className="text-text-primary text-sm font-medium mb-1">{metric.label}</p>
+                    <p className="text-text-muted text-xs leading-snug">{metric.desc}</p>
+                  </motion.div>
+                )
+              })}
             </div>
           </AnimatedSection>
         </div>

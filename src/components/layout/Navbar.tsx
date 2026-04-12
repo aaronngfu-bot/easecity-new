@@ -230,9 +230,10 @@ function AuthButtons() {
       </Link>
       <Link
         href="/contact"
-        className="px-5 py-2.5 text-sm font-medium bg-accent-cyan text-bg-base rounded-lg hover:bg-accent-cyan-light transition-all duration-200 shadow-glow-cyan-sm hover:shadow-glow-cyan"
+        className="relative px-5 py-2.5 text-sm font-semibold bg-accent-cyan text-bg-base rounded-lg hover:bg-accent-cyan-light transition-all duration-200 shadow-glow-cyan-sm hover:shadow-glow-cyan overflow-hidden group"
       >
-        {t.nav.cta}
+        <span className="relative z-10">{t.nav.cta}</span>
+        <span className="absolute inset-0 rounded-lg ring-2 ring-accent-cyan/0 group-hover:ring-accent-cyan/40 transition-all duration-300" />
       </Link>
     </div>
   )

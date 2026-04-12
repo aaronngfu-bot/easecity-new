@@ -23,7 +23,7 @@ export async function GET() {
       database: dbStatus,
       email: process.env.RESEND_API_KEY ? 'configured' : 'not_configured',
       payment: process.env.STRIPE_SECRET_KEY ? 'configured' : 'not_configured',
-      chatbot: process.env.OPENAI_API_KEY ? 'configured' : 'not_configured',
+      chatbot: process.env.OPENROUTER_API_KEY ? 'configured' : 'not_configured',
     },
   })
 }
