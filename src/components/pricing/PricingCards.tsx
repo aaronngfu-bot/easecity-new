@@ -7,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import type { T } from '@/i18n/translations'
 import { useState, useTransition } from 'react'
-import { createCheckoutSession } from '@/actions/stripe'
+import { getCheckoutSessionUrl } from '@/actions/stripe'
 import { useRouter } from 'next/navigation'
 
 function getPlans(t: T) {
@@ -138,7 +138,8 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
 
     startTransition(async () => {
       try {
-        await createCheckoutSession(plan.priceId!)
+        const url = await getCheckoutSessionUrl(plan.priceId!)
+        window.open(url, '_blank', 'noopener,noreferrer')
       } catch (err) {
         // If unauthorized, redirect to login
         if (err instanceof Error && err.message === 'Unauthorized') {
