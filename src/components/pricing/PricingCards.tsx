@@ -143,7 +143,7 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
       } catch (err) {
         // If unauthorized, redirect to login
         if (err instanceof Error && err.message === 'Unauthorized') {
-          router.push('/login?callbackUrl=/pricing')
+          router.push('/register?callbackUrl=/pricing')
         } else {
           console.error(err)
           alert(t.errors?.unexpectedError || 'An error occurred. Please try again.')

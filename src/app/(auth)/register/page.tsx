@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react'
@@ -11,6 +11,8 @@ import { useLanguage } from '@/context/LanguageContext'
 
 export default function RegisterPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
   const { t } = useLanguage()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -40,7 +42,7 @@ export default function RegisterPage() {
       if (signInResult?.error) {
         router.push('/login')
       } else {
-        router.push('/dashboard')
+        router.push(callbackUrl)
         router.refresh()
       }
     } catch {
@@ -125,7 +127,12 @@ export default function RegisterPage() {
 
       <p className="text-center text-sm text-text-secondary">
         {t.auth.haveAccount}{' '}
-        <Link href="/login" className="text-accent-cyan hover:text-accent-cyan-light transition-colors">{t.auth.signIn}</Link>
+        <Link
+          href={callbackUrl !== '/dashboard' ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : '/login'}
+          className="text-accent-cyan hover:text-accent-cyan-light transition-colors"
+        >
+          {t.auth.signIn}
+        </Link>
       </p>
     </motion.div>
   )
