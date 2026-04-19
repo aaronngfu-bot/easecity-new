@@ -9,6 +9,7 @@ import type { T } from '@/i18n/translations'
 import { useState, useTransition } from 'react'
 import { getCheckoutSessionUrl } from '@/actions/stripe'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 
 function getPlans(t: T) {
   return [
@@ -127,6 +128,7 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
   const { t } = useLanguage()
+  const { data: session } = useSession()
 
   const handleSubscribe = () => {
     if (plan.href) {
@@ -136,18 +138,21 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
 
     if (!plan.priceId) return
 
+    // Check auth client-side before calling the server action.
+    // Server action error messages are sanitized in production, so we
+    // cannot rely on err.message === 'Unauthorized' there.
+    if (!session) {
+      router.push('/register?callbackUrl=/pricing')
+      return
+    }
+
     startTransition(async () => {
       try {
         const url = await getCheckoutSessionUrl(plan.priceId!)
         window.open(url, '_blank', 'noopener,noreferrer')
       } catch (err) {
-        // If unauthorized, redirect to login
-        if (err instanceof Error && err.message === 'Unauthorized') {
-          router.push('/register?callbackUrl=/pricing')
-        } else {
-          console.error(err)
-          alert(t.errors?.unexpectedError || 'An error occurred. Please try again.')
-        }
+        console.error(err)
+        alert(t.errors?.unexpectedError || 'An error occurred. Please try again.')
       }
     })
   }
