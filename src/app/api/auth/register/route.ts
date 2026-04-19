@@ -14,7 +14,21 @@ const registerSchema = z.object({
     .max(100)
     .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
     .regex(/[0-9]/, 'Password must contain at least one number'),
+  turnstileToken: z.string().min(1, 'Human verification required'),
 })
+
+async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
+  const secret = process.env.TURNSTILE_SECRET_KEY
+  if (!secret) return true // skip in dev if key not set
+
+  const res = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ secret, response: token, remoteip: ip }),
+  })
+  const data = await res.json() as { success: boolean }
+  return data.success
+}
 
 export const POST = withErrorHandler(async (req) => {
   const ip = getClientIp(req)
@@ -26,6 +40,12 @@ export const POST = withErrorHandler(async (req) => {
 
   const body = await req.json()
   const data = registerSchema.parse(body)
+
+  // Verify Turnstile token
+  const isHuman = await verifyTurnstile(data.turnstileToken, ip)
+  if (!isHuman) {
+    return apiError('CAPTCHA_FAILED', 'Human verification failed. Please try again.', 400)
+  }
 
   const existing = await prisma.user.findUnique({
     where: { email: data.email },

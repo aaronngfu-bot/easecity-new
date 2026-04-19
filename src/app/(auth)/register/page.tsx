@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
@@ -8,6 +8,7 @@ import { motion } from 'framer-motion'
 import { UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
+import { Turnstile } from '@marsidev/react-turnstile'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -20,17 +21,25 @@ export default function RegisterPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null)
+  const turnstileRef = useRef<{ reset: () => void }>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
+
+    if (!turnstileToken) {
+      setError('請完成人機驗證')
+      return
+    }
+
     setLoading(true)
 
     try {
       const res = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ name, email, password, turnstileToken }),
       })
       const result = await res.json()
       if (!res.ok || !result.success) {
@@ -47,6 +56,8 @@ export default function RegisterPage() {
       }
     } catch {
       setError(t.auth.unexpectedError)
+      turnstileRef.current?.reset()
+      setTurnstileToken(null)
     } finally {
       setLoading(false)
     }
@@ -106,7 +117,22 @@ export default function RegisterPage() {
           <p className="text-text-muted text-xs mt-1.5">{t.auth.passwordHint}</p>
         </div>
 
-        <button type="submit" disabled={loading} className={cn(
+        {/* Turnstile */}
+        <div className="flex justify-center">
+          <Turnstile
+            ref={turnstileRef}
+            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+            onSuccess={(token) => setTurnstileToken(token)}
+            onExpire={() => setTurnstileToken(null)}
+            onError={() => {
+              setTurnstileToken(null)
+              setError('人機驗證失敗，請重新整理頁面再試。')
+            }}
+            options={{ theme: 'dark', language: 'zh-TW' }}
+          />
+        </div>
+
+        <button type="submit" disabled={loading || !turnstileToken} className={cn(
           'w-full inline-flex items-center justify-center gap-2.5 px-6 py-3',
           'bg-accent-cyan text-bg-base font-semibold text-sm rounded-xl',
           'hover:bg-accent-cyan-light transition-all duration-200',
