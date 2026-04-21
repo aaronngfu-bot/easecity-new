@@ -14,7 +14,7 @@ const en = {
     badge: 'Stream Control Platform — Live',
     headline1: 'One Hub.',
     headline2: 'Endless Control.',
-    sub: 'easecity delivers enterprise-grade stream control infrastructure — a single device orchestrating multiple remote endpoints with precision, reliability, and zero compromise.',
+    sub: 'One intelligent hub. Every endpoint in reach. Engineered for systems where precision, latency, and reliability are absolute.',
     cta1: 'Explore Services',
     cta2: 'Contact Us',
     stat1Value: '1→N',
@@ -24,6 +24,7 @@ const en = {
     stat3Value: 'Scalable',
     stat3Label: 'Architecture',
     scroll: 'Scroll',
+    broadcastHint: 'broadcast to all endpoints',
   },
 
   companyIntro: {
@@ -490,6 +491,7 @@ const en = {
     subtitleInactive: 'Subscribe to access the stream control infrastructure',
     settingsBtn: 'Settings',
     planLabel: 'Current Plan',
+    planCustomName: 'Custom plan',
     slaLabel: 'Uptime SLA',
     trialEndsLabel: 'Trial ends',
     nextBillingLabel: 'Next billing',
@@ -554,7 +556,7 @@ const zh: typeof en = {
     badge: '串流控制平台 — 上線中',
     headline1: '一個中樞。',
     headline2: '無限控制。',
-    sub: 'easecity 提供企業級串流控制基礎設施——單一裝置即可精確管理、監控並協調無限數量的遠端節點，絕不妥協。',
+    sub: '一個智能樞紐，接得到每個端點。為對精準、即時、可靠有絕對要求的系統而建。',
     cta1: '探索服務',
     cta2: '聯絡我們',
     stat1Value: '1→N',
@@ -564,6 +566,7 @@ const zh: typeof en = {
     stat3Value: '可擴展',
     stat3Label: '系統架構',
     scroll: '向下',
+    broadcastHint: '向全部端點廣播',
   },
 
   companyIntro: {
@@ -1030,6 +1033,7 @@ const zh: typeof en = {
     subtitleInactive: '訂閱後即可存取串流控制基礎設施',
     settingsBtn: '設定',
     planLabel: '目前方案',
+    planCustomName: '自訂或舊版方案',
     slaLabel: '正常運行保證',
     trialEndsLabel: '試用截止',
     nextBillingLabel: '下次扣款日',

@@ -1,9 +1,25 @@
 import { createOpenAI } from '@ai-sdk/openai'
 import { generateText } from 'ai'
+import { getServerSession } from 'next-auth'
+import { z } from 'zod'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { rateLimit, getClientIp } from '@/lib/rate-limit'
 
 export const maxDuration = 30
+
+const chatBodySchema = z.object({
+  messages: z
+    .array(
+      z.object({
+        role: z.enum(['user', 'assistant']),
+        content: z.string().max(12_000),
+      })
+    )
+    .min(1)
+    .max(40),
+  conversationId: z.string().min(1).max(64).optional(),
+})
 
 const provider = createOpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
@@ -55,7 +71,35 @@ export async function POST(req: Request) {
   }
 
   try {
-    const { messages, conversationId } = await req.json()
+    const json = await req.json()
+    const parsed = chatBodySchema.safeParse(json)
+    if (!parsed.success) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid request body' }),
+        { status: 400, headers: { 'Content-Type': 'application/json' } }
+      )
+    }
+    const { messages, conversationId } = parsed.data
+
+    if (conversationId) {
+      const session = await getServerSession(authOptions)
+      if (!session?.user?.id) {
+        return new Response(
+          JSON.stringify({ error: 'Sign in to continue a saved conversation' }),
+          { status: 401, headers: { 'Content-Type': 'application/json' } }
+        )
+      }
+      const conv = await prisma.conversation.findUnique({
+        where: { id: conversationId },
+        select: { userId: true },
+      })
+      if (!conv || conv.userId !== session.user.id) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid conversation' }),
+          { status: 403, headers: { 'Content-Type': 'application/json' } }
+        )
+      }
+    }
 
     let responseText = ''
     let totalTokens = 0

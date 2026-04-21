@@ -8,16 +8,22 @@ export function UserRoleForm({
   userId,
   currentRole,
   currentStatus,
+  actorRole,
 }: {
   userId: string
   currentRole: string
   currentStatus: string
+  actorRole: string
 }) {
   const router = useRouter()
   const [role, setRole] = useState(currentRole)
   const [status, setStatus] = useState(currentStatus)
   const [saving, setSaving] = useState(false)
   const [message, setMessage] = useState('')
+
+  const actorIsSuper = actorRole === 'SUPER_ADMIN'
+  const targetIsSuper = currentRole === 'SUPER_ADMIN'
+  const canEditRoles = actorIsSuper || !targetIsSuper
 
   const handleSave = async () => {
     setSaving(true)
@@ -52,22 +58,48 @@ export function UserRoleForm({
     <div className="p-6 rounded-xl border border-border bg-bg-surface space-y-4">
       <h2 className="font-display text-sm font-semibold text-text-primary">Manage User</h2>
 
-      <div>
-        <label className="block text-xs text-text-muted mb-1">Role</label>
-        <select value={role} onChange={(e) => setRole(e.target.value)} className={selectClass}>
-          <option value="MEMBER">MEMBER</option>
-          <option value="ADMIN">ADMIN</option>
-          <option value="SUPER_ADMIN">SUPER_ADMIN</option>
-        </select>
-      </div>
+      {!canEditRoles ? (
+        <>
+          <p className="text-xs text-text-muted rounded-lg border border-border bg-bg-elevated px-3 py-2">
+            Only a super administrator can change roles or status for this account.
+          </p>
+          <div>
+            <p className="text-xs text-text-muted mb-1">Role</p>
+            <p className="text-sm text-text-primary font-mono">{currentRole}</p>
+          </div>
+          <div>
+            <p className="text-xs text-text-muted mb-1">Status</p>
+            <p className="text-sm text-text-primary font-mono">{currentStatus}</p>
+          </div>
+        </>
+      ) : (
+        <>
+          <div>
+            <label className="block text-xs text-text-muted mb-1">Role</label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className={selectClass}
+            >
+              <option value="MEMBER">MEMBER</option>
+              <option value="ADMIN">ADMIN</option>
+              {actorIsSuper && <option value="SUPER_ADMIN">SUPER_ADMIN</option>}
+            </select>
+          </div>
 
-      <div>
-        <label className="block text-xs text-text-muted mb-1">Status</label>
-        <select value={status} onChange={(e) => setStatus(e.target.value)} className={selectClass}>
-          <option value="ACTIVE">ACTIVE</option>
-          <option value="SUSPENDED">SUSPENDED</option>
-        </select>
-      </div>
+          <div>
+            <label className="block text-xs text-text-muted mb-1">Status</label>
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className={selectClass}
+            >
+              <option value="ACTIVE">ACTIVE</option>
+              <option value="SUSPENDED">SUSPENDED</option>
+            </select>
+          </div>
+        </>
+      )}
 
       {message && (
         <p className={`text-xs ${message.includes('success') ? 'text-green-400' : 'text-red-400'}`}>
@@ -77,7 +109,11 @@ export function UserRoleForm({
 
       <button
         onClick={handleSave}
-        disabled={saving || (role === currentRole && status === currentStatus)}
+        disabled={
+          saving ||
+          !canEditRoles ||
+          (role === currentRole && status === currentStatus)
+        }
         className={cn(
           'w-full px-4 py-2.5 text-sm font-medium rounded-lg transition-all',
           'bg-accent-cyan text-bg-base hover:bg-accent-cyan-light',

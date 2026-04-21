@@ -4,6 +4,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { getStripe } from '@/lib/stripe'
+import { assertCheckoutPriceIdAllowed } from '@/lib/stripe-catalog'
 import { redirect } from 'next/navigation'
 
 export async function createCheckoutSession(priceId: string) {
@@ -11,6 +12,8 @@ export async function createCheckoutSession(priceId: string) {
   if (!session?.user) {
     throw new Error('Unauthorized')
   }
+
+  assertCheckoutPriceIdAllowed(priceId)
 
   const userId = session.user.id
   const stripe = getStripe()
@@ -88,6 +91,8 @@ export async function getCheckoutSessionUrl(priceId: string): Promise<string> {
   if (!session?.user) {
     throw new Error('Unauthorized')
   }
+
+  assertCheckoutPriceIdAllowed(priceId)
 
   const userId = session.user.id
   const stripe = getStripe()

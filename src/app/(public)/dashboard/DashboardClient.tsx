@@ -48,13 +48,14 @@ const PLAN_STYLE: Record<string, {
   pro:        { icon: Zap,        color: 'text-accent-cyan',    bg: 'bg-accent-cyan/10',   border: 'border-accent-cyan/30',   sla: '99.9%' },
   business:   { icon: Shield,     color: 'text-accent-purple',  bg: 'bg-accent-purple/10', border: 'border-accent-purple/30', sla: '99.99%' },
   enterprise: { icon: Building2,  color: 'text-yellow-400',     bg: 'bg-yellow-400/10',    border: 'border-yellow-400/30',    sla: 'Custom' },
+  unknown:    { icon: Cpu,        color: 'text-text-muted',     bg: 'bg-bg-elevated',      border: 'border-border',           sla: '—' },
 }
 
 function getPlanKey(priceId: string): string {
   if (priceId === process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID) return 'starter'
   if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID)     return 'pro'
   if (priceId === process.env.NEXT_PUBLIC_STRIPE_BIZ_PRICE_ID)     return 'business'
-  return 'starter'
+  return 'unknown'
 }
 
 function formatDate(iso: string | null, locale: string): string {
@@ -188,14 +189,16 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
     pro:        [t.pricingPage.proF1,     t.pricingPage.proF2,     t.pricingPage.proF3,     t.pricingPage.proF4,     t.pricingPage.proF5,     t.pricingPage.proF6],
     business:   [t.pricingPage.bizF1,     t.pricingPage.bizF2,     t.pricingPage.bizF3,     t.pricingPage.bizF4,     t.pricingPage.bizF5,     t.pricingPage.bizF6, t.pricingPage.bizF7],
     enterprise: [t.pricingPage.entF1,     t.pricingPage.entF2,     t.pricingPage.entF3,     t.pricingPage.entF4,     t.pricingPage.entF5],
+    unknown:    [],
   }
-  const features = featuresByPlan[planKey] ?? featuresByPlan.starter
+  const features = featuresByPlan[planKey] ?? featuresByPlan.unknown
 
   const planNames: Record<string, string> = {
     starter: t.pricingPage.starterName,
     pro: t.pricingPage.proName,
     business: t.pricingPage.bizName,
     enterprise: t.pricingPage.entName,
+    unknown: t.dashboard.planCustomName,
   }
 
   return (
@@ -252,19 +255,21 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
       </div>
 
       {/* Plan features */}
-      <div>
-        <p className="text-xs text-text-muted font-semibold uppercase tracking-wider mb-3">
-          {t.dashboard.featuresLabel}
-        </p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
-          {features.map((f) => (
-            <div key={f} className="flex items-center gap-2 text-sm text-text-secondary">
-              <CheckCircle size={13} className={style.color} />
-              {f}
-            </div>
-          ))}
+      {features.length > 0 && (
+        <div>
+          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider mb-3">
+            {t.dashboard.featuresLabel}
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
+            {features.map((f) => (
+              <div key={f} className="flex items-center gap-2 text-sm text-text-secondary">
+                <CheckCircle size={13} className={style.color} />
+                {f}
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   )
 }

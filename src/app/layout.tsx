@@ -1,19 +1,25 @@
 import type { Metadata } from 'next'
-import { Inter, Space_Grotesk } from 'next/font/google'
+import { Instrument_Sans, JetBrains_Mono, Syne } from 'next/font/google'
 import './globals.css'
 import { LanguageProvider } from '@/context/LanguageContext'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 import { OrganizationJsonLd, WebSiteJsonLd } from '@/components/seo/JsonLd'
 
-const inter = Inter({
+const instrumentSans = Instrument_Sans({
   subsets: ['latin'],
-  variable: '--font-inter',
+  variable: '--font-body',
   display: 'swap',
 })
 
-const spaceGrotesk = Space_Grotesk({
+const jetbrainsMono = JetBrains_Mono({
   subsets: ['latin'],
-  variable: '--font-space-grotesk',
+  variable: '--font-mono',
+  display: 'swap',
+})
+
+const syne = Syne({
+  subsets: ['latin'],
+  variable: '--font-display',
   display: 'swap',
 })
 
@@ -71,7 +77,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${spaceGrotesk.variable}`}
+      className={`${instrumentSans.variable} ${jetbrainsMono.variable} ${syne.variable}`}
       suppressHydrationWarning
     >
       <body className="bg-bg-base text-text-primary antialiased">

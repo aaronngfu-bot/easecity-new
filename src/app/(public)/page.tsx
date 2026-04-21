@@ -5,10 +5,12 @@ import { TechAdvantages } from '@/components/home/TechAdvantages'
 import { RoadmapSection } from '@/components/home/RoadmapSection'
 import { CTASection } from '@/components/home/CTASection'
 import { ParallaxSection } from '@/components/ui/ParallaxSection'
+import { TopologyRibbon } from '@/components/home/TopologyRibbon'
 
 export default function HomePage() {
   return (
     <>
+      <TopologyRibbon />
       <Hero />
       <ParallaxSection speed={0.15}>
         <CompanyIntro />

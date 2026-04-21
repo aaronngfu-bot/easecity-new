@@ -16,22 +16,6 @@ export async function middleware(request: NextRequest) {
     'camera=(), microphone=(), geolocation=()'
   )
 
-  // ── API CORS Headers ──
-  if (pathname.startsWith('/api')) {
-    response.headers.set('Access-Control-Allow-Origin', '*')
-    response.headers.set(
-      'Access-Control-Allow-Methods',
-      'GET, POST, PUT, PATCH, DELETE, OPTIONS'
-    )
-    response.headers.set(
-      'Access-Control-Allow-Headers',
-      'Content-Type, Authorization'
-    )
-    if (request.method === 'OPTIONS') {
-      return new NextResponse(null, { status: 204, headers: response.headers })
-    }
-  }
-
   // ── Auth: Get JWT token ──
   const token = await getToken({ req: request })
   const isLoggedIn = !!token

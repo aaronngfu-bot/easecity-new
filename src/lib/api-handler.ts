@@ -23,6 +23,13 @@ export class ForbiddenError extends Error {
   }
 }
 
+export class NotFoundError extends Error {
+  constructor(message = 'Not found') {
+    super(message)
+    this.name = 'NotFoundError'
+  }
+}
+
 export function withErrorHandler(handler: HandlerFn): HandlerFn {
   return async (req, context) => {
     try {
@@ -39,6 +46,10 @@ export function withErrorHandler(handler: HandlerFn): HandlerFn {
 
       if (error instanceof ForbiddenError) {
         return apiError('FORBIDDEN', error.message, 403)
+      }
+
+      if (error instanceof NotFoundError) {
+        return apiError('NOT_FOUND', error.message, 404)
       }
 
       console.error('[API Error]', error)

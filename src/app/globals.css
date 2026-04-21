@@ -2,10 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-inter: 'Inter', sans-serif;
-  --font-space-grotesk: 'Space Grotesk', sans-serif;
-}
+/* Body/display stacks come from next/font via --font-body / --font-display / --font-mono on <html> */
 
 @layer base {
   * {
@@ -21,8 +18,9 @@
 
   body {
     @apply bg-bg-base text-text-primary;
-    font-family: var(--font-inter);
+    font-family: var(--font-body), system-ui, sans-serif;
     overflow-x: hidden;
+    font-feature-settings: 'ss01', 'cv11';
   }
 
   /* Scrollbar */
@@ -37,29 +35,42 @@
     border-radius: 2px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: #22d3ee40;
+    background: #22ff8840;
   }
 
   /* Selection */
   ::selection {
-    background: #22d3ee30;
-    color: #22d3ee;
+    background: #22ff8830;
+    color: #22ff88;
   }
 }
 
 @layer utilities {
-  /* Dot grid background */
+  /* Legacy dot grid (kept for backward-compat with PricingHero, etc.) */
   .bg-dot-grid {
     background-image: radial-gradient(circle, #22d3ee18 1px, transparent 1px);
     background-size: 28px 28px;
   }
 
-  /* Noise texture */
+  /* New: instrument-grade rule grid — tick marks like a precision ruler */
+  .bg-rule-grid {
+    background-image:
+      linear-gradient(to right, #22ff8810 1px, transparent 1px),
+      linear-gradient(to bottom, #ffffff08 1px, transparent 1px);
+    background-size: 96px 96px, 96px 96px;
+  }
+
+  /* New: cursor-reactive grain base (overlaid via GrainField) */
+  .bg-grain {
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 0 0 0 0.14 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* Legacy noise (kept) */
   .bg-noise {
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
   }
 
-  /* Text gradient */
+  /* Text gradients */
   .text-gradient-cyan {
     @apply bg-gradient-to-r from-accent-cyan to-accent-cyan-light bg-clip-text text-transparent;
   }
@@ -72,6 +83,47 @@
     @apply bg-gradient-to-r from-accent-purple to-accent-cyan bg-clip-text text-transparent;
   }
 
+  .text-gradient-signal {
+    @apply bg-gradient-to-b from-signal via-signal-light to-signal bg-clip-text text-transparent;
+  }
+
+  /* Editorial headline — outline / stroke variant */
+  .text-outline {
+    -webkit-text-stroke: 1px #fafafa;
+    color: transparent;
+  }
+
+  .text-outline-signal {
+    -webkit-text-stroke: 1px #22ff88;
+    color: transparent;
+  }
+
+  /* Monospace label — tiny tracking-wide system labels */
+  .label-mono {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #52525b;
+  }
+
+  /* Terminal / command-prompt container */
+  .terminal {
+    background: linear-gradient(180deg, #0d0d10 0%, #08080a 100%);
+    border: 1px solid #1c1c22;
+    box-shadow:
+      inset 0 1px 0 #2a2a30,
+      0 30px 60px -30px #000;
+    font-family: var(--font-mono), ui-monospace, monospace;
+  }
+
+  .terminal-caret::after {
+    content: '_';
+    color: #22ff88;
+    margin-left: 2px;
+    animation: blink 1.1s step-end infinite;
+  }
+
   /* Glass card */
   .glass {
     @apply bg-bg-elevated/60 backdrop-blur-md border border-border;
@@ -81,7 +133,19 @@
     @apply bg-bg-elevated/80 backdrop-blur-xl border border-border;
   }
 
-  /* Glow border */
+  /* Signal border + glow */
+  .border-signal {
+    border: 1px solid #22ff8830;
+  }
+  .border-signal-hover {
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .border-signal-hover:hover {
+    border-color: #22ff8870;
+    box-shadow: inset 0 0 30px #22ff8808, 0 0 30px #22ff8825;
+  }
+
+  /* Legacy glow border (cyan) */
   .border-glow {
     border: 1px solid #22d3ee30;
     box-shadow: inset 0 0 20px #22d3ee05, 0 0 20px #22d3ee10;
@@ -110,10 +174,38 @@
   }
   .link-underline::after {
     content: '';
-    @apply absolute bottom-0 left-0 w-0 h-px bg-accent-cyan transition-all duration-300;
+    @apply absolute bottom-0 left-0 w-0 h-px bg-signal transition-all duration-300;
   }
   .link-underline:hover::after {
     @apply w-full;
+  }
+
+  /* Scanline overlay — very subtle, for terminal sections */
+  .scanlines {
+    background-image: repeating-linear-gradient(
+      0deg,
+      rgba(34, 255, 136, 0.03) 0px,
+      rgba(34, 255, 136, 0.03) 1px,
+      transparent 1px,
+      transparent 3px
+    );
+  }
+
+  /* Telemetry row — fixed-width mono columns */
+  .telemetry-row {
+    font-family: var(--font-mono), ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 11px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Hide scrollbars but keep functionality (used by horizontal timeline) */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 }
 

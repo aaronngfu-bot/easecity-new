@@ -1,10 +1,10 @@
 import { z } from 'zod'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import { withErrorHandler, AuthError, ForbiddenError } from '@/lib/api-handler'
+import { withErrorHandler, AuthError, ForbiddenError, NotFoundError } from '@/lib/api-handler'
 import { apiSuccess } from '@/lib/api-response'
 import { prisma } from '@/lib/db'
-import { isAdmin } from '@/lib/permissions'
+import { isAdmin, isSuperAdmin } from '@/lib/permissions'
 import { logAction } from '@/lib/audit'
 
 const updateUserSchema = z.object({
@@ -22,6 +22,19 @@ export const PATCH = withErrorHandler(async (req, context) => {
   const data = updateUserSchema.parse(body)
 
   const before = await prisma.user.findUnique({ where: { id } })
+  if (!before) {
+    throw new NotFoundError('User not found')
+  }
+
+  const actorIsSuper = isSuperAdmin(session.user.role)
+
+  if (!actorIsSuper && before.role === 'SUPER_ADMIN') {
+    throw new ForbiddenError('Only a super administrator can modify this account')
+  }
+
+  if (!actorIsSuper && data.role === 'SUPER_ADMIN') {
+    throw new ForbiddenError('Insufficient permissions to assign this role')
+  }
 
   const user = await prisma.user.update({
     where: { id },

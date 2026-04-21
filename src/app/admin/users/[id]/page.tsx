@@ -1,6 +1,8 @@
 export const revalidate = 0
 
 import { notFound } from 'next/navigation'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
 import { UserRoleForm } from './UserRoleForm'
@@ -10,6 +12,9 @@ export default async function AdminUserDetailPage({
 }: {
   params: { id: string }
 }) {
+  const session = await getServerSession(authOptions)
+  const actorRole = session?.user?.role ?? 'MEMBER'
+
   const user = await prisma.user.findUnique({
     where: { id: params.id },
     include: {
@@ -112,7 +117,12 @@ export default async function AdminUserDetailPage({
             </div>
           </div>
 
-          <UserRoleForm userId={user.id} currentRole={user.role} currentStatus={user.status} />
+          <UserRoleForm
+            userId={user.id}
+            currentRole={user.role}
+            currentStatus={user.status}
+            actorRole={actorRole}
+          />
         </div>
       </div>
     </div>

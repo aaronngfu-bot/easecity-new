@@ -8,7 +8,7 @@ export async function GET() {
 
   let dbStatus = 'ok'
   try {
-    await prisma.$queryRawUnsafe('SELECT 1')
+    await prisma.$queryRaw`SELECT 1`
   } catch {
     dbStatus = 'error'
   }
@@ -19,11 +19,5 @@ export async function GET() {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     latency: Date.now() - start,
-    services: {
-      database: dbStatus,
-      email: process.env.RESEND_API_KEY ? 'configured' : 'not_configured',
-      payment: process.env.STRIPE_SECRET_KEY ? 'configured' : 'not_configured',
-      chatbot: process.env.OPENROUTER_API_KEY ? 'configured' : 'not_configured',
-    },
   })
 }
