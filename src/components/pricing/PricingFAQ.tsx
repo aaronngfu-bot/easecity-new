@@ -21,7 +21,7 @@ export function PricingFAQ() {
   ]
 
   return (
-    <section className="section-padding relative">
+    <section className="section-padding relative border-t border-border">
       <div className="container-max">
         <SectionTitle
           eyebrow={t.pricingPage.faqEyebrow}
@@ -38,18 +38,26 @@ export function PricingFAQ() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-40px' }}
               transition={{ duration: 0.4, delay: i * 0.06 }}
-              className="rounded-xl border border-border bg-bg-surface overflow-hidden"
+              className={cn(
+                'glass-panel overflow-hidden !rounded-xl transition-all duration-300',
+                openIndex === i && 'border-signal/25'
+              )}
             >
               <button
                 onClick={() => setOpenIndex(openIndex === i ? null : i)}
-                className="w-full flex items-center justify-between px-6 py-4 text-left"
+                className="w-full flex items-center justify-between px-5 md:px-6 py-4 md:py-5 text-left"
               >
-                <span className="text-sm font-medium text-text-primary pr-4">{faq.q}</span>
+                <span className="flex items-center gap-3 text-sm font-medium text-text-primary pr-4">
+                  <span className="font-mono text-[10px] text-text-muted tracking-wider w-6">
+                    Q{String(i + 1).padStart(2, '0')}
+                  </span>
+                  {faq.q}
+                </span>
                 <ChevronDown
                   size={16}
                   className={cn(
-                    'shrink-0 text-text-muted transition-transform duration-200',
-                    openIndex === i && 'rotate-180 text-accent-cyan'
+                    'shrink-0 text-text-muted transition-all duration-200',
+                    openIndex === i && 'rotate-180 text-signal'
                   )}
                 />
               </button>
@@ -59,10 +67,10 @@ export function PricingFAQ() {
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: 'auto', opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.2, ease: 'easeInOut' }}
+                    transition={{ duration: 0.25, ease: 'easeInOut' }}
                     className="overflow-hidden"
                   >
-                    <div className="px-6 pb-5 pt-0">
+                    <div className="px-5 md:px-6 pb-5 pt-0 pl-[3.25rem]">
                       <p className="text-text-secondary text-sm leading-relaxed">{faq.a}</p>
                     </div>
                   </motion.div>

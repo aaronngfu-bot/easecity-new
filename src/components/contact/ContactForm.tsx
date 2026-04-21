@@ -66,15 +66,16 @@ export function ContactForm() {
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="h-full min-h-[400px] flex flex-col items-center justify-center text-center p-8 rounded-2xl border border-accent-cyan/25 bg-accent-cyan/5"
+        className="glass-prominent h-full min-h-[480px] flex flex-col items-center justify-center text-center p-10"
       >
-        <div className="w-14 h-14 rounded-full bg-accent-cyan/15 flex items-center justify-center mb-5">
-          <CheckCircle2 size={28} className="text-accent-cyan" />
+        <div className="w-16 h-16 rounded-full glass-panel !rounded-full flex items-center justify-center mb-6 border border-signal/30">
+          <CheckCircle2 size={30} className="text-signal" />
         </div>
-        <h3 className="font-display text-xl font-bold text-text-primary mb-3">
+        <div className="label-mono text-signal/70 mb-3">TRANSMISSION.COMPLETE</div>
+        <h3 className="font-display text-2xl font-bold text-text-primary mb-3">
           {t.contactForm.successTitle}
         </h3>
-        <p className="text-text-secondary text-sm leading-relaxed max-w-sm">
+        <p className="text-text-secondary text-sm leading-relaxed max-w-sm mb-6">
           {t.contactForm.successDesc}
         </p>
         <button
@@ -82,7 +83,7 @@ export function ContactForm() {
             setFormState('idle')
             setData({ name: '', email: '', company: '', subject: t.contactForm.subjects[0], message: '' })
           }}
-          className="mt-6 text-accent-cyan text-sm font-medium hover:text-accent-cyan-light transition-colors"
+          className="glass-ghost"
         >
           {t.contactForm.successReset}
         </button>
@@ -90,120 +91,116 @@ export function ContactForm() {
     )
   }
 
-  const inputClass = cn(
-    'w-full px-4 py-3 rounded-xl border bg-bg-surface text-text-primary text-sm',
-    'placeholder:text-text-muted',
-    'border-border focus:border-accent-cyan/50 focus:outline-none focus:ring-1 focus:ring-accent-cyan/30',
-    'transition-all duration-200'
-  )
-
   return (
-    <motion.form
+    <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      onSubmit={handleSubmit}
-      className="space-y-5"
+      className="glass-panel p-6 md:p-8"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label htmlFor="name" className="block text-xs font-medium text-text-secondary mb-1.5">
-            {t.contactForm.nameLabel} <span className="text-accent-cyan">{t.contactForm.required}</span>
-          </label>
-          <input
-            id="name" name="name" type="text" required
-            value={data.name} onChange={handleChange}
-            placeholder={t.contactForm.namePlaceholder}
-            className={inputClass}
-          />
-        </div>
-        <div>
-          <label htmlFor="email" className="block text-xs font-medium text-text-secondary mb-1.5">
-            {t.contactForm.emailLabel} <span className="text-accent-cyan">{t.contactForm.required}</span>
-          </label>
-          <input
-            id="email" name="email" type="email" required
-            value={data.email} onChange={handleChange}
-            placeholder={t.contactForm.emailPlaceholder}
-            className={inputClass}
-          />
-        </div>
+      <div className="flex items-center gap-2 mb-6">
+        <span className="w-1.5 h-1.5 rounded-full bg-signal animate-signal-pulse" />
+        <span className="label-mono text-signal/80">TRANSMISSION.FORM</span>
       </div>
 
-      <div>
-        <label htmlFor="company" className="block text-xs font-medium text-text-secondary mb-1.5">
-          {t.contactForm.companyLabel}
-        </label>
-        <input
-          id="company" name="company" type="text"
-          value={data.company} onChange={handleChange}
-          placeholder={t.contactForm.companyPlaceholder}
-          className={inputClass}
-        />
-      </div>
+      <form onSubmit={handleSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label htmlFor="name" className="label-mono block mb-2">
+              {t.contactForm.nameLabel} <span className="text-signal">{t.contactForm.required}</span>
+            </label>
+            <input
+              id="name" name="name" type="text" required
+              value={data.name} onChange={handleChange}
+              placeholder={t.contactForm.namePlaceholder}
+              className="glass-input"
+            />
+          </div>
+          <div>
+            <label htmlFor="email" className="label-mono block mb-2">
+              {t.contactForm.emailLabel} <span className="text-signal">{t.contactForm.required}</span>
+            </label>
+            <input
+              id="email" name="email" type="email" required
+              value={data.email} onChange={handleChange}
+              placeholder={t.contactForm.emailPlaceholder}
+              className="glass-input"
+            />
+          </div>
+        </div>
 
-      <div>
-        <label htmlFor="subject" className="block text-xs font-medium text-text-secondary mb-1.5">
-          {t.contactForm.subjectLabel} <span className="text-accent-cyan">{t.contactForm.required}</span>
-        </label>
-        <select
-          id="subject" name="subject" required
-          value={data.subject} onChange={handleChange}
-          className={cn(inputClass, 'appearance-none cursor-pointer')}
+        <div>
+          <label htmlFor="company" className="label-mono block mb-2">
+            {t.contactForm.companyLabel}
+          </label>
+          <input
+            id="company" name="company" type="text"
+            value={data.company} onChange={handleChange}
+            placeholder={t.contactForm.companyPlaceholder}
+            className="glass-input"
+          />
+        </div>
+
+        <div>
+          <label htmlFor="subject" className="label-mono block mb-2">
+            {t.contactForm.subjectLabel} <span className="text-signal">{t.contactForm.required}</span>
+          </label>
+          <select
+            id="subject" name="subject" required
+            value={data.subject} onChange={handleChange}
+            className={cn('glass-input appearance-none cursor-pointer')}
+          >
+            {t.contactForm.subjects.map((opt) => (
+              <option key={opt} value={opt} className="bg-bg-surface">{opt}</option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label htmlFor="message" className="label-mono block mb-2">
+            {t.contactForm.messageLabel} <span className="text-signal">{t.contactForm.required}</span>
+          </label>
+          <textarea
+            id="message" name="message" required rows={6}
+            value={data.message} onChange={handleChange}
+            placeholder={t.contactForm.messagePlaceholder}
+            className={cn('glass-input resize-none')}
+          />
+        </div>
+
+        {formState === 'error' && (
+          <div className="flex items-center gap-2.5 p-3 rounded-xl border border-red-500/25 bg-red-500/8 text-red-400 text-sm">
+            <AlertCircle size={15} className="flex-shrink-0" />
+            {errorMessage || t.contactForm.errorMsg}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={formState === 'loading'}
+          className={cn(
+            'glass-cta w-full',
+            formState === 'loading' && 'opacity-60 cursor-not-allowed'
+          )}
         >
-          {t.contactForm.subjects.map((opt) => (
-            <option key={opt} value={opt} className="bg-bg-surface">{opt}</option>
-          ))}
-        </select>
-      </div>
+          {formState === 'loading' ? (
+            <>
+              <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+              </svg>
+              {t.contactForm.sending}
+            </>
+          ) : (
+            <>
+              <Send size={16} />
+              {t.contactForm.submit}
+            </>
+          )}
+        </button>
 
-      <div>
-        <label htmlFor="message" className="block text-xs font-medium text-text-secondary mb-1.5">
-          {t.contactForm.messageLabel} <span className="text-accent-cyan">{t.contactForm.required}</span>
-        </label>
-        <textarea
-          id="message" name="message" required rows={6}
-          value={data.message} onChange={handleChange}
-          placeholder={t.contactForm.messagePlaceholder}
-          className={cn(inputClass, 'resize-none')}
-        />
-      </div>
-
-      {formState === 'error' && (
-        <div className="flex items-center gap-2.5 p-3 rounded-xl border border-red-500/25 bg-red-500/8 text-red-400 text-sm">
-          <AlertCircle size={15} className="flex-shrink-0" />
-          {errorMessage || t.contactForm.errorMsg}
-        </div>
-      )}
-
-      <button
-        type="submit"
-        disabled={formState === 'loading'}
-        className={cn(
-          'group w-full inline-flex items-center justify-center gap-2.5 px-6 py-3.5',
-          'bg-accent-cyan text-bg-base font-semibold text-sm rounded-xl',
-          'hover:bg-accent-cyan-light transition-all duration-200',
-          'shadow-glow-cyan-sm hover:shadow-glow-cyan',
-          'disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-accent-cyan'
-        )}
-      >
-        {formState === 'loading' ? (
-          <>
-            <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-            </svg>
-            {t.contactForm.sending}
-          </>
-        ) : (
-          <>
-            <Send size={16} />
-            {t.contactForm.submit}
-          </>
-        )}
-      </button>
-
-      <p className="text-text-muted text-xs text-center">{t.contactForm.footerNote}</p>
-    </motion.form>
+        <p className="text-text-muted text-xs text-center font-mono">{t.contactForm.footerNote}</p>
+      </form>
+    </motion.div>
   )
 }

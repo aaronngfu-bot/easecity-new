@@ -72,7 +72,7 @@ function StatCard({ label, value, sub }: { label: string; value: string | number
     <div className="p-5 rounded-xl border border-border bg-bg-surface">
       <p className="text-xs text-text-muted font-medium uppercase tracking-wider">{label}</p>
       <p className="font-display text-2xl font-bold text-text-primary mt-2">{value}</p>
-      {sub && <p className="text-xs text-accent-cyan mt-1">{sub}</p>}
+      {sub && <p className="text-xs text-signal mt-1">{sub}</p>}
     </div>
   )
 }

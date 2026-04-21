@@ -84,19 +84,22 @@ export function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-6 z-50 w-[380px] max-h-[520px] flex flex-col rounded-2xl border border-border bg-bg-surface shadow-2xl overflow-hidden"
+            className="glass-panel !rounded-2xl fixed bottom-24 right-6 z-50 w-[380px] max-h-[520px] flex flex-col shadow-2xl overflow-hidden"
           >
-            <div className="px-4 py-3 border-b border-border bg-bg-elevated flex items-center justify-between">
+            <div className="px-4 py-3 border-b border-border/60 bg-bg-base/40 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-accent-cyan/15 flex items-center justify-center">
-                  <Bot size={14} className="text-accent-cyan" />
+                <div className="w-7 h-7 rounded-lg bg-signal/15 border border-signal/25 flex items-center justify-center">
+                  <Bot size={14} className="text-signal" />
                 </div>
                 <div>
                   <p className="text-sm font-semibold text-text-primary">{t.chat.title}</p>
-                  <p className="text-xs text-accent-cyan">{t.chat.online}</p>
+                  <p className="text-[10px] text-signal font-mono tracking-wider uppercase flex items-center gap-1.5">
+                    <span className="w-1 h-1 rounded-full bg-signal animate-signal-pulse" />
+                    {t.chat.online}
+                  </p>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg text-text-muted hover:text-text-primary hover:bg-bg-surface transition-colors">
+              <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg text-text-muted hover:text-signal hover:bg-signal/5 transition-colors">
                 <X size={16} />
               </button>
             </div>
@@ -104,24 +107,24 @@ export function ChatWidget() {
             <div ref={scrollRef} className="flex-1 overflow-y-auto p-4 space-y-4 min-h-[300px]">
               {allMessages.map((msg) => (
                 <div key={msg.id} className={cn('flex gap-2.5', msg.role === 'user' ? 'flex-row-reverse' : 'flex-row')}>
-                  <div className={cn('w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5', msg.role === 'user' ? 'bg-accent-purple/15' : 'bg-accent-cyan/15')}>
-                    {msg.role === 'user' ? <User size={12} className="text-accent-purple" /> : <Bot size={12} className="text-accent-cyan" />}
+                  <div className={cn('w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-0.5 border', msg.role === 'user' ? 'bg-bg-elevated border-border' : 'bg-signal/15 border-signal/25')}>
+                    {msg.role === 'user' ? <User size={12} className="text-text-secondary" /> : <Bot size={12} className="text-signal" />}
                   </div>
-                  <div className={cn('max-w-[80%] px-3 py-2 rounded-xl text-sm leading-relaxed', msg.role === 'user' ? 'bg-accent-purple/10 text-text-primary rounded-br-sm' : 'bg-bg-elevated text-text-secondary rounded-bl-sm')}>
+                  <div className={cn('max-w-[80%] px-3 py-2 rounded-xl text-sm leading-relaxed', msg.role === 'user' ? 'bg-bg-elevated text-text-primary rounded-br-sm border border-border' : 'bg-bg-base/60 text-text-secondary rounded-bl-sm border border-border/60')}>
                     {msg.content}
                   </div>
                 </div>
               ))}
               {isLoading && (
                 <div className="flex gap-2.5">
-                  <div className="w-6 h-6 rounded-full bg-accent-cyan/15 flex items-center justify-center">
-                    <Bot size={12} className="text-accent-cyan" />
+                  <div className="w-6 h-6 rounded-full bg-signal/15 border border-signal/25 flex items-center justify-center">
+                    <Bot size={12} className="text-signal" />
                   </div>
-                  <div className="bg-bg-elevated px-3 py-2 rounded-xl rounded-bl-sm">
+                  <div className="bg-bg-base/60 border border-border/60 px-3 py-2 rounded-xl rounded-bl-sm">
                     <div className="flex gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-text-muted animate-bounce" style={{ animationDelay: '0ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-text-muted animate-bounce" style={{ animationDelay: '150ms' }} />
-                      <span className="w-1.5 h-1.5 rounded-full bg-text-muted animate-bounce" style={{ animationDelay: '300ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-signal/60 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-signal/60 animate-bounce" style={{ animationDelay: '150ms' }} />
+                      <span className="w-1.5 h-1.5 rounded-full bg-signal/60 animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
                   </div>
                 </div>
@@ -129,14 +132,14 @@ export function ChatWidget() {
               {error && <div className="text-xs text-red-400 text-center py-2">{error}</div>}
             </div>
 
-            <form onSubmit={handleSubmit} className="p-3 border-t border-border bg-bg-elevated flex gap-2">
+            <form onSubmit={handleSubmit} className="p-3 border-t border-border/60 bg-bg-base/40 flex gap-2">
               <input
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={t.chat.placeholder}
-                className="flex-1 px-3 py-2 bg-bg-surface border border-border rounded-lg text-sm text-text-primary placeholder:text-text-muted focus:outline-none focus:border-accent-cyan/50 focus:ring-1 focus:ring-accent-cyan/30"
+                className="flex-1 glass-input !py-2 !text-sm"
               />
-              <button type="submit" disabled={isLoading || !input.trim()} className="p-2 rounded-lg bg-accent-cyan text-bg-base hover:bg-accent-cyan-light transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+              <button type="submit" disabled={isLoading || !input.trim()} className="p-2 rounded-lg glass-cta !px-3 disabled:opacity-40 disabled:cursor-not-allowed">
                 <Send size={16} />
               </button>
             </form>
@@ -150,8 +153,8 @@ export function ChatWidget() {
         whileTap={{ scale: 0.95 }}
         className={cn(
           'fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center',
-          'shadow-glow-cyan transition-colors',
-          isOpen ? 'bg-bg-elevated border border-border text-text-secondary' : 'bg-accent-cyan text-bg-base'
+          'transition-colors shadow-glow-signal',
+          isOpen ? 'glass-panel !rounded-full text-text-secondary' : 'bg-signal text-bg-base border border-signal/40'
         )}
       >
         {isOpen ? <X size={22} /> : <MessageCircle size={22} />}

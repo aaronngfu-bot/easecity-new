@@ -6,7 +6,7 @@ import { Check, ArrowRight, Star, Shield, Cpu, Building2, Loader2 } from 'lucide
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import type { T } from '@/i18n/translations'
-import { useState, useTransition } from 'react'
+import { useTransition } from 'react'
 import { getCheckoutSessionUrl } from '@/actions/stripe'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
@@ -24,7 +24,6 @@ function getPlans(t: T) {
       cta: t.pricingPage.startTrial,
       priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || 'price_starter_mock',
       highlighted: false,
-      glowColor: 'from-text-muted/5 to-transparent',
     },
     {
       name: t.pricingPage.proName,
@@ -38,7 +37,6 @@ function getPlans(t: T) {
       priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || 'price_pro_mock',
       highlighted: true,
       badge: t.pricingPage.mostPopular,
-      glowColor: 'from-accent-cyan/10 to-transparent',
     },
     {
       name: t.pricingPage.bizName,
@@ -51,7 +49,6 @@ function getPlans(t: T) {
       cta: t.pricingPage.subscribeNow,
       priceId: process.env.NEXT_PUBLIC_STRIPE_BIZ_PRICE_ID || 'price_biz_mock',
       highlighted: false,
-      glowColor: 'from-accent-purple/8 to-transparent',
     },
     {
       name: t.pricingPage.entName,
@@ -64,7 +61,6 @@ function getPlans(t: T) {
       cta: t.pricingPage.contactSales,
       href: '/contact',
       highlighted: false,
-      glowColor: 'from-text-muted/5 to-transparent',
     },
   ]
 }
@@ -82,7 +78,6 @@ interface PlanData {
   href?: string
   highlighted: boolean
   badge?: string
-  glowColor: string
 }
 
 export function PricingCards() {
@@ -91,10 +86,10 @@ export function PricingCards() {
 
   return (
     <section className="section-padding relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-b from-bg-surface/30 to-bg-base pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-b from-bg-surface/20 to-bg-base pointer-events-none" />
 
       <div className="container-max relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
           {plans.map((plan, i) => (
             <PricingCard key={i} plan={plan} index={i} whatsIncluded={t.pricingPage.whatsIncluded} />
           ))}
@@ -107,13 +102,11 @@ export function PricingCards() {
           transition={{ duration: 0.6, delay: 0.3 }}
           className="mt-16 text-center"
         >
-          <p className="text-text-muted text-sm mb-6">
-            {t.pricingPage.allPlansNote}
-          </p>
-          <div className="flex flex-wrap justify-center gap-8 text-xs text-text-muted">
+          <p className="text-text-muted text-sm mb-6">{t.pricingPage.allPlansNote}</p>
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-xs text-text-muted">
             {[t.pricingPage.soc2, t.pricingPage.gdpr, t.pricingPage.iso, t.pricingPage.encryption].map((item) => (
-              <div key={item} className="flex items-center gap-2">
-                <Shield size={12} className="text-accent-cyan/60" />
+              <div key={item} className="flex items-center gap-2 font-mono tracking-wide">
+                <Shield size={12} className="text-signal/60" />
                 {item}
               </div>
             ))}
@@ -138,9 +131,6 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
 
     if (!plan.priceId) return
 
-    // Check auth client-side before calling the server action.
-    // Server action error messages are sanitized in production, so we
-    // cannot rely on err.message === 'Unauthorized' there.
     if (!session) {
       router.push('/register?callbackUrl=/pricing')
       return
@@ -164,38 +154,47 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
       className={cn(
-        'relative group rounded-2xl border transition-all duration-300 overflow-hidden flex flex-col',
-        plan.highlighted
-          ? 'border-accent-cyan/40 bg-bg-surface shadow-glow-cyan-sm hover:shadow-glow-cyan hover:border-accent-cyan/60 scale-[1.02] xl:scale-105'
-          : 'border-border bg-bg-surface hover:border-border hover:bg-bg-elevated'
+        'relative group flex flex-col overflow-hidden',
+        plan.highlighted ? 'glass-prominent xl:scale-105 z-10' : 'glass-panel'
       )}
     >
       {plan.highlighted && (
-        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-accent-cyan to-transparent" />
+        <>
+          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-signal to-transparent z-10" />
+          <div className="absolute top-4 right-4 z-10">
+            <span className="glass-badge">{plan.badge}</span>
+          </div>
+        </>
       )}
 
-      <div className={cn('absolute inset-0 bg-gradient-to-b pointer-events-none', plan.glowColor)} />
-
-      <div className="relative z-10 p-7 flex flex-col flex-1">
-        <div className="flex items-center justify-between mb-4">
-          <div className={cn(
-            'w-10 h-10 rounded-xl flex items-center justify-center transition-colors',
-            plan.highlighted ? 'bg-accent-cyan/15 text-accent-cyan' : 'bg-bg-elevated text-text-muted group-hover:text-text-secondary'
-          )}>
-            <plan.icon size={20} />
+      <div className="relative z-10 p-6 md:p-7 flex flex-col flex-1">
+        {/* Plan serial header */}
+        <div className="flex items-center justify-between mb-5">
+          <span className="font-mono text-[10px] tracking-[0.25em] text-text-muted">
+            PLAN.{String(index + 1).padStart(2, '0')}
+          </span>
+          <div
+            className={cn(
+              'w-10 h-10 rounded-xl flex items-center justify-center transition-colors',
+              plan.highlighted
+                ? 'bg-signal/15 text-signal border border-signal/30'
+                : 'bg-bg-base/40 text-text-muted border border-border group-hover:text-text-secondary'
+            )}
+          >
+            <plan.icon size={18} />
           </div>
-          {plan.badge && (
-            <span className="px-2.5 py-1 rounded-full text-xs font-semibold bg-accent-cyan/15 text-accent-cyan border border-accent-cyan/25">
-              {plan.badge}
-            </span>
-          )}
         </div>
 
         <h3 className="font-display text-xl font-bold text-text-primary">{plan.name}</h3>
-        <p className="text-text-muted text-xs mt-1 mb-5">{plan.tagline}</p>
+        <p className="text-text-muted text-xs mt-1 mb-5 font-mono tracking-wide">{plan.tagline}</p>
 
         <div className="flex items-baseline gap-1 mb-2">
-          <span className={cn('font-display text-4xl font-bold', plan.highlighted ? 'text-accent-cyan' : 'text-text-primary')}>
+          <span
+            className={cn(
+              'font-display text-4xl font-bold tabular-nums',
+              plan.highlighted ? 'text-signal' : 'text-text-primary'
+            )}
+          >
             {plan.price}
           </span>
           {plan.period && <span className="text-text-muted text-sm">{plan.period}</span>}
@@ -206,10 +205,8 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
           onClick={handleSubscribe}
           disabled={isPending}
           className={cn(
-            'group/cta w-full inline-flex items-center justify-center gap-2 px-5 py-3 text-sm font-semibold rounded-xl transition-all duration-200 mb-7 disabled:opacity-70 disabled:cursor-not-allowed',
-            plan.highlighted
-              ? 'bg-accent-cyan text-bg-base hover:bg-accent-cyan-light shadow-glow-cyan-sm hover:shadow-glow-cyan'
-              : 'border border-border text-text-primary hover:border-accent-cyan/40 hover:bg-accent-cyan/5'
+            'group/cta w-full mb-7 disabled:opacity-70 disabled:cursor-not-allowed',
+            plan.highlighted ? 'glass-cta' : 'glass-ghost'
           )}
         >
           {isPending ? (
@@ -222,12 +219,18 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
           )}
         </button>
 
-        <div className="border-t border-border pt-6 flex-1">
-          <p className="text-xs font-semibold text-text-muted uppercase tracking-wider mb-4">{whatsIncluded}</p>
+        <div className="border-t border-border/50 pt-6 flex-1">
+          <p className="label-mono mb-4">{whatsIncluded}</p>
           <ul className="space-y-3">
             {plan.features.map((feature) => (
               <li key={feature} className="flex items-start gap-2.5">
-                <Check size={14} className={cn('mt-0.5 shrink-0', plan.highlighted ? 'text-accent-cyan' : 'text-text-muted')} />
+                <Check
+                  size={14}
+                  className={cn(
+                    'mt-0.5 shrink-0',
+                    plan.highlighted ? 'text-signal' : 'text-text-muted'
+                  )}
+                />
                 <span className="text-text-secondary text-sm leading-relaxed">{feature}</span>
               </li>
             ))}

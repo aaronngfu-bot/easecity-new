@@ -19,7 +19,7 @@ export default function PrivacyPolicyPage() {
         <div className="mb-12">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-accent-cyan transition-colors font-mono mb-8"
+            className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-signal transition-colors font-mono mb-8"
           >
             ← easecity.com
           </Link>
@@ -47,12 +47,12 @@ export default function PrivacyPolicyPage() {
             <p>
               easecity is a technology company incorporated in the Hong Kong Special Administrative
               Region. We operate the stream control infrastructure platform available at{' '}
-              <span className="text-accent-cyan font-mono">easecity.com</span> and its associated
+              <span className="text-signal font-mono">easecity.com</span> and its associated
               subdomains.
             </p>
             <p className="mt-3">
               For any privacy-related enquiries, you can reach our team at:{' '}
-              <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent-cyan hover:underline">
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-signal hover:underline">
                 {CONTACT_EMAIL}
               </a>
             </p>
@@ -135,7 +135,7 @@ export default function PrivacyPolicyPage() {
                     href={link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="shrink-0 text-xs text-text-muted hover:text-accent-cyan transition-colors"
+                    className="shrink-0 text-xs text-text-muted hover:text-signal transition-colors"
                   >
                     Privacy ↗
                   </a>
@@ -185,14 +185,14 @@ export default function PrivacyPolicyPage() {
                 ['Withdraw consent', 'Where processing is based on consent, withdraw it at any time without affecting prior processing.'],
               ].map(([right, desc]) => (
                 <li key={right as string} className="flex gap-3 p-3 rounded-lg border border-border/60 bg-bg-surface/60">
-                  <span className="shrink-0 font-semibold text-accent-cyan w-36">{right}</span>
+                  <span className="shrink-0 font-semibold text-signal w-36">{right}</span>
                   <span className="text-text-secondary">{desc}</span>
                 </li>
               ))}
             </ul>
             <p className="mt-4">
               To exercise any of these rights, contact us at{' '}
-              <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent-cyan hover:underline">
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-signal hover:underline">
                 {CONTACT_EMAIL}
               </a>
               . We will respond within 30 days. Hong Kong residents may also refer to the{' '}
@@ -200,7 +200,7 @@ export default function PrivacyPolicyPage() {
                 href="https://www.pcpd.org.hk"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-accent-cyan hover:underline"
+                className="text-signal hover:underline"
               >
                 Office of the Privacy Commissioner for Personal Data (PCPD)
               </a>
@@ -242,7 +242,7 @@ export default function PrivacyPolicyPage() {
             <p className="mt-3">
               No method of electronic transmission is 100% secure. If you discover a security
               vulnerability, please report it responsibly to{' '}
-              <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent-cyan hover:underline">
+              <a href={`mailto:${CONTACT_EMAIL}`} className="text-signal hover:underline">
                 {CONTACT_EMAIL}
               </a>
               .
@@ -275,7 +275,7 @@ export default function PrivacyPolicyPage() {
               <p className="text-text-primary font-semibold">easecity</p>
               <p className="text-text-secondary">Hong Kong Special Administrative Region</p>
               <p>
-                <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent-cyan hover:underline">
+                <a href={`mailto:${CONTACT_EMAIL}`} className="text-signal hover:underline">
                   {CONTACT_EMAIL}
                 </a>
               </p>
@@ -288,10 +288,10 @@ export default function PrivacyPolicyPage() {
               © {new Date().getFullYear()} easecity. All rights reserved.
             </p>
             <div className="flex gap-6 text-xs">
-              <Link href="/legal/terms" className="text-text-muted hover:text-accent-cyan transition-colors">
+              <Link href="/legal/terms" className="text-text-muted hover:text-signal transition-colors">
                 Terms of Service
               </Link>
-              <Link href="/contact" className="text-text-muted hover:text-accent-cyan transition-colors">
+              <Link href="/contact" className="text-text-muted hover:text-signal transition-colors">
                 Contact Us
               </Link>
             </div>

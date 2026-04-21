@@ -35,16 +35,21 @@ export function UseCases() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-60px' }}
               transition={{ duration: 0.5, delay: i * 0.08, ease: [0.21, 0.47, 0.32, 0.98] }}
-              className="group p-6 rounded-2xl border border-border bg-bg-surface hover:border-accent-cyan/25 hover:bg-bg-elevated transition-all duration-300"
+              className="glass-panel glass-panel-interactive group p-6"
             >
-              <div className="mb-4 w-10 h-10 rounded-xl bg-bg-elevated group-hover:bg-accent-cyan/10 border border-border group-hover:border-accent-cyan/20 flex items-center justify-center text-text-muted group-hover:text-accent-cyan transition-all duration-300">
-                <item.icon size={18} />
+              <div className="mb-5 flex items-center justify-between">
+                <span className="font-mono text-[10px] tracking-[0.25em] text-text-muted">
+                  CASE.{String(i + 1).padStart(2, '0')}
+                </span>
+                <div className="w-10 h-10 rounded-xl bg-bg-base/40 border border-border group-hover:bg-signal/10 group-hover:border-signal/25 flex items-center justify-center text-text-muted group-hover:text-signal transition-all duration-300">
+                  <item.icon size={18} />
+                </div>
               </div>
-              <h3 className="font-display text-base font-semibold text-text-primary mb-2.5">{item.title}</h3>
-              <p className="text-text-secondary text-sm leading-relaxed mb-4">{item.description}</p>
+              <h3 className="font-display text-lg font-semibold text-text-primary mb-2.5 group-hover:text-white transition-colors">{item.title}</h3>
+              <p className="text-text-secondary text-sm leading-relaxed mb-5">{item.description}</p>
               <div className="flex flex-wrap gap-1.5">
                 {item.tags.map((tag) => (
-                  <span key={tag} className="px-2 py-0.5 rounded-md bg-bg-elevated border border-border text-text-muted text-xs font-mono">
+                  <span key={tag} className="px-2 py-0.5 rounded-md bg-bg-base/40 border border-border text-text-muted text-[11px] font-mono tracking-wide">
                     {tag}
                   </span>
                 ))}

@@ -1,28 +1,24 @@
 'use client'
 
+import { PageHero } from '@/components/ui/PageHero'
 import { useLanguage } from '@/context/LanguageContext'
 
 export function AboutHero() {
   const { t } = useLanguage()
 
   return (
-    <section className="relative pt-40 pb-20 overflow-hidden">
-      <div className="absolute inset-0 bg-hero-glow pointer-events-none" />
-      <div className="container-max relative z-10">
-        <div className="max-w-3xl">
-          <p className="text-accent-cyan text-sm font-mono tracking-widest uppercase mb-4">
-            {t.aboutPage.eyebrow}
-          </p>
-          <h1 className="font-display text-5xl md:text-6xl font-bold text-text-primary leading-tight mb-6">
-            {t.aboutPage.heading}{' '}
-            <span className="text-gradient-cyan">{t.aboutPage.headingHighlight}</span>
-          </h1>
-          <p className="text-text-secondary text-lg md:text-xl leading-relaxed">
-            {t.aboutPage.desc}
-          </p>
-        </div>
-      </div>
-      <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-    </section>
+    <PageHero
+      serial="04"
+      sectionCode="ABOUT"
+      eyebrow={t.aboutPage.eyebrow}
+      heading={t.aboutPage.heading}
+      headingHighlight={t.aboutPage.headingHighlight}
+      description={t.aboutPage.desc}
+      meta={[
+        { label: 'BASED IN', value: 'HONG KONG' },
+        { label: 'FOUNDED', value: '2025' },
+        { label: 'STACK', value: 'EDGE-NATIVE' },
+      ]}
+    />
   )
 }

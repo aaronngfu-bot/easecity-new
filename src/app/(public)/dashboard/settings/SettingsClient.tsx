@@ -5,6 +5,7 @@ import { signOut } from 'next-auth/react'
 import { Settings, LogOut, CreditCard, Loader2, ExternalLink, CheckCircle, Clock, AlertCircle, XCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { getPortalSessionUrl } from '@/actions/stripe'
+import { useLanguage } from '@/context/LanguageContext'
 
 interface SubscriptionInfo {
   status: string
@@ -23,13 +24,14 @@ interface Props {
   subscription: SubscriptionInfo | null
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status, language }: { status: string; language: string }) {
+  const zh = language === 'zh'
   const config: Record<string, { label: string; icon: React.ElementType; className: string }> = {
-    trialing:   { label: '試用中',   icon: Clock,         className: 'text-accent-cyan bg-accent-cyan/10 border-accent-cyan/20' },
-    active:     { label: '已啟用',   icon: CheckCircle,   className: 'text-green-400 bg-green-400/10 border-green-400/20' },
-    past_due:   { label: '付款逾期', icon: AlertCircle,   className: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20' },
-    canceled:   { label: '已取消',   icon: XCircle,       className: 'text-red-400 bg-red-400/10 border-red-400/20' },
-    incomplete: { label: '設定未完成', icon: AlertCircle, className: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/20' },
+    trialing:   { label: zh ? '試用中' : 'Trial',      icon: Clock,       className: 'text-signal bg-signal/10 border-signal/25' },
+    active:     { label: zh ? '已啟用' : 'Active',     icon: CheckCircle, className: 'text-signal bg-signal/10 border-signal/25' },
+    past_due:   { label: zh ? '付款逾期' : 'Past due', icon: AlertCircle, className: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/25' },
+    canceled:   { label: zh ? '已取消' : 'Canceled',   icon: XCircle,     className: 'text-red-400 bg-red-400/10 border-red-400/25' },
+    incomplete: { label: zh ? '設定未完成' : 'Incomplete', icon: AlertCircle, className: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/25' },
   }
   const c = config[status] ?? { label: status, icon: Clock, className: 'text-text-muted bg-bg-elevated border-border' }
   const Icon = c.icon
@@ -41,14 +43,20 @@ function StatusBadge({ status }: { status: string }) {
   )
 }
 
-function formatDate(dateStr: string | null) {
+function formatDate(dateStr: string | null, language: string) {
   if (!dateStr) return null
-  return new Date(dateStr).toLocaleDateString('zh-TW', { year: 'numeric', month: 'long', day: 'numeric' })
+  return new Date(dateStr).toLocaleDateString(language === 'zh' ? 'zh-TW' : 'en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
 }
 
 export default function SettingsClient({ user, subscription }: Props) {
   const [signingOut, setSigningOut] = useState(false)
   const [isPending, startTransition] = useTransition()
+  const { language } = useLanguage()
+  const zh = language === 'zh'
 
   const handleSignOut = async () => {
     setSigningOut(true)
@@ -61,75 +69,94 @@ export default function SettingsClient({ user, subscription }: Props) {
         const url = await getPortalSessionUrl()
         window.open(url, '_blank', 'noopener,noreferrer')
       } catch {
-        alert('無法開啟帳單管理。請確認您已有有效的訂閱。')
+        alert(zh ? '無法開啟帳單管理。請確認您已有有效的訂閱。' : 'Unable to open billing. Please ensure you have an active subscription.')
       }
     })
   }
 
   return (
-    <div className="space-y-6 pt-20">
+    <div className="space-y-5 pt-24 pb-16">
       <div>
-        <h1 className="font-display text-2xl font-bold text-text-primary flex items-center gap-3">
-          <Settings size={24} className="text-accent-cyan" />
-          Account Settings
+        <div className="flex items-center gap-3 mb-3">
+          <span className="font-mono text-[10px] tracking-[0.25em] text-text-muted">
+            SETTINGS.01
+          </span>
+          <span className="h-px w-12 bg-gradient-to-r from-signal/40 to-transparent" />
+          <span className="glass-badge">
+            <Settings size={10} />
+            {zh ? '設定' : 'SETTINGS'}
+          </span>
+        </div>
+        <h1 className="font-display text-3xl md:text-4xl font-bold text-text-primary tracking-tight">
+          {zh ? '帳號設定' : 'Account Settings'}
         </h1>
-        <p className="text-text-secondary text-sm mt-1">管理帳號資訊與訂閱方案</p>
+        <p className="text-text-secondary text-sm mt-2">
+          {zh ? '管理帳號資訊與訂閱方案' : 'Manage account info and subscription plans'}
+        </p>
       </div>
 
       <div className="space-y-4">
         {/* Profile Info */}
-        <div className="p-6 rounded-xl border border-border bg-bg-surface space-y-4">
-          <h2 className="font-display text-sm font-semibold text-text-primary">個人資訊</h2>
+        <div className="glass-panel p-6 space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-signal/60" />
+            <h2 className="label-mono text-signal/80">{zh ? '個人資訊' : 'PROFILE'}</h2>
+          </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <p className="text-xs text-text-muted mb-1">名稱</p>
-              <p className="text-sm text-text-primary">{user.name || '未設定'}</p>
+              <p className="label-mono mb-1">{zh ? '名稱' : 'Name'}</p>
+              <p className="text-sm text-text-primary">{user.name || (zh ? '未設定' : 'Not set')}</p>
             </div>
             <div>
-              <p className="text-xs text-text-muted mb-1">Email</p>
-              <p className="text-sm text-text-primary">{user.email}</p>
+              <p className="label-mono mb-1">Email</p>
+              <p className="text-sm text-text-primary font-mono">{user.email}</p>
             </div>
             <div>
-              <p className="text-xs text-text-muted mb-1">身份</p>
-              <p className="text-sm text-accent-cyan font-medium">{user.role}</p>
+              <p className="label-mono mb-1">{zh ? '身份' : 'Role'}</p>
+              <p className="text-sm text-signal font-mono tracking-wider">{user.role}</p>
             </div>
           </div>
         </div>
 
         {/* Billing Section */}
-        <div className="p-6 rounded-xl border border-border bg-bg-surface space-y-4">
+        <div className="glass-panel p-6 space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="font-display text-sm font-semibold text-text-primary flex items-center gap-2">
-              <CreditCard size={18} className="text-accent-purple" />
-              訂閱方案與帳單
-            </h2>
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-signal/60" />
+              <h2 className="label-mono text-signal/80 flex items-center gap-2">
+                <CreditCard size={12} />
+                {zh ? '訂閱方案與帳單' : 'SUBSCRIPTION & BILLING'}
+              </h2>
+            </div>
           </div>
 
           {subscription ? (
             <div className="space-y-4">
               <div className="flex flex-wrap items-center gap-3">
                 <span className="text-text-primary font-semibold">{subscription.planName}</span>
-                <StatusBadge status={subscription.status} />
+                <StatusBadge status={subscription.status} language={language} />
                 {subscription.cancelAtPeriodEnd && (
                   <span className="text-xs text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 px-2.5 py-1 rounded-full">
-                    到期後取消
+                    {zh ? '到期後取消' : 'Cancels at period end'}
                   </span>
                 )}
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 {subscription.status === 'trialing' && subscription.trialEnd && (
-                  <div className="p-3 rounded-lg bg-accent-cyan/5 border border-accent-cyan/15">
-                    <p className="text-xs text-text-muted mb-1">試用期截止</p>
-                    <p className="text-accent-cyan font-medium">{formatDate(subscription.trialEnd)}</p>
+                  <div className="p-3 rounded-lg bg-signal/5 border border-signal/20">
+                    <p className="label-mono mb-1">{zh ? '試用期截止' : 'Trial ends'}</p>
+                    <p className="text-signal font-medium tabular-nums">{formatDate(subscription.trialEnd, language)}</p>
                   </div>
                 )}
                 {subscription.currentPeriodEnd && (
-                  <div className="p-3 rounded-lg bg-bg-elevated border border-border">
-                    <p className="text-xs text-text-muted mb-1">
-                      {subscription.cancelAtPeriodEnd ? '服務到期日' : '下次扣款日'}
+                  <div className="p-3 rounded-lg bg-bg-base/40 border border-border">
+                    <p className="label-mono mb-1">
+                      {subscription.cancelAtPeriodEnd
+                        ? (zh ? '服務到期日' : 'Service ends')
+                        : (zh ? '下次扣款日' : 'Next billing')}
                     </p>
-                    <p className="text-text-primary font-medium">{formatDate(subscription.currentPeriodEnd)}</p>
+                    <p className="text-text-primary font-medium tabular-nums">{formatDate(subscription.currentPeriodEnd, language)}</p>
                   </div>
                 )}
               </div>
@@ -137,33 +164,34 @@ export default function SettingsClient({ user, subscription }: Props) {
               <button
                 onClick={handleManageBilling}
                 disabled={isPending}
-                className={cn(
-                  'inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg',
-                  'bg-bg-elevated border border-border text-text-primary hover:bg-border/50 hover:text-accent-cyan transition-colors',
-                  'disabled:opacity-60 disabled:cursor-not-allowed'
-                )}
+                className="glass-ghost disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {isPending ? <Loader2 size={16} className="animate-spin" /> : (
-                  <><ExternalLink size={14} className="text-text-muted" />管理帳單 / 更改方案</>
+                {isPending ? <Loader2 size={14} className="animate-spin" /> : (
+                  <>
+                    <ExternalLink size={13} />
+                    {zh ? '管理帳單 / 更改方案' : 'Manage billing / Change plan'}
+                  </>
                 )}
               </button>
             </div>
           ) : (
             <div className="space-y-3">
-              <p className="text-sm text-text-secondary">您目前沒有有效的訂閱方案。</p>
-              <a
-                href="/pricing"
-                className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg bg-accent-cyan text-bg-base hover:bg-accent-cyan-light transition-colors"
-              >
-                查看方案
+              <p className="text-sm text-text-secondary">
+                {zh ? '您目前沒有有效的訂閱方案。' : 'You do not have an active subscription.'}
+              </p>
+              <a href="/pricing" className="glass-cta">
+                {zh ? '查看方案' : 'See plans'}
               </a>
             </div>
           )}
         </div>
 
         {/* Danger Zone */}
-        <div className="p-6 rounded-xl border border-red-500/15 bg-bg-surface space-y-4">
-          <h2 className="font-display text-sm font-semibold text-red-400">登出</h2>
+        <div className="glass-panel p-6 space-y-4 !border-red-500/20">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-red-400/70" />
+            <h2 className="label-mono !text-red-400/80">{zh ? '登出' : 'SIGN OUT'}</h2>
+          </div>
           <button
             onClick={handleSignOut}
             disabled={signingOut}
@@ -174,7 +202,7 @@ export default function SettingsClient({ user, subscription }: Props) {
             )}
           >
             <LogOut size={16} />
-            {signingOut ? '登出中...' : '登出'}
+            {signingOut ? (zh ? '登出中…' : 'Signing out…') : (zh ? '登出' : 'Sign out')}
           </button>
         </div>
       </div>

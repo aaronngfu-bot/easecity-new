@@ -34,20 +34,30 @@ export function SectionTitle({
       )}
     >
       {eyebrow && (
-        <p className="text-accent-cyan text-sm font-mono tracking-widest uppercase mb-3">
-          {eyebrow}
-        </p>
+        <div
+          className={cn(
+            'flex items-center gap-2 mb-4',
+            align === 'center' && 'justify-center'
+          )}
+        >
+          <span className="w-1.5 h-1.5 rounded-full bg-signal shadow-glow-signal-sm" />
+          <p className="label-mono text-signal/80">{eyebrow}</p>
+          <span className="h-px w-8 bg-gradient-to-r from-signal/40 to-transparent" />
+        </div>
       )}
-      <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary leading-tight">
-        {title}{' '}
+      <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary leading-[1.05] tracking-tight">
+        {title}
         {titleHighlight && (
-          <span className="text-gradient-cyan">{titleHighlight}</span>
+          <>
+            {' '}
+            <span className="text-gradient-signal">{titleHighlight}</span>
+          </>
         )}
       </h2>
       {description && (
         <p
           className={cn(
-            'mt-4 text-text-secondary text-base md:text-lg leading-relaxed',
+            'mt-5 text-text-secondary text-base md:text-lg leading-relaxed',
             align === 'center' && 'max-w-2xl mx-auto'
           )}
         >

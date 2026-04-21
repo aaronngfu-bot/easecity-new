@@ -18,16 +18,14 @@ export default function Error({
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-bg-base">
-      <div className="text-center px-6">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl bg-bg-surface border border-red-500/25 mb-8">
-          <span className="font-display text-2xl font-bold text-red-400">!</span>
+      <div className="glass-panel text-center max-w-md px-8 py-10">
+        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl glass-panel !rounded-2xl !border-red-500/30 mb-6">
+          <span className="font-display text-3xl font-bold text-red-400">!</span>
         </div>
+        <div className="label-mono !text-red-400/70 mb-3">SYS.ERROR</div>
         <h1 className="font-display text-2xl font-bold text-text-primary mb-3">{t.errors.somethingWrong}</h1>
         <p className="text-text-secondary text-sm max-w-sm mx-auto mb-8">{t.errors.unexpectedError}</p>
-        <button
-          onClick={reset}
-          className="inline-flex items-center gap-2 px-6 py-3 bg-accent-cyan text-bg-base font-semibold text-sm rounded-xl hover:bg-accent-cyan-light transition-all duration-200 shadow-glow-cyan-sm hover:shadow-glow-cyan"
-        >
+        <button onClick={reset} className="glass-cta">
           {t.errors.tryAgain}
         </button>
       </div>

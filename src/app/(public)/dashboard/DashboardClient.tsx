@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useTransition } from 'react'
+import { useTransition } from 'react'
 import Link from 'next/link'
 import {
   CreditCard, CheckCircle, Clock, AlertCircle, XCircle,
@@ -39,16 +39,14 @@ interface Props {
 
 const PLAN_STYLE: Record<string, {
   icon: React.ElementType
-  color: string
-  bg: string
-  border: string
+  tier: 'free' | 'pro' | 'premium' | 'enterprise'
   sla: string
 }> = {
-  starter:    { icon: Cpu,        color: 'text-text-secondary', bg: 'bg-bg-elevated',      border: 'border-border',           sla: '99.5%' },
-  pro:        { icon: Zap,        color: 'text-accent-cyan',    bg: 'bg-accent-cyan/10',   border: 'border-accent-cyan/30',   sla: '99.9%' },
-  business:   { icon: Shield,     color: 'text-accent-purple',  bg: 'bg-accent-purple/10', border: 'border-accent-purple/30', sla: '99.99%' },
-  enterprise: { icon: Building2,  color: 'text-yellow-400',     bg: 'bg-yellow-400/10',    border: 'border-yellow-400/30',    sla: 'Custom' },
-  unknown:    { icon: Cpu,        color: 'text-text-muted',     bg: 'bg-bg-elevated',      border: 'border-border',           sla: '—' },
+  starter:    { icon: Cpu,       tier: 'free',       sla: '99.5%' },
+  pro:        { icon: Zap,       tier: 'pro',        sla: '99.9%' },
+  business:   { icon: Shield,    tier: 'premium',    sla: '99.99%' },
+  enterprise: { icon: Building2, tier: 'enterprise', sla: 'Custom' },
+  unknown:    { icon: Cpu,       tier: 'free',       sla: '—' },
 }
 
 function getPlanKey(priceId: string): string {
@@ -104,7 +102,7 @@ function AlertBanner({ subscription }: { subscription: SerializedSubscription })
 
   if (subscription.status === 'past_due') {
     return (
-      <div className="flex items-center gap-3 px-5 py-3.5 rounded-xl border border-yellow-500/40 bg-yellow-500/8 text-yellow-300 text-sm">
+      <div className="glass-panel flex items-center gap-3 px-5 py-3.5 !border-yellow-500/40 text-yellow-300 text-sm">
         <AlertCircle size={16} className="shrink-0" />
         <span className="flex-1">
           {language === 'zh'
@@ -121,16 +119,16 @@ function AlertBanner({ subscription }: { subscription: SerializedSubscription })
 
   if (subscription.status === 'trialing' && trialDays !== null && trialDays <= 3) {
     return (
-      <div className="flex items-center gap-3 px-5 py-3.5 rounded-xl border border-accent-cyan/40 bg-accent-cyan/8 text-accent-cyan text-sm">
-        <Clock size={16} className="shrink-0" />
-        <span className="flex-1">
+      <div className="glass-prominent flex items-center gap-3 px-5 py-3.5 text-sm">
+        <Clock size={16} className="shrink-0 text-signal" />
+        <span className="flex-1 text-signal">
           {language === 'zh'
             ? `試用期剩 ${trialDays} 天。到期後自動轉為正式訂閱，不需要重新設定。`
             : `${trialDays} days left in your trial. Auto-converts to paid — no reconfiguration needed.`}
         </span>
         <ManageBillingButton
           label={t.dashboard.alertManageBilling}
-          className="shrink-0 text-xs font-semibold underline underline-offset-2 hover:text-accent-cyan-light flex items-center gap-1"
+          className="shrink-0 text-xs font-semibold underline underline-offset-2 text-signal hover:text-signal-light flex items-center gap-1"
         />
       </div>
     )
@@ -138,7 +136,7 @@ function AlertBanner({ subscription }: { subscription: SerializedSubscription })
 
   if (subscription.cancelAtPeriodEnd && periodDays !== null && periodDays <= 7) {
     return (
-      <div className="flex items-center gap-3 px-5 py-3.5 rounded-xl border border-orange-500/40 bg-orange-500/8 text-orange-300 text-sm">
+      <div className="glass-panel flex items-center gap-3 px-5 py-3.5 !border-orange-500/40 text-orange-300 text-sm">
         <XCircle size={16} className="shrink-0" />
         <span className="flex-1">
           {language === 'zh'
@@ -165,11 +163,11 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
   const PlanIcon = style.icon
 
   const statusMap: Record<string, { label: string; icon: React.ElementType; cls: string }> = {
-    trialing:   { label: t.dashboard.statusTrialing,   icon: Clock,         cls: 'text-accent-cyan  bg-accent-cyan/10  border-accent-cyan/25' },
-    active:     { label: t.dashboard.statusActive,     icon: CheckCircle,   cls: 'text-green-400    bg-green-400/10    border-green-400/25' },
-    past_due:   { label: t.dashboard.statusPastDue,    icon: AlertCircle,   cls: 'text-yellow-400   bg-yellow-400/10   border-yellow-400/25' },
-    canceled:   { label: t.dashboard.statusCanceled,   icon: XCircle,       cls: 'text-red-400      bg-red-400/10      border-red-400/25' },
-    incomplete: { label: t.dashboard.statusIncomplete, icon: AlertCircle,   cls: 'text-yellow-400   bg-yellow-400/10   border-yellow-400/25' },
+    trialing:   { label: t.dashboard.statusTrialing,   icon: Clock,       cls: 'text-signal bg-signal/10 border-signal/25' },
+    active:     { label: t.dashboard.statusActive,     icon: CheckCircle, cls: 'text-signal bg-signal/10 border-signal/25' },
+    past_due:   { label: t.dashboard.statusPastDue,    icon: AlertCircle, cls: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/25' },
+    canceled:   { label: t.dashboard.statusCanceled,   icon: XCircle,     cls: 'text-red-400 bg-red-400/10 border-red-400/25' },
+    incomplete: { label: t.dashboard.statusIncomplete, icon: AlertCircle, cls: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/25' },
   }
   const st = statusMap[subscription.status] ?? statusMap.incomplete
   const StatusIcon = st.icon
@@ -183,7 +181,6 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
   const dateValue = isTrialing ? subscription.trialEnd : subscription.currentPeriodEnd
   const locale = language
 
-  // Plan features from existing pricing translations
   const featuresByPlan: Record<string, string[]> = {
     starter:    [t.pricingPage.starterF1, t.pricingPage.starterF2, t.pricingPage.starterF3, t.pricingPage.starterF4, t.pricingPage.starterF5],
     pro:        [t.pricingPage.proF1,     t.pricingPage.proF2,     t.pricingPage.proF3,     t.pricingPage.proF4,     t.pricingPage.proF5,     t.pricingPage.proF6],
@@ -201,18 +198,22 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
     unknown: t.dashboard.planCustomName,
   }
 
+  const isPremium = style.tier === 'premium' || style.tier === 'enterprise'
+
   return (
-    <div className={cn('p-6 rounded-2xl border bg-bg-surface', style.border)}>
-      {/* Header row */}
+    <div className={cn('p-6', isPremium ? 'glass-prominent' : 'glass-panel')}>
       <div className="flex items-start justify-between gap-4 mb-5">
         <div className="flex items-center gap-3">
-          <div className={cn('w-11 h-11 rounded-xl flex items-center justify-center', style.bg)}>
-            <PlanIcon size={20} className={style.color} />
+          <div className={cn(
+            'w-12 h-12 rounded-xl flex items-center justify-center border',
+            isPremium
+              ? 'bg-signal/15 border-signal/30 text-signal'
+              : 'bg-bg-base/40 border-border text-text-secondary'
+          )}>
+            <PlanIcon size={20} />
           </div>
           <div>
-            <p className="text-xs text-text-muted font-mono uppercase tracking-wider mb-1">
-              {t.dashboard.planLabel}
-            </p>
+            <p className="label-mono mb-1">{t.dashboard.planLabel}</p>
             <div className="flex items-center gap-2 flex-wrap">
               <span className="font-display text-xl font-bold text-text-primary">
                 {planNames[planKey]}
@@ -230,40 +231,35 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
           </div>
         </div>
 
-        {/* Single "Manage Billing" — opens Stripe Portal in new tab */}
         <ManageBillingButton
           label={t.dashboard.manageBilling}
-          className="shrink-0 inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium rounded-lg border border-border text-text-secondary hover:text-accent-cyan hover:border-accent-cyan/40 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+          className="glass-ghost !py-2 !px-3 !text-xs shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
         />
       </div>
 
-      {/* Date chips */}
       <div className="flex flex-wrap gap-3 mb-5">
         <div className={cn(
           'flex-1 min-w-[160px] px-4 py-3 rounded-xl border text-sm',
-          isTrialing ? 'bg-accent-cyan/5 border-accent-cyan/15' : 'bg-bg-elevated border-border'
+          isTrialing ? 'bg-signal/8 border-signal/20' : 'bg-bg-base/40 border-border'
         )}>
-          <p className="text-xs text-text-muted mb-1">{dateLabel}</p>
-          <p className={cn('font-semibold', isTrialing ? 'text-accent-cyan' : 'text-text-primary')}>
+          <p className="label-mono mb-1">{dateLabel}</p>
+          <p className={cn('font-semibold tabular-nums', isTrialing ? 'text-signal' : 'text-text-primary')}>
             {formatDate(dateValue, locale)}
           </p>
         </div>
-        <div className="flex-1 min-w-[160px] px-4 py-3 rounded-xl border bg-bg-elevated border-border text-sm">
-          <p className="text-xs text-text-muted mb-1">{t.dashboard.slaLabel}</p>
-          <p className="font-semibold text-text-primary">{style.sla} SLA</p>
+        <div className="flex-1 min-w-[160px] px-4 py-3 rounded-xl border bg-bg-base/40 border-border text-sm">
+          <p className="label-mono mb-1">{t.dashboard.slaLabel}</p>
+          <p className="font-semibold text-text-primary font-mono tabular-nums">{style.sla} SLA</p>
         </div>
       </div>
 
-      {/* Plan features */}
       {features.length > 0 && (
         <div>
-          <p className="text-xs text-text-muted font-semibold uppercase tracking-wider mb-3">
-            {t.dashboard.featuresLabel}
-          </p>
+          <p className="label-mono mb-3">{t.dashboard.featuresLabel}</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2">
             {features.map((f) => (
               <div key={f} className="flex items-center gap-2 text-sm text-text-secondary">
-                <CheckCircle size={13} className={style.color} />
+                <CheckCircle size={13} className={isPremium ? 'text-signal' : 'text-signal/60'} />
                 {f}
               </div>
             ))}
@@ -279,24 +275,18 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
 function NoSubscriptionCard() {
   const { t } = useLanguage()
   return (
-    <div className="p-8 rounded-2xl border border-dashed border-border bg-bg-surface text-center">
-      <div className="w-12 h-12 rounded-2xl bg-bg-elevated flex items-center justify-center mx-auto mb-4">
+    <div className="glass-panel p-8 text-center !border-dashed">
+      <div className="w-14 h-14 rounded-2xl bg-bg-base/40 border border-border flex items-center justify-center mx-auto mb-4">
         <CreditCard size={22} className="text-text-muted" />
       </div>
       <h3 className="font-display text-base font-semibold text-text-primary mb-1">{t.dashboard.noSubTitle}</h3>
       <p className="text-sm text-text-muted mb-5">{t.dashboard.noSubDesc}</p>
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-        <Link
-          href="/pricing"
-          className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-semibold rounded-xl bg-accent-cyan text-bg-base hover:bg-accent-cyan-light transition-colors"
-        >
+        <Link href="/pricing" className="glass-cta">
           {t.dashboard.noSubCta}
           <ArrowRight size={14} />
         </Link>
-        <Link
-          href="/services"
-          className="inline-flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-xl border border-border text-text-secondary hover:text-text-primary hover:bg-bg-elevated transition-colors"
-        >
+        <Link href="/services" className="glass-ghost">
           {t.dashboard.noSubAlt}
         </Link>
       </div>
@@ -305,31 +295,14 @@ function NoSubscriptionCard() {
 }
 
 // ─── QuickActions ─────────────────────────────────────────────────────────────
-// Note: "管理帳單" is already in SubscriptionCard → Stripe Portal.
-// QuickActions shows three *different* destinations.
 
 function QuickActions() {
   const { t } = useLanguage()
 
   const actions = [
-    {
-      icon: Settings,
-      label: t.dashboard.qaSettings,
-      desc: t.dashboard.qaSettingsDesc,
-      href: '/dashboard/settings',
-    },
-    {
-      icon: Zap,
-      label: t.dashboard.qaUpgrade,
-      desc: t.dashboard.qaUpgradeDesc,
-      href: '/pricing',
-    },
-    {
-      icon: MessageCircle,
-      label: t.dashboard.qaSupport,
-      desc: t.dashboard.qaSupportDesc,
-      href: '/contact',
-    },
+    { icon: Settings,      label: t.dashboard.qaSettings, desc: t.dashboard.qaSettingsDesc, href: '/dashboard/settings' },
+    { icon: Zap,           label: t.dashboard.qaUpgrade,  desc: t.dashboard.qaUpgradeDesc,  href: '/pricing' },
+    { icon: MessageCircle, label: t.dashboard.qaSupport,  desc: t.dashboard.qaSupportDesc,  href: '/contact' },
   ]
 
   return (
@@ -338,16 +311,16 @@ function QuickActions() {
         <Link
           key={a.label}
           href={a.href}
-          className="group flex items-center gap-3 p-4 rounded-xl border border-border bg-bg-surface hover:border-accent-cyan/30 hover:bg-bg-elevated transition-all duration-200"
+          className="glass-panel glass-panel-interactive group flex items-center gap-3 p-4"
         >
-          <div className="w-9 h-9 rounded-lg bg-bg-elevated group-hover:bg-accent-cyan/10 flex items-center justify-center text-text-muted group-hover:text-accent-cyan transition-colors shrink-0">
+          <div className="w-10 h-10 rounded-lg bg-bg-base/40 border border-border group-hover:bg-signal/10 group-hover:border-signal/25 flex items-center justify-center text-text-muted group-hover:text-signal transition-colors shrink-0">
             <a.icon size={17} />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-sm font-medium text-text-primary">{a.label}</p>
             <p className="text-xs text-text-muted truncate">{a.desc}</p>
           </div>
-          <ChevronRight size={14} className="text-text-muted group-hover:text-accent-cyan group-hover:translate-x-0.5 transition-all shrink-0" />
+          <ChevronRight size={14} className="text-text-muted group-hover:text-signal group-hover:translate-x-0.5 transition-all shrink-0" />
         </Link>
       ))}
     </div>
@@ -359,14 +332,14 @@ function QuickActions() {
 function PlatformStatus() {
   const { t } = useLanguage()
   return (
-    <div className="flex items-center justify-between px-5 py-3.5 rounded-xl border border-border bg-bg-surface">
+    <div className="glass-panel flex items-center justify-between px-5 py-3.5">
       <div className="flex items-center gap-3">
-        <Activity size={15} className="text-green-400" />
+        <Activity size={15} className="text-signal" />
         <span className="text-sm text-text-secondary">{t.dashboard.platformStatus}</span>
       </div>
       <div className="flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-        <span className="text-xs font-mono text-green-400">{t.dashboard.platformOnline}</span>
+        <div className="w-2 h-2 rounded-full bg-signal animate-signal-pulse" />
+        <span className="text-xs font-mono text-signal tracking-wider uppercase">{t.dashboard.platformOnline}</span>
       </div>
     </div>
   )
@@ -379,10 +352,10 @@ function PaymentHistory({ orders, locale }: { orders: SerializedOrder[]; locale:
   if (orders.length === 0) return null
 
   const statusStyle: Record<string, string> = {
-    paid:            'bg-green-500/15 text-green-400 border-green-500/25',
-    completed:       'bg-green-500/15 text-green-400 border-green-500/25',
+    paid:            'bg-signal/15 text-signal border-signal/25',
+    completed:       'bg-signal/15 text-signal border-signal/25',
     pending_payment: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/25',
-    refunded:        'bg-purple-500/15 text-purple-400 border-purple-500/25',
+    refunded:        'bg-blue-500/15 text-blue-400 border-blue-500/25',
     cancelled:       'bg-red-500/15 text-red-400 border-red-500/25',
     expired:         'bg-red-500/15 text-red-400 border-red-500/25',
   }
@@ -398,18 +371,21 @@ function PaymentHistory({ orders, locale }: { orders: SerializedOrder[]; locale:
   }
 
   return (
-    <div className="rounded-xl border border-border bg-bg-surface overflow-hidden">
+    <div className="glass-panel overflow-hidden">
       <div className="px-5 py-4 border-b border-border flex items-center justify-between">
-        <h2 className="font-display text-sm font-semibold text-text-primary">{t.dashboard.paymentHistory}</h2>
-        <Link href="/dashboard/orders" className="text-xs text-text-muted hover:text-accent-cyan transition-colors font-mono">
+        <div className="flex items-center gap-2">
+          <span className="w-1.5 h-1.5 rounded-full bg-signal/60" />
+          <h2 className="label-mono text-signal/80">{t.dashboard.paymentHistory}</h2>
+        </div>
+        <Link href="/dashboard/orders" className="text-xs text-text-muted hover:text-signal transition-colors font-mono tracking-wider">
           {t.dashboard.viewAllOrders} →
         </Link>
       </div>
-      <div className="divide-y divide-border">
+      <div className="divide-y divide-border/50">
         {orders.map((order) => (
-          <div key={order.id} className="px-5 py-3.5 flex items-center justify-between gap-4">
+          <div key={order.id} className="px-5 py-3.5 flex items-center justify-between gap-4 hover:bg-bg-base/20 transition-colors">
             <div className="min-w-0">
-              <p className="text-xs text-text-muted font-mono">{order.id.slice(0, 14)}…</p>
+              <p className="text-xs text-text-muted font-mono tracking-wider">{order.id.slice(0, 14)}…</p>
               <p className="text-xs text-text-muted mt-0.5">
                 {new Date(order.createdAt).toLocaleDateString(locale === 'zh' ? 'zh-TW' : 'en-US', {
                   year: 'numeric', month: 'short', day: 'numeric',
@@ -417,7 +393,7 @@ function PaymentHistory({ orders, locale }: { orders: SerializedOrder[]; locale:
               </p>
             </div>
             <div className="flex items-center gap-3 shrink-0">
-              <span className="text-sm font-medium text-text-primary tabular-nums">
+              <span className="text-sm font-medium text-text-primary tabular-nums font-mono">
                 {(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
               </span>
               <span className={cn('px-2.5 py-0.5 rounded-full text-xs font-medium border', statusStyle[order.status] ?? 'bg-gray-500/15 text-gray-400 border-gray-500/25')}>
@@ -443,36 +419,42 @@ export default function DashboardClient({ userName, subscription, recentOrders }
   )
 
   return (
-    <div className="space-y-5 pt-20 pb-10">
-      {/* Header — no duplicate settings button here */}
-      <div>
-        <h1 className="font-display text-2xl font-bold text-text-primary">
-          {userName
-            ? (language === 'zh' ? `${userName}，你好` : `Welcome, ${userName}`)
-            : (language === 'zh' ? '控制台' : 'Dashboard')}
-        </h1>
-        <p className="text-text-secondary text-sm mt-1">
-          {subscription ? t.dashboard.subtitleActive : t.dashboard.subtitleInactive}
-        </p>
+    <div className="space-y-5 pt-24 pb-16">
+      <div className="flex items-center justify-between flex-wrap gap-4">
+        <div>
+          <div className="flex items-center gap-3 mb-3">
+            <span className="font-mono text-[10px] tracking-[0.25em] text-text-muted">
+              DASHBOARD.00
+            </span>
+            <span className="h-px w-12 bg-gradient-to-r from-signal/40 to-transparent" />
+            <span className="glass-badge">
+              <span className="w-1 h-1 rounded-full bg-signal animate-signal-pulse" />
+              {language === 'zh' ? '控制台' : 'CONTROL DECK'}
+            </span>
+          </div>
+          <h1 className="font-display text-3xl md:text-4xl font-bold text-text-primary tracking-tight">
+            {userName
+              ? (language === 'zh' ? `${userName}，你好` : `Welcome, ${userName}`)
+              : (language === 'zh' ? '控制台' : 'Dashboard')}
+          </h1>
+          <p className="text-text-secondary text-sm mt-2">
+            {subscription ? t.dashboard.subtitleActive : t.dashboard.subtitleInactive}
+          </p>
+        </div>
       </div>
 
-      {/* Alert Banner */}
       {needsAlert && subscription && <AlertBanner subscription={subscription} />}
 
-      {/* Subscription */}
       {subscription ? (
         <SubscriptionCard subscription={subscription} />
       ) : (
         <NoSubscriptionCard />
       )}
 
-      {/* Quick Actions — 3 different destinations */}
       <QuickActions />
 
-      {/* Platform Status */}
       <PlatformStatus />
 
-      {/* Payment History */}
       <PaymentHistory orders={recentOrders} locale={language} />
     </div>
   )

@@ -29,15 +29,15 @@ const statusConfig = {
     markerGlow: '',
   },
   future: {
-    dot: 'bg-accent-cyan/80',
-    dotRing: 'ring-accent-cyan/20',
-    badge: 'text-accent-cyan bg-accent-cyan/10 border-accent-cyan/25',
-    line: 'bg-accent-cyan/30',
+    dot: 'bg-signal/60',
+    dotRing: 'ring-signal/15',
+    badge: 'text-signal/80 bg-signal/5 border-signal/20',
+    line: 'bg-signal/30',
     icon: Sparkles,
-    iconClass: 'text-accent-cyan',
-    cardBorder: 'border-accent-cyan/20 hover:border-accent-cyan/40',
-    numberColor: 'text-accent-cyan/15',
-    markerGlow: 'shadow-glow-cyan-sm',
+    iconClass: 'text-signal/70',
+    cardBorder: 'border-signal/15 hover:border-signal/35',
+    numberColor: 'text-signal/10',
+    markerGlow: 'shadow-glow-signal-sm',
   },
 } as const
 

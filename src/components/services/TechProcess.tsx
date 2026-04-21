@@ -28,7 +28,7 @@ export function TechProcess() {
         />
 
         <div className="relative">
-          <div className="absolute left-4 md:left-[3.25rem] top-0 bottom-0 w-px bg-gradient-to-b from-accent-cyan/40 via-accent-cyan/20 to-transparent pointer-events-none" />
+          <div className="absolute left-4 md:left-[3.25rem] top-0 bottom-0 w-px bg-gradient-to-b from-signal/40 via-signal/20 to-transparent pointer-events-none" />
 
           <div className="space-y-6">
             {steps.map((step, i) => (
@@ -42,24 +42,24 @@ export function TechProcess() {
               >
                 <div className="flex-shrink-0 z-10">
                   <div className="w-8 h-8 md:w-[6.5rem] flex items-center justify-center">
-                    <div className="w-8 h-8 rounded-full bg-bg-elevated border border-accent-cyan/30 flex items-center justify-center">
-                      <span className="text-accent-cyan text-xs font-mono font-bold">{step.number}</span>
+                    <div className="w-8 h-8 rounded-full glass-panel !rounded-full border border-signal/30 flex items-center justify-center">
+                      <span className="text-signal text-xs font-mono font-bold relative z-10">{step.number}</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="flex-1 pb-6">
-                  <div className="p-5 md:p-6 rounded-2xl border border-border bg-bg-surface hover:border-accent-cyan/25 hover:bg-bg-elevated transition-all duration-300">
+                  <div className="glass-panel glass-panel-interactive p-5 md:p-6">
                     <div className="flex flex-col md:flex-row md:items-start md:gap-8">
                       <div className="flex-1 mb-4 md:mb-0">
                         <h3 className="font-display text-lg font-semibold text-text-primary mb-2.5">{step.title}</h3>
                         <p className="text-text-secondary text-sm leading-relaxed">{step.description}</p>
                       </div>
                       <div className="md:w-64 flex-shrink-0">
-                        <p className="text-text-muted text-xs font-mono uppercase tracking-wide mb-2">{t.techProcess.technicalLabel}</p>
+                        <p className="label-mono mb-2">{t.techProcess.technicalLabel}</p>
                         <div className="grid grid-cols-2 gap-1.5">
                           {step.technical.map((tech) => (
-                            <div key={tech} className="px-2 py-1 rounded-md bg-bg-elevated border border-border text-xs text-text-muted font-mono leading-snug">
+                            <div key={tech} className="px-2 py-1 rounded-md bg-bg-base/40 border border-border text-[11px] text-text-muted font-mono leading-snug">
                               {tech}
                             </div>
                           ))}

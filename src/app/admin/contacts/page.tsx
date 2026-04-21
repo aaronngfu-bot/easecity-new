@@ -27,7 +27,7 @@ export default async function AdminContactsPage() {
                   <div className="flex items-center gap-3">
                     <h3 className="text-sm font-semibold text-text-primary">{sub.name}</h3>
                     <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${
-                      sub.status === 'new' ? 'bg-accent-cyan/15 text-accent-cyan border-accent-cyan/25' :
+                      sub.status === 'new' ? 'bg-signal/15 text-signal border-signal/25' :
                       sub.status === 'read' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/25' :
                       sub.status === 'replied' ? 'bg-green-500/15 text-green-400 border-green-500/25' :
                       'bg-gray-500/15 text-gray-400 border-gray-500/25'
@@ -42,7 +42,7 @@ export default async function AdminContactsPage() {
                 </span>
               </div>
               <div>
-                <p className="text-xs text-accent-cyan font-medium mb-1">{sub.subject}</p>
+                <p className="text-xs text-signal font-medium mb-1">{sub.subject}</p>
                 <p className="text-sm text-text-secondary leading-relaxed whitespace-pre-wrap">{sub.message}</p>
               </div>
             </div>

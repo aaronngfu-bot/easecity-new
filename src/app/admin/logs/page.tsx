@@ -27,7 +27,7 @@ export default async function AdminLogsPage() {
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-medium text-text-primary">{log.user.name || log.user.email}</span>
                     <span className="text-xs text-text-muted">performed</span>
-                    <code className="px-1.5 py-0.5 rounded bg-bg-elevated text-xs text-accent-cyan font-mono">
+                    <code className="px-1.5 py-0.5 rounded bg-bg-elevated text-xs text-signal font-mono">
                       {log.action}
                     </code>
                     <span className="text-xs text-text-muted">on</span>

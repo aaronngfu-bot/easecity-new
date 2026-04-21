@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { SectionTitle } from '@/components/ui/SectionTitle'
 import { useLanguage } from '@/context/LanguageContext'
 
-function ArchDiagram({ termLabel }: { termLabel: string }) {
+function ArchDiagram() {
   const devices = [
     { id: 'D1', label: 'Device 1', x: 80, y: 60 },
     { id: 'D2', label: 'Device 2', x: 80, y: 160 },
@@ -23,6 +23,10 @@ function ArchDiagram({ termLabel }: { termLabel: string }) {
           <feGaussianBlur stdDeviation="2.5" result="blur" />
           <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
         </filter>
+        <filter id="hubSignalGlow">
+          <feGaussianBlur stdDeviation="3" result="blur" />
+          <feMerge><feMergeNode in="blur" /><feMergeNode in="SourceGraphic" /></feMerge>
+        </filter>
         <marker id="arrowR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
           <polygon points="0 0, 8 3, 0 6" fill="#22d3ee" fillOpacity="0.7" />
         </marker>
@@ -33,21 +37,21 @@ function ArchDiagram({ termLabel }: { termLabel: string }) {
 
       {Array.from({ length: 6 }).map((_, r) =>
         Array.from({ length: 10 }).map((_, c) => (
-          <circle key={`bg-${r}-${c}`} cx={20 + c * 56} cy={20 + r * 70} r="1" fill="#22d3ee" fillOpacity="0.06" />
+          <circle key={`bg-${r}-${c}`} cx={20 + c * 56} cy={20 + r * 70} r="1" fill="#22ff88" fillOpacity="0.05" />
         ))
       )}
 
-      {/* Hub */}
-      <rect x="218" y="166" width="124" height="88" rx="12" fill="#0d1117" stroke="#22d3ee" strokeWidth="1.5" filter="url(#archGlow)" />
-      <rect x="228" y="176" width="104" height="68" rx="8" fill="#111116" stroke="#22d3ee" strokeWidth="0.6" strokeOpacity="0.4" />
-      <text x="280" y="204" textAnchor="middle" fill="#22d3ee" fontSize="11" fontFamily="monospace" fontWeight="bold">DEVICE A</text>
-      <text x="280" y="219" textAnchor="middle" fill="#22d3ee" fontSize="9" fontFamily="monospace" opacity="0.7">Control Hub</text>
-      <text x="280" y="234" textAnchor="middle" fill="#22d3ee" fontSize="8" fontFamily="monospace" opacity="0.4">stream.ctrl.engine</text>
-      <rect x="212" y="160" width="136" height="100" rx="15" fill="none" stroke="#22d3ee" strokeWidth="0.5" strokeOpacity="0.3" strokeDasharray="4 4">
+      {/* Hub — switched stroke to signal since it's the LIVE control node */}
+      <rect x="218" y="166" width="124" height="88" rx="12" fill="#0d1117" stroke="#22ff88" strokeWidth="1.5" filter="url(#hubSignalGlow)" />
+      <rect x="228" y="176" width="104" height="68" rx="8" fill="#111116" stroke="#22ff88" strokeWidth="0.6" strokeOpacity="0.4" />
+      <text x="280" y="204" textAnchor="middle" fill="#22ff88" fontSize="11" fontFamily="monospace" fontWeight="bold">DEVICE A</text>
+      <text x="280" y="219" textAnchor="middle" fill="#22ff88" fontSize="9" fontFamily="monospace" opacity="0.7">Control Hub</text>
+      <text x="280" y="234" textAnchor="middle" fill="#22ff88" fontSize="8" fontFamily="monospace" opacity="0.4">stream.ctrl.engine</text>
+      <rect x="212" y="160" width="136" height="100" rx="15" fill="none" stroke="#22ff88" strokeWidth="0.5" strokeOpacity="0.3" strokeDasharray="4 4">
         <animate attributeName="stroke-opacity" values="0.1;0.4;0.1" dur="3s" repeatCount="indefinite" />
       </rect>
 
-      {/* Remote devices */}
+      {/* Remote devices — cyan lines for data flow */}
       {devices.map((dev) => (
         <g key={dev.id}>
           <rect x="20" y={dev.y - 22} width="100" height="44" rx="8" fill="#0d1117"
@@ -125,17 +129,18 @@ export function StreamControlArch() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
-            className="lg:col-span-3 rounded-2xl border border-border bg-bg-surface p-4 md:p-6"
+            className="lg:col-span-3 glass-panel p-4 md:p-6"
           >
-            <div className="mb-3 flex items-center gap-2">
-              <div className="flex gap-1.5">
-                {['bg-red-500/50', 'bg-yellow-500/50', 'bg-green-500/50'].map((c, i) => (
-                  <div key={i} className={`w-2.5 h-2.5 rounded-full ${c}`} />
-                ))}
+            <div className="mb-3 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-signal animate-signal-pulse" />
+                <span className="label-mono text-signal/80">LIVE.TOPOLOGY</span>
               </div>
-              <span className="text-text-muted text-xs font-mono">{t.streamArch.termLabel}</span>
+              <span className="font-mono text-[10px] text-text-muted tracking-wider">
+                {t.streamArch.termLabel}
+              </span>
             </div>
-            <ArchDiagram termLabel={t.streamArch.termLabel} />
+            <ArchDiagram />
           </motion.div>
 
           <motion.div
@@ -143,12 +148,12 @@ export function StreamControlArch() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="lg:col-span-2 space-y-6"
+            className="lg:col-span-2 space-y-5"
           >
             {steps.map((item) => (
-              <div key={item.step} className="flex gap-4">
-                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-accent-cyan/10 border border-accent-cyan/20 flex items-center justify-center">
-                  <span className="text-accent-cyan text-xs font-mono font-bold">{item.step}</span>
+              <div key={item.step} className="flex gap-4 group">
+                <div className="flex-shrink-0 w-9 h-9 rounded-lg border border-signal/20 bg-signal/5 flex items-center justify-center group-hover:bg-signal/10 group-hover:border-signal/40 transition-colors">
+                  <span className="text-signal text-xs font-mono font-bold">{item.step}</span>
                 </div>
                 <div>
                   <h3 className="font-semibold text-text-primary text-sm mb-1.5">{item.title}</h3>

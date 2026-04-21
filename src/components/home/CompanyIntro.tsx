@@ -6,12 +6,6 @@ import { AnimatedSection } from '@/components/ui/AnimatedSection'
 import { useLanguage } from '@/context/LanguageContext'
 
 const metricIcons = [Activity, Globe, Cpu, Clock]
-const metricColors = [
-  { icon: 'text-accent-cyan', bg: 'bg-accent-cyan/8 group-hover:bg-accent-cyan/15', border: 'group-hover:border-accent-cyan/30', value: 'text-accent-cyan' },
-  { icon: 'text-accent-purple', bg: 'bg-accent-purple/8 group-hover:bg-accent-purple/15', border: 'group-hover:border-accent-purple/25', value: 'text-accent-purple' },
-  { icon: 'text-accent-cyan', bg: 'bg-accent-cyan/8 group-hover:bg-accent-cyan/15', border: 'group-hover:border-accent-cyan/30', value: 'text-accent-cyan' },
-  { icon: 'text-green-400', bg: 'bg-green-400/8 group-hover:bg-green-400/15', border: 'group-hover:border-green-400/25', value: 'text-green-400' },
-]
 
 export function CompanyIntro() {
   const { t } = useLanguage()
@@ -30,12 +24,13 @@ export function CompanyIntro() {
       <div className="container-max relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
           <AnimatedSection direction="left">
-            <p className="text-accent-cyan text-sm font-mono tracking-widest uppercase mb-4">
-              {t.companyIntro.eyebrow}
-            </p>
-            <h2 className="font-display text-4xl md:text-5xl font-bold text-text-primary leading-tight mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-signal shadow-glow-signal-sm" />
+              <p className="label-mono text-signal/80">{t.companyIntro.eyebrow}</p>
+            </div>
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-text-primary leading-[1.05] tracking-tight mb-6">
               {t.companyIntro.heading}{' '}
-              <span className="text-gradient-cyan">{t.companyIntro.headingHighlight}</span>
+              <span className="text-gradient-signal">{t.companyIntro.headingHighlight}</span>
             </h2>
             <p className="text-text-secondary text-lg leading-relaxed mb-6">
               {t.companyIntro.body1}
@@ -46,7 +41,10 @@ export function CompanyIntro() {
             <div className="mt-8 flex items-center gap-3">
               <div className="flex -space-x-1">
                 {[0, 1, 2].map((i) => (
-                  <div key={i} className="w-8 h-8 rounded-full bg-gradient-to-br from-accent-cyan/30 to-accent-purple/30 border-2 border-bg-base" />
+                  <div
+                    key={i}
+                    className="w-8 h-8 rounded-full bg-gradient-to-br from-signal/30 to-signal/10 border-2 border-bg-base"
+                  />
                 ))}
               </div>
               <p className="text-text-muted text-sm">{t.companyIntro.teamLabel}</p>
@@ -57,7 +55,6 @@ export function CompanyIntro() {
             <div className="grid grid-cols-2 gap-4">
               {metrics.map((metric, i) => {
                 const Icon = metricIcons[i]
-                const colors = metricColors[i]
                 return (
                   <motion.div
                     key={metric.label}
@@ -65,13 +62,13 @@ export function CompanyIntro() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.5, delay: i * 0.1 }}
-                    className={`p-5 rounded-2xl bg-bg-surface border border-border ${colors.border} transition-all duration-300 group`}
+                    className="glass-panel glass-panel-interactive p-5 group"
                   >
                     <div className="flex items-start justify-between mb-3">
-                      <p className={`font-display text-2xl font-bold ${colors.value} transition-colors`}>
+                      <p className="font-display text-2xl font-bold text-signal tabular-nums">
                         {metric.value}
                       </p>
-                      <div className={`w-8 h-8 rounded-lg ${colors.bg} ${colors.icon} flex items-center justify-center transition-all duration-300`}>
+                      <div className="w-8 h-8 rounded-lg bg-signal/8 group-hover:bg-signal/15 text-signal flex items-center justify-center transition-all duration-300">
                         <Icon size={16} />
                       </div>
                     </div>

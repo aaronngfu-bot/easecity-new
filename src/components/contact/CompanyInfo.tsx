@@ -25,17 +25,30 @@ export function CompanyInfo() {
       initial={{ opacity: 0, x: 20 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 0.5, delay: 0.15 }}
-      className="space-y-6"
+      className="space-y-5"
     >
-      <div className="p-6 rounded-2xl border border-border bg-bg-surface space-y-5">
-        <h3 className="font-display text-sm font-semibold text-text-primary">{t.companyInfo.title}</h3>
-        {infoItems.map((item) => (
-          <div key={item.label} className="flex items-start gap-3.5">
-            <div className="w-9 h-9 flex-shrink-0 rounded-lg bg-bg-elevated border border-border flex items-center justify-center text-text-muted">
+      <div className="glass-panel p-6 md:p-7 space-y-5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-signal/60" />
+            <h3 className="label-mono text-signal/80">{t.companyInfo.title}</h3>
+          </div>
+          <span className="font-mono text-[10px] tracking-[0.25em] text-text-muted">
+            META
+          </span>
+        </div>
+        {infoItems.map((item, i) => (
+          <div key={item.label} className="flex items-start gap-3.5 group">
+            <div className="w-10 h-10 flex-shrink-0 rounded-lg bg-bg-base/40 border border-border group-hover:border-signal/25 group-hover:text-signal flex items-center justify-center text-text-muted transition-colors">
               <item.icon size={16} />
             </div>
-            <div>
-              <p className="text-text-muted text-xs mb-0.5">{item.label}</p>
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-0.5">
+                <p className="label-mono">{item.label}</p>
+                <span className="font-mono text-[10px] text-text-faint">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
+              </div>
               <p className="text-text-primary text-sm font-medium">{item.value}</p>
               <p className="text-text-muted text-xs">{item.sub}</p>
             </div>
@@ -43,26 +56,34 @@ export function CompanyInfo() {
         ))}
       </div>
 
-      <div className="p-4 rounded-2xl border border-accent-cyan/15 bg-accent-cyan/4 flex items-center gap-3">
-        <div className="w-2.5 h-2.5 rounded-full bg-accent-cyan animate-pulse-slow flex-shrink-0" />
+      <div className="glass-prominent p-4 flex items-center gap-3">
+        <div className="w-2.5 h-2.5 rounded-full bg-signal animate-signal-pulse flex-shrink-0" />
         <div>
-          <p className="text-accent-cyan text-sm font-medium">{t.companyInfo.statusTitle}</p>
-          <p className="text-text-muted text-xs">{t.companyInfo.statusSub}</p>
+          <p className="text-signal text-sm font-medium">{t.companyInfo.statusTitle}</p>
+          <p className="text-text-muted text-xs font-mono">{t.companyInfo.statusSub}</p>
         </div>
       </div>
 
       <div className="space-y-3">
-        <h3 className="font-display text-sm font-semibold text-text-primary">{t.companyInfo.faqTitle}</h3>
+        <div className="flex items-center gap-2 mb-3">
+          <span className="w-1.5 h-1.5 rounded-full bg-signal/60" />
+          <h3 className="label-mono text-signal/80">{t.companyInfo.faqTitle}</h3>
+        </div>
         {faqs.map((faq, i) => (
           <motion.div
             key={faq.q}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.3 + i * 0.1 }}
-            className="p-4 rounded-xl border border-border bg-bg-surface"
+            className="glass-panel p-4"
           >
-            <p className="text-text-primary text-xs font-medium mb-1.5">{faq.q}</p>
-            <p className="text-text-secondary text-xs leading-relaxed">{faq.a}</p>
+            <div className="flex items-start gap-2 mb-1.5">
+              <span className="font-mono text-[10px] text-text-muted tracking-wider mt-0.5 flex-shrink-0">
+                Q{String(i + 1).padStart(2, '0')}
+              </span>
+              <p className="text-text-primary text-xs font-medium">{faq.q}</p>
+            </div>
+            <p className="text-text-secondary text-xs leading-relaxed pl-7">{faq.a}</p>
           </motion.div>
         ))}
       </div>

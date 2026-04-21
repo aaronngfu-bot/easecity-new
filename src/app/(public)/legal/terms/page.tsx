@@ -19,7 +19,7 @@ export default function TermsOfServicePage() {
         <div className="mb-12">
           <Link
             href="/"
-            className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-accent-cyan transition-colors font-mono mb-8"
+            className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-signal transition-colors font-mono mb-8"
           >
             ← easecity.com
           </Link>
@@ -70,7 +70,7 @@ export default function TermsOfServicePage() {
             <ul className="mt-2 list-disc list-inside space-y-1 text-text-secondary">
               <li>Provide accurate, current, and complete information during registration.</li>
               <li>Maintain the security of your password and accept responsibility for all activity that occurs under your account.</li>
-              <li>Notify us immediately at <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent-cyan hover:underline">{CONTACT_EMAIL}</a> of any unauthorised use of your account.</li>
+              <li>Notify us immediately at <a href={`mailto:${CONTACT_EMAIL}`} className="text-signal hover:underline">{CONTACT_EMAIL}</a> of any unauthorised use of your account.</li>
               <li>Not share your account credentials with any third party.</li>
             </ul>
             <p className="mt-3">
@@ -83,7 +83,7 @@ export default function TermsOfServicePage() {
             <SubSection title="4.1 Plans">
               <p className="mt-2 text-text-secondary">
                 We offer several subscription tiers (Starter, Pro, Business, Enterprise) as described
-                on our <Link href="/pricing" className="text-accent-cyan hover:underline">Pricing page</Link>. Features,
+                on our <Link href="/pricing" className="text-signal hover:underline">Pricing page</Link>. Features,
                 device limits, and SLA commitments vary by plan.
               </p>
             </SubSection>
@@ -311,7 +311,7 @@ export default function TermsOfServicePage() {
               <p className="text-text-primary font-semibold">easecity</p>
               <p className="text-text-secondary">Hong Kong Special Administrative Region</p>
               <p>
-                <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent-cyan hover:underline">
+                <a href={`mailto:${CONTACT_EMAIL}`} className="text-signal hover:underline">
                   {CONTACT_EMAIL}
                 </a>
               </p>
@@ -324,10 +324,10 @@ export default function TermsOfServicePage() {
               © {new Date().getFullYear()} easecity. All rights reserved.
             </p>
             <div className="flex gap-6 text-xs">
-              <Link href="/legal/privacy" className="text-text-muted hover:text-accent-cyan transition-colors">
+              <Link href="/legal/privacy" className="text-text-muted hover:text-signal transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/contact" className="text-text-muted hover:text-accent-cyan transition-colors">
+              <Link href="/contact" className="text-text-muted hover:text-signal transition-colors">
                 Contact Us
               </Link>
             </div>

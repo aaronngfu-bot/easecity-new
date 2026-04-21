@@ -75,7 +75,7 @@ export default async function AdminOrderDetailPage({
             </div>
             <Link
               href={`/admin/users/${order.user.id}`}
-              className="inline-block text-xs text-accent-cyan hover:text-accent-cyan-light transition-colors"
+              className="inline-block text-xs text-signal hover:text-signal-light transition-colors"
             >
               View user profile →
             </Link>

@@ -46,7 +46,7 @@ export default async function AdminOrdersPage() {
                   {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
                 </td>
                 <td className="px-5 py-4 text-right">
-                  <Link href={`/admin/orders/${order.id}`} className="text-xs text-accent-cyan hover:text-accent-cyan-light transition-colors">
+                  <Link href={`/admin/orders/${order.id}`} className="text-xs text-signal hover:text-signal-light transition-colors">
                     Details
                   </Link>
                 </td>

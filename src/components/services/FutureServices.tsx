@@ -16,9 +16,7 @@ export function FutureServices() {
       title: t.futureServices.f1Title,
       description: t.futureServices.f1Desc,
       highlights: [t.futureServices.f1H1, t.futureServices.f1H2, t.futureServices.f1H3, t.futureServices.f1H4, t.futureServices.f1H5],
-      color: 'border-border hover:border-text-muted/40',
-      iconBg: 'bg-bg-elevated text-text-secondary',
-      phaseBadge: 'text-text-muted bg-bg-elevated border-border',
+      stage: 'planned' as const,
     },
     {
       icon: BrainCircuit,
@@ -26,15 +24,14 @@ export function FutureServices() {
       title: t.futureServices.f2Title,
       description: t.futureServices.f2Desc,
       highlights: [t.futureServices.f2H1, t.futureServices.f2H2, t.futureServices.f2H3, t.futureServices.f2H4, t.futureServices.f2H5],
-      color: 'border-accent-purple/20 hover:border-accent-purple/50',
-      iconBg: 'bg-accent-purple/10 text-accent-purple',
-      phaseBadge: 'text-accent-purple bg-accent-purple/10 border-accent-purple/25',
+      stage: 'research' as const,
     },
   ]
 
   return (
     <section id="future" className="section-padding border-t border-border relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-accent-purple/3 via-transparent to-accent-cyan/3 pointer-events-none" />
+      <div className="absolute inset-0 bg-gradient-to-br from-signal/[0.02] via-transparent to-signal/[0.02] pointer-events-none" />
+      <div className="absolute inset-0 bg-rule-grid opacity-[0.1] pointer-events-none" />
 
       <div className="container-max relative z-10">
         <SectionTitle
@@ -52,11 +49,14 @@ export function FutureServices() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.55, delay: i * 0.15, ease: [0.21, 0.47, 0.32, 0.98] }}
-              className={`group p-7 rounded-2xl border bg-bg-surface transition-all duration-300 ${item.color}`}
+              className="glass-panel p-7 group"
             >
               <div className="flex items-start justify-between mb-5">
-                <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${item.phaseBadge}`}>{item.phase}</span>
-                <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${item.iconBg}`}>
+                <div className="flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-text-muted" />
+                  <span className="label-mono text-text-muted">{item.phase}</span>
+                </div>
+                <div className="w-11 h-11 rounded-xl bg-bg-base/40 border border-border flex items-center justify-center text-text-muted group-hover:text-text-secondary transition-colors">
                   <item.icon size={20} />
                 </div>
               </div>
@@ -79,14 +79,15 @@ export function FutureServices() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="text-center p-8 rounded-2xl border border-accent-cyan/15 bg-accent-cyan/4"
+          className="glass-prominent text-center p-8 md:p-10"
         >
+          <div className="flex items-center justify-center gap-2 mb-4">
+            <span className="w-1.5 h-1.5 rounded-full bg-signal animate-signal-pulse" />
+            <span className="label-mono text-signal/80">EARLY_ACCESS</span>
+          </div>
           <p className="text-text-secondary text-sm mb-3">{t.futureServices.bannerDesc}</p>
-          <h3 className="font-display text-xl font-bold text-text-primary mb-5">{t.futureServices.bannerTitle}</h3>
-          <Link
-            href="/contact"
-            className="group inline-flex items-center gap-2 px-6 py-3 bg-accent-cyan text-bg-base font-semibold text-sm rounded-xl hover:bg-accent-cyan-light transition-all duration-200 shadow-glow-cyan-sm"
-          >
+          <h3 className="font-display text-xl md:text-2xl font-bold text-text-primary mb-6">{t.futureServices.bannerTitle}</h3>
+          <Link href="/contact" className="glass-cta group">
             {t.futureServices.bannerCta}
             <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform duration-200" />
           </Link>

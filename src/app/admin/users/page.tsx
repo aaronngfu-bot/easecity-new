@@ -48,7 +48,7 @@ export default async function AdminUsersPage() {
                 <td className="px-5 py-4">
                   <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
                     user.role === 'SUPER_ADMIN' ? 'bg-purple-500/15 text-purple-400 border-purple-500/25' :
-                    user.role === 'ADMIN' ? 'bg-accent-cyan/15 text-accent-cyan border-accent-cyan/25' :
+                    user.role === 'ADMIN' ? 'bg-signal/15 text-signal border-signal/25' :
                     'bg-gray-500/15 text-gray-400 border-gray-500/25'
                   }`}>
                     {user.role}
@@ -69,7 +69,7 @@ export default async function AdminUsersPage() {
                 <td className="px-5 py-4 text-right">
                   <Link
                     href={`/admin/users/${user.id}`}
-                    className="text-xs text-accent-cyan hover:text-accent-cyan-light transition-colors"
+                    className="text-xs text-signal hover:text-signal-light transition-colors"
                   >
                     View
                   </Link>

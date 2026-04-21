@@ -19,20 +19,21 @@ export function Philosophy() {
       <div className="container-max">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20">
           <AnimatedSection direction="left">
-            <p className="text-accent-cyan text-sm font-mono tracking-widest uppercase mb-4">
-              {t.philosophy.eyebrow}
-            </p>
-            <h2 className="font-display text-4xl md:text-5xl font-bold text-text-primary leading-tight mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="w-1.5 h-1.5 rounded-full bg-signal shadow-glow-signal-sm" />
+              <p className="label-mono text-signal/80">{t.philosophy.eyebrow}</p>
+            </div>
+            <h2 className="font-display text-4xl md:text-5xl font-bold text-text-primary leading-[1.05] tracking-tight mb-6">
               {t.philosophy.heading}{' '}
-              <span className="text-gradient-cyan">{t.philosophy.headingHighlight}</span>
+              <span className="text-gradient-signal">{t.philosophy.headingHighlight}</span>
             </h2>
             <p className="text-text-secondary text-lg leading-relaxed mb-6">{t.philosophy.body1}</p>
             <p className="text-text-secondary text-base leading-relaxed mb-8">{t.philosophy.body2}</p>
 
-            <div className="p-5 rounded-2xl border border-border bg-bg-surface">
+            <div className="glass-panel p-5">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 flex-shrink-0 rounded-lg bg-accent-cyan/10 border border-accent-cyan/20 flex items-center justify-center">
-                  <span className="text-accent-cyan text-sm">香</span>
+                <div className="w-9 h-9 flex-shrink-0 rounded-lg bg-signal/8 border border-signal/20 flex items-center justify-center">
+                  <span className="text-signal text-sm font-display">香</span>
                 </div>
                 <div>
                   <p className="text-text-primary text-sm font-medium mb-1">{t.philosophy.hkTitle}</p>
@@ -43,7 +44,7 @@ export function Philosophy() {
           </AnimatedSection>
 
           <AnimatedSection direction="right">
-            <div className="space-y-5">
+            <div className="space-y-4">
               {principles.map((p, i) => (
                 <motion.div
                   key={p.number}
@@ -51,10 +52,10 @@ export function Philosophy() {
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: i * 0.1 }}
-                  className="group flex gap-5 p-5 rounded-2xl border border-border bg-bg-surface hover:border-accent-cyan/20 hover:bg-bg-elevated transition-all duration-300"
+                  className="group glass-panel glass-panel-interactive flex gap-5 p-5"
                 >
-                  <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-accent-cyan/8 border border-accent-cyan/15 flex items-center justify-center">
-                    <span className="text-accent-cyan text-xs font-mono font-bold">{p.number}</span>
+                  <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-signal/8 border border-signal/15 flex items-center justify-center group-hover:bg-signal/12 transition-colors">
+                    <span className="text-signal text-xs font-mono font-bold">{p.number}</span>
                   </div>
                   <div>
                     <h3 className="font-semibold text-text-primary text-sm mb-1.5 group-hover:text-white transition-colors">{p.title}</h3>

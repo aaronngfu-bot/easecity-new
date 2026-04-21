@@ -63,32 +63,33 @@ export default function RegisterPage() {
     }
   }
 
-  const inputClass = cn(
-    'w-full px-4 py-3 rounded-xl border bg-bg-surface text-text-primary text-sm',
-    'placeholder:text-text-muted',
-    'border-border focus:border-accent-cyan/50 focus:outline-none focus:ring-1 focus:ring-accent-cyan/30',
-    'transition-all duration-200'
-  )
-
   return (
     <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="space-y-8">
       <div className="text-center">
-        <Link href="/" className="inline-flex items-center gap-2 mb-8">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-accent-cyan to-accent-purple flex items-center justify-center">
-            <svg viewBox="0 0 20 20" fill="none" className="w-5 h-5">
-              <circle cx="10" cy="10" r="3" fill="white" />
-              <line x1="10" y1="2" x2="10" y2="7" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="10" y1="13" x2="10" y2="18" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="2" y1="10" x2="7" y2="10" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
-              <line x1="13" y1="10" x2="18" y2="10" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+        <Link href="/" className="inline-flex items-center gap-2.5 mb-8 group">
+          <div className="relative w-11 h-11 glass-panel flex items-center justify-center !rounded-xl">
+            <svg viewBox="0 0 36 36" className="w-8 h-8">
+              <circle cx="18" cy="6" r="1.2" fill="#52525b" />
+              <circle cx="30" cy="18" r="1.2" fill="#52525b" />
+              <circle cx="18" cy="30" r="1.2" fill="#52525b" />
+              <circle cx="6" cy="18" r="1.2" fill="#52525b" />
+              <line x1="18" y1="6" x2="18" y2="14" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
+              <line x1="30" y1="18" x2="22" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
+              <line x1="18" y1="30" x2="18" y2="22" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
+              <line x1="6" y1="18" x2="14" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
+              <circle cx="18" cy="18" r="3.5" fill="#22ff88" opacity="0.3" />
+              <circle cx="18" cy="18" r="2" fill="#22ff88" />
             </svg>
           </div>
         </Link>
-        <h1 className="font-display text-2xl font-bold text-text-primary">{t.auth.createAccount}</h1>
+        <div className="flex items-center justify-center gap-2 mb-3">
+          <span className="label-mono text-signal/70">AUTH.REGISTER</span>
+        </div>
+        <h1 className="font-display text-3xl font-bold text-text-primary tracking-tight">{t.auth.createAccount}</h1>
         <p className="text-text-secondary text-sm mt-2">{t.auth.getStarted}</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-6 rounded-2xl border border-border bg-bg-surface space-y-5">
+      <form onSubmit={handleSubmit} className="glass-panel p-6 md:p-8 space-y-5">
         {error && (
           <div className="flex items-center gap-2.5 p-3 rounded-xl border border-red-500/25 bg-red-500/8 text-red-400 text-sm">
             <AlertCircle size={15} className="flex-shrink-0" />
@@ -97,27 +98,26 @@ export default function RegisterPage() {
         )}
 
         <div>
-          <label htmlFor="name" className="block text-xs font-medium text-text-secondary mb-1.5">{t.auth.nameLabel}</label>
-          <input id="name" type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder={t.auth.namePlaceholder} className={inputClass} />
+          <label htmlFor="name" className="label-mono block mb-2">{t.auth.nameLabel}</label>
+          <input id="name" type="text" required value={name} onChange={(e) => setName(e.target.value)} placeholder={t.auth.namePlaceholder} className="glass-input" />
         </div>
 
         <div>
-          <label htmlFor="email" className="block text-xs font-medium text-text-secondary mb-1.5">{t.auth.emailLabel}</label>
-          <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className={inputClass} />
+          <label htmlFor="email" className="label-mono block mb-2">{t.auth.emailLabel}</label>
+          <input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" className="glass-input" />
         </div>
 
         <div>
-          <label htmlFor="password" className="block text-xs font-medium text-text-secondary mb-1.5">{t.auth.passwordLabel}</label>
+          <label htmlFor="password" className="label-mono block mb-2">{t.auth.passwordLabel}</label>
           <div className="relative">
-            <input id="password" type={showPassword ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t.auth.passwordPlaceholder} className={inputClass} />
-            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-text-secondary transition-colors">
+            <input id="password" type={showPassword ? 'text' : 'password'} required value={password} onChange={(e) => setPassword(e.target.value)} placeholder={t.auth.passwordPlaceholder} className="glass-input" />
+            <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-signal transition-colors">
               {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
             </button>
           </div>
-          <p className="text-text-muted text-xs mt-1.5">{t.auth.passwordHint}</p>
+          <p className="text-text-muted text-xs mt-2 font-mono">{t.auth.passwordHint}</p>
         </div>
 
-        {/* Turnstile */}
         <div className="flex justify-center">
           <Turnstile
             ref={turnstileRef}
@@ -132,13 +132,7 @@ export default function RegisterPage() {
           />
         </div>
 
-        <button type="submit" disabled={loading || !turnstileToken} className={cn(
-          'w-full inline-flex items-center justify-center gap-2.5 px-6 py-3',
-          'bg-accent-cyan text-bg-base font-semibold text-sm rounded-xl',
-          'hover:bg-accent-cyan-light transition-all duration-200',
-          'shadow-glow-cyan-sm hover:shadow-glow-cyan',
-          'disabled:opacity-60 disabled:cursor-not-allowed'
-        )}>
+        <button type="submit" disabled={loading || !turnstileToken} className={cn('glass-cta w-full', (loading || !turnstileToken) && 'opacity-60 cursor-not-allowed')}>
           {loading ? (
             <svg className="animate-spin h-4 w-4" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
@@ -155,7 +149,7 @@ export default function RegisterPage() {
         {t.auth.haveAccount}{' '}
         <Link
           href={callbackUrl !== '/dashboard' ? `/login?callbackUrl=${encodeURIComponent(callbackUrl)}` : '/login'}
-          className="text-accent-cyan hover:text-accent-cyan-light transition-colors"
+          className="text-signal hover:text-signal-light transition-colors underline underline-offset-2"
         >
           {t.auth.signIn}
         </Link>
