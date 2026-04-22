@@ -1,15 +1,16 @@
 'use client'
 
-import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Check, ArrowRight, Star, Shield, Cpu, Building2, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import type { T } from '@/i18n/translations'
-import { useTransition } from 'react'
+import { useTransition, useState } from 'react'
 import { getCheckoutSessionUrl } from '@/actions/stripe'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
+import { CountUp } from '@/components/ui/CountUp'
+import { MagneticButton } from '@/components/ui/MagneticButton'
 
 function getPlans(t: T) {
   return [
@@ -119,6 +120,7 @@ export function PricingCards() {
 
 function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: number; whatsIncluded: string }) {
   const [isPending, startTransition] = useTransition()
+  const [hoverTick, setHoverTick] = useState(0)
   const router = useRouter()
   const { t } = useLanguage()
   const { data: session } = useSession()
@@ -147,15 +149,29 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
     })
   }
 
+  const CtaInner = (
+    <>
+      {isPending ? (
+        <Loader2 size={16} className="animate-spin" />
+      ) : (
+        <>
+          {plan.cta}
+          <ArrowRight size={14} className="group-hover/cta:translate-x-1 transition-transform duration-200" />
+        </>
+      )}
+    </>
+  )
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-40px' }}
       transition={{ duration: 0.5, delay: index * 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
+      onMouseEnter={() => setHoverTick((t) => t + 1)}
       className={cn(
         'relative group flex flex-col overflow-hidden',
-        plan.highlighted ? 'glass-prominent xl:scale-105 z-10' : 'glass-panel'
+        plan.highlighted ? 'glass-prominent xl:scale-105 z-10' : 'glass-panel glass-panel-interactive'
       )}
     >
       {plan.highlighted && (
@@ -189,35 +205,39 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
         <p className="text-text-muted text-xs mt-1 mb-5 font-mono tracking-wide">{plan.tagline}</p>
 
         <div className="flex items-baseline gap-1 mb-2">
-          <span
+          <CountUp
+            value={plan.price}
+            duration={plan.highlighted ? 1100 : 900}
+            trigger="key"
+            triggerKey={hoverTick}
             className={cn(
-              'font-display text-4xl font-bold tabular-nums',
+              'font-display text-4xl font-bold',
               plan.highlighted ? 'text-signal' : 'text-text-primary'
             )}
-          >
-            {plan.price}
-          </span>
+          />
           {plan.period && <span className="text-text-muted text-sm">{plan.period}</span>}
         </div>
         <p className="text-text-secondary text-sm leading-relaxed mb-6">{plan.description}</p>
 
-        <button
-          onClick={handleSubscribe}
-          disabled={isPending}
-          className={cn(
-            'group/cta w-full mb-7 disabled:opacity-70 disabled:cursor-not-allowed',
-            plan.highlighted ? 'glass-cta' : 'glass-ghost'
-          )}
-        >
-          {isPending ? (
-            <Loader2 size={16} className="animate-spin" />
-          ) : (
-            <>
-              {plan.cta}
-              <ArrowRight size={14} className="group-hover/cta:translate-x-1 transition-transform duration-200" />
-            </>
-          )}
-        </button>
+        {plan.highlighted ? (
+          <MagneticButton
+            onClick={handleSubscribe}
+            disabled={isPending}
+            className="group/cta glass-cta w-full mb-7 disabled:opacity-70 disabled:cursor-not-allowed"
+            strength={10}
+            radius={160}
+          >
+            {CtaInner}
+          </MagneticButton>
+        ) : (
+          <button
+            onClick={handleSubscribe}
+            disabled={isPending}
+            className="group/cta glass-ghost w-full mb-7 disabled:opacity-70 disabled:cursor-not-allowed"
+          >
+            {CtaInner}
+          </button>
+        )}
 
         <div className="border-t border-border/50 pt-6 flex-1">
           <p className="label-mono mb-4">{whatsIncluded}</p>

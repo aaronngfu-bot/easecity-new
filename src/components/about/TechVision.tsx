@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { SectionTitle } from '@/components/ui/SectionTitle'
+import { TypewriterQuote } from '@/components/ui/TypewriterQuote'
 import { useLanguage } from '@/context/LanguageContext'
 
 export function TechVision() {
@@ -53,9 +54,11 @@ export function TechVision() {
             <span className="label-mono text-signal/60">PRINCIPLE</span>
             <span className="h-px w-8 bg-gradient-to-r from-signal/40 to-transparent" />
           </div>
-          <p className="text-text-primary text-lg md:text-xl leading-relaxed font-medium text-center">
-            {t.techVision.quote}
-          </p>
+          <TypewriterQuote
+            text={t.techVision.quote}
+            speed={22}
+            className="text-text-primary text-lg md:text-xl leading-relaxed font-medium text-center min-h-[4rem]"
+          />
           <p className="text-text-muted text-sm text-center mt-4 font-mono tracking-wide">
             — {t.techVision.quoteAttr}
           </p>
