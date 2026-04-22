@@ -26,15 +26,17 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
   const [active, setActive] = useState<Set<DeviceId>>(new Set())
   const [broadcastTick, setBroadcastTick] = useState(0)
   const [hoverId, setHoverId] = useState<DeviceId | null>(null)
-  const [log, setLog] = useState<{ id: number; text: string; type: 'info' | 'signal' | 'broadcast' }[]>([
+  const [idleGhost, setIdleGhost] = useState<DeviceId | null>(null)
+  const [log, setLog] = useState<{ id: number; text: string; type: 'info' | 'signal' | 'broadcast' | 'ambient' }[]>([
     { id: 0, text: '$ stream.ctrl.engine booted', type: 'info' },
     { id: 1, text: '  listening on hub.easecity.core', type: 'info' },
+    { id: 2, text: '  idle → heartbeat mode', type: 'ambient' },
   ])
-  const logIdRef = useRef(2)
+  const logIdRef = useRef(3)
   const logRef = useRef<HTMLDivElement>(null)
 
   /** Append to the log and auto-trim to last 8 lines. */
-  const appendLog = useCallback((text: string, type: 'info' | 'signal' | 'broadcast' = 'info') => {
+  const appendLog = useCallback((text: string, type: 'info' | 'signal' | 'broadcast' | 'ambient' = 'info') => {
     const id = logIdRef.current++
     setLog((prev) => {
       const next = [...prev, { id, text, type }]
@@ -73,6 +75,26 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
     setBroadcastTick((t) => t + 1)
     appendLog(`⚡ broadcast → ${live.length} endpoints`, 'broadcast')
   }, [appendLog])
+
+  /** Idle ghost-flow: when no device has been toggled, quietly cycle
+   *  through D1 → D2 → D3 to keep the diagram alive. This is a purely
+   *  visual hint (different styling from a real active connection) so
+   *  users glancing at the page still see "data is flowing." */
+  useEffect(() => {
+    if (active.size > 0) {
+      setIdleGhost(null)
+      return
+    }
+    // Cycle through live device ids every 2.4s
+    const live = DEVICES.filter((d) => !d.future).map((d) => d.id)
+    let i = 0
+    setIdleGhost(live[0])
+    const iv = setInterval(() => {
+      i = (i + 1) % live.length
+      setIdleGhost(live[i])
+    }, 2400)
+    return () => clearInterval(iv)
+  }, [active.size])
 
   /** Keyboard: 1-4 toggle devices, B broadcasts. Only when this element is focused or hovered. */
   const containerRef = useRef<HTMLDivElement>(null)
@@ -253,12 +275,12 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               x="280"
               y="234"
               textAnchor="middle"
-              fill={anyActive ? '#22ff88' : '#52525b'}
+              fill={anyActive ? '#22ff88' : idleGhost ? '#22ff8888' : '#52525b'}
               fontSize="8"
               fontFamily="monospace"
-              opacity="0.55"
+              opacity="0.7"
             >
-              {anyActive ? `routing ${liveCount}` : 'idle'}
+              {anyActive ? `routing ${liveCount}` : idleGhost ? 'heartbeat' : 'idle'}
             </text>
             <rect
               x="212"
@@ -287,6 +309,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
           {DEVICES.map((dev) => {
             const isActive = active.has(dev.id)
             const isHover = hoverId === dev.id
+            const isIdleGhost = !isActive && idleGhost === dev.id && active.size === 0
             const future = dev.future
             const fill = future ? '#52525b' : isActive ? '#22ff88' : '#a1a1aa'
             const strokeCol = future
@@ -295,7 +318,9 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                 ? '#22ff88'
                 : isHover
                   ? '#22ff88'
-                  : '#27272a'
+                  : isIdleGhost
+                    ? '#22ff8855'
+                    : '#27272a'
 
             return (
               <g
@@ -312,12 +337,22 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                     y1={dev.y}
                     x2="218"
                     y2="210"
-                    stroke={isActive ? 'url(#archGradActive)' : isHover ? '#22ff88' : '#27272a'}
-                    strokeWidth={isActive ? 1.5 : 1}
-                    strokeOpacity={isActive ? 1 : isHover ? 0.5 : 0.25}
-                    strokeDasharray={isActive ? '6 5' : isHover ? '3 3' : undefined}
+                    stroke={
+                      isActive
+                        ? 'url(#archGradActive)'
+                        : isHover
+                          ? '#22ff88'
+                          : isIdleGhost
+                            ? '#22ff88'
+                            : '#27272a'
+                    }
+                    strokeWidth={isActive ? 1.5 : isIdleGhost ? 1 : 1}
+                    strokeOpacity={isActive ? 1 : isHover ? 0.5 : isIdleGhost ? 0.45 : 0.25}
+                    strokeDasharray={
+                      isActive ? '6 5' : isIdleGhost ? '2 6' : isHover ? '3 3' : undefined
+                    }
                     markerEnd={isActive ? 'url(#arrowSignalR)' : undefined}
-                    className="transition-all duration-200"
+                    className="transition-all duration-500"
                   >
                     {isActive && (
                       <animate
@@ -325,6 +360,15 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                         from="0"
                         to="-66"
                         dur="1.5s"
+                        repeatCount="indefinite"
+                      />
+                    )}
+                    {isIdleGhost && (
+                      <animate
+                        attributeName="stroke-dashoffset"
+                        from="0"
+                        to="-48"
+                        dur="2.4s"
                         repeatCount="indefinite"
                       />
                     )}
@@ -391,6 +435,23 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                       attributeName="fill-opacity"
                       values="0.4;1;0.4"
                       dur="1.4s"
+                      repeatCount="indefinite"
+                    />
+                  </circle>
+                )}
+                {/* Idle heartbeat dot */}
+                {!future && isIdleGhost && (
+                  <circle cx="155" cy={dev.y - 12} r="3" fill="#22ff88" fillOpacity="0.4">
+                    <animate
+                      attributeName="fill-opacity"
+                      values="0.15;0.5;0.15"
+                      dur="2.4s"
+                      repeatCount="indefinite"
+                    />
+                    <animate
+                      attributeName="r"
+                      values="2.5;3.5;2.5"
+                      dur="2.4s"
                       repeatCount="indefinite"
                     />
                   </circle>
@@ -511,7 +572,9 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                 ? 'text-signal font-bold'
                 : l.type === 'signal'
                   ? 'text-signal'
-                  : 'text-text-muted'
+                  : l.type === 'ambient'
+                    ? 'text-signal/50 italic'
+                    : 'text-text-muted'
             }
           >
             {l.text}

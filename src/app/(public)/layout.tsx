@@ -7,6 +7,7 @@ import { BootSequence } from '@/components/ui/BootSequence'
 import { CommandPalette } from '@/components/ui/CommandPalette'
 import { KeyboardLayer } from '@/components/ui/KeyboardLayer'
 import { CursorGlowLayer } from '@/components/ui/CursorGlowLayer'
+import { AmbientLayer } from '@/components/ui/AmbientLayer'
 
 export default function PublicLayout({
   children,
@@ -15,13 +16,26 @@ export default function PublicLayout({
 }) {
   return (
     <>
+      {/* Boot sequence intro on first visit */}
       <BootSequence />
+
+      {/* Always-on background — z-[1], behind content, above bg-base */}
+      <AmbientLayer />
+
+      {/* Cursor-reactive grain noise, on top of ambient but below content */}
       <GrainField />
+
+      {/* Reacts to cursor; writes CSS vars on interactive panels */}
       <CursorGlowLayer />
+
       <Navbar />
       <main className="min-h-screen relative z-[2]">{children}</main>
       <Footer />
+
+      {/* Fixed HUD — ambient live metrics */}
       <TelemetryBand />
+
+      {/* Floating surfaces */}
       <ChatWidget />
       <CommandPalette />
       <KeyboardLayer />

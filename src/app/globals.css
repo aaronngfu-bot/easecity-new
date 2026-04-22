@@ -605,6 +605,133 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ──────────────────────────────────────────────────────────── */
+/* Ambient — always-on visual motion                            */
+/* ──────────────────────────────────────────────────────────── */
+
+/* Slow, continuous aurora mesh rotation.
+ * Two counter-rotating conic layers create a shifting, non-repeating
+ * field of signal-tinted light. Very low opacity keeps it atmospheric.
+ */
+@keyframes auroraRotateA {
+  from { transform: translate(-50%, -50%) rotate(0deg); }
+  to   { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+@keyframes auroraRotateB {
+  from { transform: translate(-50%, -50%) rotate(360deg); }
+  to   { transform: translate(-50%, -50%) rotate(0deg); }
+}
+
+.aurora-mesh {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.aurora-mesh::before,
+.aurora-mesh::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 140vmax;
+  height: 140vmax;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.aurora-mesh::before {
+  background: conic-gradient(
+    from 0deg,
+    transparent 0%,
+    rgba(34, 255, 136, 0.08) 18%,
+    transparent 32%,
+    transparent 55%,
+    rgba(34, 211, 238, 0.06) 72%,
+    transparent 88%,
+    transparent 100%
+  );
+  filter: blur(80px);
+  animation: auroraRotateA 140s linear infinite;
+}
+
+.aurora-mesh::after {
+  background: conic-gradient(
+    from 180deg,
+    transparent 0%,
+    rgba(34, 255, 136, 0.05) 22%,
+    transparent 45%,
+    transparent 70%,
+    rgba(34, 255, 136, 0.04) 85%,
+    transparent 100%
+  );
+  filter: blur(100px);
+  animation: auroraRotateB 180s linear infinite;
+}
+
+/* Subtle vertical drift for floating objects (bubbles, nodes) */
+@keyframes driftFloat {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
+/* Breathing — very gentle opacity pulse for "always live" indicators */
+@keyframes breathe {
+  0%, 100% { opacity: 0.55; }
+  50%      { opacity: 1; }
+}
+
+.breathe {
+  animation: breathe 3.2s ease-in-out infinite;
+}
+
+/* Signal packet — dashed line stroke-dashoffset drift for data flow */
+@keyframes signalPacket {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -120; }
+}
+
+@keyframes signalPacketReverse {
+  from { stroke-dashoffset: -120; }
+  to   { stroke-dashoffset: 0; }
+}
+
+/* Orbital rotation — used by the telemetry orb */
+@keyframes orbitSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes orbitSpinReverse {
+  from { transform: rotate(360deg); }
+  to   { transform: rotate(-360deg); }
+}
+
+/* Traveling signal packet — crosses a container edge-to-edge.
+ * `left` is set to a negative % of the packet's width, so translating
+ * 100% + packetWidth% of the container lands it fully off-screen right. */
+@keyframes timelinePacket {
+  0%   { transform: translateX(0); opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateX(900%); opacity: 0; }
+}
+
+/* Ambient container — opt-out when user prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .ambient-motion,
+  .ambient-motion *,
+  .aurora-mesh::before,
+  .aurora-mesh::after,
+  .breathe,
+  .count-up {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
+
 /* Shortcut kbd styling */
 .kbd {
   display: inline-flex;

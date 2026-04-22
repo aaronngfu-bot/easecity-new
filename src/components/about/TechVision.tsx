@@ -107,39 +107,80 @@ export function TechVision() {
             <span className="w-1.5 h-1.5 rounded-full bg-signal animate-signal-pulse" />
             <p className="label-mono text-signal/80">{t.techVision.timelineLabel}</p>
           </div>
-          <div className="flex items-stretch gap-0 min-w-[500px]">
-            {timeline.map((item, i, arr) => (
-              <div key={item.year} className="flex-1 flex flex-col items-center">
-                <div
-                  className={`h-[3px] w-full ${
-                    item.stage === 'live'
-                      ? 'bg-signal'
-                      : item.stage === 'planned'
-                      ? 'bg-text-muted/60'
-                      : 'bg-text-muted/25'
-                  } ${i === 0 ? 'rounded-l-full' : ''} ${i === arr.length - 1 ? 'rounded-r-full' : ''}`}
-                />
-                <div className="mt-4 text-center">
-                  <p
-                    className={`text-xs font-mono font-bold tabular-nums ${
-                      item.active ? 'text-signal' : 'text-text-muted'
-                    }`}
-                  >
-                    {item.year}
-                  </p>
-                  <p
-                    className={`text-xs mt-1 ${
-                      item.active ? 'text-text-secondary' : 'text-text-muted'
-                    }`}
-                  >
-                    {item.label}
-                  </p>
+
+          {/* Timeline track with traveling signal packet */}
+          <div className="relative min-w-[500px]">
+            {/* Base bars */}
+            <div className="relative flex items-stretch gap-0">
+              {timeline.map((item, i, arr) => (
+                <div key={item.year} className="flex-1 flex flex-col items-center">
+                  <div
+                    className={`h-[3px] w-full ${
+                      item.stage === 'live'
+                        ? 'bg-signal'
+                        : item.stage === 'planned'
+                        ? 'bg-text-muted/60'
+                        : 'bg-text-muted/25'
+                    } ${i === 0 ? 'rounded-l-full' : ''} ${i === arr.length - 1 ? 'rounded-r-full' : ''}`}
+                  />
+                  <div className="mt-4 text-center">
+                    <p
+                      className={`text-xs font-mono font-bold tabular-nums ${
+                        item.active ? 'text-signal' : 'text-text-muted'
+                      }`}
+                    >
+                      {item.year}
+                    </p>
+                    <p
+                      className={`text-xs mt-1 ${
+                        item.active ? 'text-text-secondary' : 'text-text-muted'
+                      }`}
+                    >
+                      {item.label}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* Traveling signal packet — always running */}
+            <TimelinePacket />
           </div>
         </motion.div>
       </div>
     </section>
+  )
+}
+
+/** A signal packet that crosses the timeline track left-to-right,
+ *  wraps, and restarts. Pure CSS animation; no JS needed. */
+function TimelinePacket() {
+  return (
+    <div className="pointer-events-none absolute top-0 left-0 right-0 h-[3px] ambient-motion">
+      <div
+        className="absolute top-0 h-full"
+        style={{
+          width: '14%',
+          left: '-14%',
+          background:
+            'linear-gradient(90deg, transparent 0%, #22ff88aa 55%, #22ff88 70%, transparent 100%)',
+          filter: 'blur(0.4px)',
+          animation: 'timelinePacket 8s linear infinite',
+          willChange: 'transform',
+        }}
+      />
+      <div
+        className="absolute top-0 h-full"
+        style={{
+          width: '10%',
+          left: '-10%',
+          background:
+            'linear-gradient(90deg, transparent 0%, #22ff8866 70%, transparent 100%)',
+          animation: 'timelinePacket 8s linear infinite',
+          animationDelay: '-4s',
+          willChange: 'transform',
+        }}
+      />
+    </div>
   )
 }
