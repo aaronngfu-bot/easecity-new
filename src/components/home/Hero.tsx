@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight, ChevronDown, Radio } from 'lucide-react'
-import { HKSkyline } from '@/components/shared/HKSkyline'
+import { CinematicSkyline } from '@/components/shared/CinematicSkyline'
 import { useLanguage } from '@/context/LanguageContext'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import { ControlPanel } from './ControlPanel'
@@ -79,17 +79,19 @@ export function Hero() {
   return (
     <section
       ref={heroRef}
-      className="relative min-h-screen flex flex-col justify-between overflow-hidden bg-bg-base"
+      className="relative flex flex-col overflow-hidden bg-bg-base"
       style={{
         background: `
-          radial-gradient(ellipse 60% 40% at 50% 0%, #22ff8808, transparent),
-          radial-gradient(ellipse 50% 30% at 80% 80%, #22d3ee06, transparent),
-          #09090b
+          radial-gradient(ellipse 70% 45% at 50% 105%, rgba(250,250,250,0.03), transparent 60%),
+          #07080b
         `,
       }}
     >
-      <div className="absolute inset-0 bg-rule-grid opacity-[0.15] pointer-events-none" />
-      <div className="absolute inset-0 bg-grain opacity-[0.35] pointer-events-none mix-blend-overlay" />
+      <div className="absolute inset-0 bg-rule-grid opacity-[0.12] pointer-events-none" />
+      <div className="absolute inset-0 bg-grain opacity-[0.3] pointer-events-none mix-blend-overlay" />
+
+      {/* The editorial fold — first screen only */}
+      <div className="relative min-h-screen flex flex-col">
 
       {/* Top meta bar — live badge + telemetry */}
       <div className="relative z-20 border-b border-border/60">
@@ -275,9 +277,12 @@ export function Hero() {
         </div>
       </div>
 
-      {/* HK skyline */}
-      <div className="relative z-0 pointer-events-none select-none -mb-px">
-        <HKSkyline className="opacity-25" />
+      </div>
+      {/* /editorial fold */}
+
+      {/* Cinematic HK skyline — the signature moment */}
+      <div className="relative z-[1]">
+        <CinematicSkyline variant="full" />
       </div>
 
       {/* Broadcast toast */}

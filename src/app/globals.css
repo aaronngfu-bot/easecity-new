@@ -606,68 +606,37 @@
 }
 
 /* ──────────────────────────────────────────────────────────── */
-/* Ambient — always-on visual motion                            */
+/* Ambient — always-on visual motion (Blueprint aesthetic)      */
 /* ──────────────────────────────────────────────────────────── */
 
-/* Slow, continuous aurora mesh rotation.
- * Two counter-rotating conic layers create a shifting, non-repeating
- * field of signal-tinted light. Very low opacity keeps it atmospheric.
- */
-@keyframes auroraRotateA {
-  from { transform: translate(-50%, -50%) rotate(0deg); }
-  to   { transform: translate(-50%, -50%) rotate(360deg); }
+/* Horizontal light sweep — simulates dawn / stage light moving across
+ * the viewport. Pure white-silver, NO green glow. Long cycle so it
+ * barely reads as motion, but the page feels "lit" instead of static. */
+@keyframes lightSweep {
+  0%   { transform: translateX(-50%) skewX(-8deg); opacity: 0; }
+  12%  { opacity: 0.35; }
+  88%  { opacity: 0.35; }
+  100% { transform: translateX(250%) skewX(-8deg); opacity: 0; }
 }
 
-@keyframes auroraRotateB {
-  from { transform: translate(-50%, -50%) rotate(360deg); }
-  to   { transform: translate(-50%, -50%) rotate(0deg); }
+/* Corner crosshair tick — slow breathing at viewfinder corners */
+@keyframes crosshairBreath {
+  0%, 100% { opacity: 0.25; }
+  50%      { opacity: 0.55; }
 }
 
-.aurora-mesh {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
+/* Skyline parallax float — extremely subtle vertical drift */
+@keyframes skylineFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -3px, 0); }
 }
 
-.aurora-mesh::before,
-.aurora-mesh::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 140vmax;
-  height: 140vmax;
-  pointer-events: none;
-  will-change: transform;
-}
-
-.aurora-mesh::before {
-  background: conic-gradient(
-    from 0deg,
-    transparent 0%,
-    rgba(34, 255, 136, 0.08) 18%,
-    transparent 32%,
-    transparent 55%,
-    rgba(34, 211, 238, 0.06) 72%,
-    transparent 88%,
-    transparent 100%
-  );
-  filter: blur(80px);
-  animation: auroraRotateA 140s linear infinite;
-}
-
-.aurora-mesh::after {
-  background: conic-gradient(
-    from 180deg,
-    transparent 0%,
-    rgba(34, 255, 136, 0.05) 22%,
-    transparent 45%,
-    transparent 70%,
-    rgba(34, 255, 136, 0.04) 85%,
-    transparent 100%
-  );
-  filter: blur(100px);
-  animation: auroraRotateB 180s linear infinite;
+/* Signal packet between city buildings — brief, rare */
+@keyframes cityPacket {
+  0%   { stroke-dashoffset: 0; opacity: 0; }
+  5%   { opacity: 0.9; }
+  95%  { opacity: 0.9; }
+  100% { stroke-dashoffset: -140; opacity: 0; }
 }
 
 /* Subtle vertical drift for floating objects (bubbles, nodes) */

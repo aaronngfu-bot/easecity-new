@@ -7,7 +7,7 @@ import { BootSequence } from '@/components/ui/BootSequence'
 import { CommandPalette } from '@/components/ui/CommandPalette'
 import { KeyboardLayer } from '@/components/ui/KeyboardLayer'
 import { CursorGlowLayer } from '@/components/ui/CursorGlowLayer'
-import { AmbientLayer } from '@/components/ui/AmbientLayer'
+import { BlueprintField } from '@/components/ui/BlueprintField'
 
 export default function PublicLayout({
   children,
@@ -19,10 +19,11 @@ export default function PublicLayout({
       {/* Boot sequence intro on first visit */}
       <BootSequence />
 
-      {/* Always-on background — z-[1], behind content, above bg-base */}
-      <AmbientLayer />
+      {/* Precision instrument backdrop — silver crosshairs + hairline grid
+       * + white light sweep. Replaces the earlier green aurora. */}
+      <BlueprintField />
 
-      {/* Cursor-reactive grain noise, on top of ambient but below content */}
+      {/* Cursor-reactive grain noise */}
       <GrainField />
 
       {/* Reacts to cursor; writes CSS vars on interactive panels */}
