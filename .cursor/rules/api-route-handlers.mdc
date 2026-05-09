@@ -1,0 +1,31 @@
+---
+description: App Router API routes — handlers, validation, responses
+globs: src/app/api/**/*.ts
+alwaysApply: false
+---
+
+# API Route Handlers（`src/app/api`）
+
+## 預設模式
+
+以 `withErrorHandler`（`@/lib/api-handler`）包裝 `GET`/`POST`/… handler；成功用 `apiSuccess`，錯誤用 `apiError`（`@/lib/api-response`）。業務錯誤可丟 `AuthError`、`ForbiddenError`、`NotFoundError`。
+
+```typescript
+export const POST = withErrorHandler(async (req, context) => {
+  const body = await req.json()
+  const data = someSchema.parse(body)
+  return apiSuccess({ ... }, 201)
+})
+```
+
+## Input
+
+請求 body 用 **Zod** schema，放在 `@/lib/validations/*`（與現有 `contactSchema` 等一致）。
+
+## 例外
+
+Stripe **webhook** 等需原始 body 簽章驗證的路由可不用 `withErrorHandler`，維持官方驗證流程；仍須適當錯誤碼與 log。
+
+## Admin API
+
+須驗證 session / role（`ADMIN` | `SUPER_ADMIN`），與 middleware 對齊；勿僅依賴前端隱藏按鈕。

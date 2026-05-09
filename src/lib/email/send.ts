@@ -20,6 +20,12 @@ interface SendContactEmailParams {
   message: string
 }
 
+interface SendOtpEmailParams {
+  email: string
+  otp: string
+  expiresInMinutes: number
+}
+
 export async function sendContactEmail(params: SendContactEmailParams) {
   const resend = getResend()
   const { name, email, company, subject, message } = params
@@ -67,6 +73,38 @@ export async function sendContactEmail(params: SendContactEmailParams) {
 
   if (error) {
     throw new Error(`Failed to send email: ${error.message}`)
+  }
+
+  return data
+}
+
+export async function sendOtpEmail(params: SendOtpEmailParams) {
+  const resend = getResend()
+  const fromEmail = process.env.AUTH_EMAIL_FROM || 'EaseCity <onboarding@resend.dev>'
+
+  const { data, error } = await resend.emails.send({
+    from: fromEmail,
+    to: [params.email],
+    subject: 'Your EC-Share login code',
+    html: `
+      <div style="font-family: Arial, sans-serif; max-width: 520px; margin: 0 auto;">
+        <h2 style="color: #111827;">Your EC-Share login code</h2>
+        <p style="color: #374151; line-height: 1.6;">
+          Enter this code in EC-Share to finish signing in:
+        </p>
+        <div style="font-size: 32px; letter-spacing: 8px; font-weight: 700; color: #111827; padding: 16px 0;">
+          ${escapeHtml(params.otp)}
+        </div>
+        <p style="color: #6b7280; line-height: 1.6;">
+          This code expires in ${params.expiresInMinutes} minutes. If you did not request it, you can ignore this email.
+        </p>
+      </div>
+    `,
+    text: `Your EC-Share login code is ${params.otp}. It expires in ${params.expiresInMinutes} minutes.`,
+  })
+
+  if (error) {
+    throw new Error(`Failed to send OTP email: ${error.message}`)
   }
 
   return data

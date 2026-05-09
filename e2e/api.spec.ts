@@ -47,9 +47,7 @@ test.describe('API Routes', () => {
   })
 
   test('protected API rejects unauthenticated requests', async ({ request }) => {
-    const response = await request.post('/api/payment/create-session', {
-      data: { priceId: 'price_test', mode: 'payment' },
-    })
+    const response = await request.get('/api/admin/stats')
     expect(response.status()).toBe(401)
   })
 })

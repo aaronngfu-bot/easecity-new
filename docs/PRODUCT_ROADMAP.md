@@ -162,12 +162,12 @@ Each milestone must be **shippable** (can run, can demo, can receive money where
 
 ### What the EaseCity web team owns
 See `API_CONTRACT.md`. Critical path items for M1-M2 launch:
-- `POST /api/trial/start`
-- `POST /api/license/activate`
-- `POST /api/license/refresh`
-- `POST /api/auth/email-otp` (start + verify)
+- `POST /api/v1/auth/email/request-otp`
+- `POST /api/v1/auth/email/verify-otp`
+- `POST /api/v1/license/refresh`
+- `GET /api/v1/account/me`
 - Stripe webhook consumer (`customer.subscription.*` → reissue JWT)
-- Postgres schema (users, licenses, subscriptions, trials)
+- Postgres schema (users, organizations, subscriptions, trials, devices, OTP challenges)
 
 ### Tasks I (Cursor) can autonomously complete in code
 Server/client side: single-binary refactor, UI overhaul, first-run wizard, auto-update integration, feature gate infra, WebRTC integration, coturn config, installer packaging, i18n scaffolding.
@@ -269,7 +269,7 @@ Deferred but reserved: de, fr, ru, it, tr, id-ID, vi, hi, ar (Arabic requires RT
 | D-22 | Stripe statement descriptor = **EASECITY** | 2026-04-23 | Founder pick; generic enough for future EaseCity products to share an account. |
 | D-23 | Umbrella architecture: **EaseCity is umbrella brand; EC-Share is product #1 of N** | 2026-04-23 | Stripe/Atlassian pattern. Avoids Day-500 rewrite when product #2 ships. See `COMPANY_ARCHITECTURE.md`. |
 | D-24 | User identity cross-product at **`account.easecity.hk`** (single sign-on across all future products) | 2026-04-23 | Customer has one EaseCity account, possibly multiple product subscriptions. |
-| D-25 | API gateway split: shared (`/auth/*`, `/account/*`, `/license/*`, `/org/*`, `/billing/*`) vs product-namespaced (`/ec-share/*`, `/<future>/*`) | 2026-04-23 | Stripe-style resource design. See `API_CONTRACT.md` §0. |
+| D-25 | API gateway split: shared (`/api/v1/auth/*`, `/api/v1/account/*`, `/api/v1/license/*`, `/api/v1/org/*`, `/api/v1/billing/*`) vs product-namespaced (`/api/v1/ec-share/*`, `/api/v1/<future>/*`) | 2026-04-23 | Stripe-style resource design. Reconciled to the implemented `/api/v1` prefix on 2026-05-05. See `API_CONTRACT.md` §0. |
 | D-26 | License JWT carries **`product` claim**; one JWT per product per user | 2026-04-23 | Same machine can hold multiple EaseCity product licenses simultaneously. |
 | D-27 | Stripe products scoped as "EC-Share Pro/Business/Enterprise"; prices metadata `{ product, tier }` | 2026-04-23 | Single Stripe account cleanly supports multiple product lines. |
 | D-28 | DB: `subscriptions`/`licenses`/`trials`/`devices`/`audit_log` carry `product`; `users`/`orgs`/`org_members` don't | 2026-04-23 | Identity tables shared; activity tables product-scoped. |

@@ -44,7 +44,7 @@ Key information about easecity:
 - Enables one hub to manage unlimited remote endpoints
 - Services include real-time streaming, IoT control, remote device management
 - Currently in Phase 01 (Stream Control Infrastructure), expanding into online services (Phase 02, 2027) and AI-powered services (Phase 03, 2028)
-- Pricing plans: Starter ($49/mo), Professional ($149/mo), Business ($399/mo), Enterprise (custom)
+- EC-Share pricing: 14-day trial, Pro ($19/mo or $190/yr), Business ($49/mo or $490/yr), Enterprise from $2,499/yr
 
 Guidelines:
 - Be professional, friendly, and concise
@@ -62,7 +62,7 @@ export async function POST(req: Request) {
   }
 
   const ip = getClientIp(req)
-  const { allowed } = rateLimit(`chat:${ip}`, 20, 60_000)
+  const { allowed } = await rateLimit(`chat:${ip}`, 20, 60_000)
   if (!allowed) {
     return new Response(
       JSON.stringify({ error: 'Too many requests. Please slow down.' }),

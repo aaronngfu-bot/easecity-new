@@ -59,6 +59,18 @@ From `API_CONTRACT.md` §10 — founder needs your answers to move forward:
 
 Reply to founder via email/Slack with your picks + rough M2 timeline estimate.
 
+## May 2026 addendum — contract reconciliation
+
+The current Next.js implementation in this repo is ahead of the original v0.1 web-team checklist. Trust `API_CONTRACT.md` v0.2 for the desktop-facing API shape:
+
+| Area | Current contract |
+|---|---|
+| API paths | Desktop-facing M2 routes use `/api/v1/*`, e.g. `POST /api/v1/license/refresh` |
+| Response shape | Implemented API routes return `{ success, data, meta }`; desktop clients must read payloads from `data` |
+| Stripe webhook | Prefer `POST /webhooks/stripe`; legacy `POST /api/payment/webhook` forwards to the same handler |
+| Implemented M2 foundation | OTP login, license refresh, account lookup, change-email, device rename/delete, Prisma schema, Stripe webhook, and license JWT signing are present |
+| Still deployment-blocked | Production Stripe products/price IDs, production Ed25519 key material, DNS, hosted secrets, and desktop public-key embedding |
+
 ## Late-April 2026 addendum — decisions that impact your work
 
 Founder + Cursor agent ratified decisions D-39 through D-49 during Apr 23-24 UX design passes. The highlights that affect **your** code:
@@ -68,9 +80,9 @@ Founder + Cursor agent ratified decisions D-39 through D-49 during Apr 23-24 UX 
 | **D-39** | Cloudflare tunnel **dropped from M0.5**. Don't design around `*.trycloudflare.com` URLs in API responses. A future optional tunnel integration would live in a separate `tunnel_endpoint` field, not conflated with `alice_endpoint`. |
 | **D-40** | Desktop UI unifies "host" as a **single `host:port` string**. Backend must persist and emit exactly that format (see API_CONTRACT §6 new section). Control port is a desktop implementation detail; don't model two ports server-side. |
 | **D-44** | M1 may ship true single-socket desktop protocol. No schema change expected, but be aware when tempted to "optimize" around the two-port assumption. |
-| **D-45 ~ D-49** | Desktop adds device ActionBar with custom actions + nickname edit. Impact on you: the heartbeat body (`POST /v1/host/heartbeat`) now carries per-device `alias`, `video_codec`, `video_encoder` — see WEB_TEAM_TASKS.md M3 section for full shape. |
-| **D-46 (Enterprise)** | M4 org-level custom actions: `GET/PUT /v1/org/{slug}/custom-actions`. Placeholder in WEB_TEAM_TASKS.md Enterprise section. |
-| **D-47 (Enterprise)** | M4 org-shared device aliases: `GET/PUT /v1/org/{slug}/device-aliases`. Same section. |
+| **D-45 ~ D-49** | Desktop adds device ActionBar with custom actions + nickname edit. Impact on you: the heartbeat body (`POST /api/v1/host/heartbeat`) now carries per-device `alias`, `video_codec`, `video_encoder` — see WEB_TEAM_TASKS.md M3 section for full shape. |
+| **D-46 (Enterprise)** | M4 org-level custom actions: `GET/PUT /api/v1/org/{slug}/custom-actions`. Placeholder in WEB_TEAM_TASKS.md Enterprise section. |
+| **D-47 (Enterprise)** | M4 org-shared device aliases: `GET/PUT /api/v1/org/{slug}/device-aliases`. Same section. |
 
 ---
 

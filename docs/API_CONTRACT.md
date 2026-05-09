@@ -1,9 +1,9 @@
-# EC-Share ↔ EaseCity Backend — API Contract (v0.1)
+# EC-Share ↔ EaseCity Backend — API Contract (v0.3)
 
 > **Audience**: EaseCity web/backend team (who owns `easecity.hk` stack, Stripe integration, Postgres DB).
 > **Source**: EC-Share Windows desktop client (Flutter + C++), which consumes this API.
-> **Status**: DRAFT v0.1 — all endpoints and schemas below are the desktop client's requirement; backend team may propose changes, but the JWT shape (§6) is load-bearing for the desktop entitlements system.
-> **Last updated**: 2026-04-23
+> **Status**: DRAFT v0.3 — license/account API baseline implemented 2026-05-05. Backend team may propose changes, but the JWT shape (§6) is load-bearing for the desktop entitlements system.
+> **Last updated**: 2026-05-05
 
 ---
 
@@ -16,9 +16,9 @@ This doc covers **licensing + identity + subscription** APIs between the EaseCit
 
 ### Multi-product readiness (per `COMPANY_ARCHITECTURE.md`)
 
-All endpoints follow two path conventions:
-- **Shared endpoints** (cross-product): `/auth/*`, `/account/*`, `/license/*`, `/org/*`, `/billing/*`
-- **Product-specific endpoints**: `/ec-share/*` for EC-Share, `/<future-product>/*` for later products
+All implemented desktop-facing endpoints use the `/api/v1` prefix and follow two path conventions:
+- **Shared endpoints** (cross-product): `/api/v1/auth/*`, `/api/v1/account/*`, `/api/v1/license/*`, `/api/v1/org/*`, `/api/v1/billing/*`
+- **Product-specific endpoints**: `/api/v1/ec-share/*` for EC-Share, `/api/v1/<future-product>/*` for later products
 
 JWTs include a `product` claim so shared endpoints can return product-specific data (features list, max devices, etc.) without client needing to parse the URL.
 
@@ -48,20 +48,22 @@ dl.easecity.hk        ─── installer hosting + auto-update channel manifest
 
 ## 2. Conventions
 
-- **Base URL**: `https://api.easecity.hk`
-- **Auth**: Bearer JWT in `Authorization: Bearer <token>` for user-authenticated endpoints.
+- **Base URL**: `https://api.easecity.hk` in production. In the current Next.js app, routes live under the deployed web origin and are path-prefixed with `/api/v1`.
+- **Desktop API prefix**: all M2 desktop-facing endpoints are implemented under `/api/v1/*` (for example, `POST /api/v1/license/refresh`). Do not call unprefixed `/license/*` or `/auth/*` paths from the desktop client.
+- **Auth**: Bearer license JWT in `Authorization: Bearer <token>` for license/account endpoints.
 - **Content-Type**: `application/json` both ways.
-- **Errors**: use standard HTTP codes + JSON `{ "error": { "code": "...", "message": "..." } }`.
-- **Idempotency**: for POST endpoints that create resources, accept `Idempotency-Key: <uuid>` header to prevent duplicate side effects.
-- **Rate limits**: 60 requests / minute / IP for unauthenticated endpoints; 600 / minute / user for authenticated.
-- **Timestamps**: Unix epoch seconds, UTC.
-- **Versioning**: add `/v1/` prefix if breaking changes needed; until then no prefix.
+- **Success envelope**: implemented routes return `{ "success": true, "data": { ... }, "meta": { "timestamp": 1735603200000 } }`. Endpoint examples below describe the object inside `data` unless the full envelope is shown.
+- **Errors**: standard HTTP codes + JSON `{ "success": false, "error": { "code": "...", "message": "..." }, "meta": { "timestamp": 1735603200000 } }`.
+- **Idempotency**: Stripe handles subscription idempotency via event/session IDs. Additional `Idempotency-Key` support for future create endpoints is planned, not required by the current M2 desktop API.
+- **Rate limits**: OTP request is currently limited by IP + email (`20/IP/hour`, `5/email/hour`, plus 1 request/email/minute). OTP verification is limited by IP + email (`60/IP/hour`, `30/email/hour`). Native password auth is limited by IP + email (`30/IP/hour`, `10/email/hour`). License lifecycle endpoints are limited by IP + device (`120/IP/hour`, `120/device/hour`).
+- **Timestamps**: API business fields use Unix epoch seconds, UTC. Envelope `meta.timestamp` is JavaScript epoch milliseconds.
+- **Versioning**: `/api/v1` is the active contract prefix. Breaking changes require a new prefix (`/api/v2`) or backwards-compatible adapters.
 
 ---
 
 ## 3. Identity & Auth endpoints
 
-### 3.1 `POST /auth/email/request-otp`
+### 3.1 `POST /api/v1/auth/email/request-otp`
 Start email-OTP login. Also used for trial signup.
 
 **Request**:
@@ -81,7 +83,7 @@ Start email-OTP login. Also used for trial signup.
 
 **Response 429**: too many requests for this email (max 5 / hour).
 
-### 3.2 `POST /auth/email/verify-otp`
+### 3.2 `POST /api/v1/auth/email/verify-otp`
 Complete email-OTP login.
 
 **Request**:
@@ -105,10 +107,61 @@ Complete email-OTP login.
 - On success: creates user if new, starts 14-day trial if no prior trial on this `device_fingerprint` or `email`.
 - **Trial-fraud guard**: if `device_fingerprint` has already consumed a trial within 365 days, `is_new_user: false` and the returned JWT has `tier: "expired_trial"`.
 
-### 3.3 `POST /auth/oauth/google/callback` *(optional, M2.5)*
+### 3.3a `POST /api/v1/auth/register`
+Native-client password registration. This does **not** create a NextAuth browser session; it returns an EC-Share license JWT for the desktop client.
+
+**Request**:
+```json
+{
+  "email": "user@example.com",
+  "password": "Password1",
+  "name": "Eric",
+  "device_fingerprint": "sha256_hex_64chars",
+  "app_version": "1.0.0",
+  "platform": "windows"
+}
+```
+
+**Response 201**:
+```json
+{
+  "user_id": "usr_xyz",
+  "email": "user@example.com",
+  "license_jwt": "eyJhbG...",
+  "is_new_user": true
+}
+```
+
+### 3.3b `POST /api/v1/auth/login`
+Native-client password login. OTP remains the primary low-friction auth path; this endpoint exists for clients that already collected a password through the web account flow.
+
+**Request**:
+```json
+{
+  "email": "user@example.com",
+  "password": "Password1",
+  "device_fingerprint": "sha256_hex_64chars",
+  "app_version": "1.0.0",
+  "platform": "windows"
+}
+```
+
+**Response 200**:
+```json
+{
+  "user_id": "usr_xyz",
+  "email": "user@example.com",
+  "license_jwt": "eyJhbG...",
+  "is_new_user": false
+}
+```
+
+**Response 401**: invalid email/password, OTP-only account without password, or invalid credentials. The response intentionally does not reveal which condition occurred.
+
+### 3.4 `POST /api/v1/auth/oauth/google/callback` *(optional, M2.5)*
 Google OAuth flow for users who prefer it. Deferred past M2 MVP.
 
-### 3.4 `POST /auth/logout`
+### 3.5 `POST /api/v1/auth/logout` *(planned, not implemented yet)*
 **Request**: Bearer token in header.
 **Response 204**: no content; client discards local JWT.
 
@@ -118,7 +171,7 @@ Server-side: optionally adds user to deny-list for unexpired JWTs (stateless JWT
 
 ## 4. License & trial endpoints
 
-### 4.1 `POST /license/refresh`
+### 4.1 `POST /api/v1/license/refresh`
 Called by desktop client every 24 hours while online. Renews JWT with latest tier/expiry.
 
 **Request**: Bearer token (can be expired up to 44 days, server is lenient within grace window).
@@ -140,11 +193,81 @@ Called by desktop client every 24 hours while online. Renews JWT with latest tie
 }
 ```
 
-A user with subscriptions to multiple products calls `/license/refresh` once per product. Backend returns a JWT scoped to that product.
+A user with subscriptions to multiple products calls `/api/v1/license/refresh` once per product. Backend returns a JWT scoped to that product.
 
 **Response 401**: token fully expired beyond 44-day grace OR user revoked / refunded → client shows login screen.
 
-### 4.2 `GET /account/me`
+### 4.1a `POST /api/v1/license/activate`
+Bind/confirm the current license JWT to the current device fingerprint and issue a fresh JWT. The bearer token must already be a valid EC-Share license JWT for the same `device_fingerprint`; new-machine activation should first use auth register/login/OTP with that machine fingerprint.
+
+**Request**: Bearer token in header.
+```json
+{
+  "product": "ec_share",
+  "device_fingerprint": "sha256_hex_64chars",
+  "app_version": "1.0.0",
+  "platform": "windows"
+}
+```
+
+**Response 200**:
+```json
+{
+  "license_jwt": "eyJhbG...",
+  "product": "ec_share",
+  "expires_at": 1738195200,
+  "next_refresh_at": 1735689600,
+  "activated": true
+}
+```
+
+### 4.1b `POST /api/v1/license/heartbeat`
+Lightweight desktop heartbeat for the licensed machine. This only updates the account/device activity timestamp. It is distinct from the future M3 host heartbeat (`/api/v1/host/heartbeat`), which will publish reachable endpoints and live Android device rows.
+
+**Request**: Bearer token in header.
+```json
+{
+  "product": "ec_share",
+  "device_fingerprint": "sha256_hex_64chars",
+  "app_version": "1.0.0",
+  "platform": "windows"
+}
+```
+
+**Response 200**:
+```json
+{
+  "product": "ec_share",
+  "device_fingerprint": "sha256_hex_64chars",
+  "last_seen_at": 1735603200
+}
+```
+
+### 4.1c `POST /api/v1/license/deactivate`
+Remove this machine from the account device list. This is idempotent for the row removal, but it does **not** revoke already-issued stateless JWTs until deny-list storage is implemented.
+
+**Request**: Bearer token in header.
+```json
+{
+  "product": "ec_share",
+  "device_fingerprint": "sha256_hex_64chars",
+  "app_version": "1.0.0",
+  "platform": "windows"
+}
+```
+
+**Response 200**:
+```json
+{
+  "product": "ec_share",
+  "device_fingerprint": "sha256_hex_64chars",
+  "deactivated": true,
+  "token_revoked": false,
+  "revoke_pending_reason": "Stateless JWT deny-list storage is not configured yet."
+}
+```
+
+### 4.2 `GET /api/v1/account/me`
 **Response 200**:
 ```json
 {
@@ -165,31 +288,73 @@ A user with subscriptions to multiple products calls `/license/refresh` once per
 }
 ```
 
-### 4.3 `POST /account/change-email`
-Requires fresh re-auth (OTP challenge) to prevent session hijack.
+### 4.3a `POST /api/v1/account/change-email/request-otp`
+Requires a valid bearer license JWT. Starts a fresh OTP challenge for `new_email` to prevent session hijack.
 
-### 4.4 `POST /account/devices/rename`
+**Request**:
+```json
+{ "new_email": "new@example.com" }
+```
+
+**Response 200**:
+```json
+{ "challenge_id": "chal_abc123", "expires_in_seconds": 600 }
+```
+
+### 4.3b `POST /api/v1/account/change-email`
+Requires a valid bearer license JWT and a verified change-email OTP challenge.
+
+**Request**:
+```json
+{
+  "new_email": "new@example.com",
+  "challenge_id": "chal_abc123",
+  "otp": "482951"
+}
+```
+
+**Response 200**:
+```json
+{
+  "user_id": "usr_xyz",
+  "email": "new@example.com",
+  "license_jwt": "eyJhbG..."
+}
+```
+
+### 4.4 `POST /api/v1/account/devices/rename`
 **Request**: `{ "fingerprint": "...", "nickname": "..." }`
-**Response 204**.
+**Response 200**: `{ "fingerprint": "...", "nickname": "My Thinkpad" }`.
 
-### 4.5 `DELETE /account/devices/{fingerprint}`
-Remove a device from the user's account. Server invalidates cached JWTs for that fingerprint.
+### 4.5 `DELETE /api/v1/account/devices/{fingerprint}`
+Remove a device from the user's account device list.
+
+**Response 200**: `{ "deleted": true }`.
+
+Current M2 foundation behavior removes the device row only. Full JWT deny-list invalidation for already-issued device tokens is deferred until the web team closes the deny-list storage decision in §10.
 
 ---
 
 ## 5. Stripe webhook handler (backend-only, not called by desktop)
 
-Listens to Stripe events at `POST /webhooks/stripe`:
+Listens to Stripe events at `POST /webhooks/stripe`.
+
+Compatibility route: `POST /api/payment/webhook` forwards to the same handler for older staging/Stripe CLI configs. New Stripe Dashboard endpoints should prefer `/webhooks/stripe`.
 
 | Stripe event | Server action |
 |--------------|--------------|
+| `checkout.session.completed` | Marks the legacy `orders` row paid when present; subscription entitlement comes from subsequent subscription events |
+| `checkout.session.expired` | Marks the legacy `orders` row expired when present |
 | `customer.subscription.created` | Upsert `subscriptions` row; set user's tier to the one in Stripe price metadata; reissue JWT on next refresh |
 | `customer.subscription.updated` | Update `subscriptions` row (new tier, seat count, status); reissue JWT on next refresh |
 | `customer.subscription.deleted` | Mark subscription canceled; user falls back to `tier: "expired"` after period end; JWT refresh returns that tier |
 | `invoice.payment_failed` | Mark subscription `past_due`; email customer; allow 7-day retry |
 | `invoice.payment_succeeded` | Reset any `past_due` flags |
+| `charge.refunded` | Marks the legacy `orders` row refunded when present |
 
 **Signature verification**: always verify `Stripe-Signature` header using webhook secret before acting. Reject any request that fails verification.
+
+**Idempotency**: persist every Stripe `event.id` in `StripeWebhookEvent` before processing. Events already marked `processed` return 200 with `duplicate: true`; events marked `failed` can be retried by Stripe. This makes webhook retries safe across process restarts and deploys.
 
 **Stripe price metadata (multi-product ready, per D-27)**:
 

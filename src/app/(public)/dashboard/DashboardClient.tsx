@@ -4,7 +4,7 @@ import { useTransition } from 'react'
 import Link from 'next/link'
 import {
   CreditCard, CheckCircle, Clock, AlertCircle, XCircle,
-  ArrowRight, Zap, Shield, Cpu, Building2,
+  ArrowRight, Zap, Shield, Building2,
   MessageCircle, Activity, ChevronRight, Loader2, Settings,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -42,17 +42,25 @@ const PLAN_STYLE: Record<string, {
   tier: 'free' | 'pro' | 'premium' | 'enterprise'
   sla: string
 }> = {
-  starter:    { icon: Cpu,       tier: 'free',       sla: '99.5%' },
-  pro:        { icon: Zap,       tier: 'pro',        sla: '99.9%' },
-  business:   { icon: Shield,    tier: 'premium',    sla: '99.99%' },
+  pro:        { icon: Zap,       tier: 'pro',        sla: 'Best-effort' },
+  business:   { icon: Shield,    tier: 'premium',    sla: '99.5%' },
   enterprise: { icon: Building2, tier: 'enterprise', sla: 'Custom' },
-  unknown:    { icon: Cpu,       tier: 'free',       sla: '—' },
+  unknown:    { icon: Zap,       tier: 'free',       sla: '—' },
 }
 
 function getPlanKey(priceId: string): string {
-  if (priceId === process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID) return 'starter'
-  if (priceId === process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID)     return 'pro'
-  if (priceId === process.env.NEXT_PUBLIC_STRIPE_BIZ_PRICE_ID)     return 'business'
+  if (
+    priceId === process.env.NEXT_PUBLIC_STRIPE_PRO_MONTHLY_PRICE_ID ||
+    priceId === process.env.NEXT_PUBLIC_STRIPE_PRO_ANNUAL_PRICE_ID ||
+    priceId === process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID ||
+    priceId === process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID
+  ) return 'pro'
+  if (
+    priceId === process.env.NEXT_PUBLIC_STRIPE_BUSINESS_MONTHLY_PRICE_ID ||
+    priceId === process.env.NEXT_PUBLIC_STRIPE_BUSINESS_ANNUAL_PRICE_ID ||
+    priceId === process.env.NEXT_PUBLIC_STRIPE_BIZ_PRICE_ID
+  ) return 'business'
+  if (priceId === process.env.NEXT_PUBLIC_STRIPE_ENTERPRISE_ANNUAL_PRICE_ID) return 'enterprise'
   return 'unknown'
 }
 
@@ -182,7 +190,6 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
   const locale = language
 
   const featuresByPlan: Record<string, string[]> = {
-    starter:    [t.pricingPage.starterF1, t.pricingPage.starterF2, t.pricingPage.starterF3, t.pricingPage.starterF4, t.pricingPage.starterF5],
     pro:        [t.pricingPage.proF1,     t.pricingPage.proF2,     t.pricingPage.proF3,     t.pricingPage.proF4,     t.pricingPage.proF5,     t.pricingPage.proF6],
     business:   [t.pricingPage.bizF1,     t.pricingPage.bizF2,     t.pricingPage.bizF3,     t.pricingPage.bizF4,     t.pricingPage.bizF5,     t.pricingPage.bizF6, t.pricingPage.bizF7],
     enterprise: [t.pricingPage.entF1,     t.pricingPage.entF2,     t.pricingPage.entF3,     t.pricingPage.entF4,     t.pricingPage.entF5],
@@ -191,7 +198,6 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
   const features = featuresByPlan[planKey] ?? featuresByPlan.unknown
 
   const planNames: Record<string, string> = {
-    starter: t.pricingPage.starterName,
     pro: t.pricingPage.proName,
     business: t.pricingPage.bizName,
     enterprise: t.pricingPage.entName,

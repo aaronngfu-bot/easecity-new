@@ -1,0 +1,11 @@
+---
+description: Admin area — align with server-side role enforcement
+globs: src/app/admin/**/*.tsx
+alwaysApply: false
+---
+
+# Admin UI
+
+- 僅 `ADMIN` / `SUPER_ADMIN` 應可到達（已由 `middleware` 擋）；UI 仍勿暴露敏感操作給一般用戶複製呼叫。
+- 列表與表单對齊現有 admin 元件風格（`font-display` 標題、`bg-bg-*`）。
+- 變更資料後優先 invalidate / router refresh 與現有頁面一致。

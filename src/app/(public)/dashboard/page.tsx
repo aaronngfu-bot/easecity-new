@@ -11,7 +11,10 @@ export default async function DashboardPage() {
   if (!session?.user) redirect('/login')
 
   const [subscription, recentOrders] = await Promise.all([
-    prisma.subscription.findUnique({ where: { userId: session.user.id } }),
+    prisma.subscription.findFirst({
+      where: { userId: session.user.id, product: 'ec_share' },
+      orderBy: { updatedAt: 'desc' },
+    }),
     prisma.order.findMany({
       where: { userId: session.user.id },
       orderBy: { createdAt: 'desc' },

@@ -19,5 +19,8 @@ export async function GET() {
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
     latency: Date.now() - start,
+    services: {
+      database: dbStatus,
+    },
   })
 }

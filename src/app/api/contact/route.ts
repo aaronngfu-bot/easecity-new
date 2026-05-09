@@ -7,7 +7,7 @@ import { prisma } from '@/lib/db'
 
 export const POST = withErrorHandler(async (req) => {
   const ip = getClientIp(req)
-  const { allowed, resetIn } = rateLimit(`contact:${ip}`, 3, 60_000)
+  const { allowed, resetIn } = await rateLimit(`contact:${ip}`, 3, 60_000)
 
   if (!allowed) {
     return apiError(

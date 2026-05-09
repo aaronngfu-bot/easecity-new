@@ -3,7 +3,7 @@
 > **Audience**: EaseCity web + backend engineer(s) working on `easecity.hk`, `api.easecity.hk`, `share.easecity.hk`, `dl.easecity.hk`.
 > **Primary point of contact**: founder (Eric).
 > **Source of truth for specs**: `docs/API_CONTRACT.md` — read this first.
-> **Updated**: 2026-04-24 (zip `2026-04-24b`: API §6 host-format addendum + D-39..D-49 impact table)
+> **Updated**: 2026-05-05 (contract reconciliation: current Next.js implementation uses `/api/v1/*` + response envelope; Stripe webhook supports `/webhooks/stripe` plus legacy `/api/payment/webhook`)
 
 ---
 
@@ -89,14 +89,15 @@ Founder will update these as items become available:
 ### 🔴 M2 critical path (aim to start during M1 development so you're ready)
 
 #### Auth & license
-- [ ] `POST /auth/email/request-otp` (§3.1 of API_CONTRACT)
-- [ ] `POST /auth/email/verify-otp` (§3.2)
-- [ ] `POST /auth/logout` (§3.4)
-- [ ] `POST /license/refresh` (§4.1)
-- [ ] `GET /account/me` (§4.2)
-- [ ] `POST /account/change-email` (§4.3)
-- [ ] `POST /account/devices/rename` (§4.4)
-- [ ] `DELETE /account/devices/{fingerprint}` (§4.5)
+- [x] `POST /api/v1/auth/email/request-otp` (§3.1 of API_CONTRACT) — implemented in current Next.js repo
+- [x] `POST /api/v1/auth/email/verify-otp` (§3.2) — implemented; issues EC-Share license JWT
+- [ ] `POST /api/v1/auth/logout` (§3.4) — planned; not implemented yet
+- [x] `POST /api/v1/license/refresh` (§4.1) — implemented with 44-day refresh grace
+- [x] `GET /api/v1/account/me` (§4.2) — implemented
+- [x] `POST /api/v1/account/change-email/request-otp` (§4.3a) — implemented
+- [x] `POST /api/v1/account/change-email` (§4.3b) — implemented
+- [x] `POST /api/v1/account/devices/rename` (§4.4) — implemented
+- [x] `DELETE /api/v1/account/devices/{fingerprint}` (§4.5) — implemented for device-row removal; JWT deny-list invalidation deferred
 
 #### Stripe integration — **web team owns end-to-end after founder's KYC**
 
@@ -115,23 +116,26 @@ Founder handles: HK account KYC approval + invites you as Stripe team member wit
     - Generate webhook signing secret; store in backend secrets (Fly.io / env var)
     - Confirm with founder: statement descriptor (`EASECITY` or `EC-SHARE`) + save to account settings
     - Send founder the **5 price IDs** once created — he'll paste them back in FOUNDER_TODO.md so they flow to the desktop client config
-- [ ] **In your backend code**:
-    - Stripe Checkout pages (`/checkout/pro`, `/checkout/pro-annual`, `/checkout/business`, `/checkout/business-annual`)
-    - Stripe Customer Portal redirect endpoint (so user clicks "Manage subscription" → goes to Stripe-hosted self-serve)
-    - Webhook endpoint `POST /webhooks/stripe` with signature verification
-    - Webhook handlers for the events listed in API_CONTRACT §5
-    - Price → tier mapping table (editable without redeploy — store in DB or config file)
-    - Test-mode development first (you can integrate against Stripe test keys before founder's KYC is approved — don't wait)
+- [x] **In your backend code**:
+    - Pricing page + server action creates Stripe Checkout sessions from allowed Price IDs (`src/actions/stripe.ts`)
+    - Stripe Customer Portal redirect server action implemented for dashboard settings
+    - Webhook endpoint `POST /webhooks/stripe` with signature verification implemented
+    - Compatibility webhook endpoint `POST /api/payment/webhook` forwards to the same handler for older staging configs
+    - Webhook handlers for the events listed in API_CONTRACT §5 implemented
+    - Price → tier mapping implemented via Stripe Price metadata with env-var fallback (`src/lib/stripe-catalog.ts`)
+    - Test-mode development path documented in `.env.example` and `docs_legacy/STAGING_ENV_CHECKLIST.md`
 
 #### Database
-- [ ] Postgres schema from API_CONTRACT §7 (`users`, `trials`, `subscriptions`, `devices`, `email_otp_challenges`)
-- [ ] Migration tooling (Prisma / Flyway / Alembic / your choice)
+- [x] Postgres schema from API_CONTRACT §7 implemented in Prisma (`User`, `Organization`, `OrgMember`, `EmailOtpChallenge`, `Trial`, `Subscription`, `Device`)
+- [x] Baseline Prisma migration exists at `prisma/migrations/20260427172000_ec_share_m2_foundation`
 
 #### Ed25519 keypair
-- [ ] Generate signing keypair (use `openssl genpkey -algorithm ed25519` or Python `cryptography`)
-- [ ] Store private key in hosting secrets (Fly.io secrets / env var / HashiCorp Vault)
-- [ ] Publish public key — **need to send to founder so it gets embedded in desktop client binary**
-- [ ] Document key ID (`kid`) in JWT header — start with `2026a`
+- [x] License JWT signing/verification implemented with Ed25519 (`src/lib/license-jwt.ts`)
+- [x] Dev key-generation helper exists (`npm run ecshare:key`)
+- [ ] Generate production signing keypair
+- [ ] Store production private key in hosting secrets (Fly.io secrets / env var / HashiCorp Vault)
+- [ ] Publish production public key — **need to send to founder so it gets embedded in desktop client binary**
+- [x] Document key ID (`kid`) in JWT header — start with `2026a`
 
 ### 🟡 M1 website path (parallel, not blocking desktop client)
 
@@ -157,20 +161,20 @@ Founder handles: HK account KYC approval + invites you as Stripe team member wit
 
 ### 🟣 M3 new items — dashboard device list + protocol handler (D-37, D-38)
 
-- [ ] **Device list API**: `GET /v1/account/devices/live` returns devices currently heartbeating to `api.easecity.hk` with their reachable endpoint. Each entry includes:
+- [ ] **Device list API**: `GET /api/v1/account/devices/live` returns devices currently heartbeating to `api.easecity.hk` with their reachable endpoint. Each entry includes:
     - `alice_endpoint` — single **`host:port`** string (video port 28100 is canonical; see API_CONTRACT §6 "Host-endpoint format convention" D-40). Web backend never emits two ports.
     - `device_id`, `serial`, `alias` (nickname user set via desktop's device-card ActionBar — persisted client-side and reported via heartbeat, D-47)
     - `last_seen_at`, `device_phase`
     - `video_codec` + `video_encoder` (so dashboard can hint "H.264 / software encoder" in the device row, helpful for enterprise diagnostics)
 - [ ] **⚠ NOTE — Cloudflare tunnel dropped from M0.5 (D-39, 2026-04-24)**: do NOT assume Alice's endpoint is ever a `*.trycloudflare.com` URL. It will be LAN IP / Tailscale IP / VPN IP / public IP (with manual port forward). If desktop later opts into tunnels again, this will be a separate `tunnel_endpoint` field distinct from `alice_endpoint`.
 - [ ] **Per-row "Open in app" button** on dashboard's Home page:
-    - Calls `POST /v1/share/create-native` to mint a short-lived JWT
+    - Calls `POST /api/v1/share/create-native` to mint a short-lived JWT
     - Generates deep link: `ec-share://connect?host=<endpoint>&device_id=<id>&alias=<url-encoded-alias>&token=<jwt>`
     - On click, uses `<a href="ec-share://…">` — Windows/macOS dispatches to installed `ec-share.exe`
     - If app not installed, fallback UI shows "Install EC-Share" + small "Open in browser (experimental)" secondary button
     - **Alias** is passed so Bob's desktop shows "Opening Eric's Pixel 7…" in the loading skeleton rather than "Opening device …"
 - [ ] **Per-row "Open in browser" fallback button** (M3 only, gated until WebRTC ships):
-    - Calls `POST /v1/share/create` (same as invite-link share) to mint token
+    - Calls `POST /api/v1/share/create` (same as invite-link share) to mint token
     - Redirects to `https://share.easecity.hk/v/<token>?device_id=<id>`
 - [ ] **Short-lived native-connect JWT schema** (new vs share-link JWT):
     ```json
@@ -185,7 +189,7 @@ Founder handles: HK account KYC approval + invites you as Stripe team member wit
       "role": "operator" | "viewer"
     }
     ```
-- [ ] **Alice-side heartbeat endpoint** (web team + Cursor agent work shared): `POST /v1/host/heartbeat` from running `ec-share.exe` → registers its reachable endpoint; dashboard learns which of user's machines is online and what host string to use. Sends every 60s. Heartbeat body:
+- [ ] **Alice-side heartbeat endpoint** (web team + Cursor agent work shared): `POST /api/v1/host/heartbeat` from running `ec-share.exe` → registers its reachable endpoint; dashboard learns which of user's machines is online and what host string to use. Sends every 60s. Heartbeat body:
     ```json
     {
       "machine_fingerprint": "sha256_hex_64chars",  ← identifies Alice's physical PC
@@ -198,7 +202,7 @@ Founder handles: HK account KYC approval + invites you as Stripe team member wit
       "heartbeat_version": 1
     }
     ```
-    Web backend merges this into the live-devices view served by `GET /v1/account/devices/live`.
+    Web backend merges this into the live-devices view served by `GET /api/v1/account/devices/live`.
 
 ### 🔵 M4 Enterprise surface
 
@@ -207,12 +211,12 @@ Founder handles: HK account KYC approval + invites you as Stripe team member wit
 - [ ] Audit log export (SIEM forward to Splunk/Datadog)
 - [ ] Docker Compose package for on-prem self-host (per ROADMAP D-16, SH-08)
 - [ ] **Org-level custom actions** (builds on D-46): Enterprise tier org-admin can push a shared `custom_actions.apps[]` and `custom_actions.adb[]` config to all seats; desktop's Settings → Host → Custom actions gets a "Managed by org admin" section above the user's personal list. Requires:
-    - `GET /v1/org/{slug}/custom-actions` — returns shared list
-    - `PUT /v1/org/{slug}/custom-actions` — org admin updates
+    - `GET /api/v1/org/{slug}/custom-actions` — returns shared list
+    - `PUT /api/v1/org/{slug}/custom-actions` — org admin updates
     - Desktop fetches on license refresh and merges (org list read-only for members)
 - [ ] **Device alias sync** (builds on D-47): Enterprise tier org can share device aliases across members (so when a phone moves between desks, everyone sees the same "Eric's Pixel 7" label). Requires:
-    - `GET /v1/org/{slug}/device-aliases`
-    - `PUT /v1/org/{slug}/device-aliases/{serial}`
+    - `GET /api/v1/org/{slug}/device-aliases`
+    - `PUT /api/v1/org/{slug}/device-aliases/{serial}`
     - Desktop resolves alias priority: org-shared > personal > serial fallback
 
 ---
@@ -221,6 +225,7 @@ Founder handles: HK account KYC approval + invites you as Stripe team member wit
 
 | Date | Who | Update |
 |------|-----|--------|
+| 2026-05-05 | Cursor | Reconciled web/backend contract against current Next.js implementation: M2 routes use `/api/v1/*` + `{ success, data, meta }` envelope; auth/license/account/device APIs are implemented; Stripe webhook supports `/webhooks/stripe` plus legacy `/api/payment/webhook`; production Stripe/DNS/key material remain founder/web-team deployment tasks. |
 | 2026-04-23 | founder | Created this doc; will forward to web team with API_CONTRACT.md |
 
 ---

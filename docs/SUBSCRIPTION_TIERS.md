@@ -130,7 +130,7 @@ Signed JWT issued by EaseCity subscription backend:
 }
 ```
 - **Signing**: Ed25519 keypair. Public key embedded in `ec-share.exe`; private key on backend HSM/env secret only.
-- **Renewal**: client calls `POST https://api.easecity.hk/license/refresh` every 24h while online; returns new JWT with updated `exp`.
+- **Renewal**: client calls `POST https://api.easecity.hk/api/v1/license/refresh` every 24h while online; returns new JWT with updated `exp`.
 
 ### Offline grace (founder-confirmed)
 - **0-14 days offline**: full functionality (cached last-known-good JWT).

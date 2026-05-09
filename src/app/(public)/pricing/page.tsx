@@ -4,9 +4,9 @@ import { PricingCards } from '@/components/pricing/PricingCards'
 import { PricingFAQ } from '@/components/pricing/PricingFAQ'
 
 export const metadata: Metadata = {
-  title: 'Pricing',
+  title: 'EC-Share Pricing',
   description:
-    'Transparent pricing for easecity stream control infrastructure. From startups to enterprise — choose the plan that scales with your needs.',
+    'EC-Share pricing: 14-day trial, Pro at $19/month, Business at $49/month, and Enterprise from $2,499/year.',
 }
 
 export default function PricingPage() {

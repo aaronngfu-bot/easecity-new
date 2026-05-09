@@ -51,7 +51,7 @@ account.easecity.hk/
 | **Home** | See "welcome back" + subscription status + days-left-in-trial (if trial) + CTA to upgrade + **device list with "Connect" buttons** (see §1a) | Custom page pulling from license JWT |
 | **Subscription** | View current tier; change plan (Pro ↔ Business); cancel; resubscribe; see next billing date; toggle annual/monthly | **Stripe Customer Portal** (80% free from Stripe, redirect them out) |
 | **Payment method** | Update card; view invoice history; download PDF invoices | Stripe Customer Portal |
-| **Devices** | See activated devices (fingerprint + nickname + last seen); rename; revoke (force logout from a machine); see seat quota | Custom page, calls `GET /account/me` (API_CONTRACT §4.2) |
+| **Devices** | See activated devices (fingerprint + nickname + last seen); rename; revoke (force logout from a machine); see seat quota | Custom page, calls `GET /api/v1/account/me` (API_CONTRACT §4.2) |
 | **Shares** (Business/Enterprise only) | Active invite links; revoke; view count per link; 30-day history | Custom page, calls signaling server API |
 | **Account** | Change email (requires OTP); logout all sessions; export data (GDPR); delete account | Custom page + API_CONTRACT §4.3 |
 | **Notifications** | Email preferences (product updates, billing alerts, security) | Custom page |
@@ -76,7 +76,7 @@ Next to each device:
 
 **Protocol handler registration** (M1 installer work): the installer registers `ec-share://` as a URL scheme under `HKEY_CLASSES_ROOT\ec-share\shell\open\command` pointing to `ec-share.exe --client-only %1`. The Dart side parses the full URL and extracts `host`, `device_id`, `token`.
 
-**Token verification** (M3 backend work): the dashboard asks `api.easecity.hk/v1/share/create` for a short-lived JWT bound to this user, this device, and this tier's permissions. Alice's `ec-share.exe` server (if it's the one Bob connects to) validates the token signature against the EaseCity public key embedded at install time before accepting the connection. For same-account connections (Alice shares to her own machine on another network), the token also carries `self=true` and the server skips additional checks.
+**Token verification** (M3 backend work): the dashboard asks `api.easecity.hk/api/v1/share/create` for a short-lived JWT bound to this user, this device, and this tier's permissions. Alice's `ec-share.exe` server (if it's the one Bob connects to) validates the token signature against the EaseCity public key embedded at install time before accepting the connection. For same-account connections (Alice shares to her own machine on another network), the token also carries `self=true` and the server skips additional checks.
 
 **Why a protocol handler and not just a deep link**:
 - Shorter flow: 1 click instead of "copy paste host → open app → paste"

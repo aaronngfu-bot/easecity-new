@@ -1,0 +1,18 @@
+---
+description: easecity stack, folder layout, imports — baseline for every change
+alwaysApply: true
+---
+
+# easecity 專案概要
+
+## Stack
+
+- Next.js 14 App Router，`src/app`，Route groups：`(public)`、`(auth)`、`admin`，路徑別名 `@/` → `src/`（見 `tsconfig.json`）。
+- PostgreSQL + Prisma（`prisma/schema.prisma`）；單例 `src/lib/db.ts`，勿在每個 request `new PrismaClient()`。
+- Auth：NextAuth，`authOptions` 於 `src/lib/auth.ts`，session strategy **JWT**，`session.user.id` / `role`。
+- Client i18n：`LanguageProvider` + `useLanguage()`，`t` 來自 `@/i18n/translations`（`en` | `zh`）；新字串須同步兩語系。
+- Payments：Stripe；公開表單與敏感 API 注意速率限制（見 `rate-limit`）。
+
+## 你做什麼之前
+
+讀相鄰既有檔案對齊命名與結構；只改與需求相關檔案；做完跑 `npm run build`（或使用者指定之檢查）。

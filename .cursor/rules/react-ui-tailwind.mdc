@@ -1,0 +1,21 @@
+---
+description: React components, Tailwind tokens, i18n usage
+globs: src/**/*.tsx
+alwaysApply: false
+---
+
+# UI / React（easecity）
+
+## Tailwind
+
+- 語意色：`bg-bg-base`、`bg-bg-surface`、`text-text-primary` / `secondary` / `muted`、`border-border`、`accent-cyan` / `purple`（見 `tailwind.config.ts`）。
+- 字型：`font-sans` → body stack；標題用 `font-display`。勿引入 SKILL 禁止之預設組合（專案已換 Instrument Sans + Syne）。
+- 類名合併：`cn(...)` from `@/lib/utils`（clsx + tailwind-merge）。
+
+## i18n
+
+Client 元件用 `useLanguage()`；文案加在 `@/i18n/translations.ts` 的 **en 與 zh** 兩邊。
+
+## 結構
+
+優先函式元件；新頁面對齊現有 `layout.tsx`、區塊元件放置於 `src/components/` 對應資料夾。

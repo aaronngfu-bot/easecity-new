@@ -1,7 +1,128 @@
 # MUPhone / EC-Share — Engineering Changelog
 
 所有從 Cursor 介入到目前狀態的實際改動記錄。
-最後更新：2026-04-24
+最後更新：2026-05-06
+
+## 2026-05-08 — Neon Prisma baseline applied
+### Database
+- Existing Neon DB returned Prisma `P3005` because the schema was non-empty but `_prisma_migrations` had no records.
+- Marked `20260427172000_ec_share_m2_foundation` as applied with `npx prisma migrate resolve --applied`.
+- Applied `20260505041000_stripe_webhook_events` with `npx prisma migrate deploy`.
+- Confirmed `npx prisma migrate status` reports the DB schema is up to date.
+- Confirmed via introspection that Neon now has `EmailOtpChallenge.purpose` and `StripeWebhookEvent`.
+
+### Code / Docs
+- `prisma/migrations/20260505041000_stripe_webhook_events/migration.sql` — made migration additive/idempotent for existing Neon DBs; adds `EmailOtpChallenge.purpose`, compound OTP index, and `StripeWebhookEvent` if missing.
+- `prisma/migrations/README.md` — documented existing-Neon baseline behavior.
+- `docs_legacy/STAGING_ENV_CHECKLIST.md` — added Prisma `P3005` baseline instructions.
+- `docs/PROGRESS.md` — updated migration status.
+
+### Validation
+- `npx prisma migrate resolve --applied 20260427172000_ec_share_m2_foundation` → foundation migration marked applied for existing Neon DB.
+- `npx prisma migrate deploy` → applied `20260505041000_stripe_webhook_events`.
+- `npx prisma migrate status` → database schema is up to date.
+- `npx prisma db pull --print` → confirmed `EmailOtpChallenge.purpose` and `StripeWebhookEvent`.
+
+## 2026-05-08 — Resend key corrected + e2e service isolation
+### Code
+- `playwright.config.ts` — clears `RESEND_API_KEY`, `UPSTASH_REDIS_REST_URL`, and `UPSTASH_REDIS_REST_TOKEN` for Playwright's dev server so API e2e tests do not send real contact emails or consume real Upstash rate-limit state.
+
+### Local env
+- `.env.local` — corrected local `RESEND_API_KEY` to the supplied real `re_...` key. This file remains uncommitted and must not be committed.
+
+### Docs
+- `docs/PROGRESS.md` — updated current validation notes.
+
+### Validation
+- `npm run ecshare:env-check` → all required staging env vars present.
+- `npm test` → API e2e baseline 4/4 passing with external services isolated.
+- `npm run check:staging` → env report, `prisma validate`, lint, build, and API e2e all green.
+
+## 2026-05-06 — M2 staging deploy readiness check
+### Code
+- **NEW** `scripts/dev/check-staging-env.mjs` — redacted staging env presence checker; defaults to strict mode and supports `--allow-missing` for local structural checks.
+- `package.json` — added `ecshare:env-check` and `check:staging`. `check:staging` runs env presence reporting, Prisma schema validation, lint, production build, and API e2e baseline.
+
+### Docs
+- `docs_legacy/STAGING_ENV_CHECKLIST.md` — added strict env check, `check:staging`, and explicit Prisma migration deploy notes.
+- `prisma/migrations/README.md` — documented `20260505041000_stripe_webhook_events`.
+- `docs/PROGRESS.md` — updated with the staging deploy readiness follow-up.
+
+### Validation
+- `npm run ecshare:env-check -- --allow-missing` → runs without printing secret values; reports missing explicit Pro/Business Stripe Price IDs and recommended production email/Redis/Enterprise Price ID vars.
+- `npm run check:staging` → passes: env presence report, `prisma validate`, lint, production build, and API e2e baseline all green.
+
+## 2026-05-06 — M2 staging readiness / smoke baseline
+### Code
+- `scripts/dev/ec-share-api-smoke.mjs` — added native password register/login smoke paths (`--register-password`, `--login-password`) and license lifecycle checks (`--test-license-lifecycle`, `--test-deactivate`) covering activate/heartbeat/deactivate.
+- `package.json` — added `npm test` as a stable API e2e entry point (`e2e/api.spec.ts` on Chromium).
+
+### Docs
+- `docs_legacy/STAGING_ENV_CHECKLIST.md` — added M2 staging readiness commands for `npm test`, native register/login smoke, license lifecycle smoke, and manual Stripe duplicate-event verification via `StripeWebhookEvent`.
+- `docs/PROGRESS.md` — updated with the staging readiness follow-up.
+
+### Validation
+- `npm run ecshare:smoke -- --help` → smoke script help/arg parsing works
+- `npm run lint` → 0 warnings/errors
+- `npm test` → API Playwright baseline 4/4 passing
+- `npm run build` → production build successful after rerun; first attempt was run in parallel with Playwright dev server and hit transient `.next` contention (`/_document` not found)
+
+## 2026-05-05 — Stripe entitlement baseline
+### Code
+- `prisma/schema.prisma` — added `StripeWebhookEvent` model for persistent Stripe webhook idempotency.
+- **NEW** `prisma/migrations/20260505041000_stripe_webhook_events/migration.sql` — creates webhook event table with unique `eventId` and status/type/created indexes.
+- `src/lib/stripe-webhook.ts` — added event-id dedupe/status recording; processed duplicates return 200, failed events remain retryable, and failure messages are stored for debugging.
+- `src/lib/stripe-catalog.ts` — centralized `EC_SHARE_PRODUCT` and tier seat minimum helpers (`pro=1`, `business>=3`, `enterprise>=50`).
+- `src/actions/stripe.ts` — scoped Pro trial eligibility to EC-Share subscriptions only and reused the product constant in Stripe metadata.
+
+### Docs / Config
+- `.env.example` — documented canonical `/webhooks/stripe`, legacy `/api/payment/webhook`, required Stripe Price metadata, Stripe Tax dashboard setup, and seat minimums.
+- `docs/API_CONTRACT.md` — documented webhook idempotency via stored Stripe `event.id`.
+- `docs/PROGRESS.md` — updated current status and file list for this baseline.
+
+### Validation
+- `npx prisma generate` → Prisma Client generated successfully
+- `npm run lint` → 0 warnings/errors
+- `npm run build` → production build successful
+- `npm run test:e2e -- e2e/api.spec.ts --project=chromium` → 4/4 passing
+- `npm test` not run because `package.json` has no `test` script.
+
+## 2026-05-05 — EC-Share license/account API baseline
+### Code
+- `src/lib/validations/ec-share.ts` — added native password auth schemas and license lifecycle schema, reusing the existing SHA-256 device fingerprint and Windows platform validation.
+- `src/lib/rate-limit-policy.ts` — added password auth and license lifecycle rate-limit windows.
+- **NEW** `src/app/api/v1/auth/register/route.ts` — native-client password registration; creates an active member user, hashes password with bcrypt cost 12, starts eligible trial, and returns EC-Share `license_jwt`.
+- **NEW** `src/app/api/v1/auth/login/route.ts` — native-client password login; validates active password accounts with neutral `INVALID_CREDENTIALS` failures and returns EC-Share `license_jwt`.
+- **NEW** `src/app/api/v1/license/activate/route.ts` — validates bearer license + same device fingerprint and reissues a fresh device-bound license.
+- **NEW** `src/app/api/v1/license/heartbeat/route.ts` — validates bearer license and updates `Device.lastSeenAt`.
+- **NEW** `src/app/api/v1/license/deactivate/route.ts` — validates bearer license and removes the matching `Device` row; returns `token_revoked: false` until JWT deny-list storage is implemented.
+
+### Docs
+- `docs/API_CONTRACT.md` — bumped to v0.3 with native register/login and license activate/heartbeat/deactivate request/response shapes, rate limits, and host-heartbeat distinction.
+- `docs/PROGRESS.md` — updated current status and file list for the baseline implementation.
+
+### Validation
+- `npm run lint` → 0 warnings/errors
+- `npm run build` → production build successful
+- `npm run test:e2e -- e2e/api.spec.ts --project=chromium` → 4/4 passing
+- `npm test` not run because `package.json` has no `test` script.
+
+## 2026-05-05 — Web/backend contract reconciliation
+### Code
+- `src/app/api/v1/health/route.ts` — added `services.database` to the health response so the implemented endpoint matches the existing API e2e contract.
+- `e2e/api.spec.ts` — protected API test now targets active `/api/admin/stats` instead of deprecated `/api/payment/create-session` (which correctly returns 410).
+
+### Docs
+- `docs/API_CONTRACT.md` — bumped to v0.2 and reconciled with current Next.js implementation: `/api/v1/*` path prefix, `{ success, data, meta }` response envelope, implemented OTP/license/account/device endpoints, split change-email flow, current rate limits, Stripe webhook canonical path `/webhooks/stripe` plus legacy `/api/payment/webhook` compatibility, and current device-delete limitation.
+- `docs/WEB_TEAM_TASKS.md` — marked implemented M2 foundation items (OTP auth, license refresh, account lookup, device management, Prisma schema/migration, Stripe webhook, JWT signing); left production Stripe/DNS/key material and logout/deny-list decisions pending.
+- `docs/_WEBTEAM_README.md` — added May 2026 contract reconciliation summary for web-team handoff.
+- `docs/COMPANY_ARCHITECTURE.md`, `docs/PRODUCT_ROADMAP.md`, `docs/SUBSCRIPTION_TIERS.md`, `docs/DASHBOARDS_SPEC.md` — normalized endpoint examples and future references to the implemented `/api/v1` convention.
+- `docs/PROGRESS.md` — updated current status, blockers, and validation summary for this session.
+
+### Validation
+- `npm run lint` → 0 warnings/errors
+- `npm run build` → production build successful
+- `npm run test:e2e -- e2e/api.spec.ts --project=chromium` → 4/4 passing
 
 ## 2026-04-24 — M0.5 Day 8: first-run mode chooser + TopBar wired up
 ### Code
@@ -16,7 +137,7 @@
 
 ### Docs
 - `docs/API_CONTRACT.md` — new §6 "Host-endpoint format convention (D-40)" codifying single `host:port` contract; called out M1 single-socket forward-compatibility (D-44)
-- `docs/WEB_TEAM_TASKS.md` — M3 heartbeat body + `GET /v1/account/devices/live` response now include `alias`/`video_codec`/`video_encoder`; deep-link carries `alias`; ⚠ note about D-39 Cloudflare drop; M4 org-level custom-actions and device-alias-sync placeholder
+- `docs/WEB_TEAM_TASKS.md` — M3 heartbeat body + `GET /api/v1/account/devices/live` response now include `alias`/`video_codec`/`video_encoder`; deep-link carries `alias`; ⚠ note about D-39 Cloudflare drop; M4 org-level custom-actions and device-alias-sync placeholder
 - `docs/DASHBOARDS_SPEC.md` — §1a device-row shows alias + phase dot + reachability + codec tag + last-seen
 - `docs/_WEBTEAM_README.md` — late-April addendum with D-39..D-49 impact table
 - **NEW** `dist/EC-Share-WebTeam-Docs-2026-04-24b.zip` (84.8 KB, 12 docs)

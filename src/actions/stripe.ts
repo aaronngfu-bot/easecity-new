@@ -4,7 +4,11 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { getStripe } from '@/lib/stripe'
-import { assertCheckoutPriceIdAllowed } from '@/lib/stripe-catalog'
+import {
+  assertCheckoutPriceIdAllowed,
+  EC_SHARE_PRODUCT,
+  getTierForCheckoutPriceId,
+} from '@/lib/stripe-catalog'
 import { redirect } from 'next/navigation'
 
 export async function createCheckoutSession(priceId: string) {
@@ -14,6 +18,7 @@ export async function createCheckoutSession(priceId: string) {
   }
 
   assertCheckoutPriceIdAllowed(priceId)
+  const tier = getTierForCheckoutPriceId(priceId)
 
   const userId = session.user.id
   const stripe = getStripe()
@@ -21,7 +26,12 @@ export async function createCheckoutSession(priceId: string) {
   // 1. Get or create Stripe Customer
   let user = await prisma.user.findUnique({
     where: { id: userId },
-    include: { subscriptions: true },
+    include: {
+      subscriptions: {
+        where: { product: EC_SHARE_PRODUCT },
+        select: { id: true },
+      },
+    },
   })
 
   if (!user) {
@@ -45,10 +55,10 @@ export async function createCheckoutSession(priceId: string) {
     })
   }
 
-  // 2. Check if eligible for trial (only for Starter plan & never had a subscription)
-  const isStarterPlan = priceId === process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID
+  // 2. EC-Share gives first-time self-serve Pro subscribers a 14-day trial.
+  const isProPlan = tier === 'pro'
   const hasHadSubscription = user.subscriptions && user.subscriptions.length > 0
-  const isEligibleForTrial = isStarterPlan && !hasHadSubscription
+  const isEligibleForTrial = isProPlan && !hasHadSubscription
 
   const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
 
@@ -67,13 +77,17 @@ export async function createCheckoutSession(priceId: string) {
     subscription_data: {
       metadata: {
         userId,
+        product: EC_SHARE_PRODUCT,
+        tier,
       },
       ...(isEligibleForTrial && {
-        trial_period_days: 3,
+        trial_period_days: 14,
       }),
     },
     metadata: {
       userId,
+      product: EC_SHARE_PRODUCT,
+      tier,
     },
   })
 
@@ -93,13 +107,19 @@ export async function getCheckoutSessionUrl(priceId: string): Promise<string> {
   }
 
   assertCheckoutPriceIdAllowed(priceId)
+  const tier = getTierForCheckoutPriceId(priceId)
 
   const userId = session.user.id
   const stripe = getStripe()
 
   let user = await prisma.user.findUnique({
     where: { id: userId },
-    include: { subscriptions: true },
+    include: {
+      subscriptions: {
+        where: { product: EC_SHARE_PRODUCT },
+        select: { id: true },
+      },
+    },
   })
 
   if (!user) {
@@ -121,9 +141,9 @@ export async function getCheckoutSessionUrl(priceId: string): Promise<string> {
     })
   }
 
-  const isStarterPlan = priceId === process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID
+  const isProPlan = tier === 'pro'
   const hasHadSubscription = user.subscriptions && user.subscriptions.length > 0
-  const isEligibleForTrial = isStarterPlan && !hasHadSubscription
+  const isEligibleForTrial = isProPlan && !hasHadSubscription
 
   const baseUrl = process.env.NEXTAUTH_URL || 'http://localhost:3000'
 
@@ -134,10 +154,10 @@ export async function getCheckoutSessionUrl(priceId: string): Promise<string> {
     success_url: `${baseUrl}/payment/success?session_id={CHECKOUT_SESSION_ID}`,
     cancel_url: `${baseUrl}/payment/cancel`,
     subscription_data: {
-      metadata: { userId },
-      ...(isEligibleForTrial && { trial_period_days: 3 }),
+      metadata: { userId, product: EC_SHARE_PRODUCT, tier },
+      ...(isEligibleForTrial && { trial_period_days: 14 }),
     },
-    metadata: { userId },
+    metadata: { userId, product: EC_SHARE_PRODUCT, tier },
   })
 
   if (!checkoutSession.url) {

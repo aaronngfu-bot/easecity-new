@@ -1,0 +1,21 @@
+---
+description: Middleware and role checks for dashboard and admin
+globs: src/middleware.ts
+alwaysApply: false
+---
+
+# Auth 與 Middleware
+
+## 行為（勿在未理解前改掉）
+
+- `/dashboard/*`：需登入；未登入 redirect `/login?callbackUrl=…`。
+- `/admin/*`：需登入且 `token.role` 為 `ADMIN` 或 `SUPER_ADMIN`；否則 redirect `/dashboard`。
+- `/login`、`/register`：已登入 redirect `/dashboard`。
+
+## Headers
+
+Middleware 已設 `X-Frame-Options`、`X-Content-Type-Options`、`Referrer-Policy`、`Permissions-Policy`；變更安全標頭時維持最小權限原則。
+
+## API
+
+Route handler 內如需 session，使用 NextAuth 的 `getServerSession(authOptions)`（或專案既有 helper），並與上述 role 規則一致。

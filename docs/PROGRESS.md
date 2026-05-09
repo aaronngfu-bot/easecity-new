@@ -5,6 +5,109 @@
 
 ---
 
+## Last session: 2026-05-05 (Stripe entitlement baseline)
+
+**Summary**: Implemented the EC-Share subscription / Stripe entitlement baseline hardening. Added persistent Stripe webhook idempotency via a new `StripeWebhookEvent` Prisma model + migration; webhook handling now records `event.id`, returns 200 for already processed duplicates, retries failed events, and stores failure messages for debugging. Tightened subscription entitlement mapping by centralizing `EC_SHARE_PRODUCT`, deriving tier from Stripe Price metadata/env fallback, and normalizing seats to Pro=1, Business>=3, Enterprise>=50. Checkout trial eligibility now scopes prior subscriptions to `product="ec_share"` so future EaseCity product purchases do not block an EC-Share Pro trial. `.env.example` and `API_CONTRACT.md` now document canonical webhook URL, legacy webhook compatibility, Stripe Tax dashboard setup, metadata, seat minimums, and event idempotency.
+
+### Follow-up: M2 staging readiness / smoke baseline
+
+**Summary**: Added repeatable staging readiness checks for the web/backend M2 flow. `scripts/dev/ec-share-api-smoke.mjs` now supports native password register/login flows in addition to OTP, and can exercise license activate/heartbeat/deactivate. `package.json` now has a standard `npm test` entry that runs the existing API Playwright smoke (`e2e/api.spec.ts` on Chromium). `docs_legacy/STAGING_ENV_CHECKLIST.md` now includes concrete staging commands for API e2e, register/login smoke, license lifecycle smoke, and manual Stripe webhook idempotency checks.
+
+### Follow-up: M2 staging deploy readiness check
+
+**Summary**: Added a real staging readiness command path. `scripts/dev/check-staging-env.mjs` checks required staging env vars without printing secret values, and `npm run check:staging` now chains env presence reporting, `prisma validate`, lint, production build, and the API e2e baseline. The staging checklist now points deployment operators to strict env checking before deploy and clarifies that both M2 Prisma migrations must be applied.
+
+### Follow-up: Neon migration baseline applied
+
+**Summary**: Resolved Prisma `P3005` on the existing Neon database. The DB already contained the M2 foundation schema but did not have Prisma migration history, so `20260427172000_ec_share_m2_foundation` was marked as applied with `prisma migrate resolve`, then `prisma migrate deploy` applied `20260505041000_stripe_webhook_events`. The second migration was made additive/idempotent so it safely patches existing Neon DBs by adding `EmailOtpChallenge.purpose`, the new compound OTP index, and `StripeWebhookEvent`. `prisma migrate status` now reports the database schema is up to date.
+
+### Follow-up: Resend key corrected + e2e service isolation
+
+**Summary**: Replaced the mistaken Resend DNS/public-key value in local env with the real `re_...` API key supplied by founder and confirmed `ecshare:env-check` sees all required staging env. This exposed that API e2e tests should not consume live Resend/Upstash services, so `playwright.config.ts` now clears `RESEND_API_KEY`, `UPSTASH_REDIS_REST_URL`, and `UPSTASH_REDIS_REST_TOKEN` for the Playwright dev server. `npm test` and `npm run check:staging` now pass deterministically without sending real contact emails or consuming production rate-limit state.
+
+**Files changed in follow-up**:
+- Updated `playwright.config.ts`: isolates e2e dev server from real Resend/Upstash env vars.
+- Updated `.env.local` only: corrected local `RESEND_API_KEY` (not committed).
+- Updated `docs/PROGRESS.md` and `docs/CHANGELOG.md`.
+
+**Files changed in follow-up**:
+- Updated `prisma/migrations/20260505041000_stripe_webhook_events/migration.sql`: made it additive/idempotent and added `EmailOtpChallenge.purpose` / index patch.
+- Updated `prisma/migrations/README.md`: documented the existing-Neon baseline flow.
+- Updated `docs_legacy/STAGING_ENV_CHECKLIST.md`: added `P3005` baseline instructions.
+- Updated `docs/PROGRESS.md` and `docs/CHANGELOG.md`.
+
+**Files changed in follow-up**:
+- **NEW** `scripts/dev/check-staging-env.mjs`: redacted staging env presence checker with `--strict` default and `--allow-missing` local mode.
+- Updated `package.json`: added `ecshare:env-check` and `check:staging`.
+- Updated `docs_legacy/STAGING_ENV_CHECKLIST.md`: added `check:staging`, strict env check, and migration-deploy notes.
+- Updated `prisma/migrations/README.md`: documented the Stripe webhook event migration.
+- Updated `docs/PROGRESS.md` and `docs/CHANGELOG.md`.
+
+**Files changed in follow-up**:
+- Updated `scripts/dev/ec-share-api-smoke.mjs`: added `--register-password`, `--login-password`, `--test-license-lifecycle`, and `--test-deactivate`.
+- Updated `package.json`: added `test` script for the API e2e baseline.
+- Updated `docs_legacy/STAGING_ENV_CHECKLIST.md`: added M2 staging readiness commands and Stripe duplicate-event verification notes.
+
+**Files changed this session**:
+- Updated `prisma/schema.prisma`: added `StripeWebhookEvent` for persistent Stripe event dedupe.
+- **NEW** `prisma/migrations/20260505041000_stripe_webhook_events/migration.sql`: creates the webhook event table and indexes.
+- Updated `src/lib/stripe-webhook.ts`: added event-id dedupe/status recording; duplicate processed events return success; failed events remain retryable.
+- Updated `src/lib/stripe-catalog.ts`: centralized `EC_SHARE_PRODUCT` and tier seat minimum helpers.
+- Updated `src/actions/stripe.ts`: scoped Pro trial eligibility to EC-Share subscriptions only and reused the product constant in Stripe metadata.
+- Updated `.env.example`: added Stripe Tax, webhook URL, metadata, and seat-minimum notes.
+- Updated `docs/API_CONTRACT.md`, `docs/PROGRESS.md`, and `docs/CHANGELOG.md`.
+
+**Validation**:
+- `npx prisma generate` → Prisma Client generated successfully
+- `npm run lint` → 0 warnings/errors
+- `npm run build` → production build successful after rerun; first attempt was run in parallel with Playwright dev server and hit transient `.next` contention (`/_document` not found)
+- `npm run test:e2e -- e2e/api.spec.ts --project=chromium` → 4/4 passing
+- `npm test` → API Playwright baseline passing
+
+**Additional staging readiness validation**:
+- `npm run ecshare:env-check -- --allow-missing` → runs without printing secret values; reports missing explicit Pro/Business Stripe Price IDs and recommended production email/Redis/Enterprise Price ID vars.
+- `npm run check:staging` → passes: env presence report, `prisma validate`, lint, production build, and API e2e baseline all green.
+- `npx prisma migrate resolve --applied 20260427172000_ec_share_m2_foundation` → foundation migration marked applied for existing Neon DB.
+- `npx prisma migrate deploy` → applied `20260505041000_stripe_webhook_events`.
+- `npx prisma migrate status` → database schema is up to date.
+- `npx prisma db pull --print` → confirmed `EmailOtpChallenge.purpose` and `StripeWebhookEvent` exist in Neon.
+- `npm run ecshare:env-check` → all required staging env vars present after corrected Resend key.
+- `npm test` → API e2e baseline passing with Resend/Upstash disabled in Playwright.
+- `npm run check:staging` → env report, `prisma validate`, lint, build, and API e2e all green.
+
+## Last session: 2026-05-05 (EC-Share license/account API baseline)
+
+**Summary**: Implemented the next minimal EC-Share license/account API baseline on the current Next.js web/backend repo. Added native-client password `POST /api/v1/auth/register` and `POST /api/v1/auth/login` endpoints that issue the same EC-Share `license_jwt` shape as OTP login without touching NextAuth browser sessions. Added `POST /api/v1/license/activate`, `POST /api/v1/license/heartbeat`, and `POST /api/v1/license/deactivate` on top of the existing `Device` table; no Prisma migration required. `deactivate` intentionally removes the device row but reports `token_revoked: false` because stateless JWT deny-list storage is still an open production decision. `API_CONTRACT.md` is now v0.3 and documents these endpoints, rate limits, request/response shapes, and the distinction between license heartbeat and future M3 host heartbeat.
+
+**Files changed this session**:
+- Updated `src/lib/validations/ec-share.ts`: added native password auth and license lifecycle schemas.
+- Updated `src/lib/rate-limit-policy.ts`: added password auth and license lifecycle rate-limit constants.
+- **NEW** `src/app/api/v1/auth/register/route.ts`: native password registration + trial/license issuance.
+- **NEW** `src/app/api/v1/auth/login/route.ts`: native password login + license issuance with neutral credential errors.
+- **NEW** `src/app/api/v1/license/activate/route.ts`: validates bearer license and reissues/binds a fresh license for the same device.
+- **NEW** `src/app/api/v1/license/heartbeat/route.ts`: validates bearer license and updates `Device.lastSeenAt`.
+- **NEW** `src/app/api/v1/license/deactivate/route.ts`: validates bearer license and removes the matching `Device` row without claiming stateless JWT revocation.
+- Updated `docs/API_CONTRACT.md`: v0.3 baseline endpoint contract.
+- Updated `docs/PROGRESS.md` and `docs/CHANGELOG.md`.
+
+**Validation**:
+- `npm run lint` → 0 warnings/errors
+- `npm run build` → production build successful
+- `npm run test:e2e -- e2e/api.spec.ts --project=chromium` → 4/4 passing
+- `npm test` not run because `package.json` has no `test` script.
+
+## Last session: 2026-05-05 (web/backend contract reconciliation)
+
+**Summary**: Reconciled the current Next.js web/backend workspace against the EC-Share API docs. `API_CONTRACT.md` is now v0.2 and reflects the implemented contract: `/api/v1/*` desktop endpoints, `{ success, data, meta }` response envelope, current OTP rate limits, split change-email OTP flow, implemented device rename/delete response shapes, and Stripe webhook canonical path `/webhooks/stripe` with legacy `/api/payment/webhook` compatibility. Synced downstream references in `WEB_TEAM_TASKS.md`, `_WEBTEAM_README.md`, `COMPANY_ARCHITECTURE.md`, `PRODUCT_ROADMAP.md`, `SUBSCRIPTION_TIERS.md`, and `DASHBOARDS_SPEC.md`. Small code/test reconciliation: `/api/v1/health` now returns `services.database` for the existing e2e contract, and `e2e/api.spec.ts` now tests an active protected API instead of deprecated payment session endpoint. Validation: `npm run lint` clean, `npm run build` clean, `npm run test:e2e -- e2e/api.spec.ts --project=chromium` 4/4 passing.
+
+**Files changed this session**:
+- Updated `docs/API_CONTRACT.md`: v0.2 contract reconciliation; `/api/v1` prefix; response envelope; current implemented auth/license/account/device paths; Stripe webhook compatibility route; current device-delete limitation documented.
+- Updated `docs/WEB_TEAM_TASKS.md`: marked implemented M2 auth/license/account/device/database/JWT/Stripe-backend work; left production Stripe/DNS/key material tasks pending.
+- Updated `docs/_WEBTEAM_README.md`: May 2026 addendum summarizing the current API shape and deployment blockers.
+- Updated `docs/COMPANY_ARCHITECTURE.md`, `docs/PRODUCT_ROADMAP.md`, `docs/SUBSCRIPTION_TIERS.md`, `docs/DASHBOARDS_SPEC.md`: normalized API examples and future route references to `/api/v1`.
+- Updated `src/app/api/v1/health/route.ts`: added `services.database` to match the e2e contract.
+- Updated `e2e/api.spec.ts`: protected API test now targets `/api/admin/stats` instead of deprecated `/api/payment/create-session`.
+
 ## Last session: 2026-04-24 (Day 8 — mode selection UI + TopBar wired up)
 
 **Summary**: **M0.5 Day 8 shipped.** First-run mode chooser implemented and plumbed end-to-end: fresh install shows two-card chooser ("Share my devices" / "Connect to a host") with inline IP input + recent-hosts list; user pick persists to `state.json` (`last_mode`, `last_host`, `recent_hosts`). On relaunch, app auto-resumes the last mode and attempts connect — no second prompt. Top-bar `_Logo` replaced by clickable `_ModePill` that always shows current mode (Host / Connect) + serverHost; clicking reopens the chooser mid-session (re-entrant-safe native init prevents double handler registration). **Bonus fix**: discovered `TopBar` was never wired into the render tree (Day 7's Copy-host button was invisible — code was correct, just not parented). Fixed by wrapping MainScreen body in `Column[TopBar, Expanded(DeviceGrid)]`. `_EmptyState` localized text ("未連接到伺服器") replaced with dynamic English string that reflects current mode + serverHost. Also repacked web-team zip `2026-04-24b` with API §6 host-format addendum + D-39..D-49 addendum in `_WEBTEAM_README.md`. Zero analyzer warnings, 14/14 tests green, `ec-share.exe` release build clean in 15.8s.
@@ -186,7 +289,7 @@ Files: INTERNAL_TEST_BUILD.md, FOUNDER_TODO.md, WEB_TEAM_TASKS.md, PROGRESS.md, 
 | **M0 Foundation** (codec probe, HEVC, health fix) | **100%** ✅ | — | — |
 | **M0.5 Internal Test Build** (self-host alpha for internal dogfood) | **~70%** (Day 1 ✅, Day 2-5 ✅, Day 6 ✅, Day 7 ✅, Day 8 ✅) | +1 week | Day 9 device-card action bar + settings reorg; Day 10 installer; Day 11 tester guide; Day 12 distribute |
 | **M1 EC-Share Core** (single-binary, UI overhaul, installer, auto-update) | **0%** | ~2026-07-02 (10 weeks) | EV cert procurement (3-10d); accent color pick |
-| **M2 Identity & Licensing** (login, trial, license JWT) | **0%** | M1 + 3 weeks | Web team hasn't started API_CONTRACT review |
+| **M2 Identity & Licensing** (login, trial, license JWT) | **web/backend foundation partial** (OTP, license JWT, refresh, account, devices, Stripe webhook implemented in this repo; desktop integration still pending) | M1 + 3 weeks | Production Stripe/DNS/key material; desktop public-key embedding; auth logout + JWT deny-list decision |
 | **M3 Invite Share** (WebRTC + TURN, browser viewer) | **0%** | M2 + 4 weeks | libdatachannel integration scaffolding |
 | **M4 Enterprise** (RBAC, SSO, on-prem) | **0%** | M3 + 3 weeks | First Enterprise prospect conversation |
 
@@ -195,7 +298,7 @@ Files: INTERNAL_TEST_BUILD.md, FOUNDER_TODO.md, WEB_TEAM_TASKS.md, PROGRESS.md, 
 ## Active blockers (founder action required)
 
 1. **EV code-signing cert procurement** — 3-10 business days KYC. Blocks M1 installer ship. **Start this first.**
-2. **API_CONTRACT.md handoff to web team** — cannot start M2 backend until they begin.
+2. **Production API contract handoff** — `API_CONTRACT.md` v0.2 now matches current code; web team/founder still need to deploy staging and confirm secrets/DNS.
 3. **Stripe HK account application** — requires BR + bank reference. Blocks M2 revenue path.
 4. **DNS records on `easecity.hk`** — `api.`, `share.`, `dl.`, `ecshare.` subdomains needed by M1 end.
 
@@ -205,8 +308,8 @@ See `docs/FOUNDER_TODO.md` for the full list and priorities.
 
 ## Active blockers (web team action required)
 
-1. **Review `docs/API_CONTRACT.md`** — web team hasn't started.
-2. **Open questions in API_CONTRACT §10** — 6 items need web-team answers.
+1. **Production deployment choices** — hosting, email provider, rate-limit storage, and deny-list storage still need final web-team confirmation.
+2. **Production secrets/materials** — Stripe Price IDs/webhook secret, Ed25519 production key, DNS, and hosted env vars still need to be installed.
 
 See `docs/WEB_TEAM_TASKS.md` for the full list.
 
@@ -215,6 +318,12 @@ See `docs/WEB_TEAM_TASKS.md` for the full list.
 ## Recent changes log
 
 ### Week of 2026-04-21
+- 2026-05-08 — **Neon Prisma baseline applied**: resolved existing DB `P3005`, marked foundation migration applied, deployed Stripe webhook event migration, and confirmed DB schema is up to date.
+- 2026-05-06 — **M2 staging deploy readiness check**: added redacted env checker, `npm run check:staging`, migration README notes, and stricter staging checklist flow.
+- 2026-05-06 — **M2 staging readiness / smoke baseline**: expanded `ecshare:smoke` to cover native register/login and license activate/heartbeat/deactivate; added `npm test` as standard API e2e entry; updated staging checklist with repeatable commands and Stripe duplicate-event checks.
+- 2026-05-05 — **Stripe entitlement baseline**: persistent webhook event-id dedupe (`StripeWebhookEvent` + migration), product-scoped Pro trial eligibility, centralized EC-Share Stripe product constant, tier seat minimum normalization, and env/docs alignment for Stripe metadata/webhook/Tax setup.
+- 2026-05-05 — **License/account API baseline implemented**: added native v1 password register/login plus license activate/heartbeat/deactivate endpoints; reused existing Prisma `User`/`Device`/`Trial`/`Subscription` schema with no migration; documented `API_CONTRACT.md` v0.3 and explicit stateless-JWT deny-list limitation.
+- 2026-05-05 — **Web/backend contract reconciliation**: `API_CONTRACT.md` v0.2 now matches current Next.js implementation (`/api/v1/*`, `{ success, data, meta }`, current OTP limits, split change-email flow, Stripe webhook canonical + legacy paths). Web-team docs and roadmap references synced; `/api/v1/health` and API e2e test reconciled. `npm run lint`, `npm run build`, and API Playwright test all green.
 - 2026-04-24 — **M0.5 Day 8 complete**: first-run mode chooser (two-card UI + recent-hosts list + inline IP validation); TopBar `_Logo` replaced by `_ModePill` (click reopens chooser); re-entrant-safe native init; persistence adapter with typed `last_mode`/`last_host`/`recent_hosts`; **bonus fix** `TopBar` now actually rendered (was orphan widget; Day 7 copy-host chip was invisible until now); `_EmptyState` localized text replaced. Web-team zip repacked `2026-04-24b` with API §6 host-format addendum + D-39..D-49 impact table.
 - 2026-04-24 — **M0.5 Day 7 complete**: LAN IPv4 detection + top-bar "Copy host" button (single-IP one-click, multi-IP dropdown, `--client-only`-aware visibility). Web-team docs zip repackaged with D-34..D-38 updates.
 - 2026-04-23 — **Transport-model rethink**: native `ec-share.exe` peer becomes primary (low-latency TCP); WebRTC demoted to browser fallback (D-35). M0.5 focus mode cancelled (D-34); browser viewer deferred to M3 (D-36). Dashboard gets `ec-share://` protocol handler for 1-click device open (D-37, D-38). M0.5 Day 6 coded: `--client-only <host>` real integration — Dart parses arg, auto-connects.

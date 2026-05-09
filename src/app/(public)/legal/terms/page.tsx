@@ -82,7 +82,7 @@ export default function TermsOfServicePage() {
           <Section title="4. Subscription Plans & Billing">
             <SubSection title="4.1 Plans">
               <p className="mt-2 text-text-secondary">
-                We offer several subscription tiers (Starter, Pro, Business, Enterprise) as described
+                We offer several subscription tiers (Trial, Pro, Business, Enterprise) as described
                 on our <Link href="/pricing" className="text-signal hover:underline">Pricing page</Link>. Features,
                 device limits, and SLA commitments vary by plan.
               </p>

@@ -1,0 +1,21 @@
+---
+description: Prisma schema and database access conventions
+globs: prisma/**/*.prisma
+alwaysApply: false
+---
+
+# Prisma / Database
+
+## 連線
+
+使用 `import { prisma } from '@/lib/db'`；開發環境 singleton 已處理，勿重複建立 client。
+
+## Schema
+
+- `User.role`：`SUPER_ADMIN` | `ADMIN` | `MEMBER`（字串；與程式內檢查一致）。
+- `Order.amount`：**最小貨幣單位**（cents）。
+- JSON 欄位若存成字串（如 `items`），讀寫時 `JSON.parse` / `JSON.stringify` 並處理錯誤。
+
+## 遷移
+
+變更 schema 後依專案流程使用 `prisma migrate` 或 `db push`（與團隊約定一致）；勿手改已套用 migration 的歷史。

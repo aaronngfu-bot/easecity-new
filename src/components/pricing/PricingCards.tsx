@@ -11,31 +11,41 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { CountUp } from '@/components/ui/CountUp'
 import { MagneticButton } from '@/components/ui/MagneticButton'
+import {
+  publicBusinessAnnualPriceId,
+  publicBusinessMonthlyPriceId,
+  publicProAnnualPriceId,
+  publicProMonthlyPriceId,
+} from '@/lib/stripe-public-price-ids'
 
-function getPlans(t: T) {
+type BillingInterval = 'monthly' | 'annual'
+
+function getPlans(t: T, billing: BillingInterval) {
+  const isAnnual = billing === 'annual'
+
   return [
     {
-      name: t.pricingPage.starterName,
+      name: t.pricingPage.trialName,
       icon: Cpu,
-      tagline: t.pricingPage.starterTag,
-      price: '$49',
-      period: t.pricingPage.perMonth,
-      description: t.pricingPage.starterDesc,
-      features: [t.pricingPage.starterF1, t.pricingPage.starterF2, t.pricingPage.starterF3, t.pricingPage.starterF4, t.pricingPage.starterF5, t.pricingPage.starterF6, t.pricingPage.starterF7],
+      tagline: t.pricingPage.trialTag,
+      price: t.pricingPage.trialPrice,
+      period: '',
+      description: t.pricingPage.trialDesc,
+      features: [t.pricingPage.trialF1, t.pricingPage.trialF2, t.pricingPage.trialF3, t.pricingPage.trialF4, t.pricingPage.trialF5],
       cta: t.pricingPage.startTrial,
-      priceId: process.env.NEXT_PUBLIC_STRIPE_STARTER_PRICE_ID || 'price_starter_mock',
+      href: '/register?callbackUrl=/dashboard',
       highlighted: false,
     },
     {
       name: t.pricingPage.proName,
       icon: Star,
       tagline: t.pricingPage.proTag,
-      price: '$149',
-      period: t.pricingPage.perMonth,
+      price: isAnnual ? '$190' : '$19',
+      period: isAnnual ? t.pricingPage.perYear : t.pricingPage.perMonth,
       description: t.pricingPage.proDesc,
       features: [t.pricingPage.proF1, t.pricingPage.proF2, t.pricingPage.proF3, t.pricingPage.proF4, t.pricingPage.proF5, t.pricingPage.proF6, t.pricingPage.proF7, t.pricingPage.proF8],
       cta: t.pricingPage.subscribeNow,
-      priceId: process.env.NEXT_PUBLIC_STRIPE_PRO_PRICE_ID || 'price_pro_mock',
+      priceId: isAnnual ? publicProAnnualPriceId() : publicProMonthlyPriceId(),
       highlighted: true,
       badge: t.pricingPage.mostPopular,
     },
@@ -43,12 +53,12 @@ function getPlans(t: T) {
       name: t.pricingPage.bizName,
       icon: Shield,
       tagline: t.pricingPage.bizTag,
-      price: '$399',
-      period: t.pricingPage.perMonth,
+      price: isAnnual ? '$490' : '$49',
+      period: isAnnual ? t.pricingPage.perYear : t.pricingPage.perMonth,
       description: t.pricingPage.bizDesc,
       features: [t.pricingPage.bizF1, t.pricingPage.bizF2, t.pricingPage.bizF3, t.pricingPage.bizF4, t.pricingPage.bizF5, t.pricingPage.bizF6, t.pricingPage.bizF7, t.pricingPage.bizF8, t.pricingPage.bizF9],
       cta: t.pricingPage.subscribeNow,
-      priceId: process.env.NEXT_PUBLIC_STRIPE_BIZ_PRICE_ID || 'price_biz_mock',
+      priceId: isAnnual ? publicBusinessAnnualPriceId() : publicBusinessMonthlyPriceId(),
       highlighted: false,
     },
     {
@@ -83,13 +93,34 @@ interface PlanData {
 
 export function PricingCards() {
   const { t } = useLanguage()
-  const plans = getPlans(t)
+  const [billing, setBilling] = useState<BillingInterval>('annual')
+  const plans = getPlans(t, billing)
 
   return (
     <section className="section-padding relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-b from-bg-surface/20 to-bg-base pointer-events-none" />
 
       <div className="container-max relative z-10">
+        <div className="mb-10 flex justify-center">
+          <div className="glass-panel inline-flex gap-1 p-1">
+            {(['monthly', 'annual'] as const).map((value) => (
+              <button
+                key={value}
+                type="button"
+                onClick={() => setBilling(value)}
+                className={cn(
+                  'rounded-full px-4 py-2 text-sm font-medium transition-colors',
+                  billing === value
+                    ? 'bg-signal text-bg-base'
+                    : 'text-text-muted hover:text-text-primary'
+                )}
+              >
+                {value === 'monthly' ? t.pricingPage.monthly : t.pricingPage.annual}
+              </button>
+            ))}
+          </div>
+        </div>
+
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
           {plans.map((plan, i) => (
             <PricingCard key={i} plan={plan} index={i} whatsIncluded={t.pricingPage.whatsIncluded} />

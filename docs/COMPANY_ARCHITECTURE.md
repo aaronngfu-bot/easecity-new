@@ -92,11 +92,11 @@ admin.easecity.hk               ← Internal EaseCity staff admin (subdomain, 2F
     (cross-product; each product has its own section but same navigation/UI)
 
 api.easecity.hk                 ← Cross-product HTTPS API
-    /auth/*                     Shared: OTP, OAuth, sessions
-    /account/*                  Shared: profile, org management, billing portal URLs
-    /license/*                  Shared: JWT issuance, refresh (with product claim inside)
-    /ec-share/*                 Product-specific: encoder policies, share tokens
-    /<future>/*                 Future
+    /api/v1/auth/*              Shared: OTP, OAuth, sessions
+    /api/v1/account/*           Shared: profile, org management, billing portal URLs
+    /api/v1/license/*           Shared: JWT issuance, refresh (with product claim inside)
+    /api/v1/ec-share/*          Product-specific: encoder policies, share tokens
+    /api/v1/<future>/*          Future
 
 docs.easecity.hk                ← Shared docs site, sectioned by product
     /ec-share                   EC-Share quickstart, troubleshooting
@@ -129,18 +129,18 @@ POST /license/refresh   ← Ambiguous: which product?
 
 **Good (updated)**:
 ```
-POST /license/refresh
+POST /api/v1/license/refresh
   Body: { product: "ec_share", device_fingerprint: "...", app_version: "..." }
   Response includes product-specific features array
 
-POST /ec-share/share/create   ← Product-scoped resource
+POST /api/v1/ec-share/share/create   ← Product-scoped resource
 ```
 
 Rules:
-- `/auth/*`, `/account/*`, `/org/*`, `/billing/*` → **shared** across products (no prefix)
-- `/license/*` → **shared** but body/response carry `product` field
-- `/ec-share/*` → **product-specific**
-- `/<future>/*` → **product-specific**
+- `/api/v1/auth/*`, `/api/v1/account/*`, `/api/v1/org/*`, `/api/v1/billing/*` → **shared** across products (inside the versioned API prefix)
+- `/api/v1/license/*` → **shared** but body/response carry `product` field
+- `/api/v1/ec-share/*` → **product-specific**
+- `/api/v1/<future>/*` → **product-specific**
 
 ### Rule 2: License JWT carries product claim
 
@@ -241,7 +241,7 @@ The reserved architecture means product #2 costs 20% extra effort (add a prefix 
 |----|----------|
 | **D-23** | Umbrella architecture: EaseCity is umbrella; EC-Share is product #1 of N |
 | **D-24** | User identity layer at `account.easecity.hk` (single sign-on across all future products) |
-| **D-25** | API gateway at `api.easecity.hk` with shared `/auth/*` `/account/*` `/license/*` and product-namespaced `/ec-share/*` |
+| **D-25** | API gateway at `api.easecity.hk` with shared `/api/v1/auth/*` `/api/v1/account/*` `/api/v1/license/*` and product-namespaced `/api/v1/ec-share/*` |
 | **D-26** | License JWT carries `product` claim; one JWT per product per user |
 | **D-27** | Stripe: products scoped as "EC-Share Pro/Business/Enterprise"; prices metadata `{ product, tier }` |
 | **D-28** | Database schema: `subscriptions`, `licenses`, `trials`, `devices`, `audit_log` carry `product_id`; `users`, `organizations`, `org_members` do not |

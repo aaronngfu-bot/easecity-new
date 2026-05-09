@@ -24,6 +24,11 @@ export default defineConfig({
   ],
   webServer: {
     command: 'npm run dev',
+    env: {
+      RESEND_API_KEY: '',
+      UPSTASH_REDIS_REST_URL: '',
+      UPSTASH_REDIS_REST_TOKEN: '',
+    },
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 30_000,

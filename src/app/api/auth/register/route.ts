@@ -32,7 +32,7 @@ async function verifyTurnstile(token: string, ip: string): Promise<boolean> {
 
 export const POST = withErrorHandler(async (req) => {
   const ip = getClientIp(req)
-  const { allowed } = rateLimit(`register:${ip}`, 5, 15 * 60_000)
+  const { allowed } = await rateLimit(`register:${ip}`, 5, 15 * 60_000)
 
   if (!allowed) {
     return apiError('RATE_LIMITED', 'Too many registration attempts. Please try again later.', 429)

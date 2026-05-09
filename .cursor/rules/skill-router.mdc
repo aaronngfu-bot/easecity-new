@@ -1,0 +1,50 @@
+---
+description: Skill router — when to use each installed skill family
+alwaysApply: true
+---
+
+# Skill Router
+
+每次開始任務時先判斷是否有匹配 skill。若命中，先讀對應 `SKILL.md`，再依 skill 指引行動；不要只靠記憶或名稱猜做法。若多個 skill 同時命中，優先用最具體、最貼近使用者目標的 skill，必要時再搭配通用 skill。
+
+## 本專案常用 DAILY Skills
+
+- Next.js / React / UI：改 `src/**/*.tsx`、頁面、元件、狀態、Tailwind 時，用 `frontend-patterns`；需要高質感 UI/UX 時加 `frontend-design` 或 `frontend-ui-ux`；涉及 WCAG、鍵盤操作、ARIA 時加 `accessibility`。
+- Backend / API：新增或修改 route handler、server action、validation、錯誤回應時，用 `backend-patterns` + `api-design`；涉及 auth、user input、secrets、payments、admin 權限時加 `security-review`。
+- Database：改 Prisma schema、migration、資料模型、索引、SQL/Postgres 行為時，用 `database-migrations` + `postgres-patterns`；仍遵守現有 `database-prisma` rule。
+- Stripe / Payments：新增付款、webhook、checkout、subscription、refund、Stripe API 升級時，用 `stripe-best-practices`；升級 SDK/API version 時用 `upgrade-stripe`。
+- Testing / Verification：修 bug、新功能、重構時用 `tdd-workflow`；完工驗證、build/test/lint 流程用 `verification-loop`；UI 流程測試用 `browser-qa` 或 `e2e-testing`；要錄製 demo 用 `ui-demo`。
+- Docs / Current APIs：使用者問最新框架/API 文件、Next.js/Prisma/Stripe 行為不確定時，用 `documentation-lookup`；需要網路證據或最新市場資料時用 `research-ops`。
+- Repo / Terminal / GitHub：要跑命令、查 CI、修窄範圍 failure 時用 `terminal-ops`；branch/commit/merge 策略用 `git-workflow`；PR/issue/release/checks 用 `github-ops`；維持 PR merge-ready 用 `babysit`；拆 PR 用 `split-to-prs`。
+- Cursor / ECC 設定：建立 rule 用 `create-rule`；建立 skill 用 `create-skill`；建立 hook 用 `create-hook`；改 Cursor settings 用 `update-cursor-settings`；改 CLI/status bar 用 `statusline`；整理或安裝 ECC skills 用 `install-everything-claude-code`。
+
+## Planning, Product, Architecture
+
+- 使用者要求 plan、roadmap、blueprint、多 PR 分工時，用 `blueprint`；若只是產品能力定義或 PRD 轉實作規格，用 `product-capability`。
+- 需要先驗證「該不該做」或產品方向，用 `product-lens`；多個合理方案需要權衡，用 `council`。
+- 大型重構、邊界設計、domain/use-case 分層，用 `hexagonal-architecture`；新增 ADR 或記錄重大技術決策，用 `architecture-decision-records`。
+- 搜尋現有方案再實作，用 `search-first`；要掃描 repo 能力與可用工具，用 `workspace-surface-audit`；要把技能分成 DAILY/LIBRARY，用 `agent-sort`；要從技能萃取成 rules，用 `rules-distill`。
+
+## Review, Security, Quality
+
+- 使用者說 review 時走 code-review 立場；若涉及安全、auth、輸入、payment、API endpoint，用 `security-review`。
+- 要找真實可利用漏洞或 bounty 級問題，用 `security-bounty-hunter`；掃描 Claude/Cursor 設定風險，用 `security-scan`；高風險操作或 production 系統用 `safety-guard`。
+- 需要多代理對抗驗證，用 `santa-method`；要檢查 skills/rules 是否真的被遵守，用 `skill-comply`；上下文過肥或要壓縮時，用 `context-budget` 或 `strategic-compact`。
+- 程式碼品質與格式化策略，用 `coding-standards`；若是特定語言，改用該語言的 `*-patterns`、`*-testing`、`*-security`、`*-verification` skill。
+
+## Content, Research, Media, Ops
+
+- SEO 用 `seo`；長文、文章、指南用 `article-writing`；社群內容、threads、scripts、cross-posting 用 `content-engine` 或 `crosspost`；品牌語氣用 `brand-voice`。
+- 市場、競品、投資研究用 `market-research`；投資材料用 `investor-materials`；投資人 outreach 用 `investor-outreach`；lead pipeline 用 `lead-intelligence`。
+- 影像/影音生成或剪輯用 `fal-ai-media`、`video-editing`、`videodb`、`remotion-video-creation`、`manim-video`；文件處理/OCR/翻譯用 `nutrient-document-processing` 或 `visa-doc-translate`。
+- X/Twitter API 用 `x-api`；Google Workspace 用 `google-workspace-ops`；Jira 用 `jira-integration`；email/messages/notifications 用 `email-ops`、`messages-ops`、`unified-notifications-ops`。
+
+## Library Skills
+
+語言或框架 skills 只在實際碰到該 stack 時使用：`python-*`、`django-*`、`laravel-*`、`springboot-*`、`java-*`、`kotlin-*`、`swift*`、`flutter-*`、`rust-*`、`golang-*`、`perl-*`、`nuxt4-patterns`、`nestjs-patterns`、`mcp-server-patterns` 等。不要因為 skill 存在就套用到本 Next.js 專案。
+
+行業營運 skills 只在使用者明確談到該領域時使用：物流、退貨、庫存、能源採購、製造排程、品質/CAPA、醫療/HIPAA、trade compliance、billing ops 等。
+
+## 衝突處理
+
+若 skill 指引與本 repo 既有 `.cursor/rules` 衝突，先遵守 repo rule；若使用者明確要求不同做法，先說明衝突與風險再執行。若沒有明確匹配 skill，就照一般工程判斷工作，不要為了使用 skill 而使用 skill。

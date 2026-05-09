@@ -82,16 +82,16 @@ export function CommandPalette() {
     return [
       nav('/', 'Home', 'Editorial hero + live control', Home, 'G H'),
       nav('/services', 'Services', 'Stream control + use cases + roadmap', LayoutGrid, 'G S'),
-      nav('/pricing', 'Pricing', '4 plans — starter to enterprise', Tag, 'G P'),
+      nav('/pricing', 'Pricing', 'EC-Share trial, Pro, Business, Enterprise', Tag, 'G P'),
       nav('/about', 'About', 'Philosophy + tech vision', Info, 'G A'),
       nav('/contact', 'Contact', 'Reach the team', Mail, 'G C'),
       nav('/dashboard', 'Dashboard', 'Control deck', LayoutDashboard),
       nav('/login', 'Sign in', 'Auth entry', LogIn),
 
-      plan('/pricing#starter', 'Starter — $49/mo', 'Small devices, basic control', Cpu),
-      plan('/pricing#pro', 'Pro — $149/mo', 'Most popular, full stream control', Zap),
-      plan('/pricing#business', 'Business — $399/mo', 'Advanced SLA + analytics', ShieldCheck),
-      plan('/pricing#enterprise', 'Enterprise — Custom', 'Tailored, dedicated infra', Building2),
+      plan('/pricing#trial', 'Trial — 14 days free', 'No credit card required', Cpu),
+      plan('/pricing#pro', 'Pro — $19/mo', 'Individual Android mirroring', Zap),
+      plan('/pricing#business', 'Business — $49/mo', 'Team sharing and audit log', ShieldCheck),
+      plan('/pricing#enterprise', 'Enterprise — From $2,499/yr', 'SSO, RBAC, on-prem options', Building2),
 
       action('copy-email', 'Copy contact email', 'hello@easecity.com → clipboard', MailIcon, async () => {
         try {
