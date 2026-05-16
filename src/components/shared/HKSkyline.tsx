@@ -10,12 +10,12 @@ export function HKSkyline({ className }: { className?: string }) {
     >
       <defs>
         <linearGradient id="skylineFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.15" />
-          <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.02" />
+          <stop offset="0%" stopColor="#00e5cc" stopOpacity="0.15" />
+          <stop offset="100%" stopColor="#00e5cc" stopOpacity="0.02" />
         </linearGradient>
         <filter id="skylineGlow" x="-10%" y="-10%" width="120%" height="130%">
           <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
-          <feFlood floodColor="#22d3ee" floodOpacity="0.4" result="color" />
+          <feFlood floodColor="#00e5cc" floodOpacity="0.4" result="color" />
           <feComposite in="color" in2="blur" operator="in" result="glow" />
           <feMerge>
             <feMergeNode in="glow" />
@@ -58,16 +58,16 @@ export function HKSkyline({ className }: { className?: string }) {
           L 370,155 L 370,180
         `}
         fill="url(#skylineFill)"
-        stroke="#22d3ee"
+        stroke="#00e5cc"
         strokeWidth="0.8"
         strokeOpacity="0.6"
         filter="url(#skylineGlow)"
       />
 
       {/* ---- Victoria Harbour gap with water ripple lines ---- */}
-      <line x1="370" y1="165" x2="530" y2="165" stroke="#22d3ee" strokeWidth="0.4" strokeOpacity="0.15" strokeDasharray="6 6" />
-      <line x1="380" y1="170" x2="520" y2="170" stroke="#22d3ee" strokeWidth="0.3" strokeOpacity="0.10" strokeDasharray="4 8" />
-      <line x1="390" y1="175" x2="510" y2="175" stroke="#22d3ee" strokeWidth="0.3" strokeOpacity="0.07" strokeDasharray="3 10" />
+      <line x1="370" y1="165" x2="530" y2="165" stroke="#00e5cc" strokeWidth="0.4" strokeOpacity="0.15" strokeDasharray="6 6" />
+      <line x1="380" y1="170" x2="520" y2="170" stroke="#00e5cc" strokeWidth="0.3" strokeOpacity="0.10" strokeDasharray="4 8" />
+      <line x1="390" y1="175" x2="510" y2="175" stroke="#00e5cc" strokeWidth="0.3" strokeOpacity="0.07" strokeDasharray="3 10" />
 
       {/* ---- Hong Kong Island side (right of harbour) ---- */}
       <path
@@ -110,7 +110,7 @@ export function HKSkyline({ className }: { className?: string }) {
           L 1024,165 L 1024,180
         `}
         fill="url(#skylineFill)"
-        stroke="#22d3ee"
+        stroke="#00e5cc"
         strokeWidth="0.8"
         strokeOpacity="0.6"
         filter="url(#skylineGlow)"
@@ -134,15 +134,15 @@ export function HKSkyline({ className }: { className?: string }) {
           L 1440,174 L 1440,180
         `}
         fill="url(#skylineFill)"
-        stroke="#22d3ee"
+        stroke="#00e5cc"
         strokeWidth="0.5"
         strokeOpacity="0.35"
       />
 
       {/* ---- Antenna / signal tower details (ICC tower) ---- */}
-      <line x1="104" y1="0" x2="104" y2="-8" stroke="#22d3ee" strokeWidth="0.8" strokeOpacity="0.8" />
-      <line x1="680" y1="10" x2="680" y2="2" stroke="#22d3ee" strokeWidth="0.8" strokeOpacity="0.8" />
-      <line x1="636" y1="4" x2="636" y2="-4" stroke="#22d3ee" strokeWidth="0.8" strokeOpacity="0.7" />
+      <line x1="104" y1="0" x2="104" y2="-8" stroke="#00e5cc" strokeWidth="0.8" strokeOpacity="0.8" />
+      <line x1="680" y1="10" x2="680" y2="2" stroke="#00e5cc" strokeWidth="0.8" strokeOpacity="0.8" />
+      <line x1="636" y1="4" x2="636" y2="-4" stroke="#00e5cc" strokeWidth="0.8" strokeOpacity="0.7" />
 
       {/* ---- Window lights on tall towers ---- */}
       {[96, 100, 104, 108].map((x) =>
@@ -153,7 +153,7 @@ export function HKSkyline({ className }: { className?: string }) {
             y={y}
             width="2"
             height="1.5"
-            fill="#22d3ee"
+            fill="#00e5cc"
             fillOpacity={Math.random() * 0.4 + 0.1}
           />
         ))
@@ -166,16 +166,16 @@ export function HKSkyline({ className }: { className?: string }) {
             y={y}
             width="2"
             height="1.5"
-            fill="#22d3ee"
+            fill="#00e5cc"
             fillOpacity={Math.random() * 0.3 + 0.1}
           />
         ))
       )}
 
       {/* ---- Reflection in harbour ---- */}
-      <line x1="104" y1="180" x2="104" y2="165" stroke="#22d3ee" strokeWidth="0.4" strokeOpacity="0.15" />
-      <line x1="636" y1="180" x2="636" y2="168" stroke="#22d3ee" strokeWidth="0.4" strokeOpacity="0.12" />
-      <line x1="680" y1="180" x2="680" y2="168" stroke="#22d3ee" strokeWidth="0.4" strokeOpacity="0.12" />
+      <line x1="104" y1="180" x2="104" y2="165" stroke="#00e5cc" strokeWidth="0.4" strokeOpacity="0.15" />
+      <line x1="636" y1="180" x2="636" y2="168" stroke="#00e5cc" strokeWidth="0.4" strokeOpacity="0.12" />
+      <line x1="680" y1="180" x2="680" y2="168" stroke="#00e5cc" strokeWidth="0.4" strokeOpacity="0.12" />
     </svg>
   )
 }

@@ -12,29 +12,30 @@ export default async function AdminLogsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-text-primary">Audit Logs</h1>
-        <p className="text-text-secondary text-sm mt-1">Recent system activity</p>
+        <p className="label-mono mb-2 text-signal">ADMIN.AUDIT</p>
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.05em] text-text-primary">Audit Logs</h1>
+        <p className="mt-1 text-sm text-text-secondary">Recent system activity</p>
       </div>
 
-      <div className="rounded-xl border border-border bg-bg-surface overflow-hidden">
+      <div className="overflow-hidden rounded-lg border border-border bg-bg-surface">
         {logs.length === 0 ? (
           <div className="p-8 text-center text-text-muted text-sm">No audit logs yet</div>
         ) : (
           <div className="divide-y divide-border">
             {logs.map((log) => (
-              <div key={log.id} className="px-5 py-4 flex items-start justify-between gap-4">
+              <div key={log.id} className="flex items-start justify-between gap-4 px-5 py-4 transition-colors hover:bg-bg-void/60">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-medium text-text-primary">{log.user.name || log.user.email}</span>
                     <span className="text-xs text-text-muted">performed</span>
-                    <code className="px-1.5 py-0.5 rounded bg-bg-elevated text-xs text-signal font-mono">
+                    <code className="rounded-sm border border-signal/20 bg-signal/10 px-1.5 py-0.5 font-mono text-xs text-signal">
                       {log.action}
                     </code>
                     <span className="text-xs text-text-muted">on</span>
                     <span className="text-xs text-text-secondary">{log.targetType} {log.targetId.slice(0, 8)}...</span>
                   </div>
                   {log.changes && (
-                    <pre className="mt-2 text-xs text-text-muted font-mono bg-bg-elevated rounded p-2 overflow-x-auto">
+                    <pre className="mt-2 overflow-x-auto rounded-md border border-border bg-bg-void p-2 font-mono text-xs text-text-muted">
                       {JSON.stringify(JSON.parse(log.changes), null, 2)}
                     </pre>
                   )}
@@ -42,7 +43,7 @@ export default async function AdminLogsPage() {
                     <p className="text-xs text-text-muted mt-1">IP: {log.ipAddress}</p>
                   )}
                 </div>
-                <span className="text-xs text-text-muted shrink-0">
+                <span className="shrink-0 font-mono text-xs text-text-muted">
                   {new Date(log.createdAt).toLocaleDateString('en-US', {
                     month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit',
                   })}

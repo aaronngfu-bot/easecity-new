@@ -5,7 +5,8 @@ import { issueEcShareLicense } from '@/lib/ec-share-license'
 import {
   EC_SHARE_PRODUCT,
   getBearerToken,
-  verifyLicenseJwt,
+  verifyLicenseJwtWithRevocationCheck,
+  type LicenseJwtPayload,
 } from '@/lib/license-jwt'
 import { licenseRefreshSchema } from '@/lib/validations/ec-share'
 
@@ -20,18 +21,18 @@ export const POST = withErrorHandler(async (req) => {
     return apiError('UNAUTHORIZED', 'Missing license token.', 401)
   }
 
-  const body = await req.json()
-  const data = licenseRefreshSchema.parse(body)
-
-  let payload: ReturnType<typeof verifyLicenseJwt>
+  let payload: LicenseJwtPayload
 
   try {
-    payload = verifyLicenseJwt(bearerToken, {
+    payload = await verifyLicenseJwtWithRevocationCheck(bearerToken, {
       allowExpiredSeconds: LICENSE_REFRESH_GRACE_SECONDS,
     })
   } catch {
     return apiError('UNAUTHORIZED', 'Invalid or expired license token.', 401)
   }
+
+  const body = await req.json()
+  const data = licenseRefreshSchema.parse(body)
 
   if (
     payload.product !== EC_SHARE_PRODUCT ||

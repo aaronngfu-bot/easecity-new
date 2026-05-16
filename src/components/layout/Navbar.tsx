@@ -26,7 +26,7 @@ function CommandTrigger() {
   return (
     <button
       onClick={open}
-      className="hidden lg:inline-flex items-center gap-2 px-2.5 py-1.5 rounded-md border border-border bg-bg-base/40 text-text-muted hover:text-signal hover:border-signal/30 transition-colors text-[11px] font-mono tracking-wider group"
+      className="hidden min-h-9 items-center gap-2 rounded-md border border-border bg-bg-void px-3 text-[11px] font-mono uppercase tracking-[0.12em] text-text-muted transition-colors hover:border-border-accent hover:text-signal lg:inline-flex"
       aria-label="Open command palette"
     >
       <span>Search</span>
@@ -42,11 +42,11 @@ function LangToggle() {
   const { language, setLanguage } = useLanguage()
 
   return (
-    <div className="relative flex items-center text-[11px] font-mono tracking-wider">
+    <div className="relative flex items-center rounded-md border border-border bg-bg-void px-1 text-[11px] font-mono tracking-wider">
       <button
         onClick={() => setLanguage('en')}
         className={cn(
-          'px-2.5 py-1 transition-colors duration-200 relative z-10',
+          'relative z-10 px-2.5 py-1 transition-colors duration-200',
           language === 'en' ? 'text-signal' : 'text-text-muted hover:text-text-secondary'
         )}
         aria-label="Switch to English"
@@ -57,7 +57,7 @@ function LangToggle() {
       <button
         onClick={() => setLanguage('zh')}
         className={cn(
-          'px-2.5 py-1 transition-colors duration-200 relative z-10',
+          'relative z-10 px-2.5 py-1 transition-colors duration-200',
           language === 'zh' ? 'text-signal' : 'text-text-muted hover:text-text-secondary'
         )}
         aria-label="切換至中文"
@@ -71,10 +71,7 @@ function LangToggle() {
 function EasecityLogo() {
   return (
     <Link href="/" className="group flex items-center gap-2.5" aria-label="easecity home">
-      <div className="relative w-9 h-9">
-        {/* Glass base */}
-        <div className="absolute inset-0 rounded-lg glass-panel opacity-100" />
-        {/* Signal dot — the one live node */}
+      <div className="relative h-9 w-9 rounded-md border border-signal/30 bg-signal/10">
         <div className="absolute inset-0 flex items-center justify-center">
           <svg viewBox="0 0 36 36" className="w-full h-full">
             {/* satellite nodes */}
@@ -88,19 +85,19 @@ function EasecityLogo() {
             <line x1="18" y1="30" x2="18" y2="22" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
             <line x1="6" y1="18" x2="14" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
             {/* central signal node */}
-            <circle cx="18" cy="18" r="3.5" fill="#22ff88" opacity="0.3" className="group-hover:opacity-60 transition-opacity">
+            <circle cx="18" cy="18" r="3.5" fill="#00e5cc" opacity="0.3" className="group-hover:opacity-60 transition-opacity">
               <animate attributeName="r" values="3.5;4.5;3.5" dur="2.5s" repeatCount="indefinite" />
             </circle>
-            <circle cx="18" cy="18" r="2" fill="#22ff88" />
+            <circle cx="18" cy="18" r="2" fill="#00e5cc" />
           </svg>
         </div>
       </div>
       <div className="flex flex-col leading-none">
-        <span className="font-display font-bold text-base tracking-tight text-text-primary group-hover:text-signal transition-colors duration-300">
+        <span className="font-display text-base font-semibold tracking-[-0.03em] text-text-primary transition-colors duration-300 group-hover:text-signal">
           easecity
         </span>
-        <span className="label-mono text-[9px] text-text-muted group-hover:text-signal/70 transition-colors duration-300">
-          STREAM.CONTROL
+        <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-text-muted transition-colors duration-300 group-hover:text-signal/70">
+          Control Plane
         </span>
       </div>
     </Link>
@@ -119,8 +116,9 @@ export function Navbar() {
     { href: '/', label: t.nav.home, num: '01' },
     { href: '/services', label: t.nav.services, num: '02' },
     { href: '/pricing', label: t.nav.pricing, num: '03' },
-    { href: '/about', label: t.nav.about, num: '04' },
-    { href: '/contact', label: t.nav.contact, num: '05' },
+    { href: '/download', label: t.nav.download, num: '04' },
+    { href: '/about', label: t.nav.about, num: '05' },
+    { href: '/contact', label: t.nav.contact, num: '06' },
   ]
 
   useEffect(() => {
@@ -139,8 +137,8 @@ export function Navbar() {
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className={cn(
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
-        scrolled ? 'glass-nav' : 'bg-transparent'
+        'fixed left-0 right-0 top-0 z-50 transition-all duration-300',
+        scrolled ? 'glass-nav' : 'bg-bg-void/20'
       )}
     >
       {/* Scroll progress rail — sits flush at the bottom of the navbar */}
@@ -150,11 +148,11 @@ export function Navbar() {
       />
 
       <div className="container-max">
-        <nav className="flex items-center justify-between h-16 md:h-20">
+        <nav className="flex h-16 items-center justify-between md:h-[72px]">
           <EasecityLogo />
 
           {/* Desktop Nav */}
-          <ul className="hidden md:flex items-center gap-0.5">
+          <ul className="hidden items-center gap-1 md:flex">
             {navLinks.map((link) => {
               const isActive = pathname === link.href
               return (
@@ -162,14 +160,14 @@ export function Navbar() {
                   <Link
                     href={link.href}
                     className={cn(
-                      'relative px-3.5 py-2 text-[13px] font-medium rounded-lg transition-colors duration-200 flex items-center gap-1.5',
+                      'relative flex items-center gap-1.5 rounded-md px-3.5 py-2 text-[13px] font-medium transition-colors duration-200',
                       isActive ? 'text-text-primary' : 'text-text-secondary hover:text-text-primary'
                     )}
                   >
                     {isActive && (
                       <motion.span
                         layoutId="nav-active"
-                        className="absolute inset-0 rounded-lg bg-signal/8 border border-signal/20"
+                        className="absolute inset-x-2 bottom-1 h-px bg-signal"
                         transition={{ type: 'spring', duration: 0.45, bounce: 0.18 }}
                       />
                     )}
@@ -191,9 +189,9 @@ export function Navbar() {
           {/* Desktop right cluster */}
           <div className="hidden md:flex items-center gap-3">
             <CommandTrigger />
-            <div className="w-px h-5 bg-border" />
+            <div className="h-5 w-px bg-border" />
             <LangToggle />
-            <div className="w-px h-5 bg-border" />
+            <div className="h-5 w-px bg-border" />
             <AuthButtons />
           </div>
 
@@ -202,7 +200,7 @@ export function Navbar() {
             <LangToggle />
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="p-2 rounded-lg text-text-secondary hover:text-signal hover:bg-signal/5 transition-colors duration-200"
+              className="rounded-md border border-border bg-bg-void p-2 text-text-secondary transition-colors duration-200 hover:border-border-accent hover:text-signal"
               aria-label="Toggle menu"
             >
               {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -219,7 +217,7 @@ export function Navbar() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.28, ease: 'easeInOut' }}
-            className="md:hidden overflow-hidden glass-nav"
+            className="overflow-hidden border-y border-border bg-bg-void md:hidden"
           >
             <div className="container-max py-4 flex flex-col gap-1">
               {navLinks.map((link, i) => (
@@ -232,7 +230,7 @@ export function Navbar() {
                   <Link
                     href={link.href}
                     className={cn(
-                      'flex items-center gap-3 px-4 py-3 text-sm font-medium rounded-lg transition-colors duration-200',
+                      'flex min-h-12 items-center gap-3 rounded-md px-4 py-3 text-sm font-medium transition-colors duration-200',
                       pathname === link.href
                         ? 'text-text-primary bg-signal/8 border border-signal/20'
                         : 'text-text-secondary hover:text-text-primary hover:bg-bg-elevated/50 border border-transparent'
@@ -274,14 +272,14 @@ function AuthButtons() {
       <div className="flex items-center gap-2">
         <Link
           href="/dashboard"
-          className="group inline-flex items-center gap-1.5 px-3.5 py-2 text-[13px] font-medium rounded-lg border border-border text-text-secondary hover:text-signal hover:border-signal/30 transition-colors"
+          className="group inline-flex min-h-9 items-center gap-1.5 rounded-md border border-border bg-bg-void px-3.5 text-[13px] font-medium text-text-secondary transition-colors hover:border-border-accent hover:text-signal"
         >
           <User size={13} />
           {t.auth.dashboard}
         </Link>
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="p-2 rounded-lg text-text-muted hover:text-red-400 hover:bg-red-500/10 transition-colors"
+          className="rounded-md p-2 text-text-muted transition-colors hover:bg-status-danger/10 hover:text-status-danger"
           aria-label="Sign out"
         >
           <LogOut size={15} />
@@ -294,13 +292,13 @@ function AuthButtons() {
     <div className="flex items-center gap-2">
       <Link
         href="/login"
-        className="px-3 py-2 text-[13px] font-medium text-text-secondary hover:text-text-primary transition-colors"
+        className="px-3 py-2 text-[13px] font-medium text-text-secondary transition-colors hover:text-text-primary"
       >
         {t.auth.signIn}
       </Link>
       <Link
         href="/contact"
-        className="glass-cta !py-2 !px-4 !text-[13px]"
+        className="signal-cta !min-h-9 !px-4 !py-2 !text-[13px]"
       >
         {t.nav.cta}
       </Link>
@@ -315,12 +313,12 @@ function MobileAuthButtons() {
   if (session) {
     return (
       <>
-        <Link href="/dashboard" className="glass-cta w-full">
+        <Link href="/dashboard" className="signal-cta w-full">
           {t.auth.dashboard}
         </Link>
         <button
           onClick={() => signOut({ callbackUrl: '/' })}
-          className="block w-full text-center px-5 py-3 text-sm font-medium text-red-400 border border-red-500/25 rounded-xl hover:bg-red-500/10 transition-colors"
+          className="block w-full rounded-md border border-status-danger/25 px-5 py-3 text-center text-sm font-medium text-status-danger transition-colors hover:bg-status-danger/10"
         >
           {t.auth.signOut}
         </button>
@@ -330,10 +328,10 @@ function MobileAuthButtons() {
 
   return (
     <>
-      <Link href="/login" className="glass-ghost w-full">
+      <Link href="/login" className="signal-secondary w-full">
         {t.auth.signIn}
       </Link>
-      <Link href="/contact" className="glass-cta w-full">
+      <Link href="/contact" className="signal-cta w-full">
         {t.nav.cta}
       </Link>
     </>

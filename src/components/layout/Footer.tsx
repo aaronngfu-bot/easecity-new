@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { HKSkyline } from '@/components/shared/HKSkyline'
 import { useLanguage } from '@/context/LanguageContext'
 
 export function Footer() {
@@ -28,17 +27,13 @@ export function Footer() {
   }
 
   return (
-    <footer className="relative border-t border-border overflow-hidden">
-      <div className="absolute bottom-0 left-0 right-0 opacity-20 pointer-events-none select-none">
-        <HKSkyline />
-      </div>
-
-      <div className="container-max relative z-10 pt-16 pb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-12">
-          {/* Brand */}
+    <footer className="relative overflow-hidden border-t border-border bg-bg-void">
+      <div className="absolute inset-0 control-grid opacity-20" />
+      <div className="container-max relative z-10 pb-8 pt-16">
+        <div className="mb-12 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
-            <Link href="/" className="inline-flex items-center gap-2.5 mb-4 group">
-              <div className="relative w-9 h-9 rounded-lg glass-panel flex items-center justify-center">
+            <Link href="/" className="group mb-4 inline-flex items-center gap-2.5">
+              <div className="relative flex h-9 w-9 items-center justify-center rounded-md border border-signal/30 bg-signal/10">
                 <svg viewBox="0 0 36 36" className="w-full h-full">
                   <circle cx="18" cy="6" r="1.2" fill="#52525b" />
                   <circle cx="30" cy="18" r="1.2" fill="#52525b" />
@@ -48,30 +43,29 @@ export function Footer() {
                   <line x1="30" y1="18" x2="22" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
                   <line x1="18" y1="30" x2="18" y2="22" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
                   <line x1="6" y1="18" x2="14" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-                  <circle cx="18" cy="18" r="3.5" fill="#22ff88" opacity="0.3" />
-                  <circle cx="18" cy="18" r="2" fill="#22ff88" />
+                  <circle cx="18" cy="18" r="3.5" fill="#00e5cc" opacity="0.3" />
+                  <circle cx="18" cy="18" r="2" fill="#00e5cc" />
                 </svg>
               </div>
               <div className="flex flex-col leading-none">
-                <span className="font-display font-bold text-base text-text-primary">easecity</span>
-                <span className="label-mono text-[9px] text-text-muted">STREAM.CONTROL</span>
+                <span className="font-display text-base font-semibold tracking-[-0.03em] text-text-primary">easecity</span>
+                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-text-muted">Control Plane</span>
               </div>
             </Link>
-            <p className="text-text-secondary text-sm leading-relaxed max-w-xs">
+            <p className="max-w-xs text-sm leading-relaxed text-text-secondary">
               {t.footer.brandDesc}
             </p>
-            <div className="mt-6 flex items-center gap-2">
-              <div className="w-2 h-2 rounded-full bg-signal animate-signal-pulse" />
-              <span className="text-xs text-signal/80 font-mono tracking-wider uppercase">
+            <div className="mt-6 inline-flex items-center gap-2 rounded-sm border border-signal/25 bg-signal/10 px-2.5 py-1">
+              <div className="h-1.5 w-1.5 rounded-full bg-signal animate-signal-pulse" />
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-signal">
                 {t.footer.statusOnline}
               </span>
             </div>
           </div>
 
-          {/* Links */}
           {Object.entries(footerLinks).map(([group, links]) => (
             <div key={group}>
-              <h3 className="text-xs font-semibold text-text-muted uppercase tracking-widest mb-4">
+              <h3 className="mb-4 font-mono text-[10px] font-semibold uppercase tracking-[0.18em] text-text-muted">
                 {group}
               </h3>
               <ul className="space-y-2.5">
@@ -79,7 +73,7 @@ export function Footer() {
                   <li key={link.label}>
                     <Link
                       href={link.href}
-                      className="text-sm text-text-secondary hover:text-text-primary transition-colors duration-200 link-underline"
+                      className="link-underline text-sm text-text-secondary transition-colors duration-200 hover:text-signal"
                     >
                       {link.label}
                     </Link>
@@ -90,21 +84,20 @@ export function Footer() {
           ))}
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-border pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
           <p className="text-xs text-text-muted">
             © {new Date().getFullYear()} easecity. All rights reserved.
           </p>
-          <div className="flex items-center gap-6">
-            <Link href="/legal/privacy" className="text-xs text-text-muted hover:text-text-secondary transition-colors">
+          <div className="flex flex-wrap items-center justify-center gap-5">
+            <Link href="/legal/privacy" className="text-xs text-text-muted transition-colors hover:text-signal">
               Privacy Policy
             </Link>
-            <Link href="/legal/terms" className="text-xs text-text-muted hover:text-text-secondary transition-colors">
+            <Link href="/legal/terms" className="text-xs text-text-muted transition-colors hover:text-signal">
               Terms of Service
             </Link>
-            <span className="text-xs text-text-muted font-mono tracking-wider">v1.0.0</span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-muted">v1.0.0</span>
             <div className="flex items-center gap-1.5">
-              <div className="w-1.5 h-1.5 rounded-full bg-signal/60" />
+              <div className="h-1.5 w-1.5 rounded-full bg-signal/60" />
               <span className="text-xs text-text-muted">{t.footer.builtIn}</span>
             </div>
           </div>

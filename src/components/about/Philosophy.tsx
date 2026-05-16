@@ -104,6 +104,12 @@ function PrincipleCard({ index, principle, noteLabel, isOpen, onOpen, onClose }:
     isOpen ? onClose() : onOpen()
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLDivElement>) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return
+    event.preventDefault()
+    handleClick()
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0, x: 20 }}
@@ -113,7 +119,11 @@ function PrincipleCard({ index, principle, noteLabel, isOpen, onOpen, onClose }:
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       onClick={handleClick}
-      className="group glass-panel glass-panel-interactive p-5 cursor-pointer select-none"
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+      aria-expanded={isOpen}
+      className="group glass-panel glass-panel-interactive w-full p-5 cursor-pointer select-none text-left"
     >
       <div className="flex gap-5">
         <div className="flex-shrink-0 w-9 h-9 rounded-lg bg-signal/8 border border-signal/15 flex items-center justify-center group-hover:bg-signal/12 transition-colors">

@@ -50,4 +50,31 @@ test.describe('API Routes', () => {
     const response = await request.get('/api/admin/stats')
     expect(response.status()).toBe(401)
   })
+
+  test('license JWKS returns Ed25519 public key', async ({ request }) => {
+    const response = await request.get('/api/v1/license/jwks')
+    expect(response.status()).toBe(200)
+    const body = await response.json()
+    expect(body.success).toBe(true)
+    expect(Array.isArray(body.data.keys)).toBe(true)
+    expect(body.data.keys.length).toBeGreaterThanOrEqual(1)
+    expect(body.data.keys[0].crv).toBe('Ed25519')
+    expect(body.data.keys[0].kid).toBeTruthy()
+  })
+
+  test('download latest-manifest discovery', async ({ request }) => {
+    const response = await request.get('/api/v1/download/latest-manifest')
+    expect(response.status()).toBe(200)
+    const body = await response.json()
+    expect(body.success).toBe(true)
+    expect(body.data.manifest_url).toMatch(/^https:\/\//)
+    expect(body.data.platform).toBe('windows')
+  })
+
+  test('auth logout rejects missing bearer token', async ({ request }) => {
+    const response = await request.post('/api/v1/auth/logout')
+    expect(response.status()).toBe(401)
+    const body = await response.json()
+    expect(body.success).toBe(false)
+  })
 })

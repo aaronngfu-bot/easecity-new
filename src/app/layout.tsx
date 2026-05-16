@@ -80,7 +80,7 @@ export default function RootLayout({
       className={`${instrumentSans.variable} ${jetbrainsMono.variable} ${syne.variable}`}
       suppressHydrationWarning
     >
-      <body className="bg-bg-base text-text-primary antialiased">
+      <body className="bg-bg-void text-text-primary antialiased selection:bg-signal/20 selection:text-signal">
         <OrganizationJsonLd />
         <WebSiteJsonLd />
         <SessionProvider>

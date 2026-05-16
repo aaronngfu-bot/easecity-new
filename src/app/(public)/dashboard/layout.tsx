@@ -10,7 +10,7 @@ export default function DashboardLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="section-padding">
+    <div className="pb-16 pt-24">
       <div className="container-max">{children}</div>
     </div>
   )

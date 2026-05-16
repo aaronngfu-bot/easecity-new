@@ -150,6 +150,10 @@ async function smokeWithLicense(licenseJwt) {
     await smokeLicenseLifecycle(refresh.data.license_jwt, payload.device_fingerprint)
   }
 
+  if (options.testLogout) {
+    await smokeLogout(refresh.data.license_jwt, payload.device_fingerprint)
+  }
+
   if (options.testDeviceManagement) {
     await smokeDeviceManagement(refresh.data.license_jwt, payload.device_fingerprint)
   }
@@ -157,6 +161,63 @@ async function smokeWithLicense(licenseJwt) {
   if (options.testChangeEmail) {
     await smokeChangeEmail(refresh.data.license_jwt)
   }
+}
+
+async function smokeLogout(licenseJwt, fingerprint) {
+  await postLogout(licenseJwt)
+  console.log('')
+  console.log('Logout returned 204.')
+
+  const response = await fetch(`${baseUrl}/api/v1/license/refresh`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${licenseJwt}`,
+    },
+    body: JSON.stringify({
+      product: 'ec_share',
+      device_fingerprint: fingerprint,
+      app_version: options.appVersion || 'dev-smoke',
+    }),
+  })
+
+  const json = await response.json().catch(() => null)
+  const hasRedis = Boolean(
+    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+  )
+
+  if (hasRedis) {
+    if (response.ok && json?.success) {
+      throw new Error(
+        'Expected license refresh to fail after logout when Upstash Redis deny-list is configured.'
+      )
+    }
+    console.log('Revocation check: refresh rejected after logout (Redis deny-list).')
+    return
+  }
+
+  console.log(
+    'Note: UPSTASH_REDIS_* unset — logout returned 204 but JWT revocation is not enforced server-side.'
+  )
+  if (!response.ok || json?.success === false) {
+    console.log('Refresh after logout failed anyway (token may be expired or invalid).')
+  }
+}
+
+async function postLogout(bearerToken) {
+  const response = await fetch(`${baseUrl}/api/v1/auth/logout`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${bearerToken}`,
+    },
+  })
+
+  if (response.status === 204) {
+    return
+  }
+
+  const json = await response.json().catch(() => null)
+  throw new Error(`/api/v1/auth/logout failed (${response.status}): ${JSON.stringify(json ?? {})}`)
 }
 
 async function smokeLicenseLifecycle(licenseJwt, fingerprint) {
@@ -408,8 +469,8 @@ function parseArgs(args) {
       case '--nickname':
         parsed.nickname = args[++index]
         break
-      case '--test-change-email':
-        parsed.testChangeEmail = true
+      case '--test-logout':
+        parsed.testLogout = true
         break
       case '--new-email':
         parsed.newEmail = args[++index]
@@ -455,7 +516,7 @@ Options:
   --test-device-management
                          Also test device rename/delete APIs
   --nickname <value>     Nickname to use for device rename smoke test
-  --test-change-email    Also test change-email request/confirm APIs
+  --test-logout            Also POST /api/v1/auth/logout and verify refresh denied when Redis is configured
   --new-email <email>    New email for change-email smoke test
   --change-email-challenge-id <id>
                          Existing change-email challenge ID

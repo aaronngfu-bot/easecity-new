@@ -22,13 +22,14 @@ export default async function AdminOrderDetailPage({
 
   return (
     <div className="space-y-6">
-      <Link href="/admin/orders" className="text-sm text-text-muted hover:text-text-primary transition-colors">
+      <Link href="/admin/orders" className="signal-secondary">
         ← Orders
       </Link>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="p-6 rounded-xl border border-border bg-bg-surface space-y-4">
-          <h2 className="font-display text-lg font-bold text-text-primary">Order Details</h2>
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <div className="space-y-4 rounded-lg border border-border bg-bg-surface p-6">
+          <p className="label-mono text-signal">ORDER.DETAIL</p>
+          <h2 className="font-display text-lg font-semibold tracking-[-0.03em] text-text-primary">Order Details</h2>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
               <p className="text-xs text-text-muted mb-1">Order ID</p>
@@ -36,7 +37,7 @@ export default async function AdminOrderDetailPage({
             </div>
             <div>
               <p className="text-xs text-text-muted mb-1">Status</p>
-              <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
+              <span className={`rounded-sm border px-2.5 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
                 order.status === 'paid' ? 'bg-green-500/15 text-green-400 border-green-500/25' :
                 'bg-gray-500/15 text-gray-400 border-gray-500/25'
               }`}>
@@ -67,7 +68,7 @@ export default async function AdminOrderDetailPage({
         </div>
 
         <div className="space-y-6">
-          <div className="p-6 rounded-xl border border-border bg-bg-surface space-y-3">
+          <div className="space-y-3 rounded-lg border border-border bg-bg-surface p-6">
             <h2 className="font-display text-sm font-semibold text-text-primary">Customer</h2>
             <div>
               <p className="text-sm text-text-primary">{order.user.name || '—'}</p>
@@ -81,7 +82,7 @@ export default async function AdminOrderDetailPage({
             </Link>
           </div>
 
-          <div className="p-6 rounded-xl border border-border bg-bg-surface space-y-3">
+          <div className="space-y-3 rounded-lg border border-border bg-bg-surface p-6">
             <h2 className="font-display text-sm font-semibold text-text-primary">Items</h2>
             {items.length === 0 ? (
               <p className="text-text-muted text-sm">No item data</p>

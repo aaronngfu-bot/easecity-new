@@ -61,10 +61,10 @@ export function TopologyRibbon() {
         >
           <defs>
             <linearGradient id="ribbonTrunk" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#22ff88" stopOpacity="0" />
-              <stop offset="10%" stopColor="#22ff88" stopOpacity="0.6" />
-              <stop offset="90%" stopColor="#22ff88" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#22ff88" stopOpacity="0" />
+              <stop offset="0%" stopColor="#00e5cc" stopOpacity="0" />
+              <stop offset="10%" stopColor="#00e5cc" stopOpacity="0.6" />
+              <stop offset="90%" stopColor="#00e5cc" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="#00e5cc" stopOpacity="0" />
             </linearGradient>
             <filter id="ribbonHeadGlow">
               <feGaussianBlur stdDeviation="1.5" result="blur" />
@@ -105,7 +105,7 @@ export function TopologyRibbon() {
                   y1={y}
                   x2="20"
                   y2={y}
-                  stroke={isActive || isPast ? '#22ff88' : '#3f3f46'}
+                  stroke={isActive || isPast ? '#00e5cc' : '#526066'}
                   strokeWidth={isActive ? 1.5 : 0.7}
                   strokeOpacity={isActive ? 1 : isPast ? 0.6 : 0.4}
                 />
@@ -113,8 +113,8 @@ export function TopologyRibbon() {
                   cx="16"
                   cy={y}
                   r={isActive ? 2 : 1.2}
-                  fill={isActive ? '#22ff88' : isPast ? '#22ff8870' : '#27272a'}
-                  stroke={isActive ? '#22ff88' : 'none'}
+                  fill={isActive ? '#00e5cc' : isPast ? '#00e5cc70' : '#2a3438'}
+                  stroke={isActive ? '#00e5cc' : 'none'}
                   strokeWidth="0.5"
                   filter={isActive ? 'url(#ribbonHeadGlow)' : undefined}
                 />

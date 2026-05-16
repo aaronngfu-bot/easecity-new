@@ -9,19 +9,19 @@ export default function PaymentCancelPage() {
 
   return (
     <div className="section-padding pt-24">
-      <div className="container-max flex items-center justify-center min-h-[60vh]">
-        <div className="glass-panel text-center max-w-md p-8 md:p-10">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl glass-panel !rounded-2xl !border-red-500/30 mb-6">
-            <XCircle size={36} className="text-red-400" />
+      <div className="container-max flex min-h-[60vh] items-center justify-center">
+        <div className="signal-panel max-w-md p-8 text-center md:p-10">
+          <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-md border border-status-danger/30 bg-status-danger/10">
+            <XCircle size={36} className="text-status-danger" />
           </div>
-          <div className="label-mono !text-red-400/70 mb-3">TRANSACTION.CANCELED</div>
-          <h1 className="font-display text-2xl font-bold text-text-primary mb-3">{t.payment.cancelTitle}</h1>
-          <p className="text-text-secondary text-sm leading-relaxed mb-8">{t.payment.cancelDesc}</p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/services" className="glass-cta">
+          <div className="label-mono mb-3 !text-status-danger">TRANSACTION.CANCELED</div>
+          <h1 className="mb-3 font-display text-2xl font-semibold tracking-[-0.04em] text-text-primary">{t.payment.cancelTitle}</h1>
+          <p className="mb-8 text-sm leading-relaxed text-text-secondary">{t.payment.cancelDesc}</p>
+          <div className="flex flex-col justify-center gap-3 sm:flex-row">
+            <Link href="/services" className="signal-cta">
               {t.payment.tryAgain}
             </Link>
-            <Link href="/contact" className="glass-ghost">
+            <Link href="/contact" className="signal-secondary">
               {t.payment.contactSupport}
             </Link>
           </div>

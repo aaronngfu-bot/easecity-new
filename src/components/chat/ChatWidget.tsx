@@ -84,7 +84,10 @@ export function ChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="glass-panel !rounded-2xl fixed bottom-24 right-6 z-50 w-[380px] max-h-[520px] flex flex-col shadow-2xl overflow-hidden"
+            className="glass-panel !rounded-2xl fixed bottom-24 left-4 right-4 z-50 max-h-[min(520px,calc(100dvh-7rem))] flex flex-col shadow-2xl overflow-hidden sm:left-auto sm:right-6 sm:w-[380px]"
+            role="dialog"
+            aria-modal="false"
+            aria-label={t.chat.title}
           >
             <div className="px-4 py-3 border-b border-border/60 bg-bg-base/40 flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -99,7 +102,11 @@ export function ChatWidget() {
                   </p>
                 </div>
               </div>
-              <button onClick={() => setIsOpen(false)} className="p-1.5 rounded-lg text-text-muted hover:text-signal hover:bg-signal/5 transition-colors">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="p-1.5 rounded-lg text-text-muted hover:text-signal hover:bg-signal/5 transition-colors"
+                aria-label="Close chat"
+              >
                 <X size={16} />
               </button>
             </div>
@@ -129,7 +136,11 @@ export function ChatWidget() {
                   </div>
                 </div>
               )}
-              {error && <div className="text-xs text-red-400 text-center py-2">{error}</div>}
+              {error && (
+                <div role="alert" className="text-xs text-red-400 text-center py-2">
+                  {error}
+                </div>
+              )}
             </div>
 
             <form onSubmit={handleSubmit} className="p-3 border-t border-border/60 bg-bg-base/40 flex gap-2">
@@ -138,8 +149,14 @@ export function ChatWidget() {
                 onChange={(e) => setInput(e.target.value)}
                 placeholder={t.chat.placeholder}
                 className="flex-1 glass-input !py-2 !text-sm"
+                aria-label={t.chat.placeholder}
               />
-              <button type="submit" disabled={isLoading || !input.trim()} className="p-2 rounded-lg glass-cta !px-3 disabled:opacity-40 disabled:cursor-not-allowed">
+              <button
+                type="submit"
+                disabled={isLoading || !input.trim()}
+                className="p-2 rounded-lg glass-cta !px-3 disabled:opacity-40 disabled:cursor-not-allowed"
+                aria-label="Send chat message"
+              >
                 <Send size={16} />
               </button>
             </form>
@@ -156,6 +173,8 @@ export function ChatWidget() {
           'transition-colors shadow-glow-signal',
           isOpen ? 'glass-panel !rounded-full text-text-secondary' : 'bg-signal text-bg-base border border-signal/40'
         )}
+        aria-label={isOpen ? 'Close chat' : 'Open chat'}
+        aria-expanded={isOpen}
       >
         {isOpen ? <X size={22} /> : <MessageCircle size={22} />}
       </motion.button>

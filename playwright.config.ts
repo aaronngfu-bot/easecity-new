@@ -28,6 +28,12 @@ export default defineConfig({
       RESEND_API_KEY: '',
       UPSTASH_REDIS_REST_URL: '',
       UPSTASH_REDIS_REST_TOKEN: '',
+      // Deterministic Ed25519 key so JWKS responds in CI/playwright (do not use in production).
+      LICENSE_JWT_PRIVATE_KEY_PEM: `-----BEGIN PRIVATE KEY-----
+MC4CAQAwBQYDK2VwBCIEIOGkq094zzBH3vxT+MXaCATnt1TwWhTEFhhHC85YYJYr
+-----END PRIVATE KEY-----
+`,
+      LICENSE_JWT_KEY_ID: '2026a',
     },
     url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,

@@ -207,7 +207,7 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
   const isPremium = style.tier === 'premium' || style.tier === 'enterprise'
 
   return (
-    <div className={cn('p-6', isPremium ? 'glass-prominent' : 'glass-panel')}>
+    <div className={cn('p-6', isPremium ? 'signal-panel-highlight' : 'signal-panel')}>
       <div className="flex items-start justify-between gap-4 mb-5">
         <div className="flex items-center gap-3">
           <div className={cn(
@@ -239,7 +239,7 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
 
         <ManageBillingButton
           label={t.dashboard.manageBilling}
-          className="glass-ghost !py-2 !px-3 !text-xs shrink-0 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="signal-secondary !min-h-9 shrink-0 !px-3 !py-2 !text-xs disabled:cursor-not-allowed disabled:opacity-60"
         />
       </div>
 
@@ -281,18 +281,18 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
 function NoSubscriptionCard() {
   const { t } = useLanguage()
   return (
-    <div className="glass-panel p-8 text-center !border-dashed">
-      <div className="w-14 h-14 rounded-2xl bg-bg-base/40 border border-border flex items-center justify-center mx-auto mb-4">
+      <div className="signal-panel border-dashed p-8 text-center">
+      <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-md border border-border bg-bg-void">
         <CreditCard size={22} className="text-text-muted" />
       </div>
       <h3 className="font-display text-base font-semibold text-text-primary mb-1">{t.dashboard.noSubTitle}</h3>
       <p className="text-sm text-text-muted mb-5">{t.dashboard.noSubDesc}</p>
       <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-        <Link href="/pricing" className="glass-cta">
+        <Link href="/pricing" className="signal-cta">
           {t.dashboard.noSubCta}
           <ArrowRight size={14} />
         </Link>
-        <Link href="/services" className="glass-ghost">
+        <Link href="/services" className="signal-secondary">
           {t.dashboard.noSubAlt}
         </Link>
       </div>
@@ -312,14 +312,14 @@ function QuickActions() {
   ]
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
       {actions.map((a) => (
         <Link
           key={a.label}
           href={a.href}
-          className="glass-panel glass-panel-interactive group flex items-center gap-3 p-4"
+          className="signal-panel group flex items-center gap-3 p-4 hover:border-border-accent"
         >
-          <div className="w-10 h-10 rounded-lg bg-bg-base/40 border border-border group-hover:bg-signal/10 group-hover:border-signal/25 flex items-center justify-center text-text-muted group-hover:text-signal transition-colors shrink-0">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-md border border-border bg-bg-void text-text-muted transition-colors group-hover:border-signal/25 group-hover:bg-signal/10 group-hover:text-signal">
             <a.icon size={17} />
           </div>
           <div className="flex-1 min-w-0">
@@ -338,14 +338,14 @@ function QuickActions() {
 function PlatformStatus() {
   const { t } = useLanguage()
   return (
-    <div className="glass-panel flex items-center justify-between px-5 py-3.5">
+    <div className="signal-panel flex items-center justify-between px-5 py-3.5">
       <div className="flex items-center gap-3">
         <Activity size={15} className="text-signal" />
         <span className="text-sm text-text-secondary">{t.dashboard.platformStatus}</span>
       </div>
       <div className="flex items-center gap-2">
-        <div className="w-2 h-2 rounded-full bg-signal animate-signal-pulse" />
-        <span className="text-xs font-mono text-signal tracking-wider uppercase">{t.dashboard.platformOnline}</span>
+        <div className="h-1.5 w-1.5 rounded-full bg-signal animate-signal-pulse" />
+        <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-signal">{t.dashboard.platformOnline}</span>
       </div>
     </div>
   )
@@ -377,19 +377,19 @@ function PaymentHistory({ orders, locale }: { orders: SerializedOrder[]; locale:
   }
 
   return (
-    <div className="glass-panel overflow-hidden">
-      <div className="px-5 py-4 border-b border-border flex items-center justify-between">
+    <div className="signal-panel overflow-hidden">
+      <div className="flex items-center justify-between border-b border-border px-5 py-4">
         <div className="flex items-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-signal/60" />
-          <h2 className="label-mono text-signal/80">{t.dashboard.paymentHistory}</h2>
+          <h2 className="label-mono text-signal">{t.dashboard.paymentHistory}</h2>
         </div>
-        <Link href="/dashboard/orders" className="text-xs text-text-muted hover:text-signal transition-colors font-mono tracking-wider">
+        <Link href="/dashboard/orders" className="font-mono text-xs tracking-wider text-text-muted transition-colors hover:text-signal">
           {t.dashboard.viewAllOrders} →
         </Link>
       </div>
       <div className="divide-y divide-border/50">
         {orders.map((order) => (
-          <div key={order.id} className="px-5 py-3.5 flex items-center justify-between gap-4 hover:bg-bg-base/20 transition-colors">
+          <div key={order.id} className="flex items-center justify-between gap-4 px-5 py-3.5 transition-colors hover:bg-bg-void/60">
             <div className="min-w-0">
               <p className="text-xs text-text-muted font-mono tracking-wider">{order.id.slice(0, 14)}…</p>
               <p className="text-xs text-text-muted mt-0.5">
@@ -425,20 +425,20 @@ export default function DashboardClient({ userName, subscription, recentOrders }
   )
 
   return (
-    <div className="space-y-5 pt-24 pb-16">
-      <div className="flex items-center justify-between flex-wrap gap-4">
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-3 mb-3">
-            <span className="font-mono text-[10px] tracking-[0.25em] text-text-muted">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
               DASHBOARD.00
             </span>
             <span className="h-px w-12 bg-gradient-to-r from-signal/40 to-transparent" />
-            <span className="glass-badge">
+            <span className="signal-badge">
               <span className="w-1 h-1 rounded-full bg-signal animate-signal-pulse" />
               {language === 'zh' ? '控制台' : 'CONTROL DECK'}
             </span>
           </div>
-          <h1 className="font-display text-3xl md:text-4xl font-bold text-text-primary tracking-tight">
+          <h1 className="font-display text-4xl font-semibold tracking-[-0.05em] text-text-primary md:text-5xl">
             {userName
               ? (language === 'zh' ? `${userName}，你好` : `Welcome, ${userName}`)
               : (language === 'zh' ? '控制台' : 'Dashboard')}

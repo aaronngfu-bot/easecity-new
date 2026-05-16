@@ -58,6 +58,20 @@ export default function DocsPage() {
             ))}
           </div>
 
+          <div className="mt-12 glass-prominent p-6 md:p-8">
+            <p className="label-mono mb-4">Download</p>
+            <h2 className="font-display text-2xl font-bold text-text-primary mb-3">
+              Need the Windows installer?
+            </h2>
+            <p className="text-text-secondary leading-relaxed mb-5">
+              Start from the download page to review release status, system requirements, and the
+              latest manifest endpoint before following the setup guides.
+            </p>
+            <Link href="/download" className="glass-cta inline-flex items-center justify-center">
+              Open download page
+            </Link>
+          </div>
+
           <div className="mt-12 glass-panel p-6">
             <h2 className="font-display text-2xl font-bold text-text-primary mb-3">
               Need support?

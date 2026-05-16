@@ -1,5 +1,7 @@
 import { createPrivateKey, createPublicKey, sign, verify } from 'node:crypto'
 
+import { assertLicenseJwtNotRevoked } from '@/lib/license-jwt-revocation'
+
 export const EC_SHARE_PRODUCT = 'ec_share' as const
 
 export type LicenseTier =
@@ -235,7 +237,9 @@ export function getBearerToken(request: Request): string | null {
   return token.length > 0 ? token : null
 }
 
-export function requireEcShareLicense(request: Request): LicenseJwtPayload {
+export async function requireEcShareLicense(
+  request: Request
+): Promise<LicenseJwtPayload> {
   const bearerToken = getBearerToken(request)
 
   if (!bearerToken) {
@@ -248,6 +252,17 @@ export function requireEcShareLicense(request: Request): LicenseJwtPayload {
     throw new Error('Invalid license product')
   }
 
+  await assertLicenseJwtNotRevoked(bearerToken)
+
+  return payload
+}
+
+export async function verifyLicenseJwtWithRevocationCheck(
+  token: string,
+  options: VerifyLicenseJwtOptions = {}
+): Promise<LicenseJwtPayload> {
+  const payload = verifyLicenseJwt(token, options)
+  await assertLicenseJwtNotRevoked(token)
   return payload
 }
 

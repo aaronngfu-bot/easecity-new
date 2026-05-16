@@ -53,7 +53,8 @@ function rateLimitMemory(
 
 let redisClient: Redis | null | undefined
 
-function getRedis(): Redis | null {
+/** Shared Upstash REST client; used for rate limits and optional JWT revocation. */
+export function getUpstashRedis(): Redis | null {
   if (redisClient !== undefined) return redisClient
   const url = process.env.UPSTASH_REDIS_REST_URL
   const token = process.env.UPSTASH_REDIS_REST_TOKEN
@@ -73,7 +74,7 @@ async function rateLimitUpstash(
   limit: number,
   windowMs: number
 ): Promise<RateLimitResult> {
-  const redis = getRedis()
+  const redis = getUpstashRedis()
   if (!redis) {
     return rateLimitMemory(identifier, limit, windowMs)
   }
@@ -105,7 +106,7 @@ export async function rateLimit(
   limit: number,
   windowMs: number
 ): Promise<RateLimitResult> {
-  if (getRedis()) {
+  if (getUpstashRedis()) {
     return rateLimitUpstash(identifier, limit, windowMs)
   }
   return rateLimitMemory(identifier, limit, windowMs)

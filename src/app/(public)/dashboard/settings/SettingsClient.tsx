@@ -75,19 +75,19 @@ export default function SettingsClient({ user, subscription }: Props) {
   }
 
   return (
-    <div className="space-y-5 pt-24 pb-16">
+    <div className="space-y-5">
       <div>
         <div className="flex items-center gap-3 mb-3">
-          <span className="font-mono text-[10px] tracking-[0.25em] text-text-muted">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
             SETTINGS.01
           </span>
           <span className="h-px w-12 bg-gradient-to-r from-signal/40 to-transparent" />
-          <span className="glass-badge">
+          <span className="signal-badge">
             <Settings size={10} />
             {zh ? '設定' : 'SETTINGS'}
           </span>
         </div>
-        <h1 className="font-display text-3xl md:text-4xl font-bold text-text-primary tracking-tight">
+        <h1 className="font-display text-4xl font-semibold tracking-[-0.05em] text-text-primary md:text-5xl">
           {zh ? '帳號設定' : 'Account Settings'}
         </h1>
         <p className="text-text-secondary text-sm mt-2">
@@ -97,7 +97,7 @@ export default function SettingsClient({ user, subscription }: Props) {
 
       <div className="space-y-4">
         {/* Profile Info */}
-        <div className="glass-panel p-6 space-y-4">
+        <div className="signal-panel space-y-4 p-6">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-signal/60" />
             <h2 className="label-mono text-signal/80">{zh ? '個人資訊' : 'PROFILE'}</h2>
@@ -119,7 +119,7 @@ export default function SettingsClient({ user, subscription }: Props) {
         </div>
 
         {/* Billing Section */}
-        <div className="glass-panel p-6 space-y-4">
+        <div className="signal-panel space-y-4 p-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <span className="w-1.5 h-1.5 rounded-full bg-signal/60" />
@@ -164,7 +164,7 @@ export default function SettingsClient({ user, subscription }: Props) {
               <button
                 onClick={handleManageBilling}
                 disabled={isPending}
-                className="glass-ghost disabled:opacity-60 disabled:cursor-not-allowed"
+                className="signal-secondary disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isPending ? <Loader2 size={14} className="animate-spin" /> : (
                   <>
@@ -179,7 +179,7 @@ export default function SettingsClient({ user, subscription }: Props) {
               <p className="text-sm text-text-secondary">
                 {zh ? '您目前沒有有效的訂閱方案。' : 'You do not have an active subscription.'}
               </p>
-              <a href="/pricing" className="glass-cta">
+              <a href="/pricing" className="signal-cta">
                 {zh ? '查看方案' : 'See plans'}
               </a>
             </div>
@@ -187,17 +187,17 @@ export default function SettingsClient({ user, subscription }: Props) {
         </div>
 
         {/* Danger Zone */}
-        <div className="glass-panel p-6 space-y-4 !border-red-500/20">
+        <div className="signal-panel space-y-4 border-status-danger/25 p-6">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-red-400/70" />
-            <h2 className="label-mono !text-red-400/80">{zh ? '登出' : 'SIGN OUT'}</h2>
+            <h2 className="label-mono !text-status-danger">{zh ? '登出' : 'SIGN OUT'}</h2>
           </div>
           <button
             onClick={handleSignOut}
             disabled={signingOut}
             className={cn(
-              'inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-lg',
-              'border border-red-500/25 text-red-400 hover:bg-red-500/10 transition-colors',
+              'inline-flex items-center gap-2 rounded-md px-4 py-2.5 text-sm font-medium',
+              'border border-status-danger/25 text-status-danger transition-colors hover:bg-status-danger/10',
               'disabled:opacity-60 disabled:cursor-not-allowed'
             )}
           >

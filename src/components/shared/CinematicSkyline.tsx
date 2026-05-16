@@ -505,7 +505,7 @@ function SignalArc({
       <path
         d={d}
         fill="none"
-        stroke="#22ff88"
+        stroke="#00e5cc"
         strokeWidth="0.9"
         strokeOpacity="0.18"
         strokeLinecap="round"
@@ -514,7 +514,7 @@ function SignalArc({
       <path
         d={d}
         fill="none"
-        stroke="#22ff88"
+        stroke="#00e5cc"
         strokeWidth="1.6"
         strokeOpacity="0.95"
         strokeLinecap="round"
@@ -525,10 +525,10 @@ function SignalArc({
         }}
       />
       {/* Endpoint markers (breathing) */}
-      <circle cx={from.x} cy={from.y} r="3.5" fill="#22ff88" fillOpacity="0.25">
+      <circle cx={from.x} cy={from.y} r="3.5" fill="#00e5cc" fillOpacity="0.25">
         <animate attributeName="fill-opacity" values="0.15;0.55;0.15" dur={`${duration * 0.6}s`} repeatCount="indefinite" />
       </circle>
-      <circle cx={to.x} cy={to.y} r="3.5" fill="#22ff88" fillOpacity="0.25">
+      <circle cx={to.x} cy={to.y} r="3.5" fill="#00e5cc" fillOpacity="0.25">
         <animate attributeName="fill-opacity" values="0.15;0.55;0.15" dur={`${duration * 0.6}s`} repeatCount="indefinite" begin={`${duration * 0.5}s`} />
       </circle>
     </g>

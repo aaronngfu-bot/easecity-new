@@ -15,31 +15,23 @@ export default function PublicLayout({
   children: React.ReactNode
 }) {
   return (
-    <>
-      {/* Boot sequence intro on first visit */}
+    <div className="control-canvas relative min-h-screen overflow-x-hidden">
       <BootSequence />
-
-      {/* Precision instrument backdrop — silver crosshairs + hairline grid
-       * + white light sweep. Replaces the earlier green aurora. */}
       <BlueprintField />
-
-      {/* Cursor-reactive grain noise */}
       <GrainField />
-
-      {/* Reacts to cursor; writes CSS vars on interactive panels */}
       <CursorGlowLayer />
 
+      <div className="pointer-events-none fixed inset-0 z-[1] control-grid opacity-30" />
+      <div className="pointer-events-none fixed inset-0 z-[1] signal-noise opacity-25 mix-blend-overlay" />
+
       <Navbar />
-      <main className="min-h-screen relative z-[2]">{children}</main>
+      <main className="relative z-[2] min-h-screen">{children}</main>
       <Footer />
 
-      {/* Fixed HUD — ambient live metrics */}
       <TelemetryBand />
-
-      {/* Floating surfaces */}
       <ChatWidget />
       <CommandPalette />
       <KeyboardLayer />
-    </>
+    </div>
   )
 }

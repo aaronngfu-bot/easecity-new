@@ -5,6 +5,16 @@
 
 ---
 
+## Last session: 2026-05-11 (M2 logout, JWKS, deny-list, download discovery, Stripe verify)
+
+**Summary**: Delivered the five prioritized web/backend items: **`POST /api/v1/auth/logout`** returns `204` and registers the presented JWT in an **Upstash Redis deny-list** (SHA-256 keyed, TTL until JWT `exp`) when `UPSTASH_REDIS_*` is configured; all license/account routes now reject revoked tokens via **`verifyLicenseJwtWithRevocationCheck`** / **`await requireEcShareLicense`**. Added **`GET /api/v1/license/jwks`** for desktop Ed25519/`kid` discovery (standard `{success,data}` envelope). Added **`GET /api/v1/download/latest-manifest`** plus **`/download`** page links for **`dl.easecity.hk`** manifest integration. Added **`npm run ecshare:stripe-verify`** to validate Stripe Price metadata against live Stripe API when `STRIPE_SECRET_KEY` is present. **`docs/API_CONTRACT.md`** is now **v0.4** with §10 decision table (Resend, annual rotation, Redis deny-list, optimistic seats, Upstash rate limits, Vercel). Playwright injects a deterministic dev-only Ed25519 PEM so JWKS e2e stays green without reading `.env.local`.
+
+**Files changed**: `src/lib/license-jwt-revocation.ts`, `src/lib/rate-limit.ts` (`getUpstashRedis`), `src/lib/license-jwt.ts`, `src/lib/rate-limit-policy.ts`, license/account route handlers, **NEW** `src/app/api/v1/auth/logout/route.ts`, `src/app/api/v1/license/jwks/route.ts`, `src/app/api/v1/download/latest-manifest/route.ts`, `scripts/dev/stripe-catalog-verify.mjs`, `scripts/dev/ec-share-api-smoke.mjs`, `playwright.config.ts`, `e2e/api.spec.ts`, `src/app/(public)/download/page.tsx`, `.env.example`, `package.json`, `docs/API_CONTRACT.md`, `docs/WEB_TEAM_TASKS.md`, `docs/CHANGELOG.md`.
+
+**Validation**: `npm run lint` → clean; `npm run build` → success; `npm test` → 7/7 API Playwright tests passing (Chromium). Optional: `npm run ecshare:stripe-verify` when `STRIPE_SECRET_KEY` is set; `npm run ecshare:smoke -- ... --test-logout` with Redis env to assert post-logout refresh rejection.
+
+---
+
 ## Last session: 2026-05-05 (Stripe entitlement baseline)
 
 **Summary**: Implemented the EC-Share subscription / Stripe entitlement baseline hardening. Added persistent Stripe webhook idempotency via a new `StripeWebhookEvent` Prisma model + migration; webhook handling now records `event.id`, returns 200 for already processed duplicates, retries failed events, and stores failure messages for debugging. Tightened subscription entitlement mapping by centralizing `EC_SHARE_PRODUCT`, deriving tier from Stripe Price metadata/env fallback, and normalizing seats to Pro=1, Business>=3, Enterprise>=50. Checkout trial eligibility now scopes prior subscriptions to `product="ec_share"` so future EaseCity product purchases do not block an EC-Share Pro trial. `.env.example` and `API_CONTRACT.md` now document canonical webhook URL, legacy webhook compatibility, Stripe Tax dashboard setup, metadata, seat minimums, and event idempotency.

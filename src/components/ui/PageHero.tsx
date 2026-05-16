@@ -33,23 +33,21 @@ export function PageHero({
   align = 'left',
 }: PageHeroProps) {
   return (
-    <section className="relative pt-32 md:pt-40 pb-20 md:pb-24 overflow-hidden">
-      {/* Background: signal glow + rule grid */}
+    <section className="relative overflow-hidden pb-20 pt-32 md:pb-24 md:pt-40">
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 70% 50% at 50% -10%, #22ff8810, transparent 60%), radial-gradient(ellipse 35% 25% at 15% 80%, #22ff8806, transparent 60%)',
+            'radial-gradient(ellipse 70% 42% at 72% 0%, rgba(0,229,204,0.14), transparent 58%)',
         }}
       />
-      <div className="absolute inset-0 bg-rule-grid opacity-[0.18] pointer-events-none" />
+      <div className="absolute inset-0 control-grid opacity-[0.28] pointer-events-none" />
 
-      {/* Top-right serial badge */}
       <motion.div
         initial={{ opacity: 0, y: -8 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.1 }}
-        className="absolute top-24 right-6 md:right-12 hidden md:flex items-center gap-2 glass-badge"
+        className="absolute right-6 top-24 hidden items-center gap-2 rounded-sm border border-signal/25 bg-signal/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-signal md:right-12 md:flex"
       >
         <span className="w-1 h-1 rounded-full bg-signal animate-signal-pulse" />
         <span>SYS_ONLINE</span>
@@ -57,56 +55,52 @@ export function PageHero({
 
       <div className="container-max relative z-10">
         <div className={cn('max-w-4xl', align === 'center' && 'mx-auto text-center')}>
-          {/* Serial + section code — editorial header */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className={cn(
-              'flex items-center gap-3 mb-8 md:mb-10',
+              'mb-8 flex items-center gap-3 md:mb-10',
               align === 'center' && 'justify-center'
             )}
           >
-            <span className="font-mono text-[10px] tracking-[0.25em] text-text-muted">
+            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
               {sectionCode}.{serial}
             </span>
-            <span className="h-px w-12 bg-gradient-to-r from-signal/40 to-transparent" />
-            <span className="label-mono text-signal/80">{eyebrow}</span>
+            <span className="h-px w-12 bg-gradient-to-r from-signal/50 to-transparent" />
+            <span className="signal-badge">{eyebrow}</span>
           </motion.div>
 
-          {/* Main heading */}
           <motion.h1
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="font-display text-5xl md:text-7xl lg:text-[5.5rem] font-bold text-text-primary leading-[1.02] tracking-tight mb-7 md:mb-9"
+            className="mb-7 font-display text-display-xl font-semibold text-text-primary md:mb-9"
           >
             {heading}
             <br />
-            <span className="text-gradient-signal">{headingHighlight}</span>
+            <span className="text-signal">{headingHighlight}</span>
           </motion.h1>
 
-          {/* Description */}
           <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.2 }}
             className={cn(
-              'text-text-secondary text-base md:text-lg leading-relaxed max-w-2xl',
+              'max-w-2xl text-base leading-relaxed text-text-secondary md:text-lg',
               align === 'center' && 'mx-auto'
             )}
           >
             {description}
           </motion.p>
 
-          {/* Optional telemetry meta row */}
           {meta && meta.length > 0 && (
             <motion.div
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.35 }}
               className={cn(
-                'mt-10 md:mt-14 flex flex-wrap items-stretch gap-0 border-t border-b border-border/60',
+                'mt-10 flex flex-wrap items-stretch gap-0 border-y border-border md:mt-14',
                 align === 'center' && 'justify-center'
               )}
             >
@@ -114,12 +108,12 @@ export function PageHero({
                 <div
                   key={item.label}
                   className={cn(
-                    'flex flex-col py-4 md:py-5 pr-8 md:pr-12',
-                    i > 0 && 'pl-8 md:pl-12 border-l border-border/60'
+                    'flex flex-col py-4 pr-8 md:py-5 md:pr-12',
+                    i > 0 && 'border-l border-border pl-8 md:pl-12'
                   )}
                 >
                   <span className="label-mono mb-2">{item.label}</span>
-                  <span className="font-mono text-sm md:text-base text-text-primary tabular-nums">
+                  <span className="font-mono text-sm tabular-nums text-text-primary md:text-base">
                     {item.value}
                   </span>
                 </div>

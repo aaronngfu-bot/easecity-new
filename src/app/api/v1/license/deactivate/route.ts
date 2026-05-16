@@ -1,7 +1,11 @@
 import { withErrorHandler } from '@/lib/api-handler'
 import { apiError, apiSuccess } from '@/lib/api-response'
 import { prisma } from '@/lib/db'
-import { EC_SHARE_PRODUCT, requireEcShareLicense } from '@/lib/license-jwt'
+import {
+  EC_SHARE_PRODUCT,
+  type LicenseJwtPayload,
+  requireEcShareLicense,
+} from '@/lib/license-jwt'
 import { getClientIp, rateLimit } from '@/lib/rate-limit'
 import {
   LICENSE_LIFECYCLE_DEVICE_LIMIT,
@@ -25,10 +29,10 @@ export const POST = withErrorHandler(async (req) => {
     return apiError('RATE_LIMITED', 'Too many license deactivation attempts.', 429)
   }
 
-  let payload: ReturnType<typeof requireEcShareLicense>
+  let payload: LicenseJwtPayload
 
   try {
-    payload = requireEcShareLicense(req)
+    payload = await requireEcShareLicense(req)
   } catch {
     return apiError('UNAUTHORIZED', 'Invalid or missing license token.', 401)
   }
@@ -66,6 +70,6 @@ export const POST = withErrorHandler(async (req) => {
     device_fingerprint: data.device_fingerprint,
     deactivated: result.count > 0,
     token_revoked: false,
-    revoke_pending_reason: 'Stateless JWT deny-list storage is not configured yet.',
+    note: 'Device binding removed; JWT remains valid until expiry unless revoked via POST /api/v1/auth/logout.',
   })
 })

@@ -5,7 +5,8 @@ import { issueEcShareLicense } from '@/lib/ec-share-license'
 import {
   EC_SHARE_PRODUCT,
   getBearerToken,
-  verifyLicenseJwt,
+  verifyLicenseJwtWithRevocationCheck,
+  type LicenseJwtPayload,
 } from '@/lib/license-jwt'
 
 export const dynamic = 'force-dynamic'
@@ -17,10 +18,10 @@ export const GET = withErrorHandler(async (req) => {
     return apiError('UNAUTHORIZED', 'Missing license token.', 401)
   }
 
-  let payload: ReturnType<typeof verifyLicenseJwt>
+  let payload: LicenseJwtPayload
 
   try {
-    payload = verifyLicenseJwt(bearerToken)
+    payload = await verifyLicenseJwtWithRevocationCheck(bearerToken)
   } catch {
     return apiError('UNAUTHORIZED', 'Invalid or expired license token.', 401)
   }

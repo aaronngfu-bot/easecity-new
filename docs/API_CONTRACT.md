@@ -1,9 +1,9 @@
-# EC-Share ↔ EaseCity Backend — API Contract (v0.3)
+# EC-Share ↔ EaseCity Backend — API Contract (v0.4)
 
 > **Audience**: EaseCity web/backend team (who owns `easecity.hk` stack, Stripe integration, Postgres DB).
 > **Source**: EC-Share Windows desktop client (Flutter + C++), which consumes this API.
-> **Status**: DRAFT v0.3 — license/account API baseline implemented 2026-05-05. Backend team may propose changes, but the JWT shape (§6) is load-bearing for the desktop entitlements system.
-> **Last updated**: 2026-05-05
+> **Status**: DRAFT v0.4 — logout, JWKS, download discovery, Redis JWT deny-list, and Stripe catalog verify script added 2026-05-11.
+> **Last updated**: 2026-05-11
 
 ---
 
@@ -55,7 +55,7 @@ dl.easecity.hk        ─── installer hosting + auto-update channel manifest
 - **Success envelope**: implemented routes return `{ "success": true, "data": { ... }, "meta": { "timestamp": 1735603200000 } }`. Endpoint examples below describe the object inside `data` unless the full envelope is shown.
 - **Errors**: standard HTTP codes + JSON `{ "success": false, "error": { "code": "...", "message": "..." }, "meta": { "timestamp": 1735603200000 } }`.
 - **Idempotency**: Stripe handles subscription idempotency via event/session IDs. Additional `Idempotency-Key` support for future create endpoints is planned, not required by the current M2 desktop API.
-- **Rate limits**: OTP request is currently limited by IP + email (`20/IP/hour`, `5/email/hour`, plus 1 request/email/minute). OTP verification is limited by IP + email (`60/IP/hour`, `30/email/hour`). Native password auth is limited by IP + email (`30/IP/hour`, `10/email/hour`). License lifecycle endpoints are limited by IP + device (`120/IP/hour`, `120/device/hour`).
+- **Rate limits**: OTP request is currently limited by IP + email (`20/IP/hour`, `5/email/hour`, plus 1 request/email/minute). OTP verification is limited by IP + email (`60/IP/hour`, `30/email/hour`). Native password auth is limited by IP + email (`30/IP/hour`, `10/email/hour`). License lifecycle endpoints are limited by IP + device (`120/IP/hour`, `120/device/hour`). Logout is limited by IP (`120/IP/hour`).
 - **Timestamps**: API business fields use Unix epoch seconds, UTC. Envelope `meta.timestamp` is JavaScript epoch milliseconds.
 - **Versioning**: `/api/v1` is the active contract prefix. Breaking changes require a new prefix (`/api/v2`) or backwards-compatible adapters.
 
@@ -161,11 +161,39 @@ Native-client password login. OTP remains the primary low-friction auth path; th
 ### 3.4 `POST /api/v1/auth/oauth/google/callback` *(optional, M2.5)*
 Google OAuth flow for users who prefer it. Deferred past M2 MVP.
 
-### 3.5 `POST /api/v1/auth/logout` *(planned, not implemented yet)*
-**Request**: Bearer token in header.
-**Response 204**: no content; client discards local JWT.
+### 3.5 `POST /api/v1/auth/logout`
+**Request**: Bearer license JWT (must not be expired).
 
-Server-side: optionally adds user to deny-list for unexpired JWTs (stateless JWTs mean we can't revoke, so use a short deny-list TTL = max(current JWT exp)).
+**Response `204`**: empty body — client deletes its stored JWT.
+
+Server-side: adds the presented JWT to an **Upstash Redis deny-list** (SHA-256 keyed, TTL until JWT `exp`) so `refresh` / `account` reject it until expiry. If `UPSTASH_REDIS_*` is unset (local dev), `204` is still returned but revocation is not enforced.
+
+### 3.6 `GET /api/v1/license/jwks`
+Public signing keys for desktop JWT verification (wrapped in the standard `{ success, data, meta }` envelope):
+
+```json
+{
+  "success": true,
+  "data": {
+    "keys": [
+      {
+        "kty": "OKP",
+        "crv": "Ed25519",
+        "x": "<base64url>",
+        "kid": "2026a",
+        "use": "sig",
+        "alg": "EdDSA"
+      }
+    ]
+  },
+  "meta": { "timestamp": 1735603200000 }
+}
+```
+
+`kid` matches JWT header `kid` and env `LICENSE_JWT_KEY_ID` (default `2026a`).
+
+### 3.7 `GET /api/v1/download/latest-manifest`
+Discovery for the **dl.easecity.hk** updater manifest. Returns URLs and hints; the JSON document at `manifest_url` is hosted on the download CDN (may differ from this API origin).
 
 ---
 
@@ -389,8 +417,8 @@ This is the **contract** between backend issuer and desktop verifier. Changing s
 
 ### Signing
 - **Algorithm**: `EdDSA` (Ed25519)
-- **Key rotation**: generate new keypair yearly; embed current + last year's public keys in desktop client; allow 90-day transition.
-- **Public key distribution**: embedded in `ec-share.exe` at build time. Rotation requires auto-update release.
+- **Key rotation**: generate new keypair yearly; embed current + prior public keys in desktop; allow ~90-day overlap (see §10 decision log).
+- **Public key distribution**: primary **`GET /api/v1/license/jwks`** (`kid` + JWK); desktop release builds should still pin known-good keys for offline bootstrap.
 
 ### JWT header
 ```json
@@ -596,11 +624,34 @@ CREATE TABLE devices (
 
 ---
 
-## 10. Open decisions (for web team to confirm)
+## 10. Decision log (web team confirmations — 2026-05-11)
 
-- [ ] Email delivery provider: SendGrid vs Postmark vs SES?
-- [ ] JWT key rotation schedule: annual (recommended) vs semi-annual?
-- [ ] Deny list for revoked JWTs: Redis TTL vs Postgres with cleanup cron?
-- [ ] Multi-device seat enforcement: optimistic (count concurrent JWT refreshes) vs pessimistic (heartbeat registration)? Recommendation: optimistic for v1, revisit if seat abuse seen.
-- [ ] Rate limit storage: in-process / Redis / Cloudflare?
-- [ ] Hosting decision: Fly.io Go / Node / Python FastAPI / other? (Desktop client is agnostic; just needs a stable HTTPS endpoint.)
+| Topic | Decision | Notes |
+|-------|-----------|-------|
+| Email OTP provider | **Resend** | Implemented (`RESEND_API_KEY`, `AUTH_EMAIL_FROM`). |
+| JWT key rotation schedule | **Annual** | Align new `kid` + JWKS publish + desktop pin update yearly; optional semi-annual if compliance requires. |
+| Revoked JWT deny-list | **Redis (Upstash)** | SHA-256 JWT digest keys with TTL = remaining JWT lifetime; requires `UPSTASH_REDIS_*` in production. |
+| Seat enforcement v1 | **Optimistic** | Per §10 prior recommendation; revisit if abuse appears. |
+| Rate limit storage | **Upstash Redis** when configured; else in-memory for dev | Matches existing OTP/password/license limits. |
+| Backend hosting | **Vercel** (current stack) | PostgreSQL (Neon, etc.) + Prisma; Stripe webhooks at `/webhooks/stripe`. |
+
+### Stripe catalog verification
+
+Run locally or in CI when secrets are present:
+
+`npm run ecshare:stripe-verify`
+
+Checks every configured `NEXT_PUBLIC_STRIPE_*` price ID has Stripe metadata `product=ec_share` and `tier` ∈ `{pro,business,enterprise}`.
+
+---
+
+## 11. Historical open-decisions section (archived)
+
+The checklist below was the original §10 prompt; resolved rows moved to the table above.
+
+- [x] Email delivery provider — **Resend**
+- [x] JWT key rotation schedule — **Annual**
+- [x] Deny list for revoked JWTs — **Redis TTL (Upstash)**
+- [x] Multi-device seat enforcement v1 — **Optimistic**
+- [x] Rate limit storage — **Upstash Redis / in-memory fallback**
+- [x] Hosting — **Vercel**

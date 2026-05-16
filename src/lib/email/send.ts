@@ -38,7 +38,7 @@ export async function sendContactEmail(params: SendContactEmailParams) {
     subject: `[Contact] ${subject} — ${name}`,
     html: `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #22d3ee; border-bottom: 2px solid #22d3ee; padding-bottom: 10px;">
+        <h2 style="color: #00e5cc; border-bottom: 2px solid #00e5cc; padding-bottom: 10px;">
           New Contact Form Submission
         </h2>
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">

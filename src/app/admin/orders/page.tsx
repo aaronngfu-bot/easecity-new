@@ -12,48 +12,51 @@ export default async function AdminOrdersPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-text-primary">Orders</h1>
-        <p className="text-text-secondary text-sm mt-1">{orders.length} total orders</p>
+        <p className="label-mono mb-2 text-signal">ADMIN.ORDERS</p>
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.05em] text-text-primary">Orders</h1>
+        <p className="mt-1 text-sm text-text-secondary">{orders.length} total orders</p>
       </div>
 
-      <div className="rounded-xl border border-border bg-bg-surface overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border bg-bg-elevated/50">
-              <th className="text-left px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Order ID</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Customer</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Amount</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Status</th>
-              <th className="text-left px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Date</th>
-              <th className="text-right px-5 py-3 text-xs font-semibold text-text-muted uppercase tracking-wider">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-border">
-            {orders.map((order) => (
-              <tr key={order.id} className="hover:bg-bg-elevated/30 transition-colors">
-                <td className="px-5 py-4 text-sm font-mono text-text-primary">{order.id.slice(0, 16)}...</td>
-                <td className="px-5 py-4">
-                  <p className="text-sm text-text-primary">{order.user.name || '—'}</p>
-                  <p className="text-xs text-text-muted">{order.user.email}</p>
-                </td>
-                <td className="px-5 py-4 text-sm text-text-primary">
-                  {(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
-                </td>
-                <td className="px-5 py-4">
-                  <StatusBadge status={order.status} />
-                </td>
-                <td className="px-5 py-4 text-sm text-text-secondary">
-                  {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                </td>
-                <td className="px-5 py-4 text-right">
-                  <Link href={`/admin/orders/${order.id}`} className="text-xs text-signal hover:text-signal-light transition-colors">
-                    Details
-                  </Link>
-                </td>
+      <div className="overflow-hidden rounded-lg border border-border bg-bg-surface">
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[840px]">
+            <thead>
+              <tr className="border-b border-border bg-bg-void/80">
+                <th className="px-5 py-3 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-text-muted">Order ID</th>
+                <th className="px-5 py-3 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-text-muted">Customer</th>
+                <th className="px-5 py-3 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-text-muted">Amount</th>
+                <th className="px-5 py-3 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-text-muted">Status</th>
+                <th className="px-5 py-3 text-left font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-text-muted">Date</th>
+                <th className="px-5 py-3 text-right font-mono text-[10px] font-semibold uppercase tracking-[0.16em] text-text-muted">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody className="divide-y divide-border">
+              {orders.map((order) => (
+                <tr key={order.id} className="transition-colors hover:bg-bg-void/60">
+                  <td className="px-5 py-4 text-sm font-mono text-text-primary">{order.id.slice(0, 16)}...</td>
+                  <td className="px-5 py-4">
+                    <p className="text-sm text-text-primary">{order.user.name || '—'}</p>
+                    <p className="text-xs text-text-muted">{order.user.email}</p>
+                  </td>
+                  <td className="px-5 py-4 text-sm text-text-primary">
+                    {(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
+                  </td>
+                  <td className="px-5 py-4">
+                    <StatusBadge status={order.status} />
+                  </td>
+                  <td className="px-5 py-4 text-sm text-text-secondary">
+                    {new Date(order.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </td>
+                  <td className="px-5 py-4 text-right">
+                    <Link href={`/admin/orders/${order.id}`} className="text-xs text-signal hover:text-signal-light transition-colors">
+                      Details
+                    </Link>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
         {orders.length === 0 && (
           <div className="p-8 text-center text-text-muted text-sm">No orders yet</div>
         )}

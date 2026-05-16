@@ -1,7 +1,37 @@
 # MUPhone / EC-Share — Engineering Changelog
 
 所有從 Cursor 介入到目前狀態的實際改動記錄。
-最後更新：2026-05-06
+最後更新：2026-05-11
+
+## 2026-05-11 — Logout, JWKS, Redis JWT deny-list, download manifest discovery, Stripe catalog verify
+
+### Auth / licensing
+- **NEW** `POST /api/v1/auth/logout` — `204` empty body; registers JWT digest in Upstash Redis until token `exp` when configured.
+- **NEW** `src/lib/license-jwt-revocation.ts` — Redis-backed revoke check keyed by SHA-256 of raw JWT.
+- `requireEcShareLicense` is now **async** and enforces revocation; **`verifyLicenseJwtWithRevocationCheck`** wraps refresh/account flows.
+- **NEW** `GET /api/v1/license/jwks` — returns Ed25519 JWK set + `kid` (`LICENSE_JWT_KEY_ID`, default `2026a`).
+
+### Downloads / M1 bridge
+- **NEW** `GET /api/v1/download/latest-manifest` — discovery payload pointing at `dl.easecity.hk` manifest URL (env-overridable).
+- `src/app/(public)/download/page.tsx` — surfaces manifest URL + API discovery link.
+
+### Stripe ops
+- **NEW** `scripts/dev/stripe-catalog-verify.mjs` + `npm run ecshare:stripe-verify` — verifies configured Price IDs have metadata `product=ec_share` and tier ∈ `{pro,business,enterprise}`.
+
+### Tooling / tests
+- `scripts/dev/ec-share-api-smoke.mjs` — `--test-logout` exercises logout + optional post-logout refresh rejection when Redis is configured.
+- `playwright.config.ts` — injects deterministic Ed25519 `LICENSE_JWT_PRIVATE_KEY_PEM` for JWKS/API e2e (not for production).
+- `e2e/api.spec.ts` — JWKS, latest-manifest, logout 401 coverage.
+
+### Docs
+- `docs/API_CONTRACT.md` → **v0.4**; §10 decision log; §3.5–3.7 new endpoints.
+- `docs/WEB_TEAM_TASKS.md` — auth/download tasks marked done; founder Q section points to §10.
+
+### Env
+- `.env.example` — `NEXT_PUBLIC_EC_SHARE_DOWNLOAD_MANIFEST_URL`, `EC_SHARE_DOWNLOAD_*`, Stripe verify comment.
+
+### Validation
+- `npm run lint`, `npm run build`, `npm test` → all green (7 API e2e tests on Chromium).
 
 ## 2026-05-08 — Neon Prisma baseline applied
 ### Database

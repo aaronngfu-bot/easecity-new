@@ -172,12 +172,12 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
         >
           <defs>
             <linearGradient id="archGradActive" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#22ff88" stopOpacity="0.95" />
-              <stop offset="100%" stopColor="#22ff88" stopOpacity="0.25" />
+              <stop offset="0%" stopColor="#00e5cc" stopOpacity="0.95" />
+              <stop offset="100%" stopColor="#00e5cc" stopOpacity="0.25" />
             </linearGradient>
             <linearGradient id="archGradData" x1="0" y1="0" x2="1" y2="0">
-              <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.1" />
+              <stop offset="0%" stopColor="#00e5cc" stopOpacity="0.6" />
+              <stop offset="100%" stopColor="#00e5cc" stopOpacity="0.1" />
             </linearGradient>
             <filter id="hubGlow">
               <feGaussianBlur stdDeviation={anyActive ? '4' : '2'} result="blur" />
@@ -187,7 +187,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               </feMerge>
             </filter>
             <marker id="arrowSignalR" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
-              <polygon points="0 0, 8 3, 0 6" fill="#22ff88" fillOpacity="0.8" />
+              <polygon points="0 0, 8 3, 0 6" fill="#00e5cc" fillOpacity="0.8" />
             </marker>
           </defs>
 
@@ -199,7 +199,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                 cx={20 + c * 56}
                 cy={20 + r * 70}
                 r="1"
-                fill="#22ff88"
+                fill="#00e5cc"
                 fillOpacity="0.04"
               />
             ))
@@ -214,7 +214,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                 cy={210}
                 r={20}
                 fill="none"
-                stroke="#22ff88"
+                stroke="#00e5cc"
                 strokeWidth="1.5"
                 initial={{ r: 20, opacity: 0.9 }}
                 animate={{ r: 260, opacity: 0 }}
@@ -232,7 +232,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               height="88"
               rx="12"
               fill="#0d1117"
-              stroke={anyActive ? '#22ff88' : '#2a2a30'}
+              stroke={anyActive ? '#00e5cc' : '#2a3438'}
               strokeWidth="1.5"
               filter="url(#hubGlow)"
               className="transition-all duration-300"
@@ -243,8 +243,8 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               width="104"
               height="68"
               rx="8"
-              fill="#111116"
-              stroke={anyActive ? '#22ff88' : '#2a2a30'}
+              fill="#111418"
+              stroke={anyActive ? '#00e5cc' : '#2a3438'}
               strokeWidth="0.6"
               strokeOpacity="0.4"
             />
@@ -252,7 +252,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               x="280"
               y="202"
               textAnchor="middle"
-              fill={anyActive ? '#22ff88' : '#a1a1aa'}
+              fill={anyActive ? '#00e5cc' : '#c3cdd2'}
               fontSize="11"
               fontFamily="monospace"
               fontWeight="bold"
@@ -264,7 +264,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               x="280"
               y="218"
               textAnchor="middle"
-              fill={anyActive ? '#22ff88' : '#52525b'}
+              fill={anyActive ? '#00e5cc' : '#7f8b91'}
               fontSize="9"
               fontFamily="monospace"
               opacity="0.85"
@@ -275,7 +275,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               x="280"
               y="234"
               textAnchor="middle"
-              fill={anyActive ? '#22ff88' : idleGhost ? '#22ff8888' : '#52525b'}
+              fill={anyActive ? '#00e5cc' : idleGhost ? '#00e5cc88' : '#7f8b91'}
               fontSize="8"
               fontFamily="monospace"
               opacity="0.7"
@@ -289,7 +289,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               height="100"
               rx="15"
               fill="none"
-              stroke={anyActive ? '#22ff88' : '#2a2a30'}
+              stroke={anyActive ? '#00e5cc' : '#2a3438'}
               strokeWidth="0.5"
               strokeOpacity={anyActive ? '0.4' : '0.15'}
               strokeDasharray="4 4"
@@ -311,16 +311,16 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
             const isHover = hoverId === dev.id
             const isIdleGhost = !isActive && idleGhost === dev.id && active.size === 0
             const future = dev.future
-            const fill = future ? '#52525b' : isActive ? '#22ff88' : '#a1a1aa'
+            const fill = future ? '#7f8b91' : isActive ? '#00e5cc' : '#c3cdd2'
             const strokeCol = future
               ? '#52525b'
               : isActive
-                ? '#22ff88'
+                ? '#00e5cc'
                 : isHover
-                  ? '#22ff88'
+                  ? '#00e5cc'
                   : isIdleGhost
-                    ? '#22ff8855'
-                    : '#27272a'
+                    ? '#00e5cc55'
+                    : '#2a3438'
 
             return (
               <g
@@ -341,10 +341,10 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                       isActive
                         ? 'url(#archGradActive)'
                         : isHover
-                          ? '#22ff88'
+                          ? '#00e5cc'
                           : isIdleGhost
-                            ? '#22ff88'
-                            : '#27272a'
+                            ? '#00e5cc'
+                            : '#2a3438'
                     }
                     strokeWidth={isActive ? 1.5 : isIdleGhost ? 1 : 1}
                     strokeOpacity={isActive ? 1 : isHover ? 0.5 : isIdleGhost ? 0.45 : 0.25}
@@ -380,7 +380,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                     y1={dev.y}
                     x2="218"
                     y2="210"
-                    stroke="#27272a"
+                    stroke="#2a3438"
                     strokeWidth="1"
                     strokeOpacity="0.2"
                     strokeDasharray="4 4"
@@ -410,15 +410,15 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                       width="16"
                       height="12"
                       rx="3"
-                      fill={isActive ? '#22ff88' : '#1c1c22'}
-                      stroke={isActive ? '#22ff88' : '#27272a'}
+                      fill={isActive ? '#00e5cc' : '#182024'}
+                      stroke={isActive ? '#00e5cc' : '#2a3438'}
                       strokeWidth="0.5"
                     />
                     <text
                       x="34"
                       y={dev.y - 7}
                       textAnchor="middle"
-                      fill={isActive ? '#07090a' : '#a1a1aa'}
+                      fill={isActive ? '#07090a' : '#c3cdd2'}
                       fontSize="8"
                       fontFamily="monospace"
                       fontWeight="bold"
@@ -430,7 +430,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
 
                 {/* Live dot */}
                 {!future && isActive && (
-                  <circle cx="155" cy={dev.y - 12} r="3.5" fill="#22ff88">
+                  <circle cx="155" cy={dev.y - 12} r="3.5" fill="#00e5cc">
                     <animate
                       attributeName="fill-opacity"
                       values="0.4;1;0.4"
@@ -441,7 +441,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                 )}
                 {/* Idle heartbeat dot */}
                 {!future && isIdleGhost && (
-                  <circle cx="155" cy={dev.y - 12} r="3" fill="#22ff88" fillOpacity="0.4">
+                  <circle cx="155" cy={dev.y - 12} r="3" fill="#00e5cc" fillOpacity="0.4">
                     <animate
                       attributeName="fill-opacity"
                       values="0.15;0.5;0.15"
@@ -473,7 +473,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                   x="100"
                   y={dev.y + 10}
                   textAnchor="middle"
-                  fill={future ? '#3f3f46' : isActive ? '#22ff88' : '#52525b'}
+                  fill={future ? '#526066' : isActive ? '#00e5cc' : '#7f8b91'}
                   fontSize="8"
                   fontFamily="monospace"
                   fillOpacity={isActive ? 0.85 : 0.6}
@@ -499,7 +499,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                 height="60"
                 rx="8"
                 fill="#0d1117"
-                stroke={anyActive && i === 1 ? '#22ff88' : '#27272a'}
+                stroke={anyActive && i === 1 ? '#00e5cc' : '#2a3438'}
                 strokeWidth="1"
                 strokeOpacity={anyActive && i === 1 ? 0.6 : 1}
                 className="transition-all duration-300"
@@ -508,7 +508,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                 x="470"
                 y={box.y + 25}
                 textAnchor="middle"
-                fill={anyActive && i === 1 ? '#22ff88' : '#a1a1aa'}
+                fill={anyActive && i === 1 ? '#00e5cc' : '#c3cdd2'}
                 fontSize="9"
                 fontFamily="monospace"
                 fontWeight="bold"
@@ -519,7 +519,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                 x="470"
                 y={box.y + 40}
                 textAnchor="middle"
-                fill={anyActive && i === 1 ? '#22ff88' : '#3f3f46'}
+                fill={anyActive && i === 1 ? '#00e5cc' : '#526066'}
                 fontSize="8"
                 fontFamily="monospace"
                 fillOpacity={anyActive && i === 1 ? 0.9 : 1}
@@ -536,7 +536,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               y1="210"
               x2="400"
               y2={y}
-              stroke={anyActive ? '#22ff88' : '#27272a'}
+              stroke={anyActive ? '#00e5cc' : '#2a3438'}
               strokeOpacity={anyActive ? 0.35 : 0.5}
               strokeWidth="1"
               strokeDasharray={anyActive ? '5 4' : undefined}

@@ -49,33 +49,36 @@ export function UserRoleForm({
   }
 
   const selectClass = cn(
-    'w-full px-3 py-2 rounded-lg border bg-bg-elevated text-text-primary text-sm',
+    'w-full rounded-md border bg-bg-void px-3 py-2 text-sm text-text-primary',
     'border-border focus:border-signal/50 focus:outline-none focus:ring-1 focus:ring-signal/30',
     'transition-all'
   )
 
   return (
-    <div className="p-6 rounded-xl border border-border bg-bg-surface space-y-4">
-      <h2 className="font-display text-sm font-semibold text-text-primary">Manage User</h2>
+    <div className="space-y-4 rounded-lg border border-border bg-bg-surface p-6">
+      <div>
+        <p className="label-mono mb-2 text-signal">ADMIN.USER</p>
+        <h2 className="font-display text-lg font-semibold tracking-[-0.03em] text-text-primary">Manage User</h2>
+      </div>
 
       {!canEditRoles ? (
         <>
-          <p className="text-xs text-text-muted rounded-lg border border-border bg-bg-elevated px-3 py-2">
+          <p className="rounded-md border border-border bg-bg-void px-3 py-2 text-xs text-text-muted">
             Only a super administrator can change roles or status for this account.
           </p>
           <div>
-            <p className="text-xs text-text-muted mb-1">Role</p>
+            <p className="mb-1 text-xs text-text-muted">Role</p>
             <p className="text-sm text-text-primary font-mono">{currentRole}</p>
           </div>
           <div>
-            <p className="text-xs text-text-muted mb-1">Status</p>
+            <p className="mb-1 text-xs text-text-muted">Status</p>
             <p className="text-sm text-text-primary font-mono">{currentStatus}</p>
           </div>
         </>
       ) : (
         <>
           <div>
-            <label className="block text-xs text-text-muted mb-1">Role</label>
+            <label className="mb-1 block text-xs text-text-muted">Role</label>
             <select
               value={role}
               onChange={(e) => setRole(e.target.value)}
@@ -88,7 +91,7 @@ export function UserRoleForm({
           </div>
 
           <div>
-            <label className="block text-xs text-text-muted mb-1">Status</label>
+            <label className="mb-1 block text-xs text-text-muted">Status</label>
             <select
               value={status}
               onChange={(e) => setStatus(e.target.value)}
@@ -102,7 +105,7 @@ export function UserRoleForm({
       )}
 
       {message && (
-        <p className={`text-xs ${message.includes('success') ? 'text-green-400' : 'text-red-400'}`}>
+        <p className={`text-xs ${message.includes('success') ? 'text-status-success' : 'text-status-danger'}`}>
           {message}
         </p>
       )}
@@ -115,8 +118,8 @@ export function UserRoleForm({
           (role === currentRole && status === currentStatus)
         }
         className={cn(
-          'w-full px-4 py-2.5 text-sm font-medium rounded-lg transition-all',
-          'bg-signal text-bg-base hover:bg-signal-light',
+          'w-full rounded-md px-4 py-2.5 text-sm font-semibold transition-all',
+          'bg-signal text-[#03100f] hover:bg-signal-light',
           'disabled:opacity-40 disabled:cursor-not-allowed'
         )}
       >

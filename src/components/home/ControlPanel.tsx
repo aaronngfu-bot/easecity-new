@@ -120,17 +120,17 @@ export function ControlPanel({
             </feMerge>
           </filter>
           <radialGradient id="hubAura">
-            <stop offset="0%" stopColor="#22ff88" stopOpacity="0.22" />
-            <stop offset="70%" stopColor="#22ff88" stopOpacity="0" />
+            <stop offset="0%" stopColor="#00e5cc" stopOpacity="0.22" />
+            <stop offset="70%" stopColor="#00e5cc" stopOpacity="0" />
           </radialGradient>
           <linearGradient id="cableActive" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#22ff88" stopOpacity="0.1" />
-            <stop offset="60%" stopColor="#22ff88" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#22ff88" stopOpacity="1" />
+            <stop offset="0%" stopColor="#00e5cc" stopOpacity="0.1" />
+            <stop offset="60%" stopColor="#00e5cc" stopOpacity="0.9" />
+            <stop offset="100%" stopColor="#00e5cc" stopOpacity="1" />
           </linearGradient>
           <linearGradient id="cableIdle" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#22d3ee" stopOpacity="0.05" />
-            <stop offset="100%" stopColor="#22d3ee" stopOpacity="0.25" />
+            <stop offset="0%" stopColor="#00e5cc" stopOpacity="0.05" />
+            <stop offset="100%" stopColor="#00e5cc" stopOpacity="0.25" />
           </linearGradient>
         </defs>
 
@@ -171,7 +171,7 @@ export function ControlPanel({
             y1={HUB.cy}
             x2={cursor.x}
             y2={cursor.y}
-            stroke="#22ff88"
+            stroke="#00e5cc"
             strokeWidth="0.6"
             strokeOpacity="0.3"
             strokeDasharray="2 4"
@@ -185,7 +185,7 @@ export function ControlPanel({
             cy={HUB.cy}
             r="42"
             fill="#09090b"
-            stroke="#22ff8820"
+            stroke="#00e5cc20"
             strokeWidth="1"
           />
           <circle
@@ -193,7 +193,7 @@ export function ControlPanel({
             cy={HUB.cy}
             r="30"
             fill="#0c0c10"
-            stroke="#22ff88"
+            stroke="#00e5cc"
             strokeWidth="1.2"
             strokeOpacity={broadcasting ? 1 : 0.5}
             filter="url(#cpGlow)"
@@ -202,7 +202,7 @@ export function ControlPanel({
             cx={HUB.cx}
             cy={HUB.cy}
             r="5"
-            fill="#22ff88"
+            fill="#00e5cc"
             filter="url(#cpGlow)"
           >
             <animate
@@ -216,7 +216,7 @@ export function ControlPanel({
             x={HUB.cx}
             y={HUB.cy + 56}
             textAnchor="middle"
-            fill="#22ff88"
+            fill="#00e5cc"
             fontSize="9"
             fontFamily="var(--font-mono), ui-monospace, monospace"
             letterSpacing="0.15em"
@@ -239,7 +239,7 @@ export function ControlPanel({
             cy={HUB.cy}
             r="38"
             fill="none"
-            stroke="#22ff8820"
+            stroke="#00e5cc20"
             strokeWidth="0.5"
             strokeDasharray="2 4"
           >
@@ -258,7 +258,7 @@ export function ControlPanel({
         {ENDPOINTS.map((e, i) => {
           const isActive = e.id === activeId
           const isBroadcast = broadcasting
-          const color = isActive || isBroadcast ? '#22ff88' : '#27272a'
+          const color = isActive || isBroadcast ? '#00e5cc' : '#2a3438'
           const labelColor = isActive ? '#fafafa' : '#52525b'
           return (
             <g key={e.id}>
@@ -330,7 +330,7 @@ export function ControlPanel({
                   cy={e.cy}
                   r="18"
                   fill="none"
-                  stroke="#22ff88"
+                  stroke="#00e5cc"
                   strokeWidth="1"
                   initial={{ r: 18, opacity: 0.9 }}
                   animate={{ r: 32, opacity: 0 }}
@@ -393,7 +393,7 @@ function CornerTicks() {
         { x: 0, y: 440, dx: 14, dy: -14 },
         { x: 560, y: 440, dx: -14, dy: -14 },
       ].map((c, i) => (
-        <g key={i} stroke="#22ff88" strokeWidth="1" strokeOpacity="0.4">
+        <g key={i} stroke="#00e5cc" strokeWidth="1" strokeOpacity="0.4">
           <line x1={c.x} y1={c.y} x2={c.x + c.dx} y2={c.y} />
           <line x1={c.x} y1={c.y} x2={c.x} y2={c.y + c.dy} />
         </g>

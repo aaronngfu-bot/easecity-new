@@ -1,13 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { ArrowRight, ChevronDown, Radio } from 'lucide-react'
-import { CinematicSkyline } from '@/components/shared/CinematicSkyline'
 import { useLanguage } from '@/context/LanguageContext'
-import { useIsMobile } from '@/hooks/useIsMobile'
-import { ControlPanel } from './ControlPanel'
 
 interface TerminalEntry {
   cmd: string
@@ -17,11 +14,8 @@ interface TerminalEntry {
 
 export function Hero() {
   const { t } = useLanguage()
-  const isMobile = useIsMobile()
   const heroRef = useRef<HTMLDivElement>(null)
 
-  const [activeId, setActiveId] = useState<string | null>(null)
-  const [broadcastTick, setBroadcastTick] = useState(0)
   const [log, setLog] = useState<TerminalEntry[]>([])
 
   const seedLog = useMemo<TerminalEntry[]>(
@@ -42,48 +36,15 @@ export function Hero() {
     setLog(seedLog)
   }, [seedLog])
 
-  useEffect(() => {
-    if (!activeId) return
-    const entry: TerminalEntry = {
-      cmd: `$ easecity --control endpoint_${activeId}`,
-      res: `→ ACK ${(0.6 + Math.random() * 0.6).toFixed(1)}ms · 200 OK · sync OK`,
-    }
-    setLog((prev) => [...prev.slice(-2), entry])
-  }, [activeId])
-
-  const broadcast = useCallback(() => {
-    setBroadcastTick((t) => t + 1)
-    setLog((prev) => [
-      ...prev.slice(-1),
-      {
-        cmd: '$ easecity --broadcast --all',
-        res: '→ BROADCAST_SENT · 5 nodes · ACK 100% · 0 lost',
-        tone: 'signal',
-      },
-    ])
-  }, [])
-
-  useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.code !== 'Space') return
-      const target = e.target as HTMLElement | null
-      if (target && ['INPUT', 'TEXTAREA', 'BUTTON'].includes(target.tagName)) return
-      if (target?.isContentEditable) return
-      e.preventDefault()
-      broadcast()
-    }
-    window.addEventListener('keydown', handler)
-    return () => window.removeEventListener('keydown', handler)
-  }, [broadcast])
-
   return (
     <section
       ref={heroRef}
       className="relative flex flex-col overflow-hidden bg-bg-base"
       style={{
         background: `
-          radial-gradient(ellipse 70% 45% at 50% 105%, rgba(250,250,250,0.03), transparent 60%),
-          #07080b
+          radial-gradient(ellipse 70% 45% at 50% 105%, rgba(0,229,204,0.06), transparent 62%),
+          radial-gradient(ellipse 55% 40% at 15% 20%, rgba(0,229,204,0.04), transparent 60%),
+          #07090b
         `,
       }}
     >
@@ -123,8 +84,7 @@ export function Hero() {
       {/* Main editorial + control panel */}
       <div className="relative z-10 flex-1 flex items-center">
         <div className="container-max w-full py-8 md:py-16">
-          <div className="grid grid-cols-12 gap-6 lg:gap-12 items-center">
-            {/* Left — editorial typography */}
+          <div className="grid grid-cols-12 gap-8 lg:gap-12 items-center">
             <div className="col-span-12 lg:col-span-7 relative">
               <motion.div
                 initial={{ opacity: 0 }}
@@ -210,8 +170,8 @@ export function Hero() {
                   className="mt-8 md:mt-10 flex flex-wrap items-center gap-5"
                 >
                   <Link
-                    href="/services"
-                    className="group inline-flex items-center gap-2 px-5 py-3 bg-signal text-bg-base font-semibold text-sm rounded-md hover:bg-signal-light transition-all duration-200 shadow-glow-signal-sm hover:shadow-glow-signal"
+                    href="#device-sync-showcase"
+                    className="group glass-cta !px-5 !py-3"
                   >
                     <Radio size={14} />
                     {t.hero.cta1}
@@ -219,7 +179,7 @@ export function Hero() {
                   </Link>
                   <Link
                     href="/contact"
-                    className="group inline-flex items-center gap-2 text-sm font-mono tracking-wider text-text-secondary hover:text-signal transition-colors"
+                    className="group glass-ghost !px-5 !py-3"
                   >
                     <span className="text-signal">$</span>
                     <span className="border-b border-dashed border-text-muted group-hover:border-signal transition-colors pb-0.5">
@@ -230,18 +190,17 @@ export function Hero() {
               </div>
             </div>
 
-            {/* Right — Control panel */}
             <motion.div
-              initial={{ opacity: 0, scale: 0.96 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.9, delay: 0.4, ease: [0.21, 0.47, 0.32, 0.98] }}
-              className="col-span-12 lg:col-span-5 flex items-center justify-center lg:justify-end"
+              initial={{ opacity: 0, y: 24, scale: 0.98 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.7, delay: 0.45, ease: [0.21, 0.47, 0.32, 0.98] }}
+              className="col-span-12 lg:col-span-5"
             >
-              <ControlPanel
-                activeId={activeId}
-                onActiveChange={setActiveId}
-                broadcastTick={broadcastTick}
-                isMobile={isMobile}
+              <ProductProofCard
+                eyebrow={t.hero.productCardEyebrow}
+                title={t.hero.productCardTitle}
+                desc={t.hero.productCardDesc}
+                steps={[t.hero.productStep1, t.hero.productStep2, t.hero.productStep3]}
               />
             </motion.div>
           </div>
@@ -253,22 +212,16 @@ export function Hero() {
             transition={{ duration: 0.6, delay: 1 }}
             className="mt-8 md:mt-12 max-w-3xl"
           >
-            <TerminalLog log={log} broadcastTick={broadcastTick} />
+            <TerminalLog log={log} />
           </motion.div>
 
-          {/* Broadcast hint + scroll */}
+          {/* Scroll hint */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 1.2 }}
-            className="mt-6 flex flex-wrap items-center justify-between gap-4 text-[10px] font-mono tracking-[0.2em] uppercase text-text-muted"
+            className="mt-6 flex justify-end gap-4 text-[10px] font-mono tracking-[0.2em] uppercase text-text-muted"
           >
-            <div className="flex items-center gap-2">
-              <kbd className="inline-flex items-center justify-center min-w-[48px] h-6 px-2 rounded border border-border bg-bg-elevated text-text-secondary text-[10px] font-mono">
-                SPACE
-              </kbd>
-              <span>{t.hero.broadcastHint}</span>
-            </div>
             <div className="flex items-center gap-2">
               <span>{t.hero.scroll}</span>
               <ChevronDown size={12} className="animate-bounce" />
@@ -280,25 +233,16 @@ export function Hero() {
       </div>
       {/* /editorial fold */}
 
-      {/* Cinematic HK skyline — the signature moment */}
-      <div className="relative z-[1]">
-        <CinematicSkyline variant="full" />
-      </div>
+      <div className="relative z-[1] h-16 border-t border-border/50 bg-gradient-to-b from-signal/5 to-transparent" />
 
-      {/* Broadcast toast */}
-      <AnimatePresence>
-        {broadcastTick > 0 && <BroadcastToast key={broadcastTick} />}
-      </AnimatePresence>
     </section>
   )
 }
 
 function TerminalLog({
   log,
-  broadcastTick,
 }: {
   log: TerminalEntry[]
-  broadcastTick: number
 }) {
   return (
     <div className="terminal rounded-lg overflow-hidden">
@@ -313,7 +257,7 @@ function TerminalLog({
           easecity — control
         </span>
         <span className="text-[10px] font-mono text-text-muted">
-          pid:{1000 + (broadcastTick % 999)}
+          pid:1042
         </span>
       </div>
       <div className="px-4 py-4 text-[12px] md:text-[13px] font-mono leading-[1.7] min-h-[112px]">
@@ -335,21 +279,51 @@ function TerminalLog({
   )
 }
 
-function BroadcastToast() {
+function ProductProofCard({
+  eyebrow,
+  title,
+  desc,
+  steps,
+}: {
+  eyebrow: string
+  title: string
+  desc: string
+  steps: string[]
+}) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24, scale: 0.96 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -12 }}
-      transition={{ duration: 0.35 }}
-      className="fixed bottom-16 left-1/2 -translate-x-1/2 z-40 pointer-events-none"
-    >
-      <div className="inline-flex items-center gap-3 px-4 py-2 rounded-md bg-bg-elevated border border-signal/40 shadow-glow-signal-sm">
-        <span className="w-2 h-2 rounded-full bg-signal animate-pulse" />
-        <span className="font-mono text-[11px] tracking-widest text-signal uppercase">
-          Broadcast sent · 5 nodes · ACK 100%
-        </span>
+    <div className="glass-panel p-5 md:p-6 overflow-hidden">
+      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_20%_0%,rgba(0,229,204,0.16),transparent_48%)] pointer-events-none" />
+      <div className="relative">
+        <p className="label-mono mb-3 text-signal/80">{eyebrow}</p>
+        <h2 className="font-display text-2xl font-bold leading-tight text-text-primary">{title}</h2>
+        <p className="mt-3 text-sm leading-relaxed text-text-secondary">{desc}</p>
+
+        <div className="mt-5 rounded-2xl border border-border bg-bg-base/70 p-4">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-xs font-semibold text-text-primary">EC-Share Desktop</span>
+            <span className="rounded-full border border-signal/30 bg-signal/10 px-2 py-0.5 text-[10px] font-mono text-signal">
+              LIVE
+            </span>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            {['A', 'B', 'C'].map((id) => (
+              <div key={id} className="rounded-xl border border-border bg-bg-surface p-2">
+                <div className="mb-2 h-12 rounded-lg border border-signal/20 bg-signal/10" />
+                <p className="text-center text-[10px] font-mono text-text-secondary">PHONE {id}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <ul className="mt-5 space-y-2.5">
+          {steps.map((step) => (
+            <li key={step} className="flex items-start gap-2.5 text-sm text-text-secondary">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-signal" />
+              <span>{step}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-    </motion.div>
+    </div>
   )
 }

@@ -3,7 +3,7 @@
 > **Audience**: EaseCity web + backend engineer(s) working on `easecity.hk`, `api.easecity.hk`, `share.easecity.hk`, `dl.easecity.hk`.
 > **Primary point of contact**: founder (Eric).
 > **Source of truth for specs**: `docs/API_CONTRACT.md` — read this first.
-> **Updated**: 2026-05-05 (contract reconciliation: current Next.js implementation uses `/api/v1/*` + response envelope; Stripe webhook supports `/webhooks/stripe` plus legacy `/api/payment/webhook`)
+> **Updated**: 2026-05-11 (logout + JWKS + download manifest discovery + Redis JWT deny-list + Stripe catalog verify script; API_CONTRACT §10 decision log closed)
 
 ---
 
@@ -54,16 +54,7 @@ In order:
 
 ## What the founder needs **from you** (please answer)
 
-Open questions in `docs/API_CONTRACT.md` §10 that **only you** can decide based on your stack choices:
-
-- [ ] Email delivery provider: SendGrid / Postmark / SES?
-- [ ] JWT key rotation schedule (annual recommended; we can bike-shed)
-- [ ] Deny-list for revoked JWTs: Redis vs Postgres?
-- [ ] Multi-device seat enforcement: optimistic vs pessimistic (recommended: optimistic for v1)
-- [ ] Rate-limit storage: in-process / Redis / Cloudflare
-- [ ] Backend hosting: Fly.io / Railway / Vercel / AWS / your preferred
-
-**Please reply to founder with your preferences + estimated timeline to hit M2 milestone dates** (M2 target: M1 + ~3 weeks from whenever M1 lands).
+Resolved decisions are captured in `docs/API_CONTRACT.md` §10 (2026-05-11). Open **product** questions (DNS, legal copy, screenshots) remain below under milestone sections.
 
 ---
 
@@ -91,13 +82,15 @@ Founder will update these as items become available:
 #### Auth & license
 - [x] `POST /api/v1/auth/email/request-otp` (§3.1 of API_CONTRACT) — implemented in current Next.js repo
 - [x] `POST /api/v1/auth/email/verify-otp` (§3.2) — implemented; issues EC-Share license JWT
-- [ ] `POST /api/v1/auth/logout` (§3.4) — planned; not implemented yet
+- [x] `POST /api/v1/auth/logout` (§3.5) — implemented; Redis deny-list when `UPSTASH_REDIS_*` set
+- [x] `GET /api/v1/license/jwks` (§3.6) — public Ed25519 JWK + `kid` for desktop embedding
+- [x] `GET /api/v1/download/latest-manifest` (§3.7) — discovery URL for dl.easecity.hk updater manifest
 - [x] `POST /api/v1/license/refresh` (§4.1) — implemented with 44-day refresh grace
 - [x] `GET /api/v1/account/me` (§4.2) — implemented
 - [x] `POST /api/v1/account/change-email/request-otp` (§4.3a) — implemented
 - [x] `POST /api/v1/account/change-email` (§4.3b) — implemented
 - [x] `POST /api/v1/account/devices/rename` (§4.4) — implemented
-- [x] `DELETE /api/v1/account/devices/{fingerprint}` (§4.5) — implemented for device-row removal; JWT deny-list invalidation deferred
+- [x] `DELETE /api/v1/account/devices/{fingerprint}` (§4.5) — implemented; JWT invalidation via logout deny-list (`POST /api/v1/auth/logout`)
 
 #### Stripe integration — **web team owns end-to-end after founder's KYC**
 
@@ -111,9 +104,9 @@ Founder handles: HK account KYC approval + invites you as Stripe team member wit
         - `price_business_annual` = $490 USD / year
         - `price_enterprise_annual` = $2,499 USD / year (anchor; actual Enterprise deals custom-priced)
     - Enable **Stripe Tax** ($120/yr or 0.5% revenue minimum) — see SUBSCRIPTION_TIERS.md §6
-    - Set product metadata: `tier = "pro"` / `"business"` / `"enterprise"` on each price so webhook can dispatch cleanly
+    - Set Price metadata: `product = "ec_share"` and `tier = "pro"` / `"business"` / `"enterprise"` so webhook + checkout map cleanly
     - Enable Customer Portal (Settings → Billing → Customer Portal) and configure which features customers can self-serve
-    - Generate webhook signing secret; store in backend secrets (Fly.io / env var)
+    - Generate webhook signing secret; store in backend secrets (e.g. Vercel env)
     - Confirm with founder: statement descriptor (`EASECITY` or `EC-SHARE`) + save to account settings
     - Send founder the **5 price IDs** once created — he'll paste them back in FOUNDER_TODO.md so they flow to the desktop client config
 - [x] **In your backend code**:

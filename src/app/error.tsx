@@ -17,15 +17,19 @@ export default function Error({
   }, [error])
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg-base">
-      <div className="glass-panel text-center max-w-md px-8 py-10">
-        <div className="inline-flex items-center justify-center w-20 h-20 rounded-2xl glass-panel !rounded-2xl !border-red-500/30 mb-6">
-          <span className="font-display text-3xl font-bold text-red-400">!</span>
+    <div className="control-canvas grid min-h-screen place-items-center px-5">
+      <div className="signal-panel max-w-md px-8 py-10 text-center">
+        <div className="mb-6 inline-flex h-20 w-20 items-center justify-center rounded-lg border border-status-danger/30 bg-status-danger/10">
+          <span className="font-display text-3xl font-bold text-status-danger">!</span>
         </div>
-        <div className="label-mono !text-red-400/70 mb-3">SYS.ERROR</div>
-        <h1 className="font-display text-2xl font-bold text-text-primary mb-3">{t.errors.somethingWrong}</h1>
-        <p className="text-text-secondary text-sm max-w-sm mx-auto mb-8">{t.errors.unexpectedError}</p>
-        <button onClick={reset} className="glass-cta">
+        <div className="label-mono mb-3 !text-status-danger">SYS.ERROR</div>
+        <h1 className="mb-3 font-display text-2xl font-semibold tracking-[-0.04em] text-text-primary">
+          {t.errors.somethingWrong}
+        </h1>
+        <p className="mx-auto mb-8 max-w-sm text-sm leading-6 text-text-secondary">
+          {t.errors.unexpectedError}
+        </p>
+        <button onClick={reset} className="signal-cta">
           {t.errors.tryAgain}
         </button>
       </div>

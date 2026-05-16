@@ -4,7 +4,7 @@ import { withErrorHandler } from '@/lib/api-handler'
 import { apiError, apiSuccess } from '@/lib/api-response'
 import { prisma } from '@/lib/db'
 import { sendOtpEmail } from '@/lib/email/send'
-import { requireEcShareLicense } from '@/lib/license-jwt'
+import { type LicenseJwtPayload, requireEcShareLicense } from '@/lib/license-jwt'
 import { getClientIp, rateLimit } from '@/lib/rate-limit'
 import { changeEmailRequestSchema } from '@/lib/validations/ec-share'
 
@@ -13,10 +13,10 @@ export const dynamic = 'force-dynamic'
 const OTP_EXPIRES_IN_MINUTES = 10
 
 export const POST = withErrorHandler(async (req) => {
-  let payload: ReturnType<typeof requireEcShareLicense>
+  let payload: LicenseJwtPayload
 
   try {
-    payload = requireEcShareLicense(req)
+    payload = await requireEcShareLicense(req)
   } catch {
     return apiError('UNAUTHORIZED', 'Invalid or missing license token.', 401)
   }

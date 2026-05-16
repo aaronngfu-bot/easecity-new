@@ -7,15 +7,17 @@ export default function NotFound() {
   const { t } = useLanguage()
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-bg-base">
-      <div className="glass-panel text-center max-w-md px-8 py-10">
-        <div className="inline-flex items-center justify-center w-24 h-24 rounded-2xl glass-panel !rounded-2xl !border-signal/25 mb-6">
-          <span className="font-display text-3xl font-bold text-signal tabular-nums">404</span>
+    <div className="control-canvas grid min-h-screen place-items-center px-5">
+      <div className="signal-panel max-w-md px-8 py-10 text-center">
+        <div className="mb-6 inline-flex h-24 w-24 items-center justify-center rounded-lg border border-signal/25 bg-signal/10">
+          <span className="font-display text-3xl font-semibold tabular-nums text-signal">404</span>
         </div>
-        <div className="label-mono text-signal/70 mb-3">SIGNAL.LOST</div>
-        <h1 className="font-display text-2xl font-bold text-text-primary mb-3">{t.errors.notFound}</h1>
-        <p className="text-text-secondary text-sm max-w-sm mx-auto mb-8">{t.errors.notFoundDesc}</p>
-        <Link href="/" className="glass-cta">
+        <div className="label-mono mb-3 text-signal">SIGNAL.LOST</div>
+        <h1 className="mb-3 font-display text-2xl font-semibold tracking-[-0.04em] text-text-primary">
+          {t.errors.notFound}
+        </h1>
+        <p className="mx-auto mb-8 max-w-sm text-sm leading-6 text-text-secondary">{t.errors.notFoundDesc}</p>
+        <Link href="/" className="signal-cta">
           {t.errors.backToHome}
         </Link>
       </div>

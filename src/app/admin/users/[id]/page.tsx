@@ -30,16 +30,17 @@ export default async function AdminUserDetailPage({
       <div className="flex items-center gap-4">
         <Link
           href="/admin/users"
-          className="text-sm text-text-muted hover:text-text-primary transition-colors"
+          className="signal-secondary"
         >
           ← Users
         </Link>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
-          <div className="p-6 rounded-xl border border-border bg-bg-surface">
-            <h2 className="font-display text-lg font-bold text-text-primary mb-4">Profile</h2>
+          <div className="rounded-lg border border-border bg-bg-surface p-6">
+            <p className="label-mono mb-2 text-signal">USER.PROFILE</p>
+            <h2 className="mb-4 font-display text-lg font-semibold tracking-[-0.03em] text-text-primary">Profile</h2>
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <p className="text-xs text-text-muted mb-1">Name</p>
@@ -66,7 +67,7 @@ export default async function AdminUserDetailPage({
             </div>
           </div>
 
-          <div className="rounded-xl border border-border bg-bg-surface overflow-hidden">
+          <div className="overflow-hidden rounded-lg border border-border bg-bg-surface">
             <div className="px-5 py-4 border-b border-border">
               <h2 className="font-display text-sm font-semibold text-text-primary">Recent Orders</h2>
             </div>
@@ -75,7 +76,7 @@ export default async function AdminUserDetailPage({
             ) : (
               <div className="divide-y divide-border">
                 {user.orders.map((order) => (
-                  <div key={order.id} className="px-5 py-3 flex items-center justify-between">
+                  <div key={order.id} className="flex items-center justify-between px-5 py-3 transition-colors hover:bg-bg-void/60">
                     <div>
                       <p className="text-sm font-mono text-text-primary">{order.id.slice(0, 12)}...</p>
                       <p className="text-xs text-text-muted">{new Date(order.createdAt).toLocaleDateString()}</p>
@@ -84,7 +85,7 @@ export default async function AdminUserDetailPage({
                       <span className="text-sm text-text-secondary">
                         {(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
                       </span>
-                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium border ${
+                      <span className={`rounded-sm border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
                         order.status === 'paid' ? 'bg-green-500/15 text-green-400 border-green-500/25' :
                         'bg-gray-500/15 text-gray-400 border-gray-500/25'
                       }`}>
@@ -99,7 +100,8 @@ export default async function AdminUserDetailPage({
         </div>
 
         <div className="space-y-6">
-          <div className="p-6 rounded-xl border border-border bg-bg-surface space-y-4">
+          <div className="space-y-4 rounded-lg border border-border bg-bg-surface p-6">
+            <p className="label-mono text-signal">USER.STATS</p>
             <h2 className="font-display text-sm font-semibold text-text-primary">Stats</h2>
             <div className="space-y-3">
               <div className="flex justify-between">

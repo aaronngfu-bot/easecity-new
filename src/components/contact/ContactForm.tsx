@@ -66,9 +66,10 @@ export function ContactForm() {
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="glass-prominent h-full min-h-[480px] flex flex-col items-center justify-center text-center p-10"
+        className="signal-panel-highlight flex h-full min-h-[480px] flex-col items-center justify-center p-10 text-center"
+        role="status"
       >
-        <div className="w-16 h-16 rounded-full glass-panel !rounded-full flex items-center justify-center mb-6 border border-signal/30">
+        <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-md border border-signal/30 bg-signal/10">
           <CheckCircle2 size={30} className="text-signal" />
         </div>
         <div className="label-mono text-signal/70 mb-3">TRANSMISSION.COMPLETE</div>
@@ -83,7 +84,7 @@ export function ContactForm() {
             setFormState('idle')
             setData({ name: '', email: '', company: '', subject: t.contactForm.subjects[0], message: '' })
           }}
-          className="glass-ghost"
+          className="signal-secondary"
         >
           {t.contactForm.successReset}
         </button>
@@ -96,7 +97,7 @@ export function ContactForm() {
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="glass-panel p-6 md:p-8"
+      className="signal-panel p-6 md:p-8"
     >
       <div className="flex items-center gap-2 mb-6">
         <span className="w-1.5 h-1.5 rounded-full bg-signal animate-signal-pulse" />
@@ -106,7 +107,7 @@ export function ContactForm() {
       <form onSubmit={handleSubmit} className="space-y-5">
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="name" className="label-mono block mb-2">
+            <label htmlFor="name" className="mb-2 block text-sm font-medium text-text-secondary">
               {t.contactForm.nameLabel} <span className="text-signal">{t.contactForm.required}</span>
             </label>
             <input
@@ -117,7 +118,7 @@ export function ContactForm() {
             />
           </div>
           <div>
-            <label htmlFor="email" className="label-mono block mb-2">
+            <label htmlFor="email" className="mb-2 block text-sm font-medium text-text-secondary">
               {t.contactForm.emailLabel} <span className="text-signal">{t.contactForm.required}</span>
             </label>
             <input
@@ -130,7 +131,7 @@ export function ContactForm() {
         </div>
 
         <div>
-          <label htmlFor="company" className="label-mono block mb-2">
+          <label htmlFor="company" className="mb-2 block text-sm font-medium text-text-secondary">
             {t.contactForm.companyLabel}
           </label>
           <input
@@ -142,7 +143,7 @@ export function ContactForm() {
         </div>
 
         <div>
-          <label htmlFor="subject" className="label-mono block mb-2">
+          <label htmlFor="subject" className="mb-2 block text-sm font-medium text-text-secondary">
             {t.contactForm.subjectLabel} <span className="text-signal">{t.contactForm.required}</span>
           </label>
           <select
@@ -157,7 +158,7 @@ export function ContactForm() {
         </div>
 
         <div>
-          <label htmlFor="message" className="label-mono block mb-2">
+          <label htmlFor="message" className="mb-2 block text-sm font-medium text-text-secondary">
             {t.contactForm.messageLabel} <span className="text-signal">{t.contactForm.required}</span>
           </label>
           <textarea
@@ -169,7 +170,7 @@ export function ContactForm() {
         </div>
 
         {formState === 'error' && (
-          <div className="flex items-center gap-2.5 p-3 rounded-xl border border-red-500/25 bg-red-500/8 text-red-400 text-sm">
+          <div role="alert" className="flex items-center gap-2.5 rounded-md border border-status-danger/25 bg-status-danger/10 p-3 text-sm text-status-danger">
             <AlertCircle size={15} className="flex-shrink-0" />
             {errorMessage || t.contactForm.errorMsg}
           </div>
@@ -179,7 +180,7 @@ export function ContactForm() {
           type="submit"
           disabled={formState === 'loading'}
           className={cn(
-            'glass-cta w-full',
+            'signal-cta w-full',
             formState === 'loading' && 'opacity-60 cursor-not-allowed'
           )}
         >

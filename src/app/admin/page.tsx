@@ -48,18 +48,19 @@ export default async function AdminDashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-display text-2xl font-bold text-text-primary">Dashboard</h1>
-        <p className="text-text-secondary text-sm mt-1">System overview</p>
+        <p className="label-mono mb-2 text-signal">ADMIN.OVERVIEW</p>
+        <h1 className="font-display text-3xl font-semibold tracking-[-0.05em] text-text-primary">Dashboard</h1>
+        <p className="mt-1 text-sm text-text-secondary">System overview</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
         <StatCard label="Total Users" value={totalUsers} sub={`+${recentUsers} this week`} />
         <StatCard label="Total Orders" value={totalOrders} />
         <StatCard label="Revenue" value={`$${totalRevenue.toFixed(2)}`} sub="Last 30 days" />
         <StatCard label="Contact Forms" value={totalContacts} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <RevenueChart data={dailyRevenue} />
         <OrdersChart data={dailyRevenue} />
       </div>
@@ -69,19 +70,19 @@ export default async function AdminDashboardPage() {
 
 function StatCard({ label, value, sub }: { label: string; value: string | number; sub?: string }) {
   return (
-    <div className="p-5 rounded-xl border border-border bg-bg-surface">
-      <p className="text-xs text-text-muted font-medium uppercase tracking-wider">{label}</p>
-      <p className="font-display text-2xl font-bold text-text-primary mt-2">{value}</p>
-      {sub && <p className="text-xs text-signal mt-1">{sub}</p>}
+    <div className="rounded-lg border border-border bg-bg-surface p-5">
+      <p className="font-mono text-[10px] font-medium uppercase tracking-[0.16em] text-text-muted">{label}</p>
+      <p className="mt-2 font-display text-3xl font-semibold tracking-[-0.04em] text-text-primary tabular-nums">{value}</p>
+      {sub && <p className="mt-1 text-xs text-signal">{sub}</p>}
     </div>
   )
 }
 
 function ChartSkeleton() {
   return (
-    <div className="p-5 rounded-xl border border-border bg-bg-surface">
-      <div className="h-4 w-32 bg-bg-elevated rounded animate-pulse mb-4" />
-      <div className="h-64 bg-bg-elevated rounded animate-pulse" />
+    <div className="rounded-lg border border-border bg-bg-surface p-5">
+      <div className="mb-4 h-4 w-32 animate-pulse rounded bg-bg-elevated" />
+      <div className="h-64 animate-pulse rounded bg-bg-elevated" />
     </div>
   )
 }
