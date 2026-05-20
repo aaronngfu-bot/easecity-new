@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { ArrowRight, Radio } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { ProductFrame, ProductRow } from '@/components/ui/ProductFrame'
 import { StatusBadge } from '@/components/ui/StatusBadge'
 import { useLanguage } from '@/context/LanguageContext'
 
@@ -70,64 +69,6 @@ export function SignalHero() {
               </Link>
             </motion.div>
           </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 24, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            transition={{ duration: 0.7, delay: 0.22 }}
-            className="col-span-12 lg:col-span-6"
-          >
-            <ProductFrame
-              title="EASECITY DESKTOP CONSOLE"
-              meta="Control target: Device A / relay region: AP-HK"
-              status="STREAM LIVE"
-            >
-              <div className="grid gap-3 lg:grid-cols-[0.75fr_1.25fr]">
-                <div className="rounded-lg border border-border bg-bg-surface p-3">
-                  {['Device A', 'Device B', 'Device C'].map((device, index) => (
-                    <div
-                      key={device}
-                      className={`mb-2 rounded-md border p-3 last:mb-0 ${
-                        index === 0
-                          ? 'border-signal/40 bg-signal/10'
-                          : 'border-border bg-bg-void/60'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between gap-3">
-                        <span className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-primary">
-                          {device}
-                        </span>
-                        <span className={index === 0 ? 'text-signal' : 'text-text-muted'}>●</span>
-                      </div>
-                      <p className="mt-2 text-xs text-text-muted">
-                        {index === 0 ? 'CONTROL TARGET' : 'Independent stream'}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="rounded-lg border border-border bg-bg-void p-4">
-                  <div className="grid grid-cols-3 gap-2">
-                    {[0, 1, 2].map((idx) => (
-                      <div
-                        key={idx}
-                        className={`h-28 rounded-md border ${
-                          idx === 0 ? 'border-signal/50 bg-signal/10' : 'border-border bg-bg-surface'
-                        }`}
-                      >
-                        <div className="h-full bg-[linear-gradient(135deg,rgba(0,229,204,0.10),transparent_40%),repeating-linear-gradient(0deg,rgba(255,255,255,0.06)_0_1px,transparent_1px_10px)]" />
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-4 rounded-md border border-border bg-bg-surface px-4">
-                    <ProductRow label="Command" value="tap Device A only" tone="signal" />
-                    <ProductRow label="Mirror FPS" value="60" />
-                    <ProductRow label="Operator" value="online" tone="signal" />
-                  </div>
-                </div>
-              </div>
-            </ProductFrame>
-          </motion.div>
         </div>
       </div>
     </section>
