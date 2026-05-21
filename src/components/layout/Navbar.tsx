@@ -9,35 +9,6 @@ import { Menu, X, User, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
 
-function CommandTrigger() {
-  const [isMac, setIsMac] = useState(false)
-  useEffect(() => {
-    if (typeof navigator !== 'undefined') {
-      setIsMac(/Mac|iPhone|iPad|iPod/.test(navigator.userAgent))
-    }
-  }, [])
-
-  const open = () => {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('easecity:palette:toggle'))
-    }
-  }
-
-  return (
-    <button
-      onClick={open}
-      className="hidden min-h-9 items-center gap-2 rounded-md border border-border bg-bg-void px-3 text-[11px] font-mono uppercase tracking-[0.12em] text-text-muted transition-colors hover:border-border-accent hover:text-signal lg:inline-flex"
-      aria-label="Open command palette"
-    >
-      <span>Search</span>
-      <span className="flex items-center gap-0.5">
-        <span className="kbd !h-4 !min-w-4 !text-[9px]">{isMac ? '⌘' : 'Ctrl'}</span>
-        <span className="kbd !h-4 !min-w-4 !text-[9px]">K</span>
-      </span>
-    </button>
-  )
-}
-
 function LangToggle() {
   const { language, setLanguage } = useLanguage()
 
@@ -188,8 +159,6 @@ export function Navbar() {
 
           {/* Desktop right cluster */}
           <div className="hidden md:flex items-center gap-3">
-            <CommandTrigger />
-            <div className="h-5 w-px bg-border" />
             <LangToggle />
             <div className="h-5 w-px bg-border" />
             <AuthButtons />
