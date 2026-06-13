@@ -26,6 +26,29 @@
     --border: 214 32% 88%;
     --input: 214 32% 88%;
     --ring: 173 100% 38%;
+
+    /* ── bg surface tokens (light) ── */
+    --bg-void:     #cdd5db;
+    --bg-base:     #d8e0e6;
+    --bg-surface:  #e0e7ec;
+    --bg-elevated: #e8eef2;
+    --bg-raised:   #f0f4f7;
+    --bg-warm:     #ddd9d5;
+
+    /* ── text tokens (light, WCAG AA ≥ 4.5:1 on --bg-void) ── */
+    --text-primary:   #18292f;
+    --text-secondary: #2b4050;
+    --text-muted:     #3e5866;
+    --text-faint:     #6887a0;
+
+    /* ── navbar (light) ── */
+    --nav-background: linear-gradient(135deg, rgba(0,143,130,0.07), transparent), rgba(228,240,245,0.90);
+    --nav-border:     rgba(0, 143, 130, 0.25);
+    --nav-shadow:     0 20px 80px rgba(15,35,45,0.10), inset 0 1px 0 rgba(255,255,255,0.80), 0 0 40px rgba(0,143,130,0.06);
+    --nav-base:       #18292f;
+    --nav-pill-bg:    #b8cdd6;
+    --nav-hover-text: #03100f;
+    --nav-pill-text:  #18292f;
   }
 
   .dark {
@@ -48,6 +71,29 @@
     --border: 193 18% 17%;
     --input: 193 18% 20%;
     --ring: 173 100% 45%;
+
+    /* ── bg surface tokens (dark — 現有值不變) ── */
+    --bg-void:     #030506;
+    --bg-base:     #07090b;
+    --bg-surface:  #101418;
+    --bg-elevated: #171d22;
+    --bg-raised:   #20282e;
+    --bg-warm:     #0c0b0d;
+
+    /* ── text tokens (dark — 現有值不變) ── */
+    --text-primary:   #f5f8f8;
+    --text-secondary: #c6d1d0;
+    --text-muted:     #839190;
+    --text-faint:     #536160;
+
+    /* ── navbar (dark — 現有值不變) ── */
+    --nav-background: linear-gradient(135deg, rgba(0,229,204,0.08), rgba(7,16,18,0.78)), rgba(3,5,6,0.72);
+    --nav-border:     rgba(0, 229, 204, 0.22);
+    --nav-shadow:     0 20px 80px rgba(0,0,0,0.38), inset 0 1px 0 rgba(255,255,255,0.06), 0 0 40px rgba(0,229,204,0.08);
+    --nav-base:       #eaffff;
+    --nav-pill-bg:    #071012;
+    --nav-hover-text: #03100f;
+    --nav-pill-text:  #eaffff;
   }
 
   * {

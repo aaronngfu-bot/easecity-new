@@ -10,14 +10,14 @@ const config: Config = {
   theme: {
   	extend: {
   		colors: {
-  			bg: {
-  				void: '#030506',
-  				base: '#07090b',
-  				surface: '#101418',
-  				elevated: '#171d22',
-  				raised: '#20282e',
-  				warm: '#0c0b0d'
-  			},
+			bg: {
+				void: 'var(--bg-void)',
+				base: 'var(--bg-base)',
+				surface: 'var(--bg-surface)',
+				elevated: 'var(--bg-elevated)',
+				raised: 'var(--bg-raised)',
+				warm: 'var(--bg-warm)'
+			},
   			paper: {
   				DEFAULT: '#f7fafa',
   				soft: '#eef4f3',
@@ -79,12 +79,12 @@ const config: Config = {
   				veil: '#00e5cc1f',
   				glow: '#00e5cc2e'
   			},
-  			text: {
-  				primary: '#f5f8f8',
-  				secondary: '#c6d1d0',
-  				muted: '#839190',
-  				faint: '#536160'
-  			},
+			text: {
+				primary: 'var(--text-primary)',
+				secondary: 'var(--text-secondary)',
+				muted: 'var(--text-muted)',
+				faint: 'var(--text-faint)'
+			},
   			status: {
   				success: '#20d990',
   				warning: '#f5a524',

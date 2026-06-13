@@ -17,13 +17,33 @@ import { useLanguage } from "@/context/LanguageContext";
 
 const SIGNAL_COLOR = "#00e5cc";
 
-const SIGNAL_PIXEL_COLORS = [
+const SIGNAL_PIXEL_COLORS_DARK = [
   { color: "#0c2926", weight: 45 },
   { color: "#103833", weight: 30 },
   { color: "#14524a", weight: 18 },
   { color: "#00a896", weight: 5 },
   { color: "#00e5cc", weight: 2 },
 ];
+const SIGNAL_PIXEL_COLORS_LIGHT = [
+  { color: "#cdeae6", weight: 45 },
+  { color: "#a9ddd6", weight: 30 },
+  { color: "#7fcfc4", weight: 18 },
+  { color: "#27b9a8", weight: 5 },
+  { color: "#00b29f", weight: 2 },
+];
+
+function useIsDark() {
+  const [isDark, setIsDark] = useState(true);
+  useEffect(() => {
+    const root = document.documentElement;
+    const update = () => setIsDark(root.classList.contains("dark"));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+  return isDark;
+}
 
 interface Point {
   title: string;
@@ -145,12 +165,14 @@ function PanelContent({
 export function TrustSection() {
   const isCoarsePointer = useCoarsePointer();
   const reduce = !!useReducedMotion();
+  const isDark = useIsDark();
   const { t } = useLanguage();
   const trust = t.homePage.trust;
   /* 入場 fade 完成前卡片忽略 hover，避免入場同 pixel 動畫疊埋一齊出現 */
   const [cardReady, setCardReady] = useState(false);
   /* pixel 過場 active 狀態 → 外框「由暗轉亮」transition */
   const [activePanel, setActivePanel] = useState(false);
+  const pixelColors = isDark ? SIGNAL_PIXEL_COLORS_DARK : SIGNAL_PIXEL_COLORS_LIGHT;
 
   const beforePoints: Point[] = [
     {
@@ -242,7 +264,7 @@ export function TrustSection() {
               />
             }
             gridSize={24}
-            pixelColors={SIGNAL_PIXEL_COLORS}
+            pixelColors={pixelColors}
             animationStepDuration={0.4}
             aspectRatio="0"
             once={isCoarsePointer}

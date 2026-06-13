@@ -242,16 +242,9 @@ const PillNav = ({
     }
   };
 
-  const cssVars = {
-    '--base': baseColor,
-    '--pill-bg': pillColor,
-    '--hover-text': hoveredPillTextColor,
-    '--pill-text': resolvedPillTextColor,
-  };
-
   return (
     <div className="pill-nav-container">
-      <nav className={`pill-nav ${className}`} aria-label="Primary" style={cssVars}>
+      <nav className={`pill-nav ${className}`} aria-label="Primary">
         {isRouterLink(items?.[0]?.href) ? (
           <Link
             className="pill-logo"
@@ -401,7 +394,7 @@ const PillNav = ({
         </button>
       </nav>
 
-      <div className="mobile-menu-popover mobile-only" ref={mobileMenuRef} style={cssVars}>
+      <div className="mobile-menu-popover mobile-only" ref={mobileMenuRef}>
         <ul className="mobile-menu-list">
           <li>
             <div className="mobile-language-toggle" aria-label="Language switcher">

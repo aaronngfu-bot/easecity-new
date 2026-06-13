@@ -101,11 +101,6 @@ interface DeviceFrameProps {
 function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: DeviceFrameProps) {
   const { control, purple, kind, dur, order, id, col } = frame
 
-  /*
-   * Independent sync heartbeat — each device pulses on its own random
-   * 3–6s rhythm (no ordering between frames): "this device just completed
-   * a sync with the EC-Share screen".
-   */
   const [pulse, setPulse] = useState(0)
   useEffect(() => {
     if (reduce) return
@@ -127,6 +122,8 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
       : 'bg-signal-deep/60 dark:bg-signal/70'
   const widths = [...LOG_WIDTHS.slice((order * 3) % 16), ...LOG_WIDTHS.slice(0, (order * 3) % 16)]
 
+  const btnColor = control ? 'bg-signal-deep/60 dark:bg-signal/50' : 'bg-black/25 dark:bg-white/20'
+
   return (
     <div className={cn('relative min-w-0 max-w-[132px] flex-1 lg:max-w-none', frame.className)}>
       <motion.div
@@ -135,7 +132,7 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
         initial="hidden"
         animate="show"
         className={cn(
-          'frame-depth relative aspect-[9/19] w-full rounded-2xl',
+          'frame-depth relative aspect-[9/19] w-full rounded-3xl',
           col === 'l' && 'frame-depth-l',
           col === 'r' && 'frame-depth-r',
           control
@@ -143,6 +140,17 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
             : 'border border-black/10 bg-white dark:border-white/[0.14] dark:bg-[#161c1c]'
         )}
       >
+        {/* side buttons */}
+        <span className={cn('absolute -right-[2px] top-[24%] z-[1] h-8 w-[2px] rounded-r-sm', btnColor)} />
+        <span className={cn('absolute -left-[2px] top-[17%] z-[1] h-5 w-[2px] rounded-l-sm', btnColor)} />
+        <span className={cn('absolute -left-[2px] top-[28%] z-[1] h-5 w-[2px] rounded-l-sm', btnColor)} />
+
+        {/* inner bezel */}
+        <div className="pointer-events-none absolute inset-[3px] z-[1] rounded-[1.35rem] ring-1 ring-inset ring-black/[0.06] dark:ring-white/[0.05]" />
+
+        {/* punch-hole camera */}
+        <span className="absolute left-1/2 top-2 z-[5] h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-black/80 ring-1 ring-black/15 dark:bg-black dark:ring-white/10" />
+
         {/* status row */}
         <div className="absolute inset-x-1.5 top-1.5 z-[2] flex items-center justify-between">
           {control ? (
@@ -162,9 +170,9 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
           />
         </div>
 
-        {/* fake activity — pure CSS, clipped to the frame */}
+        {/* fake activity */}
         {kind === 'log' ? (
-          <div className="absolute inset-0 overflow-hidden rounded-2xl px-2 pb-2 pt-6">
+          <div className="absolute inset-0 overflow-hidden rounded-3xl px-2 pb-2 pt-6">
             <div
               className="hero-log-scroll flex flex-col"
               style={reduce ? undefined : { animation: `heroLogScroll ${dur}s linear infinite` }}
@@ -205,12 +213,12 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
           </div>
         )}
 
-        {/* sync heartbeat — keyed remount per pulse so the flash + badge replay */}
+        {/* sync heartbeat */}
         {pulse > 0 && (
           <>
             <motion.div
               key={`flash-${pulse}`}
-              className="pointer-events-none absolute -inset-px z-[3] rounded-2xl border border-signal-deep/50 dark:border-signal/60"
+              className="pointer-events-none absolute -inset-px z-[3] rounded-3xl border border-signal-deep/50 dark:border-signal/60"
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 0.8, 0] }}
               transition={{ duration: 1.1, times: [0, 0.2, 1], ease: 'easeOut' }}

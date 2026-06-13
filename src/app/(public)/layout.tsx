@@ -33,9 +33,6 @@ export default function PublicLayout({
         logo="/images/easecity-pill-logo.svg"
         logoAlt="easecity"
         items={navItems}
-        baseColor="#eaffff"
-        pillColor="#071012"
-        hoveredPillTextColor="#03100f"
       />
       <main className="relative z-[2] min-h-screen">{children}</main>
       <Footer />
