@@ -161,7 +161,7 @@ export function KeyboardLayer() {
           s: '/services',
           p: '/pricing',
           a: '/about',
-          c: '/contact',
+          c: '/about#contact',
           d: '/dashboard',
         }
         const target = routes[key]

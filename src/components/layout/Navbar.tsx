@@ -89,7 +89,7 @@ export function Navbar() {
     { href: '/pricing', label: t.nav.pricing, num: '03' },
     { href: '/download', label: t.nav.download, num: '04' },
     { href: '/about', label: t.nav.about, num: '05' },
-    { href: '/contact', label: t.nav.contact, num: '06' },
+    { href: '/about#contact', label: t.nav.contact, num: '06' },
   ]
 
   useEffect(() => {
@@ -266,7 +266,7 @@ function AuthButtons() {
         {t.auth.signIn}
       </Link>
       <Link
-        href="/contact"
+        href="/about#contact"
         className="signal-cta !min-h-9 !px-4 !py-2 !text-[13px]"
       >
         {t.nav.cta}
@@ -300,7 +300,7 @@ function MobileAuthButtons() {
       <Link href="/login" className="signal-secondary w-full">
         {t.auth.signIn}
       </Link>
-      <Link href="/contact" className="signal-cta w-full">
+      <Link href="/about#contact" className="signal-cta w-full">
         {t.nav.cta}
       </Link>
     </>

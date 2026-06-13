@@ -308,7 +308,7 @@ function QuickActions() {
   const actions = [
     { icon: Settings,      label: t.dashboard.qaSettings, desc: t.dashboard.qaSettingsDesc, href: '/dashboard/settings' },
     { icon: Zap,           label: t.dashboard.qaUpgrade,  desc: t.dashboard.qaUpgradeDesc,  href: '/pricing' },
-    { icon: MessageCircle, label: t.dashboard.qaSupport,  desc: t.dashboard.qaSupportDesc,  href: '/contact' },
+    { icon: MessageCircle, label: t.dashboard.qaSupport,  desc: t.dashboard.qaSupportDesc,  href: '/about#contact' },
   ]
 
   return (

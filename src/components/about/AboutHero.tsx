@@ -14,6 +14,7 @@ export function AboutHero() {
       heading={t.aboutPage.heading}
       headingHighlight={t.aboutPage.headingHighlight}
       description={t.aboutPage.desc}
+      showStatusBadge={false}
       meta={[
         { label: 'BASED IN', value: 'HONG KONG' },
         { label: 'FOUNDED', value: '2025' },

@@ -11,7 +11,7 @@ export function Footer() {
       { label: t.footer.linkHome, href: '/' },
       { label: t.footer.linkAbout, href: '/about' },
       { label: t.footer.linkServices, href: '/services' },
-      { label: t.footer.linkContact, href: '/contact' },
+      { label: t.footer.linkContact, href: '/about#contact' },
     ],
     [t.footer.groupServices]: [
       { label: t.footer.linkStream, href: '/services' },
@@ -20,9 +20,9 @@ export function Footer() {
       { label: t.footer.linkOnline, href: '/services#future' },
     ],
     [t.footer.groupConnect]: [
-      { label: t.footer.linkTouch, href: '/contact' },
-      { label: t.footer.linkPartner, href: '/contact' },
-      { label: t.footer.linkEnterprise, href: '/contact' },
+      { label: t.footer.linkTouch, href: '/about#contact' },
+      { label: t.footer.linkPartner, href: '/about#contact' },
+      { label: t.footer.linkEnterprise, href: '/about#contact' },
     ],
   }
 

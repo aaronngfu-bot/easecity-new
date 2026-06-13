@@ -178,7 +178,7 @@ export function Hero() {
                     <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                   </Link>
                   <Link
-                    href="/contact"
+                    href="/about#contact"
                     className="group glass-ghost !px-5 !py-3"
                   >
                     <span className="text-signal">$</span>

@@ -21,7 +21,7 @@ export default function PaymentCancelPage() {
             <Link href="/services" className="signal-cta">
               {t.payment.tryAgain}
             </Link>
-            <Link href="/contact" className="signal-secondary">
+            <Link href="/about#contact" className="signal-secondary">
               {t.payment.contactSupport}
             </Link>
           </div>

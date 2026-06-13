@@ -3,6 +3,7 @@ import { Instrument_Sans, JetBrains_Mono, Syne } from 'next/font/google'
 import './globals.css'
 import { LanguageProvider } from '@/context/LanguageContext'
 import { SessionProvider } from '@/components/providers/SessionProvider'
+import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { OrganizationJsonLd, WebSiteJsonLd } from '@/components/seo/JsonLd'
 
 const instrumentSans = Instrument_Sans({
@@ -80,12 +81,19 @@ export default function RootLayout({
       className={`${instrumentSans.variable} ${jetbrainsMono.variable} ${syne.variable}`}
       suppressHydrationWarning
     >
-      <body className="bg-bg-void text-text-primary antialiased selection:bg-signal/20 selection:text-signal">
+      <body className="bg-background text-foreground antialiased selection:bg-signal/20 selection:text-signal">
         <OrganizationJsonLd />
         <WebSiteJsonLd />
-        <SessionProvider>
-          <LanguageProvider>{children}</LanguageProvider>
-        </SessionProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem={false}
+          disableTransitionOnChange
+        >
+          <SessionProvider>
+            <LanguageProvider>{children}</LanguageProvider>
+          </SessionProvider>
+        </ThemeProvider>
       </body>
     </html>
   )

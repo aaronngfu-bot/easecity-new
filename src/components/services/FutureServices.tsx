@@ -87,7 +87,7 @@ export function FutureServices() {
           </div>
           <p className="text-text-secondary text-sm mb-3">{t.futureServices.bannerDesc}</p>
           <h3 className="font-display text-xl md:text-2xl font-bold text-text-primary mb-6">{t.futureServices.bannerTitle}</h3>
-          <Link href="/contact" className="glass-cta group">
+          <Link href="/about#contact" className="glass-cta group">
             {t.futureServices.bannerCta}
             <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform duration-200" />
           </Link>

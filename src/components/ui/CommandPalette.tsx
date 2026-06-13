@@ -84,7 +84,7 @@ export function CommandPalette() {
       nav('/services', 'Services', 'Stream control + use cases + roadmap', LayoutGrid, 'G S'),
       nav('/pricing', 'Pricing', 'EC-Share trial, Pro, Business, Enterprise', Tag, 'G P'),
       nav('/about', 'About', 'Philosophy + tech vision', Info, 'G A'),
-      nav('/contact', 'Contact', 'Reach the team', Mail, 'G C'),
+      nav('/about#contact', 'Contact', 'Reach the team', Mail, 'G C'),
       nav('/dashboard', 'Dashboard', 'Control deck', LayoutDashboard),
       nav('/login', 'Sign in', 'Auth entry', LogIn),
 

@@ -327,7 +327,7 @@ export default function TermsOfServicePage() {
               <Link href="/legal/privacy" className="text-text-muted hover:text-signal transition-colors">
                 Privacy Policy
               </Link>
-              <Link href="/contact" className="text-text-muted hover:text-signal transition-colors">
+              <Link href="/about#contact" className="text-text-muted hover:text-signal transition-colors">
                 Contact Us
               </Link>
             </div>

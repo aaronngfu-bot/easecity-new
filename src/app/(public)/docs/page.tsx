@@ -79,7 +79,7 @@ export default function DocsPage() {
             <p className="text-text-secondary leading-relaxed mb-5">
               Use the contact page for early-access support while the full documentation set is being built.
             </p>
-            <Link href="/contact" className="glass-ghost inline-flex items-center justify-center">
+            <Link href="/about#contact" className="glass-ghost inline-flex items-center justify-center">
               Contact support
             </Link>
           </div>

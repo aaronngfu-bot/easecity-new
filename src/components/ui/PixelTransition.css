@@ -1,0 +1,39 @@
+.pixelated-image-card {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  cursor: pointer;
+}
+
+.pixelated-image-card:focus-visible {
+  outline: 2px solid #00e5cc;
+  outline-offset: 4px;
+}
+
+.pixelated-image-card__default,
+.pixelated-image-card__active,
+.pixelated-image-card__pixels {
+  position: absolute;
+  inset: 0;
+}
+
+.pixelated-image-card__default {
+  z-index: 1;
+}
+
+.pixelated-image-card__active {
+  z-index: 2;
+  display: none;
+}
+
+.pixelated-image-card__pixels {
+  z-index: 3;
+  pointer-events: none;
+}
+
+.pixelated-image-card__pixel {
+  position: absolute;
+  opacity: 0;
+}

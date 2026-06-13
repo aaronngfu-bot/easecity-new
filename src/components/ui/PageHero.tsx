@@ -20,6 +20,10 @@ interface PageHeroProps {
   meta?: { label: string; value: string }[]
   /** Optional alignment — default left, center for some pages */
   align?: 'left' | 'center'
+  /** Hide top-right operational badge when PageHero is embedded inside another page */
+  showStatusBadge?: boolean
+  /** Default is standalone page hero; embedded reduces visual weight and spacing */
+  variant?: 'default' | 'embedded'
 }
 
 export function PageHero({
@@ -31,27 +35,40 @@ export function PageHero({
   description,
   meta,
   align = 'left',
+  showStatusBadge = true,
+  variant = 'default',
 }: PageHeroProps) {
+  const isEmbedded = variant === 'embedded'
+
   return (
-    <section className="relative overflow-hidden pb-20 pt-32 md:pb-24 md:pt-40">
+    <section
+      className={cn(
+        'relative overflow-hidden',
+        isEmbedded ? 'border-t border-border pb-12 pt-20 md:pb-16 md:pt-24' : 'pb-20 pt-32 md:pb-24 md:pt-40'
+      )}
+    >
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            'radial-gradient(ellipse 70% 42% at 72% 0%, rgba(0,229,204,0.14), transparent 58%)',
+            isEmbedded
+              ? 'radial-gradient(ellipse 70% 40% at 50% 0%, rgba(0,229,204,0.08), transparent 62%)'
+              : 'radial-gradient(ellipse 70% 42% at 72% 0%, rgba(0,229,204,0.14), transparent 58%)',
         }}
       />
-      <div className="absolute inset-0 control-grid opacity-[0.28] pointer-events-none" />
+      <div className={cn('absolute inset-0 control-grid pointer-events-none', isEmbedded ? 'opacity-[0.16]' : 'opacity-[0.28]')} />
 
-      <motion.div
-        initial={{ opacity: 0, y: -8 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="absolute right-6 top-24 hidden items-center gap-2 rounded-sm border border-signal/25 bg-signal/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-signal md:right-12 md:flex"
-      >
-        <span className="w-1 h-1 rounded-full bg-signal animate-signal-pulse" />
-        <span>SYS_ONLINE</span>
-      </motion.div>
+      {showStatusBadge && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.1 }}
+          className="absolute right-6 top-24 hidden items-center gap-2 rounded-sm border border-signal/25 bg-signal/10 px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-signal md:right-12 md:flex"
+        >
+          <span className="w-1 h-1 rounded-full bg-signal animate-signal-pulse" />
+          <span>SYS_ONLINE</span>
+        </motion.div>
+      )}
 
       <div className="container-max relative z-10">
         <div className={cn('max-w-4xl', align === 'center' && 'mx-auto text-center')}>
@@ -60,7 +77,7 @@ export function PageHero({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className={cn(
-              'mb-8 flex items-center gap-3 md:mb-10',
+              isEmbedded ? 'mb-6 flex items-center gap-3 md:mb-8' : 'mb-8 flex items-center gap-3 md:mb-10',
               align === 'center' && 'justify-center'
             )}
           >
@@ -75,7 +92,10 @@ export function PageHero({
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
-            className="mb-7 font-display text-display-xl font-semibold text-text-primary md:mb-9"
+            className={cn(
+              'font-display font-semibold text-text-primary',
+              isEmbedded ? 'mb-6 text-display-lg md:mb-7' : 'mb-7 text-display-xl md:mb-9'
+            )}
           >
             {heading}
             <br />

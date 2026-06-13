@@ -3,7 +3,11 @@
 import { PageHero } from '@/components/ui/PageHero'
 import { useLanguage } from '@/context/LanguageContext'
 
-export function ContactHero() {
+interface ContactHeroProps {
+  embedded?: boolean
+}
+
+export function ContactHero({ embedded = false }: ContactHeroProps) {
   const { t } = useLanguage()
 
   return (
@@ -14,6 +18,8 @@ export function ContactHero() {
       heading={t.contactPage.heading}
       headingHighlight={t.contactPage.headingHighlight}
       description={t.contactPage.desc}
+      showStatusBadge={!embedded}
+      variant={embedded ? 'embedded' : 'default'}
       meta={[
         { label: 'RESPONSE', value: '< 24H' },
         { label: 'CHANNEL', value: 'DIRECT' },

@@ -112,7 +112,7 @@ export function Expansion() {
         >
           <p className="text-text-secondary text-base mb-6 max-w-2xl mx-auto">{t.expansion.closing}</p>
           <div className="flex flex-wrap justify-center gap-3">
-            <Link href="/contact" className="glass-cta group">
+            <Link href="/about#contact" className="glass-cta group">
               {t.expansion.cta1}
               <ArrowRight size={15} className="group-hover:translate-x-0.5 transition-transform" />
             </Link>

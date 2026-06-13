@@ -1,28 +1,17 @@
 'use client'
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, type RefObject } from 'react'
 import { cn } from '@/lib/utils'
 
-interface MagneticButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  /** Max pull distance in px. Default 8. */
-  strength?: number
-  /** Radius around button where magnetic effect begins. Default 140. */
-  radius?: number
-}
-
 /**
- * A button that gently "attracts" the cursor when nearby — small translate
- * toward the pointer. Snaps back on mouse leave. Disables on touch devices.
+ * Shared magnetic-attraction behavior: gently pulls the element toward the
+ * cursor when nearby, snaps back on leave. No-ops on touch devices.
  */
-export function MagneticButton({
-  strength = 8,
-  radius = 140,
-  className,
-  children,
-  ...rest
-}: MagneticButtonProps) {
-  const ref = useRef<HTMLButtonElement>(null)
-
+function useMagneticEffect(
+  ref: RefObject<HTMLElement>,
+  strength: number,
+  radius: number
+) {
   useEffect(() => {
     const el = ref.current
     if (!el) return
@@ -92,11 +81,60 @@ export function MagneticButton({
       if (raf) cancelAnimationFrame(raf)
       capturedEl.style.transform = ''
     }
-  }, [radius, strength])
+  }, [ref, radius, strength])
+}
+
+interface MagneticButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** Max pull distance in px. Default 8. */
+  strength?: number
+  /** Radius around button where magnetic effect begins. Default 140. */
+  radius?: number
+}
+
+/**
+ * A button that gently "attracts" the cursor when nearby — small translate
+ * toward the pointer. Snaps back on mouse leave. Disables on touch devices.
+ */
+export function MagneticButton({
+  strength = 8,
+  radius = 140,
+  className,
+  children,
+  ...rest
+}: MagneticButtonProps) {
+  const ref = useRef<HTMLButtonElement>(null)
+  useMagneticEffect(ref, strength, radius)
 
   return (
     <button ref={ref} className={cn('magnetic-target', className)} {...rest}>
       {children}
     </button>
+  )
+}
+
+interface MagneticProps {
+  strength?: number
+  radius?: number
+  className?: string
+  children: React.ReactNode
+}
+
+/**
+ * Magnetic wrapper for arbitrary content (e.g. a Next <Link>). Applies the
+ * same attraction behavior as MagneticButton via a wrapping div.
+ */
+export function Magnetic({
+  strength = 8,
+  radius = 140,
+  className,
+  children,
+}: MagneticProps) {
+  const ref = useRef<HTMLDivElement>(null)
+  useMagneticEffect(ref, strength, radius)
+
+  return (
+    <div ref={ref} className={cn('magnetic-target inline-flex', className)}>
+      {children}
+    </div>
   )
 }

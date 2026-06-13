@@ -64,7 +64,7 @@ export function SignalHero() {
                 {t.hero.cta1}
                 <ArrowRight size={15} />
               </Link>
-              <Link href="/contact" className="signal-secondary">
+              <Link href="/about#contact" className="signal-secondary">
                 {t.hero.cta2}
               </Link>
             </motion.div>

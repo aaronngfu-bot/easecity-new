@@ -5,6 +5,51 @@
 /* Body/display stacks come from next/font via --font-body / --font-display / --font-mono on <html> */
 
 @layer base {
+  /* Semantic theme tokens (light = :root, dark = .dark). HSL channels for hsl(var(--x)). */
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 173 100% 38%;
+    --primary-foreground: 180 100% 7%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215 16% 47%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222 47% 11%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 214 32% 88%;
+    --input: 214 32% 88%;
+    --ring: 173 100% 38%;
+  }
+
+  .dark {
+    --background: 210 22% 4%;
+    --foreground: 180 13% 96%;
+    --card: 210 18% 8%;
+    --card-foreground: 180 13% 96%;
+    --popover: 210 18% 8%;
+    --popover-foreground: 180 13% 96%;
+    --primary: 173 100% 45%;
+    --primary-foreground: 180 100% 6%;
+    --secondary: 210 16% 14%;
+    --secondary-foreground: 180 13% 96%;
+    --muted: 210 16% 14%;
+    --muted-foreground: 180 6% 56%;
+    --accent: 210 16% 16%;
+    --accent-foreground: 180 13% 96%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 193 18% 17%;
+    --input: 193 18% 20%;
+    --ring: 173 100% 45%;
+  }
+
   * {
     @apply border-border;
     box-sizing: border-box;
@@ -17,22 +62,30 @@
   }
 
   body {
-    @apply bg-bg-base text-text-primary;
+    @apply bg-background text-foreground;
     font-family: var(--font-body), system-ui, sans-serif;
-    overflow-x: hidden;
+    overflow-x: clip;
     font-feature-settings: 'ss01', 'cv11';
   }
 
-  /* Scrollbar */
+  /* Scrollbar — theme-aware */
   ::-webkit-scrollbar {
     width: 4px;
   }
   ::-webkit-scrollbar-track {
-    background: #09090b;
+    background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: #27272a;
+    background: #c3d0ce;
     border-radius: 2px;
+  }
+  .dark::-webkit-scrollbar-track,
+  .dark ::-webkit-scrollbar-track {
+    background: #09090b;
+  }
+  .dark::-webkit-scrollbar-thumb,
+  .dark ::-webkit-scrollbar-thumb {
+    background: #27272a;
   }
   ::-webkit-scrollbar-thumb:hover {
     background: #00e5cc40;
@@ -94,8 +147,12 @@
   }
 
   .text-outline-signal {
-    -webkit-text-stroke: 1px #00e5cc;
+    -webkit-text-stroke: 1px #008f82;
     color: transparent;
+  }
+
+  .dark .text-outline-signal {
+    -webkit-text-stroke-color: #00e5cc;
   }
 
   /* Monospace label — tiny tracking-wide system labels */
@@ -750,13 +807,27 @@
 }
 
 @layer utilities {
+  /* Continuous canvas — theme-aware site backdrop (light default, dark override) */
   .control-canvas {
+    background:
+      radial-gradient(ellipse 60% 38% at 72% 0%, rgba(0, 143, 130, 0.10), transparent 58%),
+      linear-gradient(180deg, #f2f7f7 0%, #f8fbfb 48%, #eef4f3 100%);
+  }
+
+  .dark .control-canvas {
     background:
       radial-gradient(ellipse 60% 38% at 72% 0%, rgba(0, 229, 204, 0.14), transparent 58%),
       linear-gradient(180deg, #030506 0%, #07090b 48%, #030506 100%);
   }
 
   .control-grid {
+    background-image:
+      linear-gradient(to right, rgba(0, 143, 130, 0.07) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(7, 16, 15, 0.04) 1px, transparent 1px);
+    background-size: 88px 88px;
+  }
+
+  .dark .control-grid {
     background-image:
       linear-gradient(to right, rgba(0, 229, 204, 0.07) 1px, transparent 1px),
       linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
@@ -930,4 +1001,294 @@
   .tabular {
     font-variant-numeric: tabular-nums;
   }
+
+  /* CTA sheen — a single light streak sweeps across on hover */
+  .btn-sheen {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-sheen::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -45%;
+    width: 45%;
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.5) 50%,
+      transparent 100%
+    );
+    transform: skewX(-18deg) translateX(-130%);
+    transition: transform 0.65s ease;
+    pointer-events: none;
+  }
+
+  .btn-sheen:hover::after {
+    transform: skewX(-18deg) translateX(420%);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/* Homepage choreography — Ken Burns, step autoplay, visuals    */
+/* ──────────────────────────────────────────────────────────── */
+
+@keyframes kenBurns {
+  0% {
+    transform: scale(1.06) translate3d(0, -0.6%, 0);
+  }
+  100% {
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+.ken-burns {
+  animation: kenBurns 7s ease-out forwards;
+  will-change: transform;
+}
+
+@keyframes stepProgress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 100%;
+  }
+}
+
+.step-progress {
+  display: block;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, #00e5cc, #35f5e0);
+  border-radius: 9999px;
+  animation: stepProgress linear forwards;
+}
+
+/* CoreFeatures mini-visual: scanline sweeping down a phone screen */
+@keyframes visualScan {
+  0% {
+    top: -18%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  88% {
+    opacity: 1;
+  }
+  100% {
+    top: 104%;
+    opacity: 0;
+  }
+}
+
+/* CoreFeatures mini-visual: cursor glides to the link pill and taps */
+@keyframes cursorGlide {
+  0%,
+  12% {
+    transform: translate(36px, 30px);
+  }
+  38%,
+  58% {
+    transform: translate(0, 0);
+  }
+  62% {
+    transform: translate(0, 0) scale(0.86);
+  }
+  68%,
+  82% {
+    transform: translate(0, 0) scale(1);
+  }
+  100% {
+    transform: translate(36px, 30px);
+  }
+}
+
+/* CoreFeatures mini-visual: copied-check pops in after the tap */
+@keyframes popCheck {
+  0%,
+  60% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  68%,
+  86% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  96%,
+  100% {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+}
+
+/* CoreFeatures mini-visual: soft expanding ring around the shared screen */
+@keyframes pingSoft {
+  0% {
+    transform: scale(0.55);
+    opacity: 0.75;
+  }
+  80% {
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ken-burns,
+  .step-progress {
+    animation: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/* MissionControlHero — device wall fake activity               */
+/* ──────────────────────────────────────────────────────────── */
+
+/* Endless upward scroll of a duplicated log stack (move exactly half) */
+@keyframes heroLogScroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-50%);
+  }
+}
+
+/* Activity-monitor bar: scaleY oscillation, range via CSS vars */
+@keyframes heroEqBar {
+  0%,
+  100% {
+    transform: scaleY(var(--eq-min, 0.25));
+  }
+  50% {
+    transform: scaleY(var(--eq-max, 1));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-log-scroll,
+  .hero-eq-bar {
+    animation: none !important;
+  }
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/* MissionControlHero — device frame depth                      */
+/*                                                              */
+/* Stacked 1px box-shadow layers fake a solid side (no real     */
+/* translateZ panels). Composition via vars so thickness, the   */
+/* soft ground shadow and the control-frame glow share the one  */
+/* box-shadow property:                                         */
+/*   --fd-extra  glow / inset top-light (control frames, dark)  */
+/*   --fd-side   stacked side layers, light → dark              */
+/*   --fd-ground soft drop shadow, separated for the float feel */
+/* Default (= middle column, and all frames on the flat <lg     */
+/* layout): 3px straight down. At lg+ the outer columns angle   */
+/* with their perspective: left column → bottom-right, right    */
+/* column → bottom-left.                                        */
+/* ──────────────────────────────────────────────────────────── */
+
+.frame-depth {
+  --fd-side: 0 1px 0 #e4eae9, 0 2px 0 #d7dedd, 0 3px 0 #c9d1d0;
+  --fd-ground: 0 12px 18px rgba(10, 30, 28, 0.2);
+  box-shadow: var(--fd-extra, 0 0 #0000), var(--fd-side), var(--fd-ground);
+}
+
+/* Dark: side ramp sits just under the face tone (#1e2424 near face → #131818
+ * far) so it reads as shadowed material, never brighter than the face; the
+ * lit-edge highlight (light from top-left → top + left inset lines) is the
+ * main depth cue. */
+.dark .frame-depth {
+  --fd-side: 0 1px 0 #1e2424, 0 2px 0 #181e1e, 0 3px 0 #131818;
+  --fd-ground: 0 12px 20px rgba(0, 0, 0, 0.68);
+  --fd-extra: inset 0 1px 0 rgba(120, 200, 200, 0.35), inset 1px 0 0 rgba(120, 200, 200, 0.28);
+}
+
+.frame-depth-control {
+  --fd-extra: 0 0 36px rgba(0, 143, 130, 0.16);
+}
+
+.dark .frame-depth-control {
+  --fd-extra: 0 0 40px rgba(0, 229, 204, 0.15), inset 0 1px 0 rgba(120, 200, 200, 0.4),
+    inset 1px 0 0 rgba(120, 200, 200, 0.3);
+}
+
+@media (min-width: 1024px) {
+  /* left column — tilted toward the right, 5px side shows bottom-right */
+  .frame-depth-l {
+    --fd-side: 1px 1px 0 #e8edec, 2px 2px 0 #e0e6e5, 3px 3px 0 #d8dfde,
+      4px 4px 0 #d0d8d7, 5px 5px 0 #c8d0cf;
+    --fd-ground: 7px 14px 20px rgba(10, 30, 28, 0.22);
+  }
+
+  .dark .frame-depth-l {
+    --fd-side: 1px 1px 0 #1e2424, 2px 2px 0 #1b2121, 3px 3px 0 #191e1e,
+      4px 4px 0 #161b1b, 5px 5px 0 #131818;
+    --fd-ground: 8px 14px 24px rgba(0, 0, 0, 0.7);
+  }
+
+  /* right column — tilted toward the left, 5px side shows bottom-left */
+  .frame-depth-r {
+    --fd-side: -1px 1px 0 #e8edec, -2px 2px 0 #e0e6e5, -3px 3px 0 #d8dfde,
+      -4px 4px 0 #d0d8d7, -5px 5px 0 #c8d0cf;
+    --fd-ground: -7px 14px 20px rgba(10, 30, 28, 0.22);
+  }
+
+  .dark .frame-depth-r {
+    --fd-side: -1px 1px 0 #1e2424, -2px 2px 0 #1b2121, -3px 3px 0 #191e1e,
+      -4px 4px 0 #161b1b, -5px 5px 0 #131818;
+    --fd-ground: -8px 14px 24px rgba(0, 0, 0, 0.7);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────── */
+/* TrustSection — rotating beam border                          */
+/* ──────────────────────────────────────────────────────────── */
+
+@property --beam-angle {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+.trust-card {
+  position: relative;
+}
+
+.trust-card::before {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  padding: 2px;
+  background: conic-gradient(
+    from var(--beam-angle),
+    transparent 0%,
+    transparent 75%,
+    rgba(0, 229, 204, 0.9) 85%,
+    rgba(220, 255, 250, 1) 92%,
+    transparent 100%
+  );
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  filter: drop-shadow(0 0 6px rgba(0, 229, 204, 0.7));
+  animation: beam-spin 7s linear infinite;
+  pointer-events: none;
+}
+
+.trust-card:hover::before {
+  animation-duration: 2.5s;
+}
+
+@keyframes beam-spin {
+  to { --beam-angle: 360deg; }
 }

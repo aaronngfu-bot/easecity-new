@@ -70,7 +70,7 @@ function getPlans(t: T, billing: BillingInterval) {
       description: t.pricingPage.entDesc,
       features: [t.pricingPage.entF1, t.pricingPage.entF2, t.pricingPage.entF3, t.pricingPage.entF4, t.pricingPage.entF5, t.pricingPage.entF6, t.pricingPage.entF7, t.pricingPage.entF8, t.pricingPage.entF9],
       cta: t.pricingPage.contactSales,
-      href: '/contact',
+      href: '/about#contact',
       highlighted: false,
     },
   ]

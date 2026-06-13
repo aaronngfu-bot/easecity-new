@@ -9,12 +9,9 @@ import { BlueprintField } from '@/components/ui/BlueprintField'
 import PillNav from '@/components/PillNav'
 
 const navItems = [
-  { label: '主頁', href: '/' },
-  { label: '服務', href: '/services' },
-  { label: '方案價格', href: '/pricing' },
-  { label: '下載', href: '/download' },
-  { label: '關於我們', href: '/about' },
-  { label: '聯絡我們', href: '/contact' },
+  { label: '\u4e3b\u9801', labelKey: 'home', href: '/' },
+  { label: '\u7522\u54c1', labelKey: 'product', href: '/product' },
+  { label: '\u95dc\u65bc\u6211\u5011', labelKey: 'about', href: '/about' },
 ]
 
 export default function PublicLayout({
@@ -23,7 +20,7 @@ export default function PublicLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="control-canvas relative min-h-screen overflow-x-hidden">
+    <div className="control-canvas relative min-h-screen overflow-x-clip">
       <BootSequence />
       <BlueprintField />
       <GrainField />
