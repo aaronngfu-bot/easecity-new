@@ -1,12 +1,7 @@
 'use client'
 
 import { useRef } from 'react'
-import {
-  motion,
-  useScroll,
-  useTransform,
-  useReducedMotion,
-} from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useIsMobile } from '@/hooks/useIsMobile'
 import { useMotionEnabled } from '@/lib/motion-context'
@@ -26,7 +21,6 @@ export function ParallaxSection({
 }: ParallaxProps) {
   const ref = useRef<HTMLDivElement>(null)
   const { motionEnabled } = useMotionEnabled()
-  const shouldReduce = useReducedMotion() || !motionEnabled
   const isMobile = useIsMobile()
 
   const { scrollYProgress } = useScroll({
@@ -40,7 +34,7 @@ export function ParallaxSection({
     [speed * 100, speed * -100]
   )
 
-  const disabled = shouldReduce || (disableOnMobile && isMobile)
+  const disabled = !motionEnabled || (disableOnMobile && isMobile)
 
   if (disabled) {
     return (

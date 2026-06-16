@@ -1,35 +1,16 @@
 'use client'
 
 import { useRef } from 'react'
-import {
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-} from 'framer-motion'
+import { motion, useScroll, useTransform } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useMotionEnabled } from '@/lib/motion-context'
 
 interface RevealSectionProps {
   children: React.ReactNode
   className?: string
-  /** Apply the subtle scale-down + dim as the section leaves the viewport top. */
   exit?: boolean
 }
 
-/**
- * RevealSection — the homepage's shared section-transition language.
- *
- * Entrance is scrubbed against scroll (y / opacity / scale follow the wheel
- * in real time rather than firing once), and as a section leaves the top of
- * the viewport it gently scales down and dims, creating a depth-stack feel
- * between consecutive sections.
- *
- * Intentionally NO `overflow-hidden` here — children may rely on
- * `position: sticky` (e.g. FeatureSteps). The entrance completes while the
- * section is still in the lower half of the viewport, long before any
- * sticky child engages.
- */
 export function RevealSection({
   children,
   className,
@@ -37,7 +18,7 @@ export function RevealSection({
 }: RevealSectionProps) {
   const ref = useRef<HTMLDivElement>(null)
   const { motionEnabled } = useMotionEnabled()
-  const shouldReduce = useReducedMotion() || !motionEnabled
+  const shouldReduce = !motionEnabled
 
   const { scrollYProgress } = useScroll({
     target: ref,

@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type CSSProperties } from 'react'
 import Link from 'next/link'
-import { motion, useReducedMotion, type Variants } from 'framer-motion'
+import { motion, type Variants } from 'framer-motion'
 import { ArrowDown } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { useMotionEnabled } from '@/lib/motion-context'
@@ -14,35 +14,18 @@ import { cn } from '@/lib/utils'
 interface FrameSpec {
   id: string
   kind: 'log' | 'eq'
-  /** Entrance stagger order (center-out) — purely a load sequence. */
   order: number
-  /** Activity loop duration (s) — varied per frame to avoid mechanical feel. */
   dur: number
-  /** Grid column (l/c/r) — picks the fake-thickness direction at lg+. */
   col: 'l' | 'c' | 'r'
-  /** Currently being operated from EC-Share (multi-select: two at once). */
   control?: boolean
   purple?: boolean
-  /** Responsive visibility + desktop stagger offset. */
   className: string
 }
 
 /*
- * 3×3 grid, row-major. DV-05 and DV-07 are both "in control" (solid teal
- * frame, equal prominence) — devices have no sync relationship with each
- * other; each one just heartbeats its own EC-Share connection. On <lg only
- * the middle row (+ DV-07 from sm) renders as a flat horizontal strip.
- */
-/*
- * Stagger offsets vs row gap（實際數值，唔好靠估）：
- * 垂直方向最大相對靠近量 = 上格向下 offset + 下格向上 offset。
- * 最差組合係右列 r0-r1：DV-03 (+18) 對 DV-06 (-4) → 22px。
- * row gap 需要 ≥ 22 + 5（側面厚度影）+ 1（心跳閃框 -inset-px）
- * + 8（buffer）= 36px → lg:gap-y-9。
- * 水平方向 offset 全部係 0 → col gap ≥ 0 + 5 + 1 + 8 = 14px →
- * 現有 16px（lg:gap-x-4）已夠。
- * Idle float 係成個 wall 一齊郁、mouse parallax 不存在（已 grep 證實），
- * 兩者對 frame 之間相對距離貢獻 = 0。
+ * Stagger offsets vs row gap（實際數值）：
+ * 最差組合 r0-r1：DV-03 (+18) 對 DV-06 (-4) → 22px。
+ * row gap ≥ 22 + 5 + 1 + 8 = 36px → lg:gap-y-9。
  */
 const FRAMES: FrameSpec[] = [
   { id: 'DV-01', kind: 'log', order: 5, dur: 5.2, col: 'l', className: 'hidden lg:block lg:translate-y-1.5' },
@@ -56,10 +39,8 @@ const FRAMES: FrameSpec[] = [
   { id: 'DV-09', kind: 'eq', order: 8, dur: 1.25, col: 'r', className: 'hidden lg:block lg:translate-y-2' },
 ]
 
-/** Bar widths (%) for fake log lines — rotated per frame for variety. */
 const LOG_WIDTHS = [88, 52, 70, 40, 92, 60, 76, 46, 64, 82, 56, 72, 38, 86, 58, 68]
 
-/** Per-bar shape of the activity-monitor (eq) animation. */
 const EQ_BARS = [
   { min: 0.2, max: 0.85, durMul: 1.0, delay: 0 },
   { min: 0.35, max: 1, durMul: 1.18, delay: 0.12 },
@@ -69,7 +50,6 @@ const EQ_BARS = [
   { min: 0.3, max: 1, durMul: 0.95, delay: 0.4 },
 ]
 
-/** Fake telemetry pools — cycled by the sync tick so the readout "updates". */
 const LATENCIES = [38, 41, 37, 43, 39, 36, 42, 40]
 const DEVICE_COUNTS = [247, 246, 248, 247, 249, 245, 248, 246]
 
@@ -122,7 +102,6 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
       ? 'bg-signal-deep/70 dark:bg-signal/80'
       : 'bg-signal-deep/60 dark:bg-signal/70'
   const widths = [...LOG_WIDTHS.slice((order * 3) % 16), ...LOG_WIDTHS.slice(0, (order * 3) % 16)]
-
   const btnColor = control ? 'bg-signal-deep/60 dark:bg-signal/50' : 'bg-black/25 dark:bg-white/20'
 
   return (
@@ -141,18 +120,13 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
             : 'border border-black/10 bg-white dark:border-white/[0.14] dark:bg-[#161c1c]'
         )}
       >
-        {/* side buttons */}
         <span className={cn('absolute -right-[2px] top-[24%] z-[1] h-8 w-[2px] rounded-r-sm', btnColor)} />
         <span className={cn('absolute -left-[2px] top-[17%] z-[1] h-5 w-[2px] rounded-l-sm', btnColor)} />
         <span className={cn('absolute -left-[2px] top-[28%] z-[1] h-5 w-[2px] rounded-l-sm', btnColor)} />
 
-        {/* inner bezel */}
         <div className="pointer-events-none absolute inset-[3px] z-[1] rounded-[1.35rem] ring-1 ring-inset ring-black/[0.06] dark:ring-white/[0.05]" />
-
-        {/* punch-hole camera */}
         <span className="absolute left-1/2 top-2 z-[5] h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-black/80 ring-1 ring-black/15 dark:bg-black dark:ring-white/10" />
 
-        {/* status row */}
         <div className="absolute inset-x-1.5 top-1.5 z-[2] flex items-center justify-between">
           {control ? (
             <span className="rounded-sm bg-signal-deep px-1 py-px font-mono text-[10px] font-semibold tracking-[0.12em] text-white dark:bg-signal dark:text-[#03100f]">
@@ -163,15 +137,9 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
               {id}
             </span>
           )}
-          <span
-            className={cn(
-              'h-1 w-1 rounded-full',
-              control ? 'bg-signal-deep dark:bg-signal' : 'bg-black/20 dark:bg-white/20'
-            )}
-          />
+          <span className={cn('h-1 w-1 rounded-full', control ? 'bg-signal-deep dark:bg-signal' : 'bg-black/20 dark:bg-white/20')} />
         </div>
 
-        {/* fake activity */}
         {kind === 'log' ? (
           <div className="absolute inset-0 overflow-hidden rounded-3xl px-2 pb-2 pt-6">
             <div
@@ -183,10 +151,7 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
                   {widths.map((w, i) => (
                     <div
                       key={i}
-                      className={cn(
-                        'h-[3px] rounded-full',
-                        i % 5 === 2 ? accentBar : 'bg-black/15 dark:bg-white/[0.14]'
-                      )}
+                      className={cn('h-[3px] rounded-full', i % 5 === 2 ? accentBar : 'bg-black/15 dark:bg-white/[0.14]')}
                       style={{ width: `${w}%` }}
                     />
                   ))}
@@ -214,7 +179,6 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
           </div>
         )}
 
-        {/* sync heartbeat */}
         {pulse > 0 && (
           <>
             <motion.div
@@ -246,11 +210,9 @@ export function MissionControlHero() {
   const { t } = useLanguage()
   const hero = t.homePage.hero
   const { motionEnabled } = useMotionEnabled()
-  const shouldReduce = useReducedMotion() || !motionEnabled
-  const reduce = !!shouldReduce
+  const reduce = !motionEnabled
   const [tick, setTick] = useState(0)
 
-  /* Telemetry readout refresh — starts only after the entrance has finished. */
   useEffect(() => {
     if (reduce) return
     let interval: ReturnType<typeof setInterval> | undefined
@@ -286,11 +248,9 @@ export function MissionControlHero() {
         }),
       }
 
-  /* Fake telemetry, nudged on every readout tick. */
   const latency = LATENCIES[tick % LATENCIES.length]
   const deviceCount = DEVICE_COUNTS[tick % DEVICE_COUNTS.length]
 
-  /* Headline with one highlighted keyword + hand-drawn underline. */
   const hlIndex = hero.headlineHighlight ? hero.headline.indexOf(hero.headlineHighlight) : -1
   const headline =
     hlIndex === -1 ? (
@@ -336,7 +296,6 @@ export function MissionControlHero() {
 
   return (
     <section className="relative flex min-h-screen flex-col overflow-hidden bg-[#f5f8f8] dark:bg-[#030506]">
-      {/* blueprint grid — 48px, 1px lines */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(7,16,15,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(7,16,15,0.05)_1px,transparent_1px)] bg-[size:48px_48px] dark:hidden"
@@ -345,7 +304,6 @@ export function MissionControlHero() {
         aria-hidden
         className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:48px_48px] dark:block"
       />
-      {/* corner crop marks */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <span className="absolute left-5 top-20 h-6 w-6 border-l border-t border-black/30 dark:border-white/25" />
         <span className="absolute right-5 top-20 h-6 w-6 border-r border-t border-black/30 dark:border-white/25" />
@@ -354,7 +312,6 @@ export function MissionControlHero() {
       </div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center gap-14 px-6 pb-16 pt-28 sm:px-8 lg:flex-row lg:items-center lg:gap-6 lg:px-12 lg:py-10">
-        {/* ── Left: content ── */}
         <motion.div
           variants={contentContainer}
           initial="hidden"
@@ -367,10 +324,7 @@ export function MissionControlHero() {
           >
             <span
               aria-hidden
-              className={cn(
-                'h-1.5 w-1.5 shrink-0 rounded-full bg-signal-deep dark:bg-signal',
-                !reduce && 'animate-pulse'
-              )}
+              className={cn('h-1.5 w-1.5 shrink-0 rounded-full bg-signal-deep dark:bg-signal', !reduce && 'animate-pulse')}
             />
             {hero.eyebrow}
           </motion.p>
@@ -405,27 +359,19 @@ export function MissionControlHero() {
             </button>
           </motion.div>
 
-          {/* fake telemetry readout */}
           <motion.p
             variants={contentItem}
             aria-hidden
             className="mt-12 flex flex-wrap items-center gap-x-3 gap-y-1 font-mono text-[11px] uppercase tracking-wider text-muted-foreground"
           >
-            <span>
-              {hero.readoutLatency} <ReadoutValue value={`${latency}MS`} />
-            </span>
+            <span>{hero.readoutLatency} <ReadoutValue value={`${latency}MS`} /></span>
             <span>·</span>
-            <span>
-              {hero.readoutDevices} <ReadoutValue value={String(deviceCount)} />
-            </span>
+            <span>{hero.readoutDevices} <ReadoutValue value={String(deviceCount)} /></span>
             <span>·</span>
-            <span>
-              {hero.readoutUptime} <ReadoutValue value="99.98%" />
-            </span>
+            <span>{hero.readoutUptime} <ReadoutValue value="99.98%" /></span>
           </motion.p>
         </motion.div>
 
-        {/* ── Right: device wall ── */}
         <div aria-hidden className="lg:shrink-0">
           <motion.div
             animate={reduce ? undefined : { y: [6, -6] }}
@@ -450,7 +396,6 @@ export function MissionControlHero() {
         </div>
       </div>
 
-      {/* ── Bottom: event ticker ── */}
       <motion.div
         aria-hidden
         initial={{ opacity: 0 }}
