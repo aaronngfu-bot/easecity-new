@@ -4,6 +4,7 @@ import './globals.css'
 import { LanguageProvider } from '@/context/LanguageContext'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
+import { MotionProvider } from '@/lib/motion-context'
 import { OrganizationJsonLd, WebSiteJsonLd } from '@/components/seo/JsonLd'
 
 const instrumentSans = Instrument_Sans({
@@ -84,16 +85,18 @@ export default function RootLayout({
       <body className="bg-background text-foreground antialiased selection:bg-signal/20 selection:text-signal">
         <OrganizationJsonLd />
         <WebSiteJsonLd />
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
-          disableTransitionOnChange
-        >
-          <SessionProvider>
-            <LanguageProvider>{children}</LanguageProvider>
-          </SessionProvider>
-        </ThemeProvider>
+        <MotionProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem={false}
+            disableTransitionOnChange
+          >
+            <SessionProvider>
+              <LanguageProvider>{children}</LanguageProvider>
+            </SessionProvider>
+          </ThemeProvider>
+        </MotionProvider>
       </body>
     </html>
   )

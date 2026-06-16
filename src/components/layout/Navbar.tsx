@@ -5,9 +5,10 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useSession, signOut } from 'next-auth/react'
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
-import { Menu, X, User, LogOut } from 'lucide-react'
+import { Menu, X, User, LogOut, Sparkles } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
+import { useMotionEnabled } from '@/lib/motion-context'
 
 function LangToggle() {
   const { language, setLanguage } = useLanguage()
@@ -36,6 +37,27 @@ function LangToggle() {
         ZH
       </button>
     </div>
+  )
+}
+
+function MotionToggle() {
+  const { motionEnabled, toggleMotion } = useMotionEnabled()
+
+  return (
+    <button
+      onClick={toggleMotion}
+      aria-pressed={motionEnabled}
+      aria-label={motionEnabled ? '關閉動畫效果' : '開啟動畫效果'}
+      title={motionEnabled ? '動畫:開' : '動畫:關'}
+      className={cn(
+        'inline-flex h-9 w-9 items-center justify-center rounded-md border bg-bg-void transition-colors duration-200',
+        motionEnabled
+          ? 'border-signal/30 text-signal hover:border-signal/50'
+          : 'border-border text-text-muted hover:border-border-accent hover:text-text-secondary'
+      )}
+    >
+      <Sparkles size={15} />
+    </button>
   )
 }
 
@@ -160,6 +182,7 @@ export function Navbar() {
           {/* Desktop right cluster */}
           <div className="hidden md:flex items-center gap-3">
             <LangToggle />
+            <MotionToggle />
             <div className="h-5 w-px bg-border" />
             <AuthButtons />
           </div>
@@ -167,6 +190,7 @@ export function Navbar() {
           {/* Mobile cluster */}
           <div className="md:hidden flex items-center gap-2">
             <LangToggle />
+            <MotionToggle />
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="rounded-md border border-border bg-bg-void p-2 text-text-secondary transition-colors duration-200 hover:border-border-accent hover:text-signal"

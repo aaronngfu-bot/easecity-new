@@ -6,6 +6,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { gsap } from 'gsap';
 import { useLanguage } from '@/context/LanguageContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
+import { MotionToggle } from '@/components/MotionToggle';
 import './PillNav.css';
 
 const PillNav = ({
@@ -353,6 +354,7 @@ const PillNav = ({
         </div>
 
         <ThemeToggle className="desktop-only" />
+        <MotionToggle className="desktop-only" />
 
         <button
           type="button"

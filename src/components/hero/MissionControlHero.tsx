@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { motion, useReducedMotion, type Variants } from 'framer-motion'
 import { ArrowDown } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { useMotionEnabled } from '@/lib/motion-context'
 import { Magnetic } from '@/components/ui/MagneticButton'
 import { cn } from '@/lib/utils'
 
@@ -244,8 +245,9 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
 export function MissionControlHero() {
   const { t } = useLanguage()
   const hero = t.homePage.hero
-  const shouldReduceMotion = useReducedMotion()
-  const reduce = !!shouldReduceMotion
+  const { motionEnabled } = useMotionEnabled()
+  const shouldReduce = useReducedMotion() || !motionEnabled
+  const reduce = !!shouldReduce
   const [tick, setTick] = useState(0)
 
   /* Telemetry readout refresh — starts only after the entrance has finished. */

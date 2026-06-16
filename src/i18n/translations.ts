@@ -763,6 +763,8 @@ const en = {
     redirectingDesc: 'Your session is ready. Loading your control surface now.',
     noAccount: "Don't have an account?",
     signUp: 'Sign up',
+    signOut: 'Sign out',
+    dashboard: 'Dashboard',
     createAccount: 'Create an account',
     getStarted: 'Get started with easecity',
     nameLabel: 'Full name',
@@ -773,8 +775,6 @@ const en = {
     creatingAccount: 'Creating account...',
     haveAccount: 'Already have an account?',
     unexpectedError: 'An unexpected error occurred',
-    dashboard: 'Dashboard',
-    signOut: 'Sign out',
   },
 
   chat: {
@@ -1606,6 +1606,8 @@ const zh: typeof en = {
     redirectingDesc: '登入已完成，正在載入您的控制介面。',
     noAccount: '還沒有帳戶？',
     signUp: '註冊',
+    signOut: '登出',
+    dashboard: '控制台',
     createAccount: '建立帳戶',
     getStarted: '開始使用 easecity',
     nameLabel: '姓名',
@@ -1616,8 +1618,6 @@ const zh: typeof en = {
     creatingAccount: '建立帳戶中…',
     haveAccount: '已有帳戶？',
     unexpectedError: '發生意外錯誤',
-    dashboard: '控制台',
-    signOut: '登出',
   },
 
   chat: {

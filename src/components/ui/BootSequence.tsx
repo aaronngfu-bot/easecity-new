@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { useMotionEnabled } from '@/lib/motion-context'
 
 const STORAGE_KEY = 'easecity-booted-v1' // 保留原 key，唔會打亂現有用戶嘅 gate
 const SKIP_BEFORE = 12 * 60 * 60 * 1000
@@ -20,7 +21,9 @@ const LINK_MS = 230  // 每條 link 嘅間隔
 const SYNC_MS = 950  // 同步脈衝階段長度
 
 export function BootSequence() {
-  const reduce = useReducedMotion()
+  const { motionEnabled } = useMotionEnabled()
+  const shouldReduce = useReducedMotion() || !motionEnabled
+  const reduce = !!shouldReduce
   const [visible, setVisible] = useState(false)
   const [step, setStep] = useState(0)
   const [phase, setPhase] = useState<'link' | 'sync'>('link')
