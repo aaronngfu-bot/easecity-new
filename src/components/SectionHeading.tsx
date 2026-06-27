@@ -1,14 +1,15 @@
 "use client";
 
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 import { useMotionEnabled } from "@/lib/motion-context";
 
 interface SectionHeadingProps {
-  badge?: string;
-  title: string;
-  subtitle?: string;
+  badge?: string;        // 上方小標籤,例如「FEATURES」
+  title: string;         // 主標題,例如「核心功能」
+  subtitle?: string;     // 副標題說明
   align?: "center" | "left";
+  /** 順序 stagger 模式：badge → title → subtitle 每段相隔呢個秒數；不設則維持原有節奏 */
   stepDelay?: number;
 }
 
@@ -19,6 +20,10 @@ interface Token {
 
 const CJK_RUN = /[\u3000-\u9fff\uf900-\ufaff\uff00-\uffef]|[^\u3000-\u9fff\uf900-\ufaff\uff00-\uffef]+/g;
 
+/**
+ * CJK-aware tokenization：中文逐字成 token（可自由換行），
+ * 拉丁文整個單詞一個 token（避免單詞中間斷行）。
+ */
 function tokenize(title: string): Token[] {
   const tokens: Token[] = [];
   const words = title.split(" ");
@@ -43,7 +48,7 @@ export default function SectionHeading({
   stepDelay,
 }: SectionHeadingProps) {
   const { motionEnabled } = useMotionEnabled();
-  const reduce = !motionEnabled;
+  const reduce = !!(useReducedMotion() || !motionEnabled);
   const tokens = tokenize(title);
 
   const titleBase = stepDelay ?? 0;
@@ -57,6 +62,7 @@ export default function SectionHeading({
 
   return (
     <div className={`flex flex-col ${alignClass} gap-4`}>
+      {/* mono eyebrow — 與 TrustSection / CTA 區一致的標籤語言 */}
       {badge && (
         <motion.span
           initial={{ opacity: 0, y: reduce ? 0 : 10 }}
@@ -69,6 +75,7 @@ export default function SectionHeading({
         </motion.span>
       )}
 
+      {/* 主標題:逐字淡入 + 上移 */}
       <h2
         className={`flex flex-wrap font-display text-3xl font-bold tracking-[-0.035em] text-foreground sm:text-4xl md:text-5xl ${
           align === "center" ? "justify-center" : "justify-start"
@@ -96,6 +103,7 @@ export default function SectionHeading({
         ))}
       </h2>
 
+      {/* 副標題 */}
       {subtitle && (
         <motion.p
           initial={{ opacity: 0, y: reduce ? 0 : 10 }}

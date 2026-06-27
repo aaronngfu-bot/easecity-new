@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import { useMotionEnabled } from '@/lib/motion-context'
 
@@ -18,7 +18,7 @@ export function AnimatedSection({
   direction = 'up',
 }: AnimatedSectionProps) {
   const { motionEnabled } = useMotionEnabled()
-  const shouldReduce = !motionEnabled
+  const shouldReduce = useReducedMotion() || !motionEnabled
 
   const directionMap = {
     up: { y: 30, x: 0 },
@@ -63,7 +63,7 @@ export function StaggerContainer({
   staggerDelay = 0.1,
 }: StaggerContainerProps) {
   const { motionEnabled } = useMotionEnabled()
-  const shouldReduce = !motionEnabled
+  const shouldReduce = useReducedMotion() || !motionEnabled
 
   if (shouldReduce) {
     return <div className={cn(className)}>{children}</div>
@@ -97,7 +97,7 @@ export function StaggerItem({
   className?: string
 }) {
   const { motionEnabled } = useMotionEnabled()
-  const shouldReduce = !motionEnabled
+  const shouldReduce = useReducedMotion() || !motionEnabled
 
   if (shouldReduce) {
     return <div className={cn(className)}>{children}</div>
