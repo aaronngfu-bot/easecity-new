@@ -2,7 +2,6 @@
 
 import React from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { useMotionEnabled } from "@/lib/motion-context";
 
 interface SectionHeadingProps {
   badge?: string;        // 上方小標籤,例如「FEATURES」
@@ -47,8 +46,7 @@ export default function SectionHeading({
   align = "center",
   stepDelay,
 }: SectionHeadingProps) {
-  const { motionEnabled } = useMotionEnabled();
-  const reduce = !!(useReducedMotion() || !motionEnabled);
+  const reduce = !!useReducedMotion();
   const tokens = tokenize(title);
 
   const titleBase = stepDelay ?? 0;

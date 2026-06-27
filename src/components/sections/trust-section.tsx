@@ -3,7 +3,6 @@
 import { useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
-import { useMotionEnabled } from "@/lib/motion-context";
 import {
   Bug,
   Camera,
@@ -165,8 +164,7 @@ function PanelContent({
 
 export function TrustSection() {
   const isCoarsePointer = useCoarsePointer();
-  const { motionEnabled } = useMotionEnabled();
-  const reduce = !!(useReducedMotion() || !motionEnabled);
+  const reduce = !!useReducedMotion();
   const isDark = useIsDark();
   const { t } = useLanguage();
   const trust = t.homePage.trust;

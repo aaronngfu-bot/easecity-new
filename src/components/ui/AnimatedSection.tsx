@@ -2,7 +2,6 @@
 
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { useMotionEnabled } from '@/lib/motion-context'
 
 interface AnimatedSectionProps {
   children: React.ReactNode
@@ -17,8 +16,7 @@ export function AnimatedSection({
   delay = 0,
   direction = 'up',
 }: AnimatedSectionProps) {
-  const { motionEnabled } = useMotionEnabled()
-  const shouldReduce = useReducedMotion() || !motionEnabled
+  const shouldReduceMotion = useReducedMotion()
 
   const directionMap = {
     up: { y: 30, x: 0 },
@@ -27,7 +25,7 @@ export function AnimatedSection({
     none: { y: 0, x: 0 },
   }
 
-  if (shouldReduce) {
+  if (shouldReduceMotion) {
     return <div className={cn(className)}>{children}</div>
   }
 
@@ -62,10 +60,9 @@ export function StaggerContainer({
   className,
   staggerDelay = 0.1,
 }: StaggerContainerProps) {
-  const { motionEnabled } = useMotionEnabled()
-  const shouldReduce = useReducedMotion() || !motionEnabled
+  const shouldReduceMotion = useReducedMotion()
 
-  if (shouldReduce) {
+  if (shouldReduceMotion) {
     return <div className={cn(className)}>{children}</div>
   }
 
@@ -96,10 +93,9 @@ export function StaggerItem({
   children: React.ReactNode
   className?: string
 }) {
-  const { motionEnabled } = useMotionEnabled()
-  const shouldReduce = useReducedMotion() || !motionEnabled
+  const shouldReduceMotion = useReducedMotion()
 
-  if (shouldReduce) {
+  if (shouldReduceMotion) {
     return <div className={cn(className)}>{children}</div>
   }
 

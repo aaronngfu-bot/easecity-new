@@ -9,9 +9,9 @@ import { BlueprintField } from '@/components/ui/BlueprintField'
 import PillNav from '@/components/PillNav'
 
 const navItems = [
-  { label: '主頁', labelKey: 'home', href: '/' },
-  { label: '產品', labelKey: 'product', href: '/product' },
-  { label: '關於我們', labelKey: 'about', href: '/about' },
+  { label: '\u4e3b\u9801', labelKey: 'home', href: '/' },
+  { label: '\u7522\u54c1', labelKey: 'product', href: '/product' },
+  { label: '\u95dc\u65bc\u6211\u5011', labelKey: 'about', href: '/about' },
 ]
 
 export default function PublicLayout({

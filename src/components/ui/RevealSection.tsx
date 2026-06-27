@@ -8,7 +8,6 @@ import {
   useTransform,
 } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import { useMotionEnabled } from '@/lib/motion-context'
 
 interface RevealSectionProps {
   children: React.ReactNode
@@ -36,8 +35,7 @@ export function RevealSection({
   exit = true,
 }: RevealSectionProps) {
   const ref = useRef<HTMLDivElement>(null)
-  const { motionEnabled } = useMotionEnabled()
-  const shouldReduce = useReducedMotion() || !motionEnabled
+  const shouldReduceMotion = useReducedMotion()
 
   const { scrollYProgress } = useScroll({
     target: ref,
@@ -56,7 +54,7 @@ export function RevealSection({
     [0.975, 1, 1, exit ? 0.985 : 1]
   )
 
-  if (shouldReduce) {
+  if (shouldReduceMotion) {
     return (
       <div ref={ref} className={className}>
         {children}
