@@ -9,7 +9,7 @@ const en = {
     download: 'Download',
     about: 'About',
     contact: 'Contact',
-    cta: 'Get in Touch',
+    cta: 'Free Trial',
   },
 
   product: {
@@ -861,7 +861,7 @@ const zh: typeof en = {
     download: '下載',
     about: '關於我們',
     contact: '聯絡我們',
-    cta: '立即聯絡',
+    cta: '免費試用',
   },
 
   product: {

@@ -245,32 +245,18 @@ const PillNav = ({
   return (
     <div className="pill-nav-container">
       <nav className={`pill-nav ${className}`} aria-label="Primary">
-        {isRouterLink(items?.[0]?.href) ? (
-          <Link
-            className="pill-logo"
-            href={items[0].href}
-            aria-label="Home"
-            onMouseEnter={handleLogoEnter}
-            role="menuitem"
-            ref={el => {
-              logoRef.current = el;
-            }}
-          >
-            <img src={logo} alt={logoAlt} ref={logoImgRef} />
-          </Link>
-        ) : (
-          <a
-            className="pill-logo"
-            href={items?.[0]?.href || '#'}
-            aria-label="Home"
-            onMouseEnter={handleLogoEnter}
-            ref={el => {
-              logoRef.current = el;
-            }}
-          >
-            <img src={logo} alt={logoAlt} ref={logoImgRef} />
-          </a>
-        )}
+        <Link
+          className="pill-logo"
+          href="/"
+          aria-label="Home"
+          onMouseEnter={handleLogoEnter}
+          role="menuitem"
+          ref={el => {
+            logoRef.current = el;
+          }}
+        >
+          <img src={logo} alt={logoAlt} ref={logoImgRef} />
+        </Link>
 
         <div className="pill-nav-items desktop-only" ref={navItemsRef}>
           <ul className="pill-list" role="menubar">
@@ -384,6 +370,14 @@ const PillNav = ({
         </button>
 
         <button
+          type="button"
+          onClick={() => router.push('/signup')}
+          className="pill-cta desktop-only inline-flex items-center rounded-full bg-emerald-400 px-4 py-1.5 text-xs font-semibold text-zinc-950 transition-colors hover:bg-emerald-300"
+        >
+          {t.nav.cta ?? '免費試用'}
+        </button>
+
+        <button
           className="mobile-menu-button mobile-only"
           onClick={toggleMobileMenu}
           aria-label="Toggle menu"
@@ -458,6 +452,18 @@ const PillNav = ({
               }}
             >
               Sign in
+            </button>
+          </li>
+          <li>
+            <button
+              type="button"
+              className="mobile-menu-link w-full text-left"
+              onClick={() => {
+                router.push('/signup');
+                closeMobileMenu();
+              }}
+            >
+              {t.nav.cta ?? '免費試用'}
             </button>
           </li>
         </ul>

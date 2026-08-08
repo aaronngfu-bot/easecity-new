@@ -1,3 +1,4 @@
+import PillNav from '@/components/PillNav'
 import { Footer } from '@/components/layout/Footer'
 import { ChatWidget } from '@/components/chat/ChatWidget'
 import { GrainField } from '@/components/ui/GrainField'
@@ -6,12 +7,10 @@ import { CommandPalette } from '@/components/ui/CommandPalette'
 import { KeyboardLayer } from '@/components/ui/KeyboardLayer'
 import { CursorGlowLayer } from '@/components/ui/CursorGlowLayer'
 import { BlueprintField } from '@/components/ui/BlueprintField'
-import PillNav from '@/components/PillNav'
 
 const navItems = [
-  { label: '\u4e3b\u9801', labelKey: 'home', href: '/' },
-  { label: '\u7522\u54c1', labelKey: 'product', href: '/product' },
-  { label: '\u95dc\u65bc\u6211\u5011', labelKey: 'about', href: '/about' },
+  { href: '/pricing',  labelKey: 'pricing' },
+  { href: '/download', labelKey: 'download' },
 ]
 
 export default function PublicLayout({

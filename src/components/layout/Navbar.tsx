@@ -8,6 +8,7 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { Menu, X, User, LogOut } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 function LangToggle() {
   const { language, setLanguage } = useLanguage()
@@ -84,12 +85,8 @@ export function Navbar() {
   const progressWidth = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
 
   const navLinks = [
-    { href: '/', label: t.nav.home, num: '01' },
-    { href: '/services', label: t.nav.services, num: '02' },
-    { href: '/pricing', label: t.nav.pricing, num: '03' },
-    { href: '/download', label: t.nav.download, num: '04' },
-    { href: '/about', label: t.nav.about, num: '05' },
-    { href: '/about#contact', label: t.nav.contact, num: '06' },
+    { href: '/pricing',  label: t.nav.pricing,  num: '01' },
+    { href: '/download', label: t.nav.download, num: '02' },
   ]
 
   useEffect(() => {
@@ -160,6 +157,7 @@ export function Navbar() {
           {/* Desktop right cluster */}
           <div className="hidden md:flex items-center gap-3">
             <LangToggle />
+            <ThemeToggle />
             <div className="h-5 w-px bg-border" />
             <AuthButtons />
           </div>
@@ -167,6 +165,7 @@ export function Navbar() {
           {/* Mobile cluster */}
           <div className="md:hidden flex items-center gap-2">
             <LangToggle />
+            <ThemeToggle />
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="rounded-md border border-border bg-bg-void p-2 text-text-secondary transition-colors duration-200 hover:border-border-accent hover:text-signal"
