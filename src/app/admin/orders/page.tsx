@@ -1,9 +1,18 @@
 export const revalidate = 0
 
+import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { isAdmin } from '@/lib/permissions'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
 
 export default async function AdminOrdersPage() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !isAdmin(session.user.role)) {
+    redirect('/dashboard')
+  }
+
   const orders = await prisma.order.findMany({
     orderBy: { createdAt: 'desc' },
     include: { user: { select: { name: true, email: true } } },
@@ -67,14 +76,14 @@ export default async function AdminOrdersPage() {
 
 function StatusBadge({ status }: { status: string }) {
   const s: Record<string, string> = {
-    paid: 'bg-green-500/15 text-green-400 border-green-500/25',
-    completed: 'bg-green-500/15 text-green-400 border-green-500/25',
-    fulfilled: 'bg-blue-500/15 text-blue-400 border-blue-500/25',
-    pending_payment: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/25',
-    created: 'bg-gray-500/15 text-gray-400 border-gray-500/25',
-    expired: 'bg-red-500/15 text-red-400 border-red-500/25',
-    cancelled: 'bg-red-500/15 text-red-400 border-red-500/25',
-    refunded: 'bg-purple-500/15 text-purple-400 border-purple-500/25',
+    paid: 'bg-status-success/15 text-status-success border-status-success/25',
+    completed: 'bg-status-success/15 text-status-success border-status-success/25',
+    fulfilled: 'bg-status-info/15 text-status-info border-status-info/25',
+    pending_payment: 'bg-status-warning/15 text-status-warning border-status-warning/25',
+    created: 'bg-bg-elevated/50 text-text-muted border-border',
+    expired: 'bg-status-danger/15 text-status-danger border-status-danger/25',
+    cancelled: 'bg-status-danger/15 text-status-danger border-status-danger/25',
+    refunded: 'bg-accent-purple/15 text-accent-purple border-accent-purple/25',
   }
   return (
     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${s[status] || s.created}`}>

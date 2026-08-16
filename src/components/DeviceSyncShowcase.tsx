@@ -260,10 +260,10 @@ function DesktopConsole({
   return (
     <div className="relative origin-center transition-all duration-300 lg:[transform:rotateX(3deg)]">
       <div className="absolute -inset-8 rounded-[2.5rem] bg-gradient-to-br from-signal/18 via-purple-500/10 to-transparent blur-3xl" />
-      <div className="relative rounded-[2rem] border border-white/15 bg-gradient-to-br from-[#171c21] via-[#07090a] to-black p-3 shadow-[0_38px_100px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.18)]">
+      <div className="relative rounded-[2rem] border border-border bg-gradient-to-br from-bg-elevated via-bg-base to-bg-void dark:from-[#171c21] dark:via-[#07090a] dark:to-black p-3 shadow-[0_38px_100px_rgba(0,0,0,0.75),inset_0_1px_0_rgba(255,255,255,0.18)]">
         <div className="pointer-events-none absolute inset-x-10 top-2 h-px bg-gradient-to-r from-transparent via-white/45 to-transparent" />
 
-        <div className="relative overflow-hidden rounded-[1.45rem] border border-white/10 bg-[#070a0d] p-4 shadow-[inset_0_0_70px_rgba(0,229,204,0.07)] md:p-5">
+        <div className="relative overflow-hidden rounded-[1.45rem] border border-border bg-bg-void dark:bg-[#070a0d] p-4 shadow-[inset_0_0_70px_rgba(0,229,204,0.07)] md:p-5">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_18%_0%,rgba(0,229,204,0.18),transparent_42%),radial-gradient(ellipse_at_88%_12%,rgba(99,102,241,0.16),transparent_44%),linear-gradient(135deg,rgba(255,255,255,0.08),transparent_28%)] pointer-events-none" />
           <div className="absolute inset-0 bg-rule-grid opacity-[0.11] pointer-events-none" />
 
@@ -305,10 +305,10 @@ function DesktopConsole({
           </div>
         </div>
 
-        <div className="mx-auto mt-3 h-3 w-36 rounded-b-2xl bg-gradient-to-b from-[#171d22] to-[#07090a] shadow-[0_12px_28px_rgba(0,0,0,0.55)]" />
+        <div className="mx-auto mt-3 h-3 w-36 rounded-b-2xl bg-gradient-to-b from-bg-elevated to-bg-base dark:from-[#171d22] dark:to-[#07090a] shadow-[0_12px_28px_rgba(0,0,0,0.55)]" />
       </div>
-      <div className="mx-auto h-10 w-32 bg-gradient-to-b from-[#15191d] to-[#090b0e] shadow-[0_20px_45px_rgba(0,0,0,0.48)]" />
-      <div className="mx-auto h-3 w-72 rounded-full bg-gradient-to-r from-transparent via-[#1b2227] to-transparent shadow-[0_18px_38px_rgba(0,0,0,0.48)]" />
+      <div className="mx-auto h-10 w-32 bg-gradient-to-b from-bg-elevated to-bg-base dark:from-[#15191d] dark:to-[#090b0e] shadow-[0_20px_45px_rgba(0,0,0,0.48)]" />
+      <div className="mx-auto h-3 w-72 rounded-full bg-gradient-to-r from-transparent via-bg-elevated to-transparent dark:via-[#1b2227] shadow-[0_18px_38px_rgba(0,0,0,0.48)]" />
     </div>
   )
 }

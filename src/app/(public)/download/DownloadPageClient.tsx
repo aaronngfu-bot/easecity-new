@@ -43,7 +43,7 @@ export function DownloadPageClient({
         <div className="container-max">
           <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
             <div className="glass-prominent overflow-hidden p-6 md:p-8">
-              <div className="mb-8 flex flex-col gap-4 border-b border-white/10 pb-8 sm:flex-row sm:items-start sm:justify-between">
+              <div className="mb-8 flex flex-col gap-4 border-b border-border dark:border-white/10 pb-8 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="label-mono mb-4">{copy.primaryInstallerLabel}</p>
                   <h2 className="font-display text-3xl font-bold text-text-primary md:text-4xl">
@@ -57,7 +57,7 @@ export function DownloadPageClient({
               </div>
 
               <div className="grid gap-6 md:grid-cols-[0.9fr_1.1fr]">
-                <div className="rounded-2xl border border-white/10 bg-bg-base/50 p-5">
+                <div className="rounded-2xl border border-border dark:border-white/10 bg-bg-base/50 p-5">
                   <p className="label-mono mb-3">{copy.releaseCardLabel}</p>
                   <p className="mb-2 font-display text-2xl font-bold text-text-primary">
                     {copy.releaseCardTitle}
@@ -146,7 +146,7 @@ export function DownloadPageClient({
               <p className="label-mono mb-4">{copy.platformsLabel}</p>
               <div className="space-y-4">
                 {copy.platformInterest.map((item) => (
-                  <div key={item.platform} className="rounded-xl border border-white/10 bg-white/[0.02] p-4">
+                  <div key={item.platform} className="rounded-xl border border-border dark:border-white/10 bg-bg-elevated/40 dark:bg-white/[0.02] p-4">
                     <div className="mb-2 flex items-center justify-between gap-4">
                       <h3 className="font-display text-xl font-bold text-text-primary">
                         {item.platform}
@@ -164,7 +164,7 @@ export function DownloadPageClient({
         </div>
       </section>
 
-      <section className="section-padding border-t border-white/10">
+      <section className="section-padding border-t border-border dark:border-white/10">
         <div className="container-max grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
           <div className="glass-panel p-6 md:p-8">
             <p className="label-mono mb-4">{copy.verificationLabel}</p>
@@ -211,7 +211,7 @@ export function DownloadPageClient({
         </div>
       </section>
 
-      <section className="section-padding border-t border-white/10">
+      <section className="section-padding border-t border-border dark:border-white/10">
         <div className="container-max">
           <div className="mb-8 max-w-2xl">
             <p className="label-mono mb-4">{copy.versionHistoryLabel}</p>
@@ -233,7 +233,7 @@ export function DownloadPageClient({
                     </h3>
                     <p className="mt-2 text-text-secondary leading-relaxed">{release.note}</p>
                   </div>
-                  <span className="w-fit rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">
+                  <span className="w-fit rounded-full border border-border dark:border-white/10 bg-bg-elevated/40 dark:bg-white/[0.03] px-3 py-1.5 font-mono text-[10px] uppercase tracking-[0.18em] text-text-muted">
                     {release.status}
                   </span>
                 </div>

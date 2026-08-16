@@ -29,9 +29,9 @@ function StatusBadge({ status, language }: { status: string; language: string })
   const config: Record<string, { label: string; icon: React.ElementType; className: string }> = {
     trialing:   { label: zh ? '試用中' : 'Trial',      icon: Clock,       className: 'text-signal bg-signal/10 border-signal/25' },
     active:     { label: zh ? '已啟用' : 'Active',     icon: CheckCircle, className: 'text-signal bg-signal/10 border-signal/25' },
-    past_due:   { label: zh ? '付款逾期' : 'Past due', icon: AlertCircle, className: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/25' },
-    canceled:   { label: zh ? '已取消' : 'Canceled',   icon: XCircle,     className: 'text-red-400 bg-red-400/10 border-red-400/25' },
-    incomplete: { label: zh ? '設定未完成' : 'Incomplete', icon: AlertCircle, className: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/25' },
+    past_due:   { label: zh ? '付款逾期' : 'Past due', icon: AlertCircle, className: 'text-status-warning bg-status-warning/10 border-status-warning/25' },
+    canceled:   { label: zh ? '已取消' : 'Canceled',   icon: XCircle,     className: 'text-status-danger bg-red-400/10 border-red-400/25' },
+    incomplete: { label: zh ? '設定未完成' : 'Incomplete', icon: AlertCircle, className: 'text-status-warning bg-status-warning/10 border-status-warning/25' },
   }
   const c = config[status] ?? { label: status, icon: Clock, className: 'text-text-muted bg-bg-elevated border-border' }
   const Icon = c.icon
@@ -136,7 +136,7 @@ export default function SettingsClient({ user, subscription }: Props) {
                 <span className="text-text-primary font-semibold">{subscription.planName}</span>
                 <StatusBadge status={subscription.status} language={language} />
                 {subscription.cancelAtPeriodEnd && (
-                  <span className="text-xs text-yellow-400 bg-yellow-400/10 border border-yellow-400/20 px-2.5 py-1 rounded-full">
+                  <span className="text-xs text-status-warning bg-status-warning/10 border border-status-warning/20 px-2.5 py-1 rounded-full">
                     {zh ? '到期後取消' : 'Cancels at period end'}
                   </span>
                 )}
@@ -189,7 +189,7 @@ export default function SettingsClient({ user, subscription }: Props) {
         {/* Danger Zone */}
         <div className="signal-panel space-y-4 border-status-danger/25 p-6">
           <div className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-400/70" />
+            <span className="w-1.5 h-1.5 rounded-full bg-status-danger/70" />
             <h2 className="label-mono !text-status-danger">{zh ? '登出' : 'SIGN OUT'}</h2>
           </div>
           <button

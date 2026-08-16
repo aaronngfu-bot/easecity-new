@@ -1,5 +1,9 @@
 export const revalidate = 0
 
+import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { isAdmin } from '@/lib/permissions'
 import { prisma } from '@/lib/db'
 import dynamic from 'next/dynamic'
 
@@ -14,6 +18,11 @@ const OrdersChart = dynamic(
 )
 
 export default async function AdminDashboardPage() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !isAdmin(session.user.role)) {
+    redirect('/dashboard')
+  }
+
   const now = new Date()
   const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000)
   const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)

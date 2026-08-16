@@ -1,6 +1,7 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useTheme } from 'next-themes'
 import {
   BarChart,
   Bar,
@@ -18,6 +19,22 @@ interface DailyData {
 }
 
 export function OrdersChart({ data }: { data: DailyData[] }) {
+  const { resolvedTheme } = useTheme()
+  const isDark = resolvedTheme !== 'light'
+
+  const colors = useMemo(
+    () => ({
+      grid: isDark ? '#172024' : '#d8e2e0',
+      axis: isDark ? '#243034' : '#b8c8c6',
+      tick: isDark ? '#839190' : '#667472',
+      tooltipBg: isDark ? '#101418' : '#f0f4f7',
+      tooltipBorder: isDark ? '#243034' : '#d8e2e0',
+      tooltipLabel: isDark ? '#c6d1d0' : '#2b4050',
+      bar: isDark ? '#35f5e0' : '#008f82',
+    }),
+    [isDark]
+  )
+
   const formattedData = useMemo(
     () =>
       data.map((d) => ({
@@ -39,32 +56,32 @@ export function OrdersChart({ data }: { data: DailyData[] }) {
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={formattedData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#172024" />
+            <CartesianGrid strokeDasharray="3 3" stroke={colors.grid} />
             <XAxis
               dataKey="label"
-              tick={{ fill: '#839190', fontSize: 11 }}
-              axisLine={{ stroke: '#243034' }}
+              tick={{ fill: colors.tick, fontSize: 11 }}
+              axisLine={{ stroke: colors.axis }}
               tickLine={false}
               interval="preserveStartEnd"
             />
             <YAxis
-              tick={{ fill: '#839190', fontSize: 11 }}
-              axisLine={{ stroke: '#243034' }}
+              tick={{ fill: colors.tick, fontSize: 11 }}
+              axisLine={{ stroke: colors.axis }}
               tickLine={false}
               allowDecimals={false}
             />
             <Tooltip
               contentStyle={{
-                backgroundColor: '#101418',
-                border: '1px solid #243034',
+                backgroundColor: colors.tooltipBg,
+                border: `1px solid ${colors.tooltipBorder}`,
                 borderRadius: '8px',
                 fontSize: '12px',
               }}
-              labelStyle={{ color: '#c6d1d0' }}
-              itemStyle={{ color: '#35f5e0' }}
+              labelStyle={{ color: colors.tooltipLabel }}
+              itemStyle={{ color: colors.bar }}
               formatter={(value) => [String(value), 'Orders']}
             />
-            <Bar dataKey="orders" fill="#35f5e0" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="orders" fill={colors.bar} radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       </div>

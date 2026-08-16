@@ -8,6 +8,7 @@ import { motion } from 'framer-motion'
 import { UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
+import { useTheme } from 'next-themes'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 
 export default function RegisterPage() {
@@ -15,6 +16,7 @@ export default function RegisterPage() {
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
   const { t } = useLanguage()
+  const { resolvedTheme } = useTheme()
   const googleAuthEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true'
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -160,7 +162,7 @@ export default function RegisterPage() {
               setTurnstileToken(null)
               setError('人機驗證失敗，請重新整理頁面再試。')
             }}
-            options={{ theme: 'dark', language: 'zh-TW' }}
+            options={{ theme: resolvedTheme === 'light' ? 'light' : 'dark', language: 'zh-TW' }}
           />
         </div>
 

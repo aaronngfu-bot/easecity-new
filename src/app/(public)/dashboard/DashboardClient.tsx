@@ -110,7 +110,7 @@ function AlertBanner({ subscription }: { subscription: SerializedSubscription })
 
   if (subscription.status === 'past_due') {
     return (
-      <div className="glass-panel flex items-center gap-3 px-5 py-3.5 !border-yellow-500/40 text-yellow-300 text-sm">
+      <div className="glass-panel flex items-center gap-3 px-5 py-3.5 !border-status-warning/40 text-status-warning text-sm">
         <AlertCircle size={16} className="shrink-0" />
         <span className="flex-1">
           {language === 'zh'
@@ -119,7 +119,7 @@ function AlertBanner({ subscription }: { subscription: SerializedSubscription })
         </span>
         <ManageBillingButton
           label={t.dashboard.alertUpdatePayment}
-          className="shrink-0 text-xs font-semibold underline underline-offset-2 hover:text-yellow-200 flex items-center gap-1"
+          className="shrink-0 text-xs font-semibold underline underline-offset-2 hover:text-status-warning flex items-center gap-1"
         />
       </div>
     )
@@ -144,7 +144,7 @@ function AlertBanner({ subscription }: { subscription: SerializedSubscription })
 
   if (subscription.cancelAtPeriodEnd && periodDays !== null && periodDays <= 7) {
     return (
-      <div className="glass-panel flex items-center gap-3 px-5 py-3.5 !border-orange-500/40 text-orange-300 text-sm">
+      <div className="glass-panel flex items-center gap-3 px-5 py-3.5 !border-status-warning/40 text-status-warning text-sm">
         <XCircle size={16} className="shrink-0" />
         <span className="flex-1">
           {language === 'zh'
@@ -153,7 +153,7 @@ function AlertBanner({ subscription }: { subscription: SerializedSubscription })
         </span>
         <ManageBillingButton
           label={t.dashboard.alertRenew}
-          className="shrink-0 text-xs font-semibold underline underline-offset-2 hover:text-orange-200 flex items-center gap-1"
+          className="shrink-0 text-xs font-semibold underline underline-offset-2 hover:text-status-warning flex items-center gap-1"
         />
       </div>
     )
@@ -173,9 +173,9 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
   const statusMap: Record<string, { label: string; icon: React.ElementType; cls: string }> = {
     trialing:   { label: t.dashboard.statusTrialing,   icon: Clock,       cls: 'text-signal bg-signal/10 border-signal/25' },
     active:     { label: t.dashboard.statusActive,     icon: CheckCircle, cls: 'text-signal bg-signal/10 border-signal/25' },
-    past_due:   { label: t.dashboard.statusPastDue,    icon: AlertCircle, cls: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/25' },
-    canceled:   { label: t.dashboard.statusCanceled,   icon: XCircle,     cls: 'text-red-400 bg-red-400/10 border-red-400/25' },
-    incomplete: { label: t.dashboard.statusIncomplete, icon: AlertCircle, cls: 'text-yellow-400 bg-yellow-400/10 border-yellow-400/25' },
+    past_due:   { label: t.dashboard.statusPastDue,    icon: AlertCircle, cls: 'text-status-warning bg-status-warning/10 border-status-warning/25' },
+    canceled:   { label: t.dashboard.statusCanceled,   icon: XCircle,     cls: 'text-status-danger bg-red-400/10 border-red-400/25' },
+    incomplete: { label: t.dashboard.statusIncomplete, icon: AlertCircle, cls: 'text-status-warning bg-status-warning/10 border-status-warning/25' },
   }
   const st = statusMap[subscription.status] ?? statusMap.incomplete
   const StatusIcon = st.icon
@@ -229,7 +229,7 @@ function SubscriptionCard({ subscription }: { subscription: SerializedSubscripti
                 {st.label}
               </span>
               {subscription.cancelAtPeriodEnd && (
-                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border border-orange-500/30 text-orange-400 bg-orange-500/8">
+                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border border-status-warning/30 text-status-warning bg-status-warning/8">
                   {t.dashboard.cancelAtPeriodEnd}
                 </span>
               )}
@@ -360,10 +360,10 @@ function PaymentHistory({ orders, locale }: { orders: SerializedOrder[]; locale:
   const statusStyle: Record<string, string> = {
     paid:            'bg-signal/15 text-signal border-signal/25',
     completed:       'bg-signal/15 text-signal border-signal/25',
-    pending_payment: 'bg-yellow-500/15 text-yellow-400 border-yellow-500/25',
-    refunded:        'bg-blue-500/15 text-blue-400 border-blue-500/25',
-    cancelled:       'bg-red-500/15 text-red-400 border-red-500/25',
-    expired:         'bg-red-500/15 text-red-400 border-red-500/25',
+    pending_payment: 'bg-status-warning/15 text-status-warning border-status-warning/25',
+    refunded:        'bg-status-info/15 text-status-info border-status-info/25',
+    cancelled:       'bg-status-danger/15 text-status-danger border-status-danger/25',
+    expired:         'bg-status-danger/15 text-status-danger border-status-danger/25',
   }
 
   const statusLabel: Record<string, string> = {
@@ -402,7 +402,7 @@ function PaymentHistory({ orders, locale }: { orders: SerializedOrder[]; locale:
               <span className="text-sm font-medium text-text-primary tabular-nums font-mono">
                 {(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
               </span>
-              <span className={cn('px-2.5 py-0.5 rounded-full text-xs font-medium border', statusStyle[order.status] ?? 'bg-gray-500/15 text-gray-400 border-gray-500/25')}>
+              <span className={cn('px-2.5 py-0.5 rounded-full text-xs font-medium border', statusStyle[order.status] ?? 'bg-bg-elevated/50 text-text-muted border-border')}>
                 {statusLabel[order.status] ?? order.status}
               </span>
             </div>

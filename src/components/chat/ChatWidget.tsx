@@ -27,40 +27,43 @@ export function ChatWidget() {
 
   const sendMessage = useCallback(async (text: string) => {
     const userMsg: ChatMessage = { id: `u-${Date.now()}`, role: 'user', content: text }
-    setMessages(prev => [...prev, userMsg])
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const res = await fetch('/api/chat', {
+    setMessages(prev => {
+      const updated = [...prev, userMsg]
+      // Send with the latest messages array, not the stale closure
+      fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: [...messages, userMsg].map(m => ({
+          messages: [
+            { id: 'welcome', role: 'assistant' as const, content: t.chat.welcome },
+            ...updated,
+          ].map(m => ({
             role: m.role,
             content: m.content,
           })),
         }),
+      }).then(async (res) => {
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}))
+          throw new Error(data.error || 'Failed to get response')
+        }
+        const data = await res.json()
+        const assistantMsg: ChatMessage = {
+          id: data.id || `a-${Date.now()}`,
+          role: 'assistant',
+          content: data.content,
+        }
+        setMessages(prev2 => [...prev2, assistantMsg])
+      }).catch((err) => {
+        setError(err instanceof Error ? err.message : t.chat.error)
+      }).finally(() => {
+        setIsLoading(false)
       })
-
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data.error || 'Failed to get response')
-      }
-
-      const data = await res.json()
-      const assistantMsg: ChatMessage = {
-        id: data.id || `a-${Date.now()}`,
-        role: 'assistant',
-        content: data.content,
-      }
-      setMessages(prev => [...prev, assistantMsg])
-    } catch (err) {
-      setError(err instanceof Error ? err.message : t.chat.error)
-    } finally {
-      setIsLoading(false)
-    }
-  }, [messages, t.chat.error])
+      return updated
+    })
+    setIsLoading(true)
+    setError(null)
+  }, [t.chat.welcome, t.chat.error])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()

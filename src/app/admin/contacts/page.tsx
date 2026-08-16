@@ -1,8 +1,17 @@
 export const revalidate = 0
 
+import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { isAdmin } from '@/lib/permissions'
 import { prisma } from '@/lib/db'
 
 export default async function AdminContactsPage() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !isAdmin(session.user.role)) {
+    redirect('/dashboard')
+  }
+
   const submissions = await prisma.contactSubmission.findMany({
     orderBy: { createdAt: 'desc' },
   })
@@ -29,9 +38,9 @@ export default async function AdminContactsPage() {
                     <h3 className="text-sm font-semibold text-text-primary">{sub.name}</h3>
                     <span className={`rounded-sm border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
                       sub.status === 'new' ? 'bg-signal/15 text-signal border-signal/25' :
-                      sub.status === 'read' ? 'bg-yellow-500/15 text-yellow-400 border-yellow-500/25' :
-                      sub.status === 'replied' ? 'bg-green-500/15 text-green-400 border-green-500/25' :
-                      'bg-gray-500/15 text-gray-400 border-gray-500/25'
+                      sub.status === 'read' ? 'bg-status-warning/15 text-status-warning border-status-warning/25' :
+                      sub.status === 'replied' ? 'bg-status-success/15 text-status-success border-status-success/25' :
+                      'bg-bg-elevated/50 text-text-muted border-border'
                     }`}>
                       {sub.status}
                     </span>

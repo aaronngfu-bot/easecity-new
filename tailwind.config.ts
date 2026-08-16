@@ -17,16 +17,16 @@ const config: Config = {
 				elevated: 'var(--bg-elevated)',
 				raised: 'var(--bg-raised)',
 				warm: 'var(--bg-warm)'
-			},
-  			paper: {
-  				DEFAULT: '#f7fafa',
-  				soft: '#eef4f3',
-  				card: '#ffffff',
-  				border: '#d8e2e0',
-  				ink: '#07100f',
-  				muted: '#667472'
-  			},
-  			border: {
+						},
+						paper: {
+							DEFAULT: 'var(--paper-bg, #f7fafa)',
+							soft: 'var(--paper-soft, #eef4f3)',
+							card: 'var(--paper-card, #ffffff)',
+							border: 'var(--paper-border, #d8e2e0)',
+							ink: 'var(--paper-ink, #07100f)',
+							muted: 'var(--paper-muted, #667472)'
+						},
+			  			border: {
   				DEFAULT: 'hsl(var(--border))',
   				subtle: '#172024',
   				strong: '#3a4a4f',

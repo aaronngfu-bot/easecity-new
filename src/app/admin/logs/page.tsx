@@ -1,8 +1,17 @@
 export const revalidate = 0
 
+import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { isAdmin } from '@/lib/permissions'
 import { prisma } from '@/lib/db'
 
 export default async function AdminLogsPage() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !isAdmin(session.user.role)) {
+    redirect('/dashboard')
+  }
+
   const logs = await prisma.auditLog.findMany({
     orderBy: { createdAt: 'desc' },
     take: 100,

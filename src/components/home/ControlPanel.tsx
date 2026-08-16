@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback } from 'react'
+import { useEffect, useMemo, useRef, useState, useCallback } from 'react'
 import { motion } from 'framer-motion'
 
 interface Endpoint {
@@ -36,6 +36,23 @@ export function ControlPanel({
   const svgRef = useRef<SVGSVGElement>(null)
   const [cursor, setCursor] = useState<{ x: number; y: number } | null>(null)
   const [broadcasting, setBroadcasting] = useState(false)
+
+  /* Theme-aware SVG colors — read from CSS custom properties set in globals.css */
+  const svgVars = useMemo(() => {
+    if (typeof window === 'undefined') return {
+      nodeBg: '#09090b', nodeCore: '#0c0c10', labelDim: '#52525b', coordDim: '#3f3f46', signal: '#00e5cc',
+    }
+    const styles = getComputedStyle(document.documentElement)
+    const root = document.documentElement
+    const isDark = root.classList.contains('dark')
+    return {
+      nodeBg: isDark ? '#09090b' : '#e8eef2',
+      nodeCore: isDark ? '#0c0c10' : '#f0f4f7',
+      labelDim: isDark ? '#52525b' : '#6887a0',
+      coordDim: isDark ? '#3f3f46' : '#8ba8b8',
+      signal: isDark ? '#00e5cc' : '#008f82',
+    }
+  }, [])
 
   const nearestEndpoint = useCallback(
     (pt: { x: number; y: number }) => {
@@ -120,17 +137,17 @@ export function ControlPanel({
             </feMerge>
           </filter>
           <radialGradient id="hubAura">
-            <stop offset="0%" stopColor="#00e5cc" stopOpacity="0.22" />
-            <stop offset="70%" stopColor="#00e5cc" stopOpacity="0" />
+            <stop offset="0%" stopColor={svgVars.signal} stopOpacity="0.22" />
+            <stop offset="70%" stopColor={svgVars.signal} stopOpacity="0" />
           </radialGradient>
           <linearGradient id="cableActive" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#00e5cc" stopOpacity="0.1" />
-            <stop offset="60%" stopColor="#00e5cc" stopOpacity="0.9" />
-            <stop offset="100%" stopColor="#00e5cc" stopOpacity="1" />
+            <stop offset="0%" stopColor={svgVars.signal} stopOpacity="0.1" />
+            <stop offset="60%" stopColor={svgVars.signal} stopOpacity="0.9" />
+            <stop offset="100%" stopColor={svgVars.signal} stopOpacity="1" />
           </linearGradient>
           <linearGradient id="cableIdle" x1="0" y1="0" x2="1" y2="0">
-            <stop offset="0%" stopColor="#00e5cc" stopOpacity="0.05" />
-            <stop offset="100%" stopColor="#00e5cc" stopOpacity="0.25" />
+            <stop offset="0%" stopColor={svgVars.signal} stopOpacity="0.05" />
+            <stop offset="100%" stopColor={svgVars.signal} stopOpacity="0.25" />
           </linearGradient>
         </defs>
 
@@ -171,7 +188,7 @@ export function ControlPanel({
             y1={HUB.cy}
             x2={cursor.x}
             y2={cursor.y}
-            stroke="#00e5cc"
+            stroke={svgVars.signal}
             strokeWidth="0.6"
             strokeOpacity="0.3"
             strokeDasharray="2 4"
@@ -184,16 +201,16 @@ export function ControlPanel({
             cx={HUB.cx}
             cy={HUB.cy}
             r="42"
-            fill="#09090b"
-            stroke="#00e5cc20"
+            fill={svgVars.nodeBg}
+            stroke={`${svgVars.signal}20`}
             strokeWidth="1"
           />
           <circle
             cx={HUB.cx}
             cy={HUB.cy}
             r="30"
-            fill="#0c0c10"
-            stroke="#00e5cc"
+            fill={svgVars.nodeCore}
+            stroke={svgVars.signal}
             strokeWidth="1.2"
             strokeOpacity={broadcasting ? 1 : 0.5}
             filter="url(#cpGlow)"
@@ -202,7 +219,7 @@ export function ControlPanel({
             cx={HUB.cx}
             cy={HUB.cy}
             r="5"
-            fill="#00e5cc"
+            fill={svgVars.signal}
             filter="url(#cpGlow)"
           >
             <animate
@@ -216,7 +233,7 @@ export function ControlPanel({
             x={HUB.cx}
             y={HUB.cy + 56}
             textAnchor="middle"
-            fill="#00e5cc"
+            fill={svgVars.signal}
             fontSize="9"
             fontFamily="var(--font-mono), ui-monospace, monospace"
             letterSpacing="0.15em"
@@ -227,7 +244,7 @@ export function ControlPanel({
             x={HUB.cx}
             y={HUB.cy + 68}
             textAnchor="middle"
-            fill="#52525b"
+            fill={svgVars.labelDim}
             fontSize="8"
             fontFamily="var(--font-mono), ui-monospace, monospace"
           >
@@ -239,7 +256,7 @@ export function ControlPanel({
             cy={HUB.cy}
             r="38"
             fill="none"
-            stroke="#00e5cc20"
+            stroke={`${svgVars.signal}20`}
             strokeWidth="0.5"
             strokeDasharray="2 4"
           >
@@ -258,8 +275,8 @@ export function ControlPanel({
         {ENDPOINTS.map((e, i) => {
           const isActive = e.id === activeId
           const isBroadcast = broadcasting
-          const color = isActive || isBroadcast ? '#00e5cc' : '#2a3438'
-          const labelColor = isActive ? '#fafafa' : '#52525b'
+          const color = isActive || isBroadcast ? svgVars.signal : (svgVars.labelDim)
+          const labelColor = isActive ? (svgVars.signal === '#00e5cc' ? '#fafafa' : '#18292f') : svgVars.labelDim
           return (
             <g key={e.id}>
               {/* Node outer ring */}
@@ -267,7 +284,7 @@ export function ControlPanel({
                 cx={e.cx}
                 cy={e.cy}
                 r="18"
-                fill="#09090b"
+                fill={svgVars.nodeBg}
                 stroke={color}
                 strokeWidth="0.8"
                 strokeOpacity={isActive || isBroadcast ? 0.8 : 0.35}
@@ -277,7 +294,7 @@ export function ControlPanel({
                 cx={e.cx}
                 cy={e.cy}
                 r="10"
-                fill="#111116"
+                fill={svgVars.nodeCore}
                 stroke={color}
                 strokeWidth={isActive || isBroadcast ? 1.4 : 0.8}
                 strokeOpacity={isActive || isBroadcast ? 1 : 0.5}
@@ -317,7 +334,7 @@ export function ControlPanel({
                 x={e.cx}
                 y={e.cy + 48}
                 textAnchor="middle"
-                fill="#3f3f46"
+                fill={svgVars.coordDim}
                 fontSize="7"
                 fontFamily="var(--font-mono), ui-monospace, monospace"
               >
@@ -330,7 +347,7 @@ export function ControlPanel({
                   cy={e.cy}
                   r="18"
                   fill="none"
-                  stroke="#00e5cc"
+                  stroke={svgVars.signal}
                   strokeWidth="1"
                   initial={{ r: 18, opacity: 0.9 }}
                   animate={{ r: 32, opacity: 0 }}
@@ -345,7 +362,7 @@ export function ControlPanel({
         <text
           x="12"
           y="20"
-          fill="#3f3f46"
+          fill={svgVars.coordDim}
           fontSize="8"
           fontFamily="var(--font-mono), ui-monospace, monospace"
           letterSpacing="0.15em"
@@ -356,7 +373,7 @@ export function ControlPanel({
           x="548"
           y="20"
           textAnchor="end"
-          fill="#3f3f46"
+          fill={svgVars.coordDim}
           fontSize="8"
           fontFamily="var(--font-mono), ui-monospace, monospace"
           letterSpacing="0.15em"
@@ -366,7 +383,7 @@ export function ControlPanel({
         <text
           x="12"
           y="432"
-          fill="#3f3f46"
+          fill={svgVars.coordDim}
           fontSize="8"
           fontFamily="var(--font-mono), ui-monospace, monospace"
           letterSpacing="0.15em"
@@ -393,7 +410,7 @@ function CornerTicks() {
         { x: 0, y: 440, dx: 14, dy: -14 },
         { x: 560, y: 440, dx: -14, dy: -14 },
       ].map((c, i) => (
-        <g key={i} stroke="#00e5cc" strokeWidth="1" strokeOpacity="0.4">
+        <g key={i} stroke="var(--signal, #00e5cc)" strokeWidth="1" strokeOpacity="0.4">
           <line x1={c.x} y1={c.y} x2={c.x + c.dx} y2={c.y} />
           <line x1={c.x} y1={c.y} x2={c.x} y2={c.y + c.dy} />
         </g>

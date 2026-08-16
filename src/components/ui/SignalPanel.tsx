@@ -7,7 +7,7 @@ const toneClasses: Record<PanelTone, string> = {
   default: 'border-border bg-bg-surface text-text-primary',
   raised: 'border-border-strong bg-bg-elevated text-text-primary shadow-card',
   highlight:
-    'border-border-accent bg-[linear-gradient(135deg,rgba(0,229,204,0.10),#171d22_42%,#101418)] text-text-primary shadow-panel',
+    'border-border-accent bg-[linear-gradient(135deg,rgba(0,229,204,0.10),var(--bg-elevated)_42%,var(--bg-surface))] text-text-primary shadow-panel',
   paper: 'border-paper-border bg-paper-card text-paper-ink shadow-paper',
   danger: 'border-status-danger/30 bg-status-danger/10 text-text-primary',
 }

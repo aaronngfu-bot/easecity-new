@@ -184,7 +184,7 @@ export default function FeaturesCards({
                   />
                 </div>
 
-                <div className="relative z-10 p-8 rounded-3xl h-full flex flex-col bg-black/80 border border-white/20 dark:border-white/10">
+                <div className="relative z-10 p-8 rounded-3xl h-full flex flex-col bg-black/80 border border-border dark:border-white/20 dark:border-border dark:border-white/10">
                   <div className="mb-6 filter drop-shadow-lg">{feature.icon}</div>
                   <h3 className="text-2xl font-bold mb-4 text-white">{feature.title}</h3>
                   <p className="leading-relaxed flex-grow text-gray-100 font-medium">

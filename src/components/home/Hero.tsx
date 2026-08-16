@@ -42,9 +42,9 @@ export function Hero() {
       className="relative flex flex-col overflow-hidden bg-bg-base"
       style={{
         background: `
-          radial-gradient(ellipse 70% 45% at 50% 105%, rgba(0,229,204,0.06), transparent 62%),
-          radial-gradient(ellipse 55% 40% at 15% 20%, rgba(0,229,204,0.04), transparent 60%),
-          #07090b
+          radial-gradient(ellipse 70% 45% at 50% 105%, var(--signal-glow-soft, rgba(0,229,204,0.06)), transparent 62%),
+          radial-gradient(ellipse 55% 40% at 15% 20%, var(--signal-glow-soft, rgba(0,229,204,0.04)), transparent 60%),
+          var(--bg-base)
         `,
       }}
     >

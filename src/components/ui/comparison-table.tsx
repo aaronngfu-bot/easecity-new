@@ -52,7 +52,7 @@ function ProductLogo({ product }: { product: Product }) {
 
   return (
     <span
-      className="grid h-7 w-7 place-items-center rounded-full bg-white/10 text-sm"
+      className="grid h-7 w-7 place-items-center rounded-full bg-bg-elevated/60 dark:bg-white/10 text-sm"
       aria-hidden="true"
     >
       {product.logo}
@@ -101,10 +101,10 @@ export function ComparisonTable({
           )}
         </div>
 
-        <div className="hidden overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] shadow-[0_30px_90px_rgba(0,0,0,0.35)] md:block">
+        <div className="hidden overflow-hidden rounded-2xl border border-border dark:border-white/10 bg-bg-elevated/40 dark:bg-white/[0.03] shadow-[0_30px_90px_rgba(0,0,0,0.35)] md:block">
           <table className="w-full border-collapse">
             <thead>
-              <tr className="border-b border-white/10">
+              <tr className="border-b border-border dark:border-white/10">
                 <th
                   scope="col"
                   className="w-[28%] px-6 py-5 text-left text-sm font-semibold text-neutral-300"
@@ -136,7 +136,7 @@ export function ComparisonTable({
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.05, duration: 0.25 }}
-                  className="border-b border-white/10 transition-colors duration-200 last:border-b-0 hover:bg-white/5"
+                  className="border-b border-border dark:border-white/10 transition-colors duration-200 last:border-b-0 hover:bg-bg-elevated/50 dark:bg-white/5"
                 >
                   <th
                     scope="row"
@@ -175,7 +175,7 @@ export function ComparisonTable({
               className={`rounded-2xl border p-5 ${
                 product.isPrimary
                   ? "border-signal/30 bg-signal/10"
-                  : "border-white/10 bg-white/[0.03]"
+                  : "border-border dark:border-white/10 bg-bg-elevated/40 dark:bg-white/[0.03]"
               }`}
             >
               <div className="mb-5 flex items-center gap-3">
@@ -192,7 +192,7 @@ export function ComparisonTable({
                 {rows.map((row) => (
                   <div
                     key={`${product.id}-${row.feature}`}
-                    className="flex items-start justify-between gap-4 border-b border-white/10 pb-3 last:border-b-0 last:pb-0"
+                    className="flex items-start justify-between gap-4 border-b border-border dark:border-white/10 pb-3 last:border-b-0 last:pb-0"
                   >
                     <div>
                       <p className="text-sm font-medium text-white">{row.feature}</p>

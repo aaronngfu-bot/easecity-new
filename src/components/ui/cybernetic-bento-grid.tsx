@@ -62,7 +62,7 @@ const MultiDeviceVisual = () => (
     ].map(([position, label]) => (
       <div
         key={label}
-        className={`absolute ${position} grid h-12 w-8 place-items-center rounded-md border border-white/10 bg-black/50 text-[10px] font-semibold text-sky-200`}
+        className={`absolute ${position} grid h-12 w-8 place-items-center rounded-md border border-border dark:border-white/10 bg-black/50 text-[10px] font-semibold text-sky-200`}
       >
         {label}
       </div>

@@ -1,8 +1,9 @@
 export const revalidate = 0
 
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
+import { isAdmin } from '@/lib/permissions'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
 import { UserRoleForm } from './UserRoleForm'
@@ -13,7 +14,10 @@ export default async function AdminUserDetailPage({
   params: { id: string }
 }) {
   const session = await getServerSession(authOptions)
-  const actorRole = session?.user?.role ?? 'MEMBER'
+  if (!session?.user || !isAdmin(session.user.role)) {
+    redirect('/dashboard')
+  }
+  const actorRole = session.user.role
 
   const user = await prisma.user.findUnique({
     where: { id: params.id },
@@ -86,8 +90,8 @@ export default async function AdminUserDetailPage({
                         {(order.amount / 100).toFixed(2)} {order.currency.toUpperCase()}
                       </span>
                       <span className={`rounded-sm border px-2 py-0.5 font-mono text-[10px] uppercase tracking-[0.12em] ${
-                        order.status === 'paid' ? 'bg-green-500/15 text-green-400 border-green-500/25' :
-                        'bg-gray-500/15 text-gray-400 border-gray-500/25'
+                        order.status === 'paid' ? 'bg-status-success/15 text-status-success border-status-success/25' :
+                        'bg-bg-elevated/50 text-text-muted border-border'
                       }`}>
                         {order.status}
                       </span>

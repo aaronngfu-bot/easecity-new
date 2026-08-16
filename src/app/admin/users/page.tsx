@@ -1,9 +1,18 @@
 export const revalidate = 0
 
+import { redirect } from 'next/navigation'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth'
+import { isAdmin } from '@/lib/permissions'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
 
 export default async function AdminUsersPage() {
+  const session = await getServerSession(authOptions)
+  if (!session?.user || !isAdmin(session.user.role)) {
+    redirect('/dashboard')
+  }
+
   const users = await prisma.user.findMany({
     orderBy: { createdAt: 'desc' },
     select: {
@@ -49,17 +58,17 @@ export default async function AdminUsersPage() {
                   </td>
                   <td className="px-5 py-4">
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                      user.role === 'SUPER_ADMIN' ? 'bg-purple-500/15 text-purple-400 border-purple-500/25' :
+                      user.role === 'SUPER_ADMIN' ? 'bg-accent-purple/15 text-accent-purple border-accent-purple/25' :
                       user.role === 'ADMIN' ? 'bg-signal/15 text-signal border-signal/25' :
-                      'bg-gray-500/15 text-gray-400 border-gray-500/25'
+                      'bg-bg-elevated/50 text-text-muted border-border'
                     }`}>
                       {user.role}
                     </span>
                   </td>
                   <td className="px-5 py-4">
                     <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium border ${
-                      user.status === 'ACTIVE' ? 'bg-green-500/15 text-green-400 border-green-500/25' :
-                      'bg-red-500/15 text-red-400 border-red-500/25'
+                      user.status === 'ACTIVE' ? 'bg-status-success/15 text-status-success border-status-success/25' :
+                      'bg-status-danger/15 text-status-danger border-status-danger/25'
                     }`}>
                       {user.status}
                     </span>
