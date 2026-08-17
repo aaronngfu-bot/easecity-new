@@ -15,7 +15,7 @@ export function CTASection() {
       className="relative flex min-h-[80vh] items-center justify-center overflow-hidden border-t border-border"
     >
       <PerspectiveMarquee
-        className="text-[var(--signal)]/30 dark:text-[#5eead4]/45"
+        className="text-[var(--signal)]/30 [#5eead4]/45"
         items={t.cta.marquee}
         fontSize={language === 'zh' ? 96 : 72}
         fontWeight={800}
@@ -23,7 +23,7 @@ export function CTASection() {
       />
       {/* 中央 vignette：襯托文字，theme-aware */}
       <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_600px_300px_at_center,rgba(247,250,250,0.88)_0%,rgba(247,250,250,0.5)_50%,transparent_80%)] dark:bg-[radial-gradient(ellipse_600px_300px_at_center,rgba(5,5,5,0.75)_0%,rgba(5,5,5,0.4)_50%,transparent_80%)]"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_600px_300px_at_center,rgba(247,250,250,0.88)_0%,rgba(247,250,250,0.5)_50%,transparent_80%)] [radial-gradient(ellipse_600px_300px_at_center,rgba(5,5,5,0.75)_0%,rgba(5,5,5,0.4)_50%,transparent_80%)]"
         aria-hidden
       />
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-signal/40 to-transparent" />

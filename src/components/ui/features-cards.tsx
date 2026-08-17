@@ -151,13 +151,13 @@ export default function FeaturesCards({
   const getShaderConfig = (index: number) => SHADER_CONFIGS[index % SHADER_CONFIGS.length];
 
   return (
-    <section className="min-h-screen py-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-background dark:to-background">
+    <section className="min-h-screen py-20 px-4 bg-gradient-to-br from-gray-50 to-gray-100  ">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-light text-gray-900 dark:text-white mb-6">
+          <h2 className="text-4xl md:text-5xl font-light text-gray-900  mb-6">
             {heading}
           </h2>
-          <p className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-xl text-gray-600  max-w-3xl mx-auto leading-relaxed">
             {subheading}
           </p>
         </div>
@@ -184,7 +184,7 @@ export default function FeaturesCards({
                   />
                 </div>
 
-                <div className="relative z-10 p-8 rounded-3xl h-full flex flex-col bg-black/80 border border-border dark:border-white/20 dark:border-border dark:border-white/10">
+                <div className="relative z-10 p-8 rounded-3xl h-full flex flex-col bg-black/80 border border-border   ">
                   <div className="mb-6 filter drop-shadow-lg">{feature.icon}</div>
                   <h3 className="text-2xl font-bold mb-4 text-white">{feature.title}</h3>
                   <p className="leading-relaxed flex-grow text-gray-100 font-medium">

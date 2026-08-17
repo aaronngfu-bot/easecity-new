@@ -124,7 +124,7 @@ export default function ProductPage() {
         <div className="mt-16 grid gap-8 md:grid-cols-2">
           <Link
             href="/pricing"
-            className="group block rounded-2xl border border-border dark:border-white/10 bg-bg-elevated/50 dark:bg-white/5 p-8 transition hover:border-border-strong dark:border-white/30 hover:bg-bg-elevated/60 dark:bg-white/10"
+            className="group block rounded-2xl border border-border  bg-bg-elevated/50  p-8 transition hover:border-border-strong  hover:bg-bg-elevated/60 "
           >
             <h2 className="mb-3 text-2xl font-semibold text-text-primary">
               {t.product.pricing.title}
@@ -139,7 +139,7 @@ export default function ProductPage() {
 
           <Link
             href="/download"
-            className="group block rounded-2xl border border-border dark:border-white/10 bg-bg-elevated/50 dark:bg-white/5 p-8 transition hover:border-border-strong dark:border-white/30 hover:bg-bg-elevated/60 dark:bg-white/10"
+            className="group block rounded-2xl border border-border  bg-bg-elevated/50  p-8 transition hover:border-border-strong  hover:bg-bg-elevated/60 "
           >
             <h2 className="mb-3 text-2xl font-semibold text-text-primary">
               {t.product.download.title}

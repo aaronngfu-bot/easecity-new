@@ -118,11 +118,11 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
   const accentBar = purple
     ? 'bg-accent-purple/65'
     : control
-      ? 'bg-signal-deep/70 dark:bg-signal/80'
-      : 'bg-signal-deep/60 dark:bg-signal/70'
+      ? 'bg-signal-deep/70  bg-signal/80'
+      : 'bg-signal-deep/60  bg-signal/70'
   const widths = [...LOG_WIDTHS.slice((order * 3) % 16), ...LOG_WIDTHS.slice(0, (order * 3) % 16)]
 
-  const btnColor = control ? 'bg-signal-deep/60 dark:bg-signal/50' : 'bg-black/25 dark:bg-white/20'
+  const btnColor = control ? 'bg-signal-deep/60  bg-signal/50' : 'bg-black/25  bg-white/20'
 
   return (
     <div className={cn('relative min-w-0 max-w-[132px] flex-1 lg:max-w-none', frame.className)}>
@@ -136,8 +136,8 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
           col === 'l' && 'frame-depth-l',
           col === 'r' && 'frame-depth-r',
           control
-            ? 'frame-depth-control border-2 border-signal-deep bg-white dark:border-signal dark:bg-[var(--bg-elevated)]'
-            : 'border border-black/10 bg-white dark:border-white/[0.14] dark:bg-[var(--bg-elevated)]'
+            ? 'frame-depth-control border-2 border-signal-deep bg-white  border-signal '
+            : 'border border-black/10 bg-white  border-white/[0.14] '
         )}
       >
         {/* side buttons */}
@@ -146,26 +146,26 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
         <span className={cn('absolute -left-[2px] top-[28%] z-[1] h-5 w-[2px] rounded-l-sm', btnColor)} />
 
         {/* inner bezel */}
-        <div className="pointer-events-none absolute inset-[3px] z-[1] rounded-[1.35rem] ring-1 ring-inset ring-black/[0.06] dark:ring-white/[0.05]" />
+        <div className="pointer-events-none absolute inset-[3px] z-[1] rounded-[1.35rem] ring-1 ring-inset ring-black/[0.06]  ring-white/[0.05]" />
 
         {/* punch-hole camera */}
-        <span className="absolute left-1/2 top-2 z-[5] h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-black/80 ring-1 ring-black/15 dark:bg-black dark:ring-white/10" />
+        <span className="absolute left-1/2 top-2 z-[5] h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-black/80 ring-1 ring-black/15  bg-black  ring-white/10" />
 
         {/* status row */}
         <div className="absolute inset-x-1.5 top-1.5 z-[2] flex items-center justify-between">
           {control ? (
-            <span className="rounded-sm bg-signal-deep px-1 py-px font-mono text-[10px] font-semibold tracking-[0.12em] text-white dark:bg-signal dark:text-[var(--text-primary)]">
+            <span className="rounded-sm bg-signal-deep px-1 py-px font-mono text-[10px] font-semibold tracking-[0.12em] text-white  bg-signal ">
               {controlLabel}
             </span>
           ) : (
-            <span className="font-mono text-[7px] tracking-[0.18em] text-black/35 dark:text-white/30">
+            <span className="font-mono text-[7px] tracking-[0.18em] text-black/35  text-text-muted">
               {id}
             </span>
           )}
           <span
             className={cn(
               'h-1 w-1 rounded-full',
-              control ? 'bg-signal-deep dark:bg-signal' : 'bg-black/20 dark:bg-white/20'
+              control ? 'bg-signal-deep  bg-signal' : 'bg-black/20  bg-white/20'
             )}
           />
         </div>
@@ -184,7 +184,7 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
                       key={i}
                       className={cn(
                         'h-[3px] rounded-full',
-                        i % 5 === 2 ? accentBar : 'bg-black/15 dark:bg-white/[0.14]'
+                        i % 5 === 2 ? accentBar : 'bg-black/15  bg-white/[0.14]'
                       )}
                       style={{ width: `${w}%` }}
                     />
@@ -218,14 +218,14 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
           <>
             <motion.div
               key={`flash-${pulse}`}
-              className="pointer-events-none absolute -inset-px z-[3] rounded-3xl border border-signal-deep/50 dark:border-signal/60"
+              className="pointer-events-none absolute -inset-px z-[3] rounded-3xl border border-signal-deep/50  border-signal/60"
               initial={{ opacity: 0 }}
               animate={{ opacity: [0, 0.8, 0] }}
               transition={{ duration: 1.1, times: [0, 0.2, 1], ease: 'easeOut' }}
             />
             <motion.span
               key={`badge-${pulse}`}
-              className="absolute right-1 top-4 z-[3] rounded border border-signal-deep/50 bg-white px-1.5 py-0.5 font-mono text-xs font-semibold tracking-wide text-signal-deep shadow-sm dark:border-signal/50 dark:bg-[var(--bg-surface)] dark:text-signal"
+              className="absolute right-1 top-4 z-[3] rounded border border-signal-deep/50 bg-white px-1.5 py-0.5 font-mono text-xs font-semibold tracking-wide text-signal-deep shadow-sm  border-signal/50   text-signal"
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: [0, 1, 1, 0], y: [4, 0, 0, -2] }}
               transition={{ duration: 2.4, times: [0, 0.08, 0.78, 1] }}
@@ -296,7 +296,7 @@ export function MissionControlHero() {
     ) : (
       <>
         {hero.headline.slice(0, hlIndex)}
-        <span className="relative inline text-signal-deep dark:text-signal md:whitespace-nowrap">
+        <span className="relative inline text-signal-deep  text-signal md:whitespace-nowrap">
           {hero.headlineHighlight}
           <svg
             aria-hidden
@@ -333,22 +333,22 @@ export function MissionControlHero() {
     )
 
   return (
-    <section className="relative flex min-h-screen flex-col overflow-hidden bg-[var(--text-primary)] dark:bg-[var(--bg-void)]">
+    <section className="relative flex min-h-screen flex-col overflow-hidden bg-[var(--text-primary)]  bg-[var(--bg-void)]">
       {/* blueprint grid — 48px, 1px lines */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(7,16,15,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(7,16,15,0.05)_1px,transparent_1px)] bg-[size:48px_48px] dark:hidden"
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(to_right,rgba(7,16,15,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(7,16,15,0.05)_1px,transparent_1px)] bg-[size:48px_48px] "
       />
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:48px_48px] dark:block"
+        className="pointer-events-none absolute inset-0 hidden bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:48px_48px]  block"
       />
       {/* corner crop marks */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
-        <span className="absolute left-5 top-20 h-6 w-6 border-l border-t border-black/30 dark:border-white/25" />
-        <span className="absolute right-5 top-20 h-6 w-6 border-r border-t border-black/30 dark:border-white/25" />
-        <span className="absolute bottom-16 left-5 h-6 w-6 border-b border-l border-black/30 dark:border-white/25" />
-        <span className="absolute bottom-16 right-5 h-6 w-6 border-b border-r border-black/30 dark:border-white/25" />
+        <span className="absolute left-5 top-20 h-6 w-6 border-l border-t border-black/30  border-white/25" />
+        <span className="absolute right-5 top-20 h-6 w-6 border-r border-t border-black/30  border-white/25" />
+        <span className="absolute bottom-16 left-5 h-6 w-6 border-b border-l border-black/30  border-white/25" />
+        <span className="absolute bottom-16 right-5 h-6 w-6 border-b border-r border-black/30  border-white/25" />
       </div>
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-1 flex-col justify-center gap-14 px-6 pb-16 pt-28 sm:px-8 lg:flex-row lg:items-center lg:gap-6 lg:px-12 lg:py-10">
@@ -366,7 +366,7 @@ export function MissionControlHero() {
             <span
               aria-hidden
               className={cn(
-                'h-1.5 w-1.5 shrink-0 rounded-full bg-signal-deep dark:bg-signal',
+                'h-1.5 w-1.5 shrink-0 rounded-full bg-signal-deep  bg-signal',
                 !reduce && 'animate-pulse'
               )}
             />
@@ -388,7 +388,7 @@ export function MissionControlHero() {
             <Magnetic>
               <Link
                 href="/pricing"
-                className="btn-sheen inline-flex items-center justify-center rounded-full bg-signal px-7 py-3 text-sm font-semibold text-[var(--text-primary)] shadow-glow-signal-sm transition hover:bg-signal-light hover:shadow-glow-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-black"
+                className="btn-sheen inline-flex items-center justify-center rounded-full bg-signal px-7 py-3 text-sm font-semibold text-[var(--text-primary)] shadow-glow-signal-sm transition hover:bg-signal-light hover:shadow-glow-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white  focus-visible:ring-offset-black"
               >
                 {hero.ctaTrial}
               </Link>
@@ -396,7 +396,7 @@ export function MissionControlHero() {
             <button
               type="button"
               onClick={scrollToLearnMore}
-              className="inline-flex items-center justify-center gap-2 rounded-full border border-foreground/15 px-6 py-3 font-mono text-sm text-foreground transition hover:border-signal-deep/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:hover:border-signal/60 dark:focus-visible:ring-offset-black"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-foreground/15 px-6 py-3 font-mono text-sm text-foreground transition hover:border-signal-deep/60 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal/40 focus-visible:ring-offset-2 focus-visible:ring-offset-white  hover:border-signal/60  focus-visible:ring-offset-black"
             >
               {hero.ctaExplore}
               <ArrowDown size={15} aria-hidden />
@@ -454,9 +454,9 @@ export function MissionControlHero() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.8, delay: reduce ? 0 : 1.5 }}
-        className="relative z-10 flex h-10 items-center overflow-hidden border-t border-black/[0.07] font-mono text-[10px] uppercase tracking-wider text-muted-foreground dark:border-white/[0.06]"
+        className="relative z-10 flex h-10 items-center overflow-hidden border-t border-black/[0.07] font-mono text-[10px] uppercase tracking-wider text-muted-foreground [0.06]"
       >
-        <span className="relative z-10 flex h-full shrink-0 items-center border-r border-black/[0.08] bg-[#eaf0f0] pl-6 pr-4 text-foreground/70 dark:border-white/[0.08] dark:bg-[var(--bg-surface)]">
+        <span className="relative z-10 flex h-full shrink-0 items-center border-r border-black/[0.08] bg-[#eaf0f0] pl-6 pr-4 text-foreground/70 [0.08] ">
           {hero.tickerLabel}&nbsp;▸
         </span>
         <div className={cn('flex w-max', !reduce && 'animate-ticker')}>
@@ -465,7 +465,7 @@ export function MissionControlHero() {
               {hero.tickerEvents.map((event, i) => (
                 <span key={i} className="whitespace-nowrap">
                   {event.pre}
-                  {event.hl && <span className="text-signal-deep dark:text-signal">{event.hl}</span>}
+                  {event.hl && <span className="text-signal-deep  text-signal">{event.hl}</span>}
                   {event.post}
                 </span>
               ))}

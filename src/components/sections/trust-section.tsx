@@ -108,7 +108,7 @@ function PanelContent({
 
       <h3
         className={`mb-6 font-display text-3xl font-bold tracking-[-0.035em] transition-colors duration-500 sm:text-4xl md:text-6xl ${
-          isAfter ? "text-card-foreground" : "text-card-foreground/70 dark:text-card-foreground/65"
+          isAfter ? "text-card-foreground" : "text-card-foreground/70 "
         }`}
       >
         {title}
@@ -126,7 +126,7 @@ function PanelContent({
               className={`mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg transition-colors duration-500 ${
                 isAfter
                   ? "bg-signal/10 text-signal"
-                  : "bg-black/[0.06] text-black/45 dark:bg-white/[0.06] dark:text-white/45"
+                  : "bg-black/[0.06] text-black/45 [0.06]  text-white/45"
               }`}
             >
               {point.icon}
@@ -134,12 +134,12 @@ function PanelContent({
             <div>
               <p
                 className={`text-base font-semibold transition-colors duration-500 md:text-xl ${
-                  isAfter ? "" : "text-card-foreground/75 dark:text-card-foreground/70"
+                  isAfter ? "" : "text-card-foreground/75 "
                 }`}
               >
                 {point.title}
               </p>
-              <p className="mt-1.5 text-sm leading-6 text-muted-foreground dark:text-white/60 md:text-base">
+              <p className="mt-1.5 text-sm leading-6 text-muted-foreground  text-white/60 md:text-base">
                 {point.description}
               </p>
             </div>
@@ -271,8 +271,8 @@ export function TrustSection() {
             onActiveChange={setActivePanel}
             className={`min-h-[680px] rounded-2xl border transition-[border-color,box-shadow] duration-500 md:min-h-[600px] ${
               activePanel
-                ? "border-signal-deep/40 shadow-[0_0_44px_rgba(0,143,130,0.16)] dark:border-signal/45 dark:shadow-[0_0_44px_rgba(0,229,204,0.16),0_30px_100px_rgba(0,0,0,0.42)]"
-                : "border-black/10 shadow-card dark:border-white/[0.12] dark:shadow-[0_30px_100px_rgba(0,0,0,0.42)]"
+                ? "border-signal-deep/40 shadow-[0_0_44px_rgba(0,143,130,0.16)]  border-signal/45 [0_0_44px_rgba(0,229,204,0.16),0_30px_100px_rgba(0,0,0,0.42)]"
+                : "border-black/10 shadow-card [0.12] [0_30px_100px_rgba(0,0,0,0.42)]"
             }`}
           />
         </motion.div>

@@ -231,8 +231,8 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               width="124"
               height="88"
               rx="12"
-              fill="#0d1117"
-              stroke={anyActive ? 'var(--signal)' : '#2a3438'}
+              fill="var(--bg-surface)"
+              stroke={anyActive ? 'var(--signal)' : 'var(--border-strong)'}
               strokeWidth="1.5"
               filter="url(#hubGlow)"
               className="transition-all duration-300"
@@ -243,8 +243,8 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               width="104"
               height="68"
               rx="8"
-              fill="#111418"
-              stroke={anyActive ? 'var(--signal)' : '#2a3438'}
+              fill="var(--bg-surface)"
+              stroke={anyActive ? 'var(--signal)' : 'var(--border-strong)'}
               strokeWidth="0.6"
               strokeOpacity="0.4"
             />
@@ -252,7 +252,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               x="280"
               y="202"
               textAnchor="middle"
-              fill={anyActive ? 'var(--signal)' : '#c3cdd2'}
+              fill={anyActive ? 'var(--signal)' : 'var(--text-muted)'}
               fontSize="11"
               fontFamily="monospace"
               fontWeight="bold"
@@ -264,7 +264,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               x="280"
               y="218"
               textAnchor="middle"
-              fill={anyActive ? 'var(--signal)' : '#7f8b91'}
+              fill={anyActive ? 'var(--signal)' : 'var(--text-faint)'}
               fontSize="9"
               fontFamily="monospace"
               opacity="0.85"
@@ -275,7 +275,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               x="280"
               y="234"
               textAnchor="middle"
-              fill={anyActive ? 'var(--signal)' : idleGhost ? 'var(--signal)88' : '#7f8b91'}
+              fill={anyActive ? 'var(--signal)' : idleGhost ? 'var(--signal)88' : 'var(--text-faint)'}
               fontSize="8"
               fontFamily="monospace"
               opacity="0.7"
@@ -289,7 +289,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               height="100"
               rx="15"
               fill="none"
-              stroke={anyActive ? 'var(--signal)' : '#2a3438'}
+              stroke={anyActive ? 'var(--signal)' : 'var(--border-strong)'}
               strokeWidth="0.5"
               strokeOpacity={anyActive ? '0.4' : '0.15'}
               strokeDasharray="4 4"
@@ -311,16 +311,16 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
             const isHover = hoverId === dev.id
             const isIdleGhost = !isActive && idleGhost === dev.id && active.size === 0
             const future = dev.future
-            const fill = future ? '#7f8b91' : isActive ? 'var(--signal)' : '#c3cdd2'
+            const fill = future ? 'var(--text-faint)' : isActive ? 'var(--signal)' : 'var(--text-muted)'
             const strokeCol = future
-              ? '#52525b'
+              ? 'var(--text-faint)'
               : isActive
                 ? 'var(--signal)'
                 : isHover
                   ? 'var(--signal)'
                   : isIdleGhost
                     ? 'var(--signal)55'
-                    : '#2a3438'
+                    : 'var(--border-strong)'
 
             return (
               <g
@@ -344,7 +344,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                           ? 'var(--signal)'
                           : isIdleGhost
                             ? 'var(--signal)'
-                            : '#2a3438'
+                            : 'var(--border-strong)'
                     }
                     strokeWidth={isActive ? 1.5 : isIdleGhost ? 1 : 1}
                     strokeOpacity={isActive ? 1 : isHover ? 0.5 : isIdleGhost ? 0.45 : 0.25}
@@ -380,7 +380,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                     y1={dev.y}
                     x2="218"
                     y2="210"
-                    stroke="#2a3438"
+                    stroke="var(--border-strong)"
                     strokeWidth="1"
                     strokeOpacity="0.2"
                     strokeDasharray="4 4"
@@ -394,7 +394,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                   width="150"
                   height="44"
                   rx="8"
-                  fill="#0d1117"
+                  fill="var(--bg-surface)"
                   stroke={strokeCol}
                   strokeWidth={isActive ? 1.5 : 1}
                   strokeDasharray={future ? '4 3' : undefined}
@@ -410,15 +410,15 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                       width="16"
                       height="12"
                       rx="3"
-                      fill={isActive ? 'var(--signal)' : '#182024'}
-                      stroke={isActive ? 'var(--signal)' : '#2a3438'}
+                      fill={isActive ? 'var(--signal)' : 'var(--bg-elevated)'}
+                      stroke={isActive ? 'var(--signal)' : 'var(--border-strong)'}
                       strokeWidth="0.5"
                     />
                     <text
                       x="34"
                       y={dev.y - 7}
                       textAnchor="middle"
-                      fill={isActive ? 'var(--bg-base)' : '#c3cdd2'}
+                      fill={isActive ? 'var(--bg-base)' : 'var(--text-muted)'}
                       fontSize="8"
                       fontFamily="monospace"
                       fontWeight="bold"
@@ -473,7 +473,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                   x="100"
                   y={dev.y + 10}
                   textAnchor="middle"
-                  fill={future ? '#526066' : isActive ? 'var(--signal)' : '#7f8b91'}
+                  fill={future ? 'var(--text-faint)' : isActive ? 'var(--signal)' : 'var(--text-faint)'}
                   fontSize="8"
                   fontFamily="monospace"
                   fillOpacity={isActive ? 0.85 : 0.6}
@@ -498,8 +498,8 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                 width="140"
                 height="60"
                 rx="8"
-                fill="#0d1117"
-                stroke={anyActive && i === 1 ? 'var(--signal)' : '#2a3438'}
+                fill="var(--bg-surface)"
+                stroke={anyActive && i === 1 ? 'var(--signal)' : 'var(--border-strong)'}
                 strokeWidth="1"
                 strokeOpacity={anyActive && i === 1 ? 0.6 : 1}
                 className="transition-all duration-300"
@@ -508,7 +508,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                 x="470"
                 y={box.y + 25}
                 textAnchor="middle"
-                fill={anyActive && i === 1 ? 'var(--signal)' : '#c3cdd2'}
+                fill={anyActive && i === 1 ? 'var(--signal)' : 'var(--text-muted)'}
                 fontSize="9"
                 fontFamily="monospace"
                 fontWeight="bold"
@@ -519,7 +519,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
                 x="470"
                 y={box.y + 40}
                 textAnchor="middle"
-                fill={anyActive && i === 1 ? 'var(--signal)' : '#526066'}
+                fill={anyActive && i === 1 ? 'var(--signal)' : 'var(--text-faint)'}
                 fontSize="8"
                 fontFamily="monospace"
                 fillOpacity={anyActive && i === 1 ? 0.9 : 1}
@@ -536,7 +536,7 @@ export function InteractiveArchDiagram({ termLabel }: { termLabel: string }) {
               y1="210"
               x2="400"
               y2={y}
-              stroke={anyActive ? 'var(--signal)' : '#2a3438'}
+              stroke={anyActive ? 'var(--signal)' : 'var(--border-strong)'}
               strokeOpacity={anyActive ? 0.35 : 0.5}
               strokeWidth="1"
               strokeDasharray={anyActive ? '5 4' : undefined}

@@ -55,7 +55,7 @@ export function CinematicSkyline({ variant = 'full' }: { variant?: 'full' | 'com
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(180deg, #05060a 0%, #07080c 45%, #0a0a10 70%, var(--bg-base) 100%)',
+            'linear-gradient(180deg, var(--bg-void) 0%, var(--bg-void) 45%, var(--bg-void) 70%, var(--bg-base) 100%)',
         }}
       />
 
@@ -96,8 +96,8 @@ export function CinematicSkyline({ variant = 'full' }: { variant?: 'full' | 'com
             L 1300 58 L 1420 78 L 1540 62 L 1660 84 L 1780 70 L 1900 92
             L 1920 88 L 1920 140 Z
           `}
-          fill="#0c0d12"
-          stroke="#6b7280"
+          fill="var(--bg-base)"
+          stroke="var(--text-faint)"
           strokeWidth="0.7"
           strokeOpacity="0.28"
         />
@@ -111,12 +111,12 @@ export function CinematicSkyline({ variant = 'full' }: { variant?: 'full' | 'com
       >
         <defs>
           <linearGradient id="cityFill" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#1f2937" stopOpacity="0.8" />
+            <stop offset="0%" stopColor="var(--bg-raised)" stopOpacity="0.8" />
             <stop offset="100%" stopColor="var(--bg-base)" stopOpacity="1" />
           </linearGradient>
           <linearGradient id="cityStroke" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#d4d4d8" stopOpacity="0.95" />
-            <stop offset="100%" stopColor="#a1a1aa" stopOpacity="0.5" />
+            <stop offset="0%" stopColor="var(--text-muted)" stopOpacity="0.95" />
+            <stop offset="100%" stopColor="var(--text-faint)" stopOpacity="0.5" />
           </linearGradient>
           {/* Signal packet glow for arcs */}
           <filter id="signalGlow" x="-50%" y="-50%" width="200%" height="200%">
@@ -130,9 +130,9 @@ export function CinematicSkyline({ variant = 'full' }: { variant?: 'full' | 'com
 
         {/* Harbour reflection rules */}
         <g opacity="0.25">
-          <line x1="500" y1="440" x2="740" y2="440" stroke="#a1a1aa" strokeWidth="0.6" strokeDasharray="8 6" />
-          <line x1="520" y1="456" x2="720" y2="456" stroke="#a1a1aa" strokeWidth="0.5" strokeDasharray="5 9" />
-          <line x1="540" y1="472" x2="700" y2="472" stroke="#a1a1aa" strokeWidth="0.4" strokeDasharray="3 11" />
+          <line x1="500" y1="440" x2="740" y2="440" stroke="var(--text-faint)" strokeWidth="0.6" strokeDasharray="8 6" />
+          <line x1="520" y1="456" x2="720" y2="456" stroke="var(--text-faint)" strokeWidth="0.5" strokeDasharray="5 9" />
+          <line x1="540" y1="472" x2="700" y2="472" stroke="var(--text-faint)" strokeWidth="0.4" strokeDasharray="3 11" />
         </g>
 
         {/* ---- KOWLOON SIDE (left of harbour) ---- */}
@@ -174,7 +174,7 @@ export function CinematicSkyline({ variant = 'full' }: { variant?: 'full' | 'com
         />
 
         {/* Victoria Harbour water lines */}
-        <g stroke="#d4d4d8" strokeOpacity="0.15">
+        <g stroke="var(--text-muted)" strokeOpacity="0.15">
           <line x1="680" y1="475" x2="980" y2="475" strokeWidth="0.6" strokeDasharray="12 10" />
           <line x1="700" y1="492" x2="960" y2="492" strokeWidth="0.5" strokeDasharray="8 14" />
           <line x1="720" y1="508" x2="940" y2="508" strokeWidth="0.4" strokeDasharray="5 18" />
@@ -237,7 +237,7 @@ export function CinematicSkyline({ variant = 'full' }: { variant?: 'full' | 'com
         </g>
 
         {/* Window lights — very sparse silver dots on tall towers */}
-        <g fill="#e5e7eb">
+        <g fill="var(--text-secondary)">
           {[228, 232, 236, 240].map((x) =>
             [70, 92, 118, 144, 172, 200].map((y) => (
               <rect
@@ -449,15 +449,15 @@ function Annotation({
   return (
     <g opacity="0.75">
       {/* Dot at tower tip */}
-      <circle cx={x} cy={y} r="2.5" fill="none" stroke="#d4d4d8" strokeWidth="0.8" />
-      <circle cx={x} cy={y} r="0.8" fill="#d4d4d8" />
+      <circle cx={x} cy={y} r="2.5" fill="none" stroke="var(--text-muted)" strokeWidth="0.8" />
+      <circle cx={x} cy={y} r="0.8" fill="var(--text-muted)" />
       {/* Leader line */}
       <line
         x1={x}
         y1={y}
         x2={labelX}
         y2={labelY}
-        stroke="#d4d4d8"
+        stroke="var(--text-muted)"
         strokeWidth="0.5"
         strokeDasharray="3 3"
         strokeOpacity="0.6"
@@ -469,7 +469,7 @@ function Annotation({
         textAnchor={anchor}
         fontSize="10"
         fontFamily="monospace"
-        fill="#d4d4d8"
+        fill="var(--text-muted)"
         fillOpacity="0.85"
         letterSpacing="1.5"
       >

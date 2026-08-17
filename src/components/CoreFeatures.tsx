@@ -20,7 +20,7 @@ function MirrorVisual() {
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className={`relative overflow-hidden rounded-lg border border-signal/25 bg-gradient-to-b from-signal/15 to-accent-purple/10 dark:from-signal/10 dark:to-accent-purple/10 ${
+          className={`relative overflow-hidden rounded-lg border border-signal/25 bg-gradient-to-b from-signal/15 to-accent-purple/10   ${
             i === 1 ? "h-32 w-[4.5rem]" : "mt-4 h-28 w-16"
           }`}
         >

@@ -27,7 +27,7 @@ export function BlueprintField() {
       {/* Diagonal light sweep — the only moving element */}
       <div className="absolute inset-0 overflow-hidden">
         <div
-          className="absolute top-0 left-0 h-full bg-[linear-gradient(90deg,transparent_0%,rgba(7,16,15,0.03)_50%,transparent_100%)] dark:bg-[linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.035)_50%,transparent_100%)]"
+          className="absolute top-0 left-0 h-full bg-[linear-gradient(90deg,transparent_0%,rgba(7,16,15,0.03)_50%,transparent_100%)] [linear-gradient(90deg,transparent_0%,rgba(255,255,255,0.035)_50%,transparent_100%)]"
           style={{
             width: '22vw',
             filter: 'blur(40px)',
@@ -39,7 +39,7 @@ export function BlueprintField() {
 
       {/* Column hairline grid — 12 cols, nearly invisible (theme-aware via currentColor) */}
       <svg
-        className="absolute inset-0 w-full h-full text-[var(--text-primary)] dark:text-white"
+        className="absolute inset-0 w-full h-full text-[var(--text-primary)] "
         preserveAspectRatio="none"
         viewBox="0 0 100 100"
       >

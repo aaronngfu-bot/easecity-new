@@ -151,8 +151,8 @@ export function PerspectiveMarquee({
       </div>
 
       {/* edge fades — theme-aware */}
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#f7fafa_0%,transparent_18%,transparent_82%,#f7fafa_100%)] dark:bg-[linear-gradient(90deg,#050505_0%,transparent_18%,transparent_82%,#050505_100%)]" />
-      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#f7fafa_0%,transparent_25%,transparent_75%,#f7fafa_100%)] dark:bg-[linear-gradient(180deg,#050505_0%,transparent_25%,transparent_75%,#050505_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(90deg,#f7fafa_0%,transparent_18%,transparent_82%,#f7fafa_100%)] [linear-gradient(90deg,#050505_0%,transparent_18%,transparent_82%,#050505_100%)]" />
+      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,#f7fafa_0%,transparent_25%,transparent_75%,#f7fafa_100%)] [linear-gradient(180deg,#050505_0%,transparent_25%,transparent_75%,#050505_100%)]" />
     </div>
   );
 }
