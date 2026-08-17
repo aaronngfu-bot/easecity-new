@@ -86,8 +86,8 @@ export default function RootLayout({
         <WebSiteJsonLd />
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
-          enableSystem={false}
+          defaultTheme="system"
+          enableSystem={true}
           disableTransitionOnChange
         >
           <SessionProvider>

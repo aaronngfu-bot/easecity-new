@@ -214,7 +214,7 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
       {plan.highlighted && (
         <>
           <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-signal to-transparent z-10" />
-          <div className="absolute right-4 top-4 z-10">
+          <div className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2">
             <span className="signal-badge">{plan.badge}</span>
           </div>
         </>

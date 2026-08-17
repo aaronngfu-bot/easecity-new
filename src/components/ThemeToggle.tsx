@@ -24,11 +24,11 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
     <button
       type="button"
       onClick={toggle}
-      aria-label={isDark ? '切換至淺色模式' : '切換至深色模式'}
-      title={isDark ? '切換至淺色模式' : '切換至深色模式'}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      suppressHydrationWarning
       className={`inline-flex h-9 w-9 items-center justify-center rounded-full border border-signal/30 bg-signal/10 text-signal transition-colors hover:border-signal/60 hover:bg-signal/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal/50 ${className}`}
     >
-      {/* 未掛載前先佔位,避免 hydration mismatch */}
       {mounted ? (
         isDark ? <Sun size={16} /> : <Moon size={16} />
       ) : (
