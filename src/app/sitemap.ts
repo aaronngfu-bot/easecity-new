@@ -1,6 +1,6 @@
 import type { MetadataRoute } from 'next'
 
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://easecity.com'
+const BASE_URL = process.env.NEXTAUTH_URL || 'https://easecity.hk'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [

@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 }
 
 const LAST_UPDATED = 'April 10, 2026'
-const CONTACT_EMAIL = 'hello@easecity.com'
+const CONTACT_EMAIL = 'hello@easecity.hk'
 
 export default function TermsOfServicePage() {
   return (
@@ -21,7 +21,7 @@ export default function TermsOfServicePage() {
             href="/"
             className="inline-flex items-center gap-1.5 text-xs text-text-muted hover:text-signal transition-colors font-mono mb-8"
           >
-            ← easecity.com
+            ← easecity.hk
           </Link>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-bg-surface text-xs text-text-muted font-mono mb-6">
             Legal

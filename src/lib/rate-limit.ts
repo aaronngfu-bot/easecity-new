@@ -82,18 +82,26 @@ async function rateLimitUpstash(
   const now = Date.now()
   const windowStart = Math.floor(now / windowMs) * windowMs
   const key = `rl:v1:${identifier}:${windowStart}`
-  const count = await redis.incr(key)
-  if (count === 1) {
-    const ttlMs = windowStart + windowMs - now + 500
-    await redis.pexpire(key, Math.max(1000, ttlMs))
-  }
+  try {
+    const count = await redis.incr(key)
+    if (count === 1) {
+      const ttlMs = windowStart + windowMs - now + 500
+      await redis.pexpire(key, Math.max(1000, ttlMs))
+    }
 
-  const resetIn = Math.max(0, windowStart + windowMs - now)
+    const resetIn = Math.max(0, windowStart + windowMs - now)
 
-  if (count > limit) {
-    return { allowed: false, remaining: 0, resetIn }
+    if (count > limit) {
+      return { allowed: false, remaining: 0, resetIn }
+    }
+    return { allowed: true, remaining: limit - count, resetIn }
+  } catch {
+    // Upstash connection failed (DNS, timeout, etc.) — fall back to
+    // in-memory so the request doesn't 500. This is safe for single-
+    // instance dev; production multi-instance would lose cross-
+    // instance rate limiting but stays available.
+    return rateLimitMemory(identifier, limit, windowMs)
   }
-  return { allowed: true, remaining: limit - count, resetIn }
 }
 
 /**

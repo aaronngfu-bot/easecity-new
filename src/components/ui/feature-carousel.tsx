@@ -172,6 +172,7 @@ const stepVariants: Variants = {
 const StepImage = forwardRef<HTMLImageElement, StepImageProps>(
   ({ src, alt, className, style, ...props }, ref) => {
     return (
+      // eslint-disable-next-line @next/next/no-img-element
       <img
         ref={ref}
         alt={alt}

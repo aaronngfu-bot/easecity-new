@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://easecity.com',
+    url: 'https://easecity.hk',
     siteName: 'easecity',
     title: 'easecity — Stream Control Infrastructure',
     description:

@@ -29,7 +29,7 @@ interface SendOtpEmailParams {
 export async function sendContactEmail(params: SendContactEmailParams) {
   const resend = getResend()
   const { name, email, company, subject, message } = params
-  const toEmail = process.env.CONTACT_EMAIL_TO || 'hello@easecity.com'
+  const toEmail = process.env.CONTACT_EMAIL_TO || 'hello@easecity.hk'
 
   const { data, error } = await resend.emails.send({
     from: 'easecity Contact <onboarding@resend.dev>',

@@ -6,7 +6,7 @@ interface OrganizationJsonLdProps {
 
 export function OrganizationJsonLd({
   name = 'easecity',
-  url = 'https://easecity.com',
+  url = 'https://easecity.hk',
   description = 'Enterprise-grade stream control infrastructure — enabling a single device to manage, monitor, and orchestrate unlimited remote endpoints.',
 }: OrganizationJsonLdProps) {
   const jsonLd = {
@@ -44,7 +44,7 @@ interface WebSiteJsonLdProps {
 
 export function WebSiteJsonLd({
   name = 'easecity',
-  url = 'https://easecity.com',
+  url = 'https://easecity.hk',
 }: WebSiteJsonLdProps) {
   const jsonLd = {
     '@context': 'https://schema.org',

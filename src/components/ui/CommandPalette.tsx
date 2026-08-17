@@ -93,10 +93,10 @@ export function CommandPalette() {
       plan('/pricing#business', 'Business — $49/mo', 'Team sharing and audit log', ShieldCheck),
       plan('/pricing#enterprise', 'Enterprise — From $2,499/yr', 'SSO, RBAC, on-prem options', Building2),
 
-      action('copy-email', 'Copy contact email', 'hello@easecity.com → clipboard', MailIcon, async () => {
+      action('copy-email', 'Copy contact email', 'hello@easecity.hk → clipboard', MailIcon, async () => {
         try {
-          await navigator.clipboard.writeText('hello@easecity.com')
-          fire('easecity:toast', { message: 'hello@easecity.com copied' })
+          await navigator.clipboard.writeText('hello@easecity.hk')
+          fire('easecity:toast', { message: 'hello@easecity.hk copied' })
         } catch {
           fire('easecity:toast', { message: 'Copy failed — try again' })
         }

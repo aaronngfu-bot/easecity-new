@@ -165,6 +165,7 @@ export const Lid = ({
         className="absolute inset-0 h-96 w-[36rem] rounded-2xl bg-[#010101] p-2"
       >
         <div className="absolute inset-0 rounded-lg bg-[#272729]" />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src as string}
           alt="screen"

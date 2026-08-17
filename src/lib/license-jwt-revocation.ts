@@ -22,7 +22,12 @@ export async function revokeLicenseJwtToken(
   }
 
   const ttlSec = Math.max(1, expiresAtUnix - Math.floor(Date.now() / 1000))
-  await redis.set(`${REVOKE_KEY_PREFIX}${sha256Hex(token)}`, '1', { ex: ttlSec })
+  try {
+    await redis.set(`${REVOKE_KEY_PREFIX}${sha256Hex(token)}`, '1', { ex: ttlSec })
+  } catch {
+    // Best-effort: if Redis is down, the token simply isn't deny-listed.
+    // Its natural expiry still applies.
+  }
 }
 
 export async function isLicenseJwtRevoked(token: string): Promise<boolean> {
@@ -31,8 +36,13 @@ export async function isLicenseJwtRevoked(token: string): Promise<boolean> {
     return false
   }
 
-  const v = await redis.get(`${REVOKE_KEY_PREFIX}${sha256Hex(token)}`)
-  return v !== null && v !== undefined
+  try {
+    const v = await redis.get(`${REVOKE_KEY_PREFIX}${sha256Hex(token)}`)
+    return v !== null && v !== undefined
+  } catch {
+    // If Redis is down, assume not revoked (fail-open).
+    return false
+  }
 }
 
 export async function assertLicenseJwtNotRevoked(token: string): Promise<void> {
