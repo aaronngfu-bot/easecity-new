@@ -26,11 +26,11 @@ const syne = Syne({
 
 export const metadata: Metadata = {
   title: {
-    default: 'easecity — Stream Control Infrastructure',
+    default: 'easecity — Technology for connected teams',
     template: '%s | easecity',
   },
   description:
-    'easecity delivers enterprise-grade stream control infrastructure — enabling a single device to manage, monitor, and orchestrate unlimited remote endpoints with precision and scale.',
+    'EaseCity Technologies Limited builds tools and services for connected teams. Our first product, EC-Share, is Android device mirroring for teams.',
   keywords: [
     'easecity',
     'stream control',
@@ -47,13 +47,13 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://easecity.hk',
     siteName: 'easecity',
-    title: 'easecity — Stream Control Infrastructure',
+    title: 'easecity — Technology for connected teams',
     description:
       'Enterprise-grade stream control. One hub, unlimited endpoints. Built for the future of connected systems.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'easecity — Stream Control Infrastructure',
+    title: 'easecity — Technology for connected teams',
     description:
       'Enterprise-grade stream control. One hub, unlimited endpoints.',
   },

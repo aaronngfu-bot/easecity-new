@@ -1,68 +1,133 @@
 'use client'
 
+import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
-import { CTASection } from '@/components/home/CTASection'
-import { ParallaxSection } from '@/components/ui/ParallaxSection'
-import { TrustSection } from '@/components/sections/trust-section'
-import CoreFeatures from '@/components/CoreFeatures'
-import { FeatureSteps } from '@/components/ui/feature-steps'
-import { FAQ } from '@/components/FAQ'
 import { RevealSection } from '@/components/ui/RevealSection'
 import SectionHeading from '@/components/SectionHeading'
-import { MissionControlHero } from '@/components/hero/MissionControlHero'
 
 export default function HomePage() {
   const { t } = useLanguage()
 
   return (
     <main className="relative min-h-screen">
-      <MissionControlHero />
+      {/* Hero — company-level, not product-specific */}
+      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[var(--bg-base)]">
+        <div aria-hidden className="absolute inset-0 bg-grid opacity-50" />
+        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_30%,var(--signal-soft),transparent_70%)]" />
 
-      {/* 大氣橋接區：hero 底色溶入連續畫布，signal 微光標示交界 */}
-      <div aria-hidden className="pointer-events-none relative -mt-[1px] h-[180px] overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#f5f8f8] via-[#f5f8f8]/45 to-transparent dark:from-[#030506] dark:via-[#030506]/45 dark:to-transparent" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_130%_at_50%_0%,rgba(0,143,130,0.06),transparent_70%)] dark:bg-[radial-gradient(ellipse_55%_130%_at_50%_0%,rgba(0,229,204,0.08),transparent_70%)]" />
-      </div>
+        <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
+          <p className="label-mono mb-6 flex items-center justify-center gap-2">
+            <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)] animate-pulse" />
+            ESECITY — HONG KONG
+          </p>
 
-      <div id="learn-more" className="scroll-mt-24">
-        <RevealSection>
-          <TrustSection />
-        </RevealSection>
-      </div>
+          <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-[var(--text-primary)] sm:text-5xl md:text-6xl">
+            We build tools that connect
+            <br />
+            <span className="text-gradient-signal">people and devices.</span>
+          </h1>
 
-      <RevealSection>
-        <CoreFeatures />
-      </RevealSection>
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--text-secondary)]">
+            EaseCity Technologies Limited is a Hong Kong-based technology company.
+            We develop desktop software, web platforms, and custom systems for
+            teams who need reliable, beautiful tools.
+          </p>
 
-      <RevealSection>
-        <section id="how-to-use" className="py-24 md:py-32">
-          <div className="mx-auto mb-14 max-w-6xl px-4 md:px-6">
-            <SectionHeading
-              badge="WORKFLOW"
-              align="left"
-              title={t.homePage.how.title}
-              subtitle={t.homePage.how.sub}
-            />
+          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+            <Link href="/ec-share" className="btn-primary">
+              Explore EC-Share
+            </Link>
+            <Link href="/services" className="btn-secondary">
+              Our Services
+            </Link>
           </div>
-          <FeatureSteps
-            step1img="/images/ec-share-flow-install.jpg"
-            step2img="/images/ec-share-screenshot.png"
-            step3img="/images/ec-share-screenshot.png"
-            step4img="/images/ec-share-screenshot.png"
-            alt="EC-Share 產品使用流程示意圖"
-          />
+        </div>
+      </section>
+
+      {/* Products overview */}
+      <RevealSection>
+        <section className="section-padding">
+          <div className="container-max">
+            <SectionHeading
+              badge="PRODUCTS"
+              align="center"
+              title="What we make"
+              subtitle="Tools built for teams who value speed, clarity, and control."
+            />
+
+            <div className="mt-12 grid gap-6 md:grid-cols-2">
+              {/* EC-Share */}
+              <Link href="/ec-share" className="card p-8 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)]">
+                    <svg className="h-5 w-5 text-[var(--signal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="label-mono">PRODUCT 01</p>
+                    <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">EC-Share</h3>
+                  </div>
+                </div>
+                <p className="text-[var(--text-secondary)] leading-relaxed">
+                  Android device mirroring for teams. Multi-device grid, instant focus mode,
+                  clipboard sync, and desktop-to-desktop sharing via LAN or VPN.
+                </p>
+                <div className="mt-4 flex gap-2">
+                  <span className="badge">Windows</span>
+                  <span className="badge">Android</span>
+                  <span className="badge">14-day trial</span>
+                </div>
+              </Link>
+
+              {/* Services */}
+              <Link href="/services" className="card p-8 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]">
+                <div className="mb-4 flex items-center gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)]">
+                    <svg className="h-5 w-5 text-[var(--signal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p className="label-mono">SERVICES</p>
+                    <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">Custom Development</h3>
+                  </div>
+                </div>
+                <p className="text-[var(--text-secondary)] leading-relaxed">
+                  System development, web platforms, and design services.
+                  We help teams ship reliable software with thoughtful UX.
+                </p>
+                <div className="mt-4 flex gap-2">
+                  <span className="badge">Web</span>
+                  <span className="badge">Desktop</span>
+                  <span className="badge">Design</span>
+                </div>
+              </Link>
+            </div>
+          </div>
         </section>
       </RevealSection>
 
+      {/* About teaser */}
       <RevealSection>
-        <FAQ />
+        <section className="section-padding bg-[var(--bg-surface)]">
+          <div className="container-max">
+            <div className="mx-auto max-w-3xl text-center">
+              <SectionHeading
+                badge="ABOUT"
+                align="center"
+                title="Built in Hong Kong"
+                subtitle="EaseCity Technologies Limited (逸城科技有限公司) is a Hong Kong SAR company building tools for connected teams."
+              />
+              <div className="mt-8">
+                <Link href="/about" className="btn-secondary">
+                  Learn more about us
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
       </RevealSection>
-
-      <div className="relative z-10">
-        <ParallaxSection speed={0.12}>
-          <CTASection />
-        </ParallaxSection>
-      </div>
     </main>
   )
 }

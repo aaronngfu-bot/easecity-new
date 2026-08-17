@@ -1,73 +1,67 @@
-import type { Metadata } from 'next'
-import Link from 'next/link'
-import { PageHero } from '@/components/ui/PageHero'
+'use client'
 
-export const metadata: Metadata = {
-  title: 'EC-Share',
-  description:
-    'EC-Share is Android device mirroring for teams: grid view, focus mode, LAN mirroring, and Business invite sharing.',
-}
-
-const features = [
-  {
-    title: 'Multi-device grid',
-    body: 'Watch up to 5 devices on Pro and 15 on Business from one Windows desktop app.',
-  },
-  {
-    title: 'Focus mode',
-    body: 'Jump from grid view into a single Android screen when you need precise operation.',
-  },
-  {
-    title: 'LAN-first mirroring',
-    body: 'Same-network workflows stay direct and low latency. Cloud sharing comes later for Business.',
-  },
-  {
-    title: 'Team-ready licensing',
-    body: 'Email OTP, signed license JWTs, Stripe subscriptions, and offline grace are built into the web backend.',
-  },
-]
+import { useLanguage } from '@/context/LanguageContext'
+import { CTASection } from '@/components/home/CTASection'
+import { ParallaxSection } from '@/components/ui/ParallaxSection'
+import { TrustSection } from '@/components/sections/trust-section'
+import CoreFeatures from '@/components/CoreFeatures'
+import { FeatureSteps } from '@/components/ui/feature-steps'
+import { FAQ } from '@/components/FAQ'
+import { RevealSection } from '@/components/ui/RevealSection'
+import SectionHeading from '@/components/SectionHeading'
+import { MissionControlHero } from '@/components/hero/MissionControlHero'
 
 export default function EcSharePage() {
+  const { t } = useLanguage()
+
   return (
-    <>
-      <PageHero
-        serial="01"
-        sectionCode="EC-SHARE"
-        eyebrow="Product"
-        heading="Android device mirroring"
-        headingHighlight="for teams."
-        description="EC-Share turns a Windows machine into a team-ready Android control room for developers, QA teams, support engineers, and enterprise device workflows."
-        meta={[
-          { label: 'Trial', value: '14 days' },
-          { label: 'Pro', value: '$19/mo' },
-          { label: 'Business', value: '$49/mo' },
-        ]}
-      />
+    <main className="relative min-h-screen">
+      <MissionControlHero />
 
-      <section className="section-padding">
-        <div className="container-max">
-          <div className="grid gap-5 md:grid-cols-2">
-            {features.map((feature) => (
-              <div key={feature.title} className="glass-panel p-6">
-                <p className="label-mono mb-3">EC-SHARE</p>
-                <h2 className="font-display text-2xl font-bold text-text-primary mb-3">
-                  {feature.title}
-                </h2>
-                <p className="text-text-secondary leading-relaxed">{feature.body}</p>
-              </div>
-            ))}
-          </div>
+      <div aria-hidden className="pointer-events-none relative -mt-[1px] h-[180px] overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-[var(--bg-base)] via-[var(--bg-base)]/45 to-transparent" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_55%_130%_at_50%_0%,var(--signal-soft),transparent_70%)]" />
+      </div>
 
-          <div className="mt-12 flex flex-col gap-4 sm:flex-row">
-            <Link href="/download" className="glass-cta inline-flex items-center justify-center">
-              Download for Windows
-            </Link>
-            <Link href="/pricing" className="glass-ghost inline-flex items-center justify-center">
-              View pricing
-            </Link>
+      <div id="learn-more" className="scroll-mt-24">
+        <RevealSection>
+          <TrustSection />
+        </RevealSection>
+      </div>
+
+      <RevealSection>
+        <CoreFeatures />
+      </RevealSection>
+
+      <RevealSection>
+        <section id="how-to-use" className="py-24 md:py-32">
+          <div className="mx-auto mb-14 max-w-6xl px-4 md:px-6">
+            <SectionHeading
+              badge="WORKFLOW"
+              align="left"
+              title={t.homePage.how.title}
+              subtitle={t.homePage.how.sub}
+            />
           </div>
-        </div>
-      </section>
-    </>
+          <FeatureSteps
+            step1img="/images/ec-share-flow-install.jpg"
+            step2img="/images/ec-share-screenshot.png"
+            step3img="/images/ec-share-screenshot.png"
+            step4img="/images/ec-share-screenshot.png"
+            alt="EC-Share product workflow"
+          />
+        </section>
+      </RevealSection>
+
+      <RevealSection>
+        <FAQ />
+      </RevealSection>
+
+      <div className="relative z-10">
+        <ParallaxSection speed={0.12}>
+          <CTASection />
+        </ParallaxSection>
+      </div>
+    </main>
   )
 }

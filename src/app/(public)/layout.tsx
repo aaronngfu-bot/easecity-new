@@ -1,16 +1,14 @@
 import PillNav from '@/components/PillNav'
 import { Footer } from '@/components/layout/Footer'
 import { ChatWidget } from '@/components/chat/ChatWidget'
-import { GrainField } from '@/components/ui/GrainField'
-import { BootSequence } from '@/components/ui/BootSequence'
 import { CommandPalette } from '@/components/ui/CommandPalette'
 import { KeyboardLayer } from '@/components/ui/KeyboardLayer'
-import { CursorGlowLayer } from '@/components/ui/CursorGlowLayer'
-import { BlueprintField } from '@/components/ui/BlueprintField'
 
 const navItems = [
-  { href: '/pricing',  labelKey: 'pricing' },
-  { href: '/download', labelKey: 'download' },
+  { href: '/ec-share',  labelKey: 'product' },
+  { href: '/services',  labelKey: 'services' },
+  { href: '/pricing',   labelKey: 'pricing' },
+  { href: '/download',  labelKey: 'download' },
 ]
 
 export default function PublicLayout({
@@ -20,13 +18,7 @@ export default function PublicLayout({
 }) {
   return (
     <div className="control-canvas relative min-h-screen overflow-x-clip">
-      <BootSequence />
-      <BlueprintField />
-      <GrainField />
-      <CursorGlowLayer />
-
-      <div className="pointer-events-none fixed inset-0 z-[1] control-grid opacity-30" />
-      <div className="pointer-events-none fixed inset-0 z-[1] signal-noise opacity-25 mix-blend-overlay" />
+      <div className="pointer-events-none fixed inset-0 z-[1] control-grid opacity-20" />
 
       <PillNav
         logo="/images/easecity-pill-logo.svg"
