@@ -55,7 +55,7 @@ export function CinematicSkyline({ variant = 'full' }: { variant?: 'full' | 'com
         className="absolute inset-0"
         style={{
           background:
-            'linear-gradient(180deg, #05060a 0%, #07080c 45%, #0a0a10 70%, #09090b 100%)',
+            'linear-gradient(180deg, #05060a 0%, #07080c 45%, #0a0a10 70%, var(--bg-base) 100%)',
         }}
       />
 
@@ -112,7 +112,7 @@ export function CinematicSkyline({ variant = 'full' }: { variant?: 'full' | 'com
         <defs>
           <linearGradient id="cityFill" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#1f2937" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="#09090b" stopOpacity="1" />
+            <stop offset="100%" stopColor="var(--bg-base)" stopOpacity="1" />
           </linearGradient>
           <linearGradient id="cityStroke" x1="0" y1="0" x2="0" y2="1">
             <stop offset="0%" stopColor="#d4d4d8" stopOpacity="0.95" />
@@ -230,7 +230,7 @@ export function CinematicSkyline({ variant = 'full' }: { variant?: 'full' | 'com
         />
 
         {/* Antennas on ICC (Kowloon) and IFC/BoC (HK Island) */}
-        <g stroke="#fafafa" strokeWidth="1" strokeOpacity="0.85">
+        <g stroke="var(--text-primary)" strokeWidth="1" strokeOpacity="0.85">
           <line x1="236" y1="50" x2="236" y2="30" />
           <line x1="1230" y1="28" x2="1230" y2="10" />
           <line x1="1280" y1="60" x2="1280" y2="42" />
@@ -505,7 +505,7 @@ function SignalArc({
       <path
         d={d}
         fill="none"
-        stroke="#00e5cc"
+        stroke="var(--signal)"
         strokeWidth="0.9"
         strokeOpacity="0.18"
         strokeLinecap="round"
@@ -514,7 +514,7 @@ function SignalArc({
       <path
         d={d}
         fill="none"
-        stroke="#00e5cc"
+        stroke="var(--signal)"
         strokeWidth="1.6"
         strokeOpacity="0.95"
         strokeLinecap="round"
@@ -525,10 +525,10 @@ function SignalArc({
         }}
       />
       {/* Endpoint markers (breathing) */}
-      <circle cx={from.x} cy={from.y} r="3.5" fill="#00e5cc" fillOpacity="0.25">
+      <circle cx={from.x} cy={from.y} r="3.5" fill="var(--signal)" fillOpacity="0.25">
         <animate attributeName="fill-opacity" values="0.15;0.55;0.15" dur={`${duration * 0.6}s`} repeatCount="indefinite" />
       </circle>
-      <circle cx={to.x} cy={to.y} r="3.5" fill="#00e5cc" fillOpacity="0.25">
+      <circle cx={to.x} cy={to.y} r="3.5" fill="var(--signal)" fillOpacity="0.25">
         <animate attributeName="fill-opacity" values="0.15;0.55;0.15" dur={`${duration * 0.6}s`} repeatCount="indefinite" begin={`${duration * 0.5}s`} />
       </circle>
     </g>

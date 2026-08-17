@@ -59,7 +59,7 @@ function InviteVisual() {
         </div>
         {/* copied check — pops right after the cursor tap */}
         <span
-          className="absolute -right-2.5 -top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-signal text-[#03100f] opacity-0"
+          className="absolute -right-2.5 -top-2.5 flex h-6 w-6 items-center justify-center rounded-full bg-signal text-[var(--text-primary)] opacity-0"
           style={{ animation: "popCheck 4.5s ease-in-out infinite" }}
         >
           <Check className="h-3.5 w-3.5" strokeWidth={3} aria-hidden="true" />

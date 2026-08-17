@@ -147,14 +147,14 @@ const config: Config = {
   			'hero-glow': 'radial-gradient(ellipse 80% 60% at 50% -10%, #00e5cc12, transparent)',
   			'card-gradient': 'linear-gradient(135deg, #171d22, #101418)',
   			'control-grid': 'linear-gradient(to right, #00e5cc10 1px, transparent 1px), linear-gradient(to bottom, #ffffff08 1px, transparent 1px)',
-  			'signal-glow': 'radial-gradient(ellipse 40% 30% at 50% 50%, #00e5cc20, transparent)',
-  			'data-glow': 'radial-gradient(ellipse 40% 30% at 50% 50%, #00e5cc18, transparent)'
+  			'signal-glow': 'radial-gradient(ellipse 40% 30% at 50% 50%, var(--signal-soft), transparent)',
+  			'data-glow': 'radial-gradient(ellipse 40% 30% at 50% 50%, var(--signal-soft), transparent)'
   		},
   		animation: {
   			'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
   			float: 'float 6s ease-in-out infinite',
   			'glow-pulse': 'glowPulse 3s ease-in-out infinite',
-  			'signal-pulse': 'signalPulse 2s ease-in-out infinite',
+  			'signal-pulse': 'none',
   			flow: 'flow 3s linear infinite',
   			scan: 'scan 4s linear infinite',
   			'fade-up': 'fadeUp 0.6s ease-out forwards',
@@ -174,8 +174,8 @@ const config: Config = {
   			},
   			glowPulse: {
   				'0%, 100%': {
-  					boxShadow: '0 0 5px #00e5cc40, 0 0 20px #00e5cc20',
-  					borderColor: '#00e5cc40'
+  					boxShadow: '0 0 5px var(--signal), 0 0 20px var(--signal-soft)',
+  					borderColor: 'var(--signal)'
   				},
   				'50%': {
   					boxShadow: '0 0 15px #00e5cc80, 0 0 40px #00e5cc30',
@@ -188,7 +188,7 @@ const config: Config = {
   					opacity: '0.9'
   				},
   				'50%': {
-  					boxShadow: '0 0 14px #00e5ccaa, 0 0 36px #00e5cc55',
+  					boxShadow: '0 0 14px #00e5ccaa, 0 0 36px var(--signal)',
   					opacity: '1'
   				}
   			},
@@ -253,10 +253,10 @@ const config: Config = {
   		},
   		boxShadow: {
   			'glow-cyan': '0 0 20px #00e5cc30, 0 0 60px #00e5cc10',
-  			'glow-cyan-sm': '0 0 10px #00e5cc40',
+  			'glow-cyan-sm': '0 0 10px var(--signal)',
   			'glow-purple': '0 0 20px #a855f730, 0 0 60px #a855f710',
-  			'glow-signal': '0 0 22px #00e5cc40, 0 0 60px #00e5cc18',
-  			'glow-signal-sm': '0 0 10px #00e5cc55',
+  			'glow-signal': '0 0 22px var(--signal), 0 0 60px var(--signal-soft)',
+  			'glow-signal-sm': '0 0 10px var(--signal)',
   			panel: '0 24px 80px rgba(0,0,0,0.35)',
   			card: '0 12px 40px rgba(0,0,0,0.24)',
   			'card-hover': '0 18px 56px rgba(0,0,0,0.34)',

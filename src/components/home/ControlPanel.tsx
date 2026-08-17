@@ -40,17 +40,17 @@ export function ControlPanel({
   /* Theme-aware SVG colors — read from CSS custom properties set in globals.css */
   const svgVars = useMemo(() => {
     if (typeof window === 'undefined') return {
-      nodeBg: '#09090b', nodeCore: '#0c0c10', labelDim: '#52525b', coordDim: '#3f3f46', signal: '#00e5cc',
+      nodeBg: 'var(--bg-base)', nodeCore: '#0c0c10', labelDim: '#52525b', coordDim: '#3f3f46', signal: 'var(--signal)',
     }
     const styles = getComputedStyle(document.documentElement)
     const root = document.documentElement
     const isDark = root.classList.contains('dark')
     return {
-      nodeBg: isDark ? '#09090b' : '#e8eef2',
+      nodeBg: isDark ? 'var(--bg-base)' : '#e8eef2',
       nodeCore: isDark ? '#0c0c10' : '#f0f4f7',
-      labelDim: isDark ? '#52525b' : '#6887a0',
+      labelDim: isDark ? '#52525b' : 'var(--text-faint)',
       coordDim: isDark ? '#3f3f46' : '#8ba8b8',
-      signal: isDark ? '#00e5cc' : '#008f82',
+      signal: isDark ? 'var(--signal)' : 'var(--signal)',
     }
   }, [])
 
@@ -276,7 +276,7 @@ export function ControlPanel({
           const isActive = e.id === activeId
           const isBroadcast = broadcasting
           const color = isActive || isBroadcast ? svgVars.signal : (svgVars.labelDim)
-          const labelColor = isActive ? (svgVars.signal === '#00e5cc' ? '#fafafa' : '#18292f') : svgVars.labelDim
+          const labelColor = isActive ? (svgVars.signal === 'var(--signal)' ? 'var(--text-primary)' : 'var(--text-primary)') : svgVars.labelDim
           return (
             <g key={e.id}>
               {/* Node outer ring */}
@@ -410,7 +410,7 @@ function CornerTicks() {
         { x: 0, y: 440, dx: 14, dy: -14 },
         { x: 560, y: 440, dx: -14, dy: -14 },
       ].map((c, i) => (
-        <g key={i} stroke="var(--signal, #00e5cc)" strokeWidth="1" strokeOpacity="0.4">
+        <g key={i} stroke="var(--signal, var(--signal))" strokeWidth="1" strokeOpacity="0.4">
           <line x1={c.x} y1={c.y} x2={c.x + c.dx} y2={c.y} />
           <line x1={c.x} y1={c.y} x2={c.x} y2={c.y + c.dy} />
         </g>

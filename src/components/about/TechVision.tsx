@@ -163,7 +163,7 @@ function TimelinePacket() {
           width: '14%',
           left: '-14%',
           background:
-            'linear-gradient(90deg, transparent 0%, #00e5ccaa 55%, #00e5cc 70%, transparent 100%)',
+            'linear-gradient(90deg, transparent 0%, var(--signal)aa 55%, var(--signal) 70%, transparent 100%)',
           filter: 'blur(0.4px)',
           animation: 'timelinePacket 8s linear infinite',
           willChange: 'transform',
@@ -175,7 +175,7 @@ function TimelinePacket() {
           width: '10%',
           left: '-10%',
           background:
-            'linear-gradient(90deg, transparent 0%, #00e5cc66 70%, transparent 100%)',
+            'linear-gradient(90deg, transparent 0%, var(--signal)66 70%, transparent 100%)',
           animation: 'timelinePacket 8s linear infinite',
           animationDelay: '-4s',
           willChange: 'transform',

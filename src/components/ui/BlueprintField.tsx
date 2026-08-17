@@ -39,7 +39,7 @@ export function BlueprintField() {
 
       {/* Column hairline grid — 12 cols, nearly invisible (theme-aware via currentColor) */}
       <svg
-        className="absolute inset-0 w-full h-full text-[#07100f] dark:text-white"
+        className="absolute inset-0 w-full h-full text-[var(--text-primary)] dark:text-white"
         preserveAspectRatio="none"
         viewBox="0 0 100 100"
       >

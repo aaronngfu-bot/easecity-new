@@ -26,11 +26,11 @@ export function OrdersChart({ data }: { data: DailyData[] }) {
     () => ({
       grid: isDark ? '#172024' : '#d8e2e0',
       axis: isDark ? '#243034' : '#b8c8c6',
-      tick: isDark ? '#839190' : '#667472',
-      tooltipBg: isDark ? '#101418' : '#f0f4f7',
+      tick: isDark ? 'var(--text-muted)' : '#667472',
+      tooltipBg: isDark ? 'var(--bg-surface)' : '#f0f4f7',
       tooltipBorder: isDark ? '#243034' : '#d8e2e0',
-      tooltipLabel: isDark ? '#c6d1d0' : '#2b4050',
-      bar: isDark ? '#35f5e0' : '#008f82',
+      tooltipLabel: isDark ? 'var(--text-secondary)' : 'var(--text-secondary)',
+      bar: isDark ? 'var(--signal-light)' : 'var(--signal)',
     }),
     [isDark]
   )

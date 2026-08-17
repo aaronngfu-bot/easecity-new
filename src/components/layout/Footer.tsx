@@ -43,8 +43,8 @@ export function Footer() {
                   <line x1="30" y1="18" x2="22" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
                   <line x1="18" y1="30" x2="18" y2="22" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
                   <line x1="6" y1="18" x2="14" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-                  <circle cx="18" cy="18" r="3.5" fill="#00e5cc" opacity="0.3" />
-                  <circle cx="18" cy="18" r="2" fill="#00e5cc" />
+                  <circle cx="18" cy="18" r="3.5" fill="var(--signal)" opacity="0.3" />
+                  <circle cx="18" cy="18" r="2" fill="var(--signal)" />
                 </svg>
               </div>
               <div className="flex flex-col leading-none">

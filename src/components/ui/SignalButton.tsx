@@ -9,7 +9,7 @@ type ButtonSize = 'sm' | 'md' | 'lg'
 
 const variantClasses: Record<ButtonVariant, string> = {
   primary:
-    'border-transparent bg-signal text-[#03100f] shadow-glow-signal-sm hover:bg-signal-light hover:shadow-glow-signal focus-visible:ring-signal/60',
+    'border-transparent bg-signal text-[var(--text-primary)] shadow-glow-signal-sm hover:bg-signal-light hover:shadow-glow-signal focus-visible:ring-signal/60',
   secondary:
     'border-border bg-bg-surface text-text-primary hover:border-border-accent hover:bg-bg-elevated focus-visible:ring-signal/50',
   ghost:

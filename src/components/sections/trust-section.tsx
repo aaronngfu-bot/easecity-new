@@ -15,14 +15,14 @@ import PixelTransition from "@/components/ui/PixelTransition";
 import SectionHeading from "@/components/SectionHeading";
 import { useLanguage } from "@/context/LanguageContext";
 
-const SIGNAL_COLOR = "#00e5cc";
+const SIGNAL_COLOR = "var(--signal)";
 
 const SIGNAL_PIXEL_COLORS_DARK = [
   { color: "#0c2926", weight: 45 },
   { color: "#103833", weight: 30 },
   { color: "#14524a", weight: 18 },
-  { color: "#00a896", weight: 5 },
-  { color: "#00e5cc", weight: 2 },
+  { color: "var(--signal-light)", weight: 5 },
+  { color: "var(--signal)", weight: 2 },
 ];
 const SIGNAL_PIXEL_COLORS_LIGHT = [
   { color: "#cdeae6", weight: 45 },

@@ -15,9 +15,9 @@ const PillNav = ({
   activeHref = undefined,
   className = '',
   ease = 'power3.easeOut',
-  baseColor = '#eaffff',
+  baseColor = 'var(--signal)',
   pillColor = '#071012',
-  hoveredPillTextColor = '#03100f',
+  hoveredPillTextColor = 'var(--text-primary)',
   pillTextColor = undefined,
   onMobileMenuClick = undefined,
   initialLoadAnimation = true,
@@ -373,7 +373,7 @@ const PillNav = ({
         <button
           type="button"
           onClick={() => router.push('/signup')}
-          className="pill-cta desktop-only inline-flex items-center rounded-full bg-signal px-4 py-1.5 text-xs font-semibold text-[#03100f] transition-colors hover:bg-signal-light"
+          className="pill-cta desktop-only inline-flex items-center rounded-full bg-signal px-4 py-1.5 text-xs font-semibold text-[var(--text-primary)] transition-colors hover:bg-signal-light"
         >
           {t.nav.cta ?? '免費試用'}
         </button>

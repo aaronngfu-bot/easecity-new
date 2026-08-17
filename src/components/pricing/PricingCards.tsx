@@ -117,7 +117,7 @@ export function PricingCards() {
                 className={cn(
                   'rounded-md px-4 py-2 text-sm font-semibold transition-colors',
                   billing === value
-                    ? 'bg-signal text-[#03100f]'
+                    ? 'bg-signal text-[var(--text-primary)]'
                     : 'text-paper-muted hover:text-paper-ink'
                 )}
               >

@@ -15,7 +15,7 @@ export function CTASection() {
       className="relative flex min-h-[80vh] items-center justify-center overflow-hidden border-t border-border"
     >
       <PerspectiveMarquee
-        className="text-[#008f82]/30 dark:text-[#5eead4]/45"
+        className="text-[var(--signal)]/30 dark:text-[#5eead4]/45"
         items={t.cta.marquee}
         fontSize={language === 'zh' ? 96 : 72}
         fontWeight={800}

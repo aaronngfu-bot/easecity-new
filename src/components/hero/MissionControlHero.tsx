@@ -136,8 +136,8 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
           col === 'l' && 'frame-depth-l',
           col === 'r' && 'frame-depth-r',
           control
-            ? 'frame-depth-control border-2 border-signal-deep bg-white dark:border-signal dark:bg-[#161c1c]'
-            : 'border border-black/10 bg-white dark:border-white/[0.14] dark:bg-[#161c1c]'
+            ? 'frame-depth-control border-2 border-signal-deep bg-white dark:border-signal dark:bg-[var(--bg-elevated)]'
+            : 'border border-black/10 bg-white dark:border-white/[0.14] dark:bg-[var(--bg-elevated)]'
         )}
       >
         {/* side buttons */}
@@ -154,7 +154,7 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
         {/* status row */}
         <div className="absolute inset-x-1.5 top-1.5 z-[2] flex items-center justify-between">
           {control ? (
-            <span className="rounded-sm bg-signal-deep px-1 py-px font-mono text-[10px] font-semibold tracking-[0.12em] text-white dark:bg-signal dark:text-[#03100f]">
+            <span className="rounded-sm bg-signal-deep px-1 py-px font-mono text-[10px] font-semibold tracking-[0.12em] text-white dark:bg-signal dark:text-[var(--text-primary)]">
               {controlLabel}
             </span>
           ) : (
@@ -225,7 +225,7 @@ function DeviceFrame({ frame, reduce, entrance, controlLabel, syncedLabel }: Dev
             />
             <motion.span
               key={`badge-${pulse}`}
-              className="absolute right-1 top-4 z-[3] rounded border border-signal-deep/50 bg-white px-1.5 py-0.5 font-mono text-xs font-semibold tracking-wide text-signal-deep shadow-sm dark:border-signal/50 dark:bg-[#0a1316] dark:text-signal"
+              className="absolute right-1 top-4 z-[3] rounded border border-signal-deep/50 bg-white px-1.5 py-0.5 font-mono text-xs font-semibold tracking-wide text-signal-deep shadow-sm dark:border-signal/50 dark:bg-[var(--bg-surface)] dark:text-signal"
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: [0, 1, 1, 0], y: [4, 0, 0, -2] }}
               transition={{ duration: 2.4, times: [0, 0.08, 0.78, 1] }}
@@ -333,7 +333,7 @@ export function MissionControlHero() {
     )
 
   return (
-    <section className="relative flex min-h-screen flex-col overflow-hidden bg-[#f5f8f8] dark:bg-[#030506]">
+    <section className="relative flex min-h-screen flex-col overflow-hidden bg-[var(--text-primary)] dark:bg-[var(--bg-void)]">
       {/* blueprint grid — 48px, 1px lines */}
       <div
         aria-hidden
@@ -388,7 +388,7 @@ export function MissionControlHero() {
             <Magnetic>
               <Link
                 href="/pricing"
-                className="btn-sheen inline-flex items-center justify-center rounded-full bg-signal px-7 py-3 text-sm font-semibold text-[#03100f] shadow-glow-signal-sm transition hover:bg-signal-light hover:shadow-glow-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-black"
+                className="btn-sheen inline-flex items-center justify-center rounded-full bg-signal px-7 py-3 text-sm font-semibold text-[var(--text-primary)] shadow-glow-signal-sm transition hover:bg-signal-light hover:shadow-glow-signal focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-signal/70 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-black"
               >
                 {hero.ctaTrial}
               </Link>
@@ -456,7 +456,7 @@ export function MissionControlHero() {
         transition={{ duration: 0.8, delay: reduce ? 0 : 1.5 }}
         className="relative z-10 flex h-10 items-center overflow-hidden border-t border-black/[0.07] font-mono text-[10px] uppercase tracking-wider text-muted-foreground dark:border-white/[0.06]"
       >
-        <span className="relative z-10 flex h-full shrink-0 items-center border-r border-black/[0.08] bg-[#eaf0f0] pl-6 pr-4 text-foreground/70 dark:border-white/[0.08] dark:bg-[#0a1012]">
+        <span className="relative z-10 flex h-full shrink-0 items-center border-r border-black/[0.08] bg-[#eaf0f0] pl-6 pr-4 text-foreground/70 dark:border-white/[0.08] dark:bg-[var(--bg-surface)]">
           {hero.tickerLabel}&nbsp;▸
         </span>
         <div className={cn('flex w-max', !reduce && 'animate-ticker')}>

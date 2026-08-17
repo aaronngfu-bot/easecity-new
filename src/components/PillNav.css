@@ -87,7 +87,7 @@
 
 .pill.is-active {
   background: rgba(0, 229, 204, 0.12);
-  color: #35f5e0;
+  color: var(--signal-light);
   box-shadow: inset 0 0 0 1px rgba(0, 229, 204, 0.28);
 }
 
@@ -96,7 +96,7 @@
   left: 50%;
   z-index: -1;
   border-radius: 999px;
-  background: #00e5cc;
+  background: var(--signal);
   box-shadow: 0 0 32px rgba(0, 229, 204, 0.38);
 }
 
@@ -152,7 +152,7 @@
 
 .pill-language-toggle button:hover,
 .pill-language-toggle button.is-active {
-  color: #00e5cc;
+  color: var(--signal);
 }
 
 .mobile-menu-button {
@@ -171,7 +171,7 @@
   width: 17px;
   height: 1.5px;
   border-radius: 999px;
-  background: #00e5cc;
+  background: var(--signal);
   transform-origin: center;
 }
 
@@ -224,7 +224,7 @@
 .mobile-menu-link.is-active,
 .mobile-menu-link:hover {
   background: rgba(0, 229, 204, 0.12);
-  color: #35f5e0;
+  color: var(--signal-light);
 }
 
 .mobile-language-toggle {
@@ -250,7 +250,7 @@
 }
 
 .mobile-language-toggle button.is-active {
-  color: #00e5cc;
+  color: var(--signal);
 }
 
 @media (max-width: 900px) {
@@ -280,7 +280,7 @@ html:not(.dark) .pill-language-toggle {
 
 html:not(.dark) .pill-language-toggle button:hover,
 html:not(.dark) .pill-language-toggle button.is-active {
-  color: #007a70;
+  color: var(--signal);
 }
 
 html:not(.dark) .mobile-menu-button {
@@ -300,22 +300,22 @@ html:not(.dark) .mobile-language-toggle {
 }
 
 html:not(.dark) .mobile-language-toggle button.is-active {
-  color: #007a70;
+  color: var(--signal);
 }
 
 html:not(.dark) .mobile-menu-link.is-active,
 html:not(.dark) .mobile-menu-link:hover {
   background: rgba(0, 143, 130, 0.12);
-  color: #006b63;
+  color: var(--signal);
 }
 
 html:not(.dark) .pill.is-active {
   background: rgba(0, 143, 130, 0.12);
-  color: #006b63;
+  color: var(--signal);
   box-shadow: inset 0 0 0 1px rgba(0, 143, 130, 0.28);
 }
 
 html:not(.dark) .hover-circle {
-  background: #00a896;
+  background: var(--signal-light);
   box-shadow: 0 0 32px rgba(0, 143, 130, 0.32);
 }
