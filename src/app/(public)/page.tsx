@@ -7,6 +7,7 @@ import SectionHeading from '@/components/SectionHeading'
 
 export default function HomePage() {
   const { t } = useLanguage()
+  const c = t.companyPage
 
   return (
     <main className="relative min-h-screen">
@@ -18,27 +19,25 @@ export default function HomePage() {
         <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
           <p className="label-mono mb-6 flex items-center justify-center gap-2">
             <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)] animate-pulse" />
-            ESECITY — HONG KONG
+            {c.heroEyebrow}
           </p>
 
           <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-[var(--text-primary)] sm:text-5xl md:text-6xl">
-            We build tools that connect
+            {c.heroTitle}
             <br />
-            <span className="text-gradient-signal">people and devices.</span>
+            <span className="text-gradient-signal">{c.heroHighlight}</span>
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--text-secondary)]">
-            EaseCity Technologies Limited is a Hong Kong-based technology company.
-            We develop desktop software, web platforms, and custom systems for
-            teams who need reliable, beautiful tools.
+            {c.heroSubtitle}
           </p>
 
           <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
             <Link href="/ec-share" className="btn-primary">
-              Explore EC-Share
+              {c.heroCtaProduct}
             </Link>
             <Link href="/services" className="btn-secondary">
-              Our Services
+              {c.heroCtaServices}
             </Link>
           </div>
         </div>
@@ -49,10 +48,10 @@ export default function HomePage() {
         <section className="section-padding">
           <div className="container-max">
             <SectionHeading
-              badge="PRODUCTS"
+              badge={c.productsBadge}
               align="center"
-              title="What we make"
-              subtitle="Tools built for teams who value speed, clarity, and control."
+              title={c.productsTitle}
+              subtitle={c.productsSubtitle}
             />
 
             <div className="mt-12 grid gap-6 md:grid-cols-2">
@@ -65,13 +64,12 @@ export default function HomePage() {
                     </svg>
                   </div>
                   <div>
-                    <p className="label-mono">PRODUCT 01</p>
-                    <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">EC-Share</h3>
+                    <p className="label-mono">{c.product01Label}</p>
+                    <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.product01Name}</h3>
                   </div>
                 </div>
                 <p className="text-[var(--text-secondary)] leading-relaxed">
-                  Android device mirroring for teams. Multi-device grid, instant focus mode,
-                  clipboard sync, and desktop-to-desktop sharing via LAN or VPN.
+                  {c.product01Desc}
                 </p>
                 <div className="mt-4 flex gap-2">
                   <span className="badge">Windows</span>
@@ -89,13 +87,12 @@ export default function HomePage() {
                     </svg>
                   </div>
                   <div>
-                    <p className="label-mono">SERVICES</p>
-                    <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">Custom Development</h3>
+                    <p className="label-mono">{c.servicesLabel}</p>
+                    <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.servicesName}</h3>
                   </div>
                 </div>
                 <p className="text-[var(--text-secondary)] leading-relaxed">
-                  System development, web platforms, and design services.
-                  We help teams ship reliable software with thoughtful UX.
+                  {c.servicesDesc}
                 </p>
                 <div className="mt-4 flex gap-2">
                   <span className="badge">Web</span>
@@ -114,14 +111,14 @@ export default function HomePage() {
           <div className="container-max">
             <div className="mx-auto max-w-3xl text-center">
               <SectionHeading
-                badge="ABOUT"
+                badge={c.aboutBadge}
                 align="center"
-                title="Built in Hong Kong"
-                subtitle="EaseCity Technologies Limited (逸城科技有限公司) is a Hong Kong SAR company building tools for connected teams."
+                title={c.aboutTitle}
+                subtitle={c.aboutSubtitle}
               />
               <div className="mt-8">
                 <Link href="/about" className="btn-secondary">
-                  Learn more about us
+                  {c.aboutCta}
                 </Link>
               </div>
             </div>
