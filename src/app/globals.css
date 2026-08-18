@@ -427,6 +427,82 @@
   --paper-muted: var(--text-muted);
 }
 
+/* Markdown content (VLOG / updates) — clean readable styles */
+.prose-async {
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+  line-height: 1.75;
+}
+.prose-async > * + * {
+  margin-top: 1em;
+}
+.prose-async h1, .prose-async h2, .prose-async h3, .prose-async h4 {
+  color: var(--text-primary);
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-weight: 700;
+  line-height: 1.3;
+  margin-top: 1.6em;
+}
+.prose-async h1 { font-size: 1.5rem; }
+.prose-async h2 { font-size: 1.3rem; }
+.prose-async h3 { font-size: 1.15rem; }
+.prose-async a {
+  color: var(--signal);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.prose-async a:hover { color: var(--signal-light); }
+.prose-async strong { color: var(--text-primary); font-weight: 600; }
+.prose-async ul, .prose-async ol { padding-left: 1.4em; }
+.prose-async ul { list-style: disc; }
+.prose-async ol { list-style: decimal; }
+.prose-async li + li { margin-top: 0.4em; }
+.prose-async blockquote {
+  border-left: 2px solid var(--signal);
+  padding-left: 1em;
+  color: var(--text-muted);
+  font-style: italic;
+}
+.prose-async code {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 0.85em;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  padding: 0.1em 0.35em;
+  color: var(--signal);
+}
+.prose-async pre {
+  background: var(--bg-void);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1em;
+  overflow-x: auto;
+}
+.prose-async pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  color: var(--text-primary);
+}
+.prose-async img { border-radius: 8px; }
+.prose-async hr {
+  border: none;
+  border-top: 1px solid var(--border-color);
+  margin: 2em 0;
+}
+.prose-async table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.prose-async th, .prose-async td {
+  border: 1px solid var(--border-color);
+  padding: 0.5em 0.75em;
+  text-align: left;
+}
+.prose-async th { background: var(--bg-elevated); color: var(--text-primary); }
+
 /* Legacy utility class compat — mapped to new tokens */
 .signal-badge {
   display: inline-flex;

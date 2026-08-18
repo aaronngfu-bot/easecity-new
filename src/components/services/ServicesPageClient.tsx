@@ -117,13 +117,13 @@ export function ServicesPageClient() {
                     <span key={tag} className="badge">{tag}</span>
                   ))}
                 </div>
-                <a
-                  href={`mailto:admin@easecity.hk?subject=${encodeURIComponent(c.enquireSubjectPrefix + service.title)}`}
+                <Link
+                  href={`/about#contact?subject=${encodeURIComponent(c.enquireSubjectPrefix + service.title)}`}
                   className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
                 >
                   {c.enquireService}
                   <ArrowUpRight size={14} />
-                </a>
+                </Link>
               </motion.div>
             ))}
           </div>

@@ -272,8 +272,9 @@ const en = {
         servicesSubtitle: "From low-latency infrastructure to polished web products — one team, full ownership.",
         servicesCta: "Explore all services",
         vlogBadge: "UPDATES",
-        vlogTitle: "What we've been building",
-        vlogSubtitle: "A running log of recent work, releases, and product notes.",
+            vlogTitle: "What we've been building",
+            vlogSubtitle: "A running log of recent work, releases, and product notes.",
+            vlogCta: "View all updates",
         vlogItems: [
           { date: '2026-08', title: 'Brand refresh & transparent mark', body: 'Shipped a new interlocking brand mark, transparent favicon set, and a unified dark/light theme token system across the site.' },
           { date: '2026-08', title: 'Pricing clarity', body: 'Enterprise tier moved to a contact-driven model; transparent self-serve pricing for solo and team plans.' },
@@ -1300,8 +1301,9 @@ const zh: typeof en = {
         servicesSubtitle: "從低延遲基礎設施到精緻網頁產品——一個團隊，全程負責。",
         servicesCta: "探索全部服務",
         vlogBadge: "動態",
-        vlogTitle: "我們最近在做什麼",
-        vlogSubtitle: "近期工作、發佈與產品紀錄的持續日誌。",
+            vlogTitle: "我們最近在做什麼",
+            vlogSubtitle: "近期工作、發佈與產品紀錄的持續日誌。",
+            vlogCta: "查看全部動態",
         vlogItems: [
           { date: '2026-08', title: '品牌重塑與透明標記', body: '推出全新交疊品牌標記、透明 favicon 組，以及全站統一的深淺色 theme token 系統。' },
           { date: '2026-08', title: '定價更清晰', body: '企業版改為聯絡制；個人與團隊方案維持透明的自助訂閱。' },

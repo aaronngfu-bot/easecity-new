@@ -14,6 +14,7 @@ function AdminSidebar() {
     { href: '/admin/users', label: 'Users', icon: '◎' },
     { href: '/admin/orders', label: 'Orders', icon: '◈' },
     { href: '/admin/contacts', label: 'Contacts', icon: '◇' },
+    { href: '/admin/vlog', label: 'VLOG / Updates', icon: '▤' },
     { href: '/admin/logs', label: 'Audit Logs', icon: '◆' },
   ]
 

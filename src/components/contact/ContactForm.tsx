@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { Send, CheckCircle2, AlertCircle } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -18,15 +19,22 @@ interface FormData {
 
 export function ContactForm() {
   const { t } = useLanguage()
+  const searchParams = useSearchParams()
+  const presetSubject = searchParams.get('subject')
   const [formState, setFormState] = useState<FormState>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  const initialSubject = presetSubject || t.contactForm.subjects[0]
   const [data, setData] = useState<FormData>({
     name: '',
     email: '',
     company: '',
-    subject: t.contactForm.subjects[0],
+    subject: initialSubject,
     message: '',
   })
+
+  const allSubjects = presetSubject && !t.contactForm.subjects.includes(presetSubject)
+    ? [presetSubject, ...t.contactForm.subjects]
+    : t.contactForm.subjects
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -151,7 +159,7 @@ export function ContactForm() {
             value={data.subject} onChange={handleChange}
             className={cn('glass-input appearance-none cursor-pointer')}
           >
-            {t.contactForm.subjects.map((opt) => (
+            {allSubjects.map((opt) => (
               <option key={opt} value={opt} className="bg-bg-surface">{opt}</option>
             ))}
           </select>

@@ -42,7 +42,7 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
         <Link className="pill-logo" href="/" aria-label="Home">
           <BrandMark size={28} />
           <span className="pill-wordmark">
-            <span className="pill-wordmark-brand">easecity</span>
+            <span className="pill-wordmark-brand">EaseCity</span>
           </span>
         </Link>
 

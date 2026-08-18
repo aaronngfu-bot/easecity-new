@@ -1,13 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { ArrowRight, ArrowUpRight, Calendar, Code2, Globe, Palette, Lightbulb, Megaphone, Fingerprint, Cpu } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Code2, Globe, Palette, Lightbulb, Megaphone, Fingerprint, Cpu } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { RevealSection } from '@/components/ui/RevealSection'
 import SectionHeading from '@/components/SectionHeading'
 import { CompanyIllustration } from '@/components/illustrations/CompanyIllustration'
+import { VlogTimeline } from '@/components/home/VlogTimeline'
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -198,30 +198,7 @@ export default function HomePage() {
             />
 
             <div className="mx-auto mt-12 max-w-3xl">
-              <ol className="relative space-y-6 border-l border-[var(--border-color)] pl-6">
-                {c.vlogItems.map((item) => (
-                  <motion.li
-                    key={item.title}
-                    initial={{ opacity: 0, x: -12 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: '-40px' }}
-                    transition={{ duration: 0.4 }}
-                    className="relative"
-                  >
-                    <span className="absolute -left-[31px] top-1 h-2.5 w-2.5 rounded-full bg-[var(--signal)] ring-4 ring-[var(--bg-base)]" />
-                    <div className="flex items-center gap-2">
-                      <Calendar size={13} className="text-[var(--signal)]" />
-                      <span className="label-mono">{item.date}</span>
-                    </div>
-                    <h3 className="mt-1 font-display text-lg font-semibold text-[var(--text-primary)]">
-                      {item.title}
-                    </h3>
-                    <p className="mt-1 text-sm leading-relaxed text-[var(--text-secondary)]">
-                      {item.body}
-                    </p>
-                  </motion.li>
-                ))}
-              </ol>
+              <VlogTimeline fallback={c.vlogItems} />
             </div>
           </div>
         </section>
