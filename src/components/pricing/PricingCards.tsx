@@ -181,14 +181,14 @@ function PricingCard({ plan, whatsIncluded }: { plan: PlanData; whatsIncluded: s
       )}
     >
       {plan.highlighted && (
-        <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2 -translate-y-1/2">
+        <div className="absolute left-1/2 top-4 z-20 -translate-x-1/2">
           <span className="badge bg-[var(--signal)] text-[var(--text-primary)] border-[var(--signal)]">
             {plan.badge}
           </span>
         </div>
       )}
 
-      <div className={cn('flex flex-1 flex-col p-6 md:p-7', plan.highlighted && 'pt-8')}>
+      <div className={cn('flex flex-1 flex-col p-6 md:p-7', plan.highlighted && 'pt-14')}>
         <div className="mb-4 flex items-center justify-between">
           <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
             <plan.icon size={18} />
