@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -11,6 +12,7 @@ interface DbPost {
   slug: string
   title: string
   excerpt: string | null
+  image: string | null
   publishedAt: string | null
 }
 
@@ -44,7 +46,7 @@ export function VlogTimeline({ fallback }: { fallback: StaticItem[] }) {
     }
   }, [])
 
-  const items: { date: string; title: string; body: string; slug?: string }[] = posts
+  const items: { date: string; title: string; body: string; slug?: string; image?: string | null }[] = posts
     ? posts.map((p) => ({
         date: p.publishedAt
           ? new Date(p.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
@@ -52,6 +54,7 @@ export function VlogTimeline({ fallback }: { fallback: StaticItem[] }) {
         title: p.title,
         body: p.excerpt ?? '',
         slug: p.slug,
+        image: p.image,
       }))
     : fallback
 
@@ -68,6 +71,13 @@ export function VlogTimeline({ fallback }: { fallback: StaticItem[] }) {
             className="relative"
           >
             <span className="absolute -left-[31px] top-1 h-2.5 w-2.5 rounded-full bg-[var(--signal)] ring-4 ring-[var(--bg-base)]" />
+            {item.image && (
+              <div className="mb-3 overflow-hidden rounded-lg border border-[var(--border-color)]">
+                <div className="relative aspect-[16/7] overflow-hidden">
+                  <Image src={item.image} alt={item.title} fill sizes="(max-width: 768px) 100vw, 640px" className="object-cover" />
+                </div>
+              </div>
+            )}
             <div className="flex items-center gap-2">
               <Calendar size={13} className="text-[var(--signal)]" />
               <span className="label-mono">{item.date}</span>

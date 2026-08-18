@@ -40,6 +40,7 @@ const vlogPatchSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'lowercase letters, numbers, and hyphens only')
     .optional(),
   excerpt: z.string().max(300).nullable().optional(),
+  image: z.string().max(2_000_000).nullable().optional(),
   content: z.string().min(1).optional(),
   published: z.boolean().optional(),
   publishedAt: z.string().datetime().nullable().optional(),

@@ -21,6 +21,7 @@ interface EditorState {
   title: string
   slug: string
   excerpt: string
+  image: string
   content: string
   published: boolean
 }
@@ -29,6 +30,7 @@ const EMPTY: EditorState = {
   title: '',
   slug: '',
   excerpt: '',
+  image: '',
   content: '',
   published: false,
 }
@@ -82,6 +84,7 @@ export default function AdminVlogPage() {
         title: d.data.title,
         slug: d.data.slug,
         excerpt: d.data.excerpt ?? '',
+        image: d.data.image ?? '',
         content: d.data.content ?? '',
         published: d.data.published,
       })
@@ -107,6 +110,7 @@ export default function AdminVlogPage() {
             title: editor.title,
             slug: editor.slug,
             excerpt: editor.excerpt,
+            image: editor.image,
             content: editor.content,
             published: editor.published,
           }),
@@ -121,6 +125,7 @@ export default function AdminVlogPage() {
             title: editor.title,
             slug: editor.slug,
             excerpt: editor.excerpt,
+            image: editor.image,
             content: editor.content,
             published: editor.published,
           }),
@@ -221,6 +226,44 @@ export default function AdminVlogPage() {
               className="glass-input"
               placeholder="One-line summary shown on the timeline"
             />
+          </div>
+
+          <div className="mt-4">
+            <label className="mb-1.5 block text-sm font-medium text-text-secondary">Cover image</label>
+            <div className="flex items-start gap-3">
+              {editor.image && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={editor.image} alt="cover" className="h-20 w-20 shrink-0 rounded-md border border-border object-cover" />
+              )}
+              <div className="flex-1 space-y-2">
+                <input
+                  value={editor.image.startsWith('data:') ? '' : editor.image}
+                  onChange={(e) => setEditor({ ...editor, image: e.target.value })}
+                  className="glass-input"
+                  placeholder="URL, or upload a file below"
+                />
+                <label className="inline-flex cursor-pointer items-center gap-2 text-xs text-text-muted hover:text-signal">
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+                      const reader = new FileReader()
+                      reader.onload = () => {
+                        if (reader.result) {
+                          setEditor((prev) => (prev ? { ...prev, image: reader.result as string } : prev))
+                        }
+                      }
+                      reader.readAsDataURL(file)
+                    }}
+                  />
+                  <span className="signal-secondary min-h-0 px-3 py-1.5 text-xs">Upload image</span>
+                  Upload from this device (stored inline)
+                </label>
+              </div>
+            </div>
           </div>
 
           <div className="mt-4">

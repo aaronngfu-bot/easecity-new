@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { ArrowRight, Mail, MessageSquare, Search, Send, ArrowUpRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { PageHero } from '@/components/ui/PageHero'
+import { services as serviceCatalog } from '@/lib/services'
 
 function ServiceIcon({ icon }: { icon: string }) {
   const common = { strokeWidth: 1.8, stroke: 'currentColor', fill: 'none' } as const
@@ -48,14 +49,13 @@ export function ServicesPageClient() {
   const { t } = useLanguage()
   const c = t.servicesPage
 
-  const services = [
-    { icon: 'code', title: c.s1Title, body: c.s1Body, tags: ['C++', 'Flutter', 'Next.js', 'Node.js'] },
-    { icon: 'web', title: c.s2Title, body: c.s2Body, tags: ['Next.js', 'Prisma', 'Stripe', 'Vercel'] },
-    { icon: 'design', title: c.s3Title, body: c.s3Body, tags: ['Figma', 'Tailwind', 'Design Systems'] },
-    { icon: 'consult', title: c.s4Title, body: c.s4Body, tags: ['Architecture', 'Performance', 'Process'] },
-    { icon: 'ad', title: c.s5Title, body: c.s5Body, tags: ['Google Ads', 'Meta', 'SEO'] },
-    { icon: 'brand', title: c.s6Title, body: c.s6Body, tags: ['Logo', 'Brand Identity', 'Visual System'] },
-  ]
+  const services = serviceCatalog.map((s) => ({
+    slug: s.slug,
+    icon: s.icon,
+    title: c[s.titleKey as keyof typeof c] as string,
+    body: c[s.bodyKey as keyof typeof c] as string,
+    tags: s.tags,
+  }))
 
   const process = [
     { icon: 'search', title: c.p1Title, description: c.p1Desc },
@@ -118,7 +118,7 @@ export function ServicesPageClient() {
                   ))}
                 </div>
                 <Link
-                  href={`/about#contact?subject=${encodeURIComponent(c.enquireSubjectPrefix + service.title)}`}
+                  href={`/services/${service.slug}`}
                   className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
                 >
                   {c.enquireService}

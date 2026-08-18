@@ -264,6 +264,7 @@ model VlogPost {
   slug        String    @unique
   title       String
   excerpt     String?
+  image       String?   // cover image: absolute URL or data URL
   content     String    // markdown
   published   Boolean   @default(false)
   publishedAt DateTime?

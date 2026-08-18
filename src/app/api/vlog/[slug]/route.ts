@@ -18,6 +18,7 @@ export const GET = withErrorHandler(async (_req, context) => {
     slug: post.slug,
     title: post.title,
     excerpt: post.excerpt,
+    image: post.image,
     content: post.content,
     publishedAt: post.publishedAt?.toISOString() ?? null,
   })

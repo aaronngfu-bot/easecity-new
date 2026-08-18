@@ -26,26 +26,27 @@ const syne = Syne({
 
 export const metadata: Metadata = {
   title: {
-    default: 'EaseCity — Technology for connected teams',
+    default: 'EaseCity — Web services, system architecture & AI',
     template: '%s | EaseCity',
   },
   description:
-    'EaseCity Technologies Limited builds tools and services for connected teams. Our first product, EC-Share, is Android device mirroring for teams.',
+    'EaseCity Technologies Limited is a Hong Kong technology firm building web services, system architecture, and AI solutions. We also ship EC-Share, Android device mirroring for teams.',
   icons: {
     icon: [
+      { url: '/images/easecity-favicon.svg', type: 'image/svg+xml' },
       { url: '/images/easecity-favicon.ico', sizes: 'any' },
-      { url: '/images/easecity-favicon.png', type: 'image/png', sizes: '48x48' },
     ],
     apple: '/images/easecity-apple-touch-icon.png',
-    other: [{ rel: 'mask-icon', url: '/images/easecity-logo-light-128.png', color: '#57bcb2' }],
   },
   keywords: [
     'EaseCity',
     'EC-Share',
+    'web services',
+    'system architecture',
+    'AI solutions',
     'Android device mirroring',
     'remote device management',
-    'tech company',
-    'Hong Kong tech',
+    'Hong Kong tech company',
   ],
   authors: [{ name: 'EaseCity Technologies Limited' }],
   creator: 'EaseCity',
@@ -54,15 +55,15 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://easecity.hk',
     siteName: 'EaseCity',
-    title: 'EaseCity — Technology for connected teams',
+    title: 'EaseCity — Web services, system architecture & AI',
     description:
-      'EaseCity Technologies Limited builds tools and services for connected teams. EC-Share is Android device mirroring for teams.',
+      'Hong Kong technology firm building web services, system architecture, and AI solutions — and the makers of EC-Share.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'EaseCity — Technology for connected teams',
+    title: 'EaseCity — Web services, system architecture & AI',
     description:
-      'EaseCity Technologies Limited builds tools and services for connected teams.',
+      'Hong Kong technology firm building web services, system architecture, and AI solutions — and the makers of EC-Share.',
   },
   robots: {
     index: true,

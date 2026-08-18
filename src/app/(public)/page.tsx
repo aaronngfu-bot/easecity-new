@@ -8,6 +8,16 @@ import { RevealSection } from '@/components/ui/RevealSection'
 import SectionHeading from '@/components/SectionHeading'
 import { CompanyIllustration } from '@/components/illustrations/CompanyIllustration'
 import { VlogTimeline } from '@/components/home/VlogTimeline'
+import { services as serviceCatalog } from '@/lib/services'
+
+const SERVICE_ICONS: Record<string, React.ElementType> = {
+  code: Code2,
+  web: Globe,
+  design: Palette,
+  consult: Lightbulb,
+  ad: Megaphone,
+  brand: Fingerprint,
+}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -21,49 +31,50 @@ const fadeUp = {
 export default function HomePage() {
   const { t } = useLanguage()
   const c = t.companyPage
+  const c2 = t.servicesPage
 
-  const services = [
-    { icon: Cpu, title: t.servicesPage.s1Title, body: t.servicesPage.s1Body },
-    { icon: Globe, title: t.servicesPage.s2Title, body: t.servicesPage.s2Body },
-    { icon: Palette, title: t.servicesPage.s3Title, body: t.servicesPage.s3Body },
-    { icon: Lightbulb, title: t.servicesPage.s4Title, body: t.servicesPage.s4Body },
-    { icon: Megaphone, title: t.servicesPage.s5Title, body: t.servicesPage.s5Body },
-    { icon: Fingerprint, title: t.servicesPage.s6Title, body: t.servicesPage.s6Body },
-  ]
+  const services = serviceCatalog.map((s) => ({
+    slug: s.slug,
+    icon: SERVICE_ICONS[s.icon] ?? Code2,
+    title: c2[s.titleKey as keyof typeof c2] as string,
+    body: c2[s.bodyKey as keyof typeof c2] as string,
+  }))
 
   return (
     <main className="relative min-h-screen">
-      {/* Hero */}
-      <section className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[var(--bg-base)]">
+      {/* Hero — left copy / right illustration on desktop */}
+      <section className="relative overflow-hidden bg-[var(--bg-base)]">
         <div aria-hidden className="absolute inset-0 bg-grid opacity-50" />
-        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_60%_40%_at_50%_30%,var(--signal-soft),transparent_70%)]" />
+        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_30%_20%,var(--signal-soft),transparent_70%)]" />
 
-        <div className="relative z-10 mx-auto max-w-4xl px-6 text-center">
-          <p className="label-mono mb-6 flex items-center justify-center gap-2">
-            <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)] animate-pulse" />
-            {c.heroEyebrow}
-          </p>
+        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-32 md:pt-40 lg:grid-cols-2 lg:gap-8">
+          <div className="text-left">
+            <p className="label-mono mb-6 flex items-center gap-2">
+              <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)] animate-pulse" />
+              {c.heroEyebrow}
+            </p>
 
-          <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-[var(--text-primary)] sm:text-5xl md:text-6xl">
-            {c.heroTitle}
-            <br />
-            <span className="text-gradient-signal">{c.heroHighlight}</span>
-          </h1>
+            <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-[var(--text-primary)] sm:text-5xl md:text-6xl">
+              {c.heroTitle}
+              <br />
+              <span className="text-gradient-signal">{c.heroHighlight}</span>
+            </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-[var(--text-secondary)]">
-            {c.heroSubtitle}
-          </p>
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-[var(--text-secondary)]">
+              {c.heroSubtitle}
+            </p>
 
-          <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-            <Link href="/ec-share" className="btn-primary">
-              {c.heroCtaProduct}
-            </Link>
-            <Link href="/services" className="btn-secondary">
-              {c.heroCtaServices}
-            </Link>
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
+              <Link href="/ec-share" className="btn-primary px-7 py-3 text-sm">
+                {c.heroCtaProduct}
+              </Link>
+              <Link href="/services" className="btn-secondary px-7 py-3 text-sm">
+                {c.heroCtaServices}
+              </Link>
+            </div>
           </div>
 
-          <div className="mx-auto mt-14 max-w-3xl">
+          <div className="lg:pl-4">
             <CompanyIllustration />
           </div>
         </div>
@@ -167,7 +178,7 @@ export default function HomePage() {
                     {s.body}
                   </p>
                   <Link
-                    href="/services"
+                    href={`/services/${s.slug}`}
                     className="mt-auto pt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
                   >
                     {t.servicesPage.enquireService}

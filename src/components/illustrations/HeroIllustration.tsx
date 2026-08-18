@@ -77,9 +77,41 @@ export function HeroIllustration() {
       <path d="M400 84 V60" stroke="var(--signal)" strokeWidth="1" strokeDasharray="3 3" />
       <path d="M550 100 V76" stroke="var(--signal)" strokeWidth="1" strokeDasharray="3 3" opacity="0.5" />
 
+      {/* travelling data pulses along the three connections */}
+      <circle r="3" fill="var(--signal)" className="hi-pulse">
+        <animateMotion dur="2.4s" repeatCount="indefinite" begin="0s" path="M250 100 L250 76" />
+      </circle>
+      <circle r="3" fill="var(--signal)" className="hi-pulse">
+        <animateMotion dur="2.4s" repeatCount="indefinite" begin="0.8s" path="M400 84 L400 60" />
+      </circle>
+      <circle r="3" fill="var(--signal)" className="hi-pulse">
+        <animateMotion dur="2.4s" repeatCount="indefinite" begin="0.4s" path="M550 100 L550 76" />
+      </circle>
+
+      {/* focus phone scan line */}
+      <rect x="335" y="84" width="140" height="206" rx="12" fill="none" stroke="var(--signal)" strokeWidth="0.6" opacity="0.35" className="hi-scan" />
+
       {/* Status dots top-right of monitor */}
-      <circle cx="640" cy="56" r="4" fill="var(--signal)" />
+      <circle cx="640" cy="56" r="4" fill="var(--signal)" className="hi-dot" />
       <circle cx="656" cy="56" r="4" fill="var(--border-strong)" />
+
+      <style jsx>{`
+        .hi-pulse { filter: drop-shadow(0 0 3px var(--signal)); }
+        .hi-dot { animation: hi-blink 2s ease-in-out infinite; }
+        .hi-scan { animation: hi-scan 3s ease-in-out infinite; }
+        @keyframes hi-blink {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.35; }
+        }
+        @keyframes hi-scan {
+          0%, 100% { opacity: 0.15; }
+          50% { opacity: 0.4; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hi-pulse, .hi-dot, .hi-scan { animation: none !important; opacity: 0.7; }
+          .hi-pulse animateMotion { display: none; }
+        }
+      `}</style>
     </svg>
   )
 }

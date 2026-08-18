@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import Image from 'next/image'
 import { prisma } from '@/lib/db'
 import { Calendar, ArrowLeft } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
@@ -43,17 +44,24 @@ export default async function VlogPage() {
             </div>
           ) : (
             posts.map((post) => (
-              <article key={post.id} className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-6 md:p-8">
-                <div className="mb-3 flex items-center gap-2">
-                  <Calendar size={13} className="text-[var(--signal)]" />
-                  <span className="label-mono">
-                    {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
-                  </span>
-                </div>
-                <h2 className="font-display text-2xl font-semibold text-[var(--text-primary)]">{post.title}</h2>
-                {post.excerpt && <p className="mt-2 text-sm text-[var(--text-muted)]">{post.excerpt}</p>}
-                <div className="prose-async mt-5">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+              <article key={post.id} className="overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)]">
+                {post.image && (
+                  <div className="relative aspect-[16/7] overflow-hidden bg-[var(--bg-elevated)]">
+                    <Image src={post.image} alt={post.title} fill sizes="(max-width: 768px) 100vw, 720px" className="object-cover" />
+                  </div>
+                )}
+                <div className="p-6 md:p-8">
+                  <div className="mb-3 flex items-center gap-2">
+                    <Calendar size={13} className="text-[var(--signal)]" />
+                    <span className="label-mono">
+                      {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
+                    </span>
+                  </div>
+                  <h2 className="font-display text-2xl font-semibold text-[var(--text-primary)]">{post.title}</h2>
+                  {post.excerpt && <p className="mt-2 text-sm text-[var(--text-muted)]">{post.excerpt}</p>}
+                  <div className="prose-async mt-5">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
+                  </div>
                 </div>
               </article>
             ))

@@ -26,6 +26,7 @@ export const GET = withErrorHandler(async (req) => {
         slug: true,
         title: true,
         excerpt: true,
+        image: true,
         content: includeBody,
         publishedAt: true,
       },

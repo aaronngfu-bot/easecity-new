@@ -17,6 +17,7 @@ const vlogSchema = z.object({
     .max(160)
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'lowercase letters, numbers, and hyphens only'),
   excerpt: z.string().max(300).optional().nullable(),
+  image: z.string().max(2_000_000).optional().nullable(),
   content: z.string().min(1),
   published: z.boolean().optional(),
   publishedAt: z.string().datetime().optional().nullable(),
@@ -61,6 +62,7 @@ export const POST = withErrorHandler(async (req) => {
       title: data.title,
       slug: data.slug,
       excerpt: data.excerpt || null,
+      image: data.image || null,
       content: data.content,
       published: data.published ?? false,
       publishedAt: data.published ? (data.publishedAt ? new Date(data.publishedAt) : new Date()) : null,
