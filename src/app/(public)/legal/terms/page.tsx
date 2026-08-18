@@ -4,7 +4,7 @@ import Link from 'next/link'
 export const metadata: Metadata = {
   title: 'Terms of Service',
   description:
-    'easecity Terms of Service — the agreement governing your use of our stream control infrastructure platform.',
+    'easecity Terms of Service — the agreement governing your use of our products and services platform.',
   robots: { index: true, follow: true },
 }
 

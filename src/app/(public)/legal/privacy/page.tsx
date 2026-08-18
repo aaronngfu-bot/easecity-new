@@ -34,7 +34,7 @@ export default function PrivacyPolicyPage() {
           </p>
           <div className="mt-6 p-4 rounded-xl border border-border bg-bg-surface text-sm text-text-secondary leading-relaxed">
             This Privacy Policy explains how easecity (&ldquo;we&rdquo;, &ldquo;us&rdquo;, &ldquo;our&rdquo;) collects, uses, stores,
-            and protects your personal data when you use our website and stream control infrastructure
+            and protects your personal data when you use our website and products and services
             services. By accessing or using our services, you agree to the practices described in
             this policy.
           </div>
@@ -46,7 +46,7 @@ export default function PrivacyPolicyPage() {
           <Section title="1. Who We Are">
             <p>
               easecity is a technology company incorporated in the Hong Kong Special Administrative
-              Region. We operate the stream control infrastructure platform available at{' '}
+              Region. We operate the products and services platform available at{' '}
               <span className="text-signal font-mono">easecity.hk</span> and its associated
               subdomains.
             </p>

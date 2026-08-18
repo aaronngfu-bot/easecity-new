@@ -9,7 +9,7 @@ import { ContactHero } from '@/components/contact/ContactHero'
 export const metadata: Metadata = {
   title: 'About',
   description:
-    'easecity is a Hong Kong-based technology company building the infrastructure layer for connected systems — starting with stream control, expanding into AI-powered services.',
+    'EaseCity Technologies Limited is a Hong Kong-based technology company building tools and services for connected teams — starting with EC-Share, Android device mirroring for teams.',
 }
 
 export default function AboutPage() {

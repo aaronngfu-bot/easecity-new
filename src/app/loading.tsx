@@ -9,7 +9,7 @@ export default function Loading() {
           <div className="absolute left-1/2 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-signal shadow-glow-signal" />
         </div>
         <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-signal">Acquiring signal</p>
-        <p className="mt-2 text-xs text-text-muted">Loading the control plane…</p>
+        <p className="mt-2 text-xs text-text-muted">Loading…</p>
       </div>
     </div>
   )

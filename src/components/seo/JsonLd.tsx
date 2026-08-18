@@ -7,7 +7,7 @@ interface OrganizationJsonLdProps {
 export function OrganizationJsonLd({
   name = 'easecity',
   url = 'https://easecity.hk',
-  description = 'Enterprise-grade stream control infrastructure — enabling a single device to manage, monitor, and orchestrate unlimited remote endpoints.',
+  description = 'EaseCity Technologies Limited builds tools and services for connected teams. EC-Share is Android device mirroring for teams.',
 }: OrganizationJsonLdProps) {
   const jsonLd = {
     '@context': 'https://schema.org',
