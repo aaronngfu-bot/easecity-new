@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import './PillNav.css'
 
 interface NavItem {
   href: string
