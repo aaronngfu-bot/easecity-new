@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
+import { HeroIllustration } from '@/components/illustrations/HeroIllustration'
 
 const features = [
   { key: 'f1Title', desc: 'f1Desc', icon: 'grid' },
@@ -160,6 +161,11 @@ export default function EcSharePage() {
                 </div>
               ))}
             </div>
+          </div>
+
+          {/* Illustration */}
+          <div className="mx-auto mt-14 max-w-4xl">
+            <HeroIllustration />
           </div>
         </div>
       </section>
