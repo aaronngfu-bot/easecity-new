@@ -17,6 +17,28 @@
 @layer base {
   /* ── LIGHT (default :root) ──────────────────────────────────── */
   :root {
+    /* shadcn-compatible HSL tokens (compat layer for border-bg and
+       bg-card etc. that reference hsl(var(--x)) in tailwind.config) */
+    --background: 0 0% 98%;
+    --foreground: 175 60% 8%;
+    --card: 0 0% 100%;
+    --card-foreground: 175 60% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 175 60% 8%;
+    --primary: 173 100% 34%;
+    --primary-foreground: 180 100% 7%;
+    --secondary: 180 25% 95%;
+    --secondary-foreground: 175 60% 8%;
+    --muted: 180 25% 95%;
+    --muted-foreground: 175 15% 40%;
+    --accent: 180 25% 95%;
+    --accent-foreground: 175 60% 8%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 175 15% 86%;
+    --input: 175 15% 86%;
+    --ring: 173 100% 34%;
+
     /* Brand signal — same teal in both modes */
     --signal: #008f82;
     --signal-light: #00a896;
@@ -74,6 +96,27 @@
 
   /* ── DARK (.dark class on <html>) ───────────────────────────── */
   .dark {
+    /* shadcn-compatible HSL tokens (dark) */
+    --background: 210 22% 4%;
+    --foreground: 180 13% 96%;
+    --card: 210 18% 8%;
+    --card-foreground: 180 13% 96%;
+    --popover: 210 18% 8%;
+    --popover-foreground: 180 13% 96%;
+    --primary: 173 100% 45%;
+    --primary-foreground: 180 100% 6%;
+    --secondary: 210 16% 14%;
+    --secondary-foreground: 180 13% 96%;
+    --muted: 210 16% 14%;
+    --muted-foreground: 180 6% 56%;
+    --accent: 210 16% 16%;
+    --accent-foreground: 180 13% 96%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 193 18% 17%;
+    --input: 193 18% 20%;
+    --ring: 173 100% 45%;
+
     --signal: #00e5cc;
     --signal-light: #35f5e0;
     --signal-bright: #00e5cc;
