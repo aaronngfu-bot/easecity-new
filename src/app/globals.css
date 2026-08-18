@@ -479,3 +479,25 @@
   position: relative;
   overflow: hidden;
 }
+
+/* Illustration animations — subtle, functional only */
+@keyframes hub-pulse {
+  0%, 100% { r: 40px; }
+  50% { r: 44px; }
+}
+@keyframes dot-float {
+  0%, 100% { transform: translateY(0); opacity: 0.7; }
+  50% { transform: translateY(-6px); opacity: 1; }
+}
+.hub-pulse {
+  animation: hub-pulse 3s ease-in-out infinite;
+}
+.dot-float {
+  animation: dot-float 3s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hub-pulse,
+  .dot-float {
+    animation: none !important;
+  }
+}

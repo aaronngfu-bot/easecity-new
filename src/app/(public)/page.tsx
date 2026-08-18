@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { RevealSection } from '@/components/ui/RevealSection'
 import SectionHeading from '@/components/SectionHeading'
+import { CompanyIllustration } from '@/components/illustrations/CompanyIllustration'
 
 export default function HomePage() {
   const { t } = useLanguage()
@@ -39,6 +40,11 @@ export default function HomePage() {
             <Link href="/services" className="btn-secondary">
               {c.heroCtaServices}
             </Link>
+          </div>
+
+          {/* Illustration */}
+          <div className="mx-auto mt-14 max-w-3xl">
+            <CompanyIllustration />
           </div>
         </div>
       </section>
