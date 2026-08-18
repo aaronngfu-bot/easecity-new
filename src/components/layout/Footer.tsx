@@ -16,8 +16,8 @@ export function Footer() {
     [t.footer.groupServices]: [
       { label: t.footer.linkStream, href: '/services' },
       { label: t.footer.linkRemote, href: '/services' },
-      { label: t.footer.linkAI, href: '/services#future' },
-      { label: t.footer.linkOnline, href: '/services#future' },
+      { label: t.footer.linkAI, href: '/services' },
+      { label: t.footer.linkOnline, href: '/services' },
     ],
     [t.footer.groupConnect]: [
       { label: t.footer.linkTouch, href: '/about#contact' },
@@ -48,8 +48,8 @@ export function Footer() {
                 </svg>
               </div>
               <div className="flex flex-col leading-none">
-                <span className="font-display text-base font-semibold tracking-[-0.03em] text-text-primary">easecity</span>
-                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-text-muted">Control Plane</span>
+                <span className="font-display text-base font-semibold tracking-[-0.03em] text-text-primary">EaseCity</span>
+                <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-text-muted">Technologies Limited</span>
               </div>
             </Link>
             <p className="max-w-xs text-sm leading-relaxed text-text-secondary">
@@ -86,7 +86,7 @@ export function Footer() {
 
         <div className="flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
           <p className="text-xs text-text-muted">
-            © {new Date().getFullYear()} easecity. All rights reserved.
+            © {new Date().getFullYear()} EaseCity Technologies Limited. All rights reserved.
           </p>
           <div className="flex flex-wrap items-center justify-center gap-5">
             <Link href="/legal/privacy" className="text-xs text-text-muted transition-colors hover:text-signal">
