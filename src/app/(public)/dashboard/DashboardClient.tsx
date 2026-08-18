@@ -428,22 +428,18 @@ export default function DashboardClient({ userName, subscription, recentOrders }
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-3 mb-3">
-            <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-text-muted">
-              DASHBOARD.00
-            </span>
-            <span className="h-px w-12 bg-gradient-to-r from-signal/40 to-transparent" />
-            <span className="signal-badge">
-              <span className="w-1 h-1 rounded-full bg-signal animate-signal-pulse" />
-              {language === 'zh' ? '控制台' : 'CONTROL DECK'}
+          <div className="mb-3 flex items-center gap-2">
+            <span className="badge">
+              <span className="h-1 w-1 rounded-full bg-[var(--signal)]" />
+              {language === 'zh' ? '控制台' : 'Dashboard'}
             </span>
           </div>
-          <h1 className="font-display text-4xl font-semibold tracking-[-0.05em] text-text-primary md:text-5xl">
+          <h1 className="font-display text-4xl font-semibold tracking-tight text-[var(--text-primary)] md:text-5xl">
             {userName
               ? (language === 'zh' ? `${userName}，你好` : `Welcome, ${userName}`)
               : (language === 'zh' ? '控制台' : 'Dashboard')}
           </h1>
-          <p className="text-text-secondary text-sm mt-2">
+          <p className="mt-2 text-sm text-[var(--text-secondary)]">
             {subscription ? t.dashboard.subtitleActive : t.dashboard.subtitleInactive}
           </p>
         </div>
