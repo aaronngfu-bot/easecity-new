@@ -10,6 +10,7 @@ const en = {
     about: 'About',
     contact: 'Contact',
     cta: 'Free Trial',
+    signIn: 'Sign in',
   },
 
   product: {
@@ -247,7 +248,7 @@ const en = {
     trust3: 'Scalable from day one',
   },
   companyPage: {
-    heroEyebrow: "ESECITY — HONG KONG",
+    heroEyebrow: "EASECITY — HK",
     heroTitle: "We build tools that connect",
     heroHighlight: "people and devices.",
     heroSubtitle: "EaseCity Technologies Limited is a Hong Kong-based technology company. We develop desktop software, web platforms, and custom systems for teams who need reliable, beautiful tools.",
@@ -997,6 +998,7 @@ const zh: typeof en = {
     about: '關於我們',
     contact: '聯絡我們',
     cta: '免費試用',
+    signIn: '登入',
   },
 
   product: {
@@ -1226,7 +1228,7 @@ const zh: typeof en = {
   },
 
   companyPage: {
-    heroEyebrow: "ESECITY — 香港",
+    heroEyebrow: "EASECITY — 香港",
     heroTitle: "我們打造連接",
     heroHighlight: "人與裝置的工具。",
     heroSubtitle: "逸城科技有限公司是一家位於香港的科技公司。我們為需要可靠、美觀工具的團隊開發桌面軟體、網頁平台與客製化系統。",

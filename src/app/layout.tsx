@@ -26,36 +26,39 @@ const syne = Syne({
 
 export const metadata: Metadata = {
   title: {
-    default: 'easecity — Technology for connected teams',
-    template: '%s | easecity',
+    default: 'EaseCity — Technology for connected teams',
+    template: '%s | EaseCity',
   },
   description:
     'EaseCity Technologies Limited builds tools and services for connected teams. Our first product, EC-Share, is Android device mirroring for teams.',
+  icons: {
+    icon: '/images/easecity-logo.png',
+    apple: '/images/easecity-logo.png',
+  },
   keywords: [
-    'easecity',
-    'stream control',
+    'EaseCity',
+    'EC-Share',
+    'Android device mirroring',
     'remote device management',
-    'streaming infrastructure',
-    'IoT control',
     'tech company',
     'Hong Kong tech',
   ],
-  authors: [{ name: 'easecity' }],
-  creator: 'easecity',
+  authors: [{ name: 'EaseCity Technologies Limited' }],
+  creator: 'EaseCity',
   openGraph: {
     type: 'website',
     locale: 'en_US',
     url: 'https://easecity.hk',
-    siteName: 'easecity',
-    title: 'easecity — Technology for connected teams',
+    siteName: 'EaseCity',
+    title: 'EaseCity — Technology for connected teams',
     description:
-      'Enterprise-grade stream control. One hub, unlimited endpoints. Built for the future of connected systems.',
+      'EaseCity Technologies Limited builds tools and services for connected teams. EC-Share is Android device mirroring for teams.',
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'easecity — Technology for connected teams',
+    title: 'EaseCity — Technology for connected teams',
     description:
-      'Enterprise-grade stream control. One hub, unlimited endpoints.',
+      'EaseCity Technologies Limited builds tools and services for connected teams.',
   },
   robots: {
     index: true,

@@ -89,7 +89,7 @@ export default function PillNav({ logo, logoAlt = 'Logo', items, className = '' 
           onClick={() => router.push('/login')}
           className="pill-sign-in desktop-only"
         >
-          <span>Sign in</span>
+          <span>{t.nav.signIn}</span>
         </button>
 
         <button
@@ -97,7 +97,7 @@ export default function PillNav({ logo, logoAlt = 'Logo', items, className = '' 
           onClick={() => router.push('/signup')}
           className="pill-cta desktop-only"
         >
-          {t.nav.cta ?? 'Free Trial'}
+          {t.nav.cta}
         </button>
 
         <button
@@ -161,7 +161,7 @@ export default function PillNav({ logo, logoAlt = 'Logo', items, className = '' 
                   setMobileMenuOpen(false)
                 }}
               >
-                Sign in
+                {t.nav.signIn}
               </button>
             </li>
             <li>
@@ -173,7 +173,7 @@ export default function PillNav({ logo, logoAlt = 'Logo', items, className = '' 
                   setMobileMenuOpen(false)
                 }}
               >
-                {t.nav.cta ?? 'Free Trial'}
+                {t.nav.cta}
               </button>
             </li>
           </ul>

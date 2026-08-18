@@ -46,11 +46,11 @@
     --signal-soft: rgba(0, 143, 130, 0.08);
 
     /* Backgrounds — layered from darkest (void) to lightest (raised) */
-    --bg-void: #f0f4f7;
-    --bg-base: #f5f8f8;
-    --bg-surface: #ffffff;
-    --bg-elevated: #f0f4f5;
-    --bg-raised: #e8eef0;
+    --bg-void: #edf1f4;
+    --bg-base: #f4f7f8;
+    --bg-surface: #fafcfc;
+    --bg-elevated: #eef2f4;
+    --bg-raised: #e6ebee;
 
     /* Text */
     --text-primary: #07100f;
