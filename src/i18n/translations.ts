@@ -313,6 +313,34 @@ const en = {
     ctaSecondary: "Talk to us",
   },
 
+  servicesPage: {
+    heroEyebrow: "What we do",
+    heroHeading: "Development & design",
+    heroHighlight: "for teams.",
+    heroDescription: "EaseCity builds custom systems, web platforms, and interfaces for teams who need reliable tools that work. From concept to deployment, we handle the full cycle.",
+    metaBasedIn: "Based in",
+    metaBasedValue: "Hong Kong",
+    metaTeam: "Team",
+    metaTeamValue: "Lean & focused",
+    s1Title: "System Development",
+    s1Body: "Custom desktop and backend systems built with modern stacks. From real-time streaming infrastructure to internal tools and automation pipelines.",
+    s2Title: "Web Platforms",
+    s2Body: "Full-stack web applications — marketing sites, dashboards, admin panels, and API backends. Deployed on Vercel with PostgreSQL, Stripe, and Resend.",
+    s3Title: "UI / UX Design",
+    s3Body: "Interface design that balances aesthetics with function. Dark/light mode systems, component libraries, and interaction design that scales.",
+    s4Title: "Consulting",
+    s4Body: "Architecture review, performance audits, and team workflow optimization. We help you ship faster without cutting corners.",
+    howWeWork: "How we work",
+    p1Title: "Discovery",
+    p1Desc: "We discuss your goals, constraints, and timeline. No assumptions — we map the problem before writing code.",
+    p2Title: "Design & Prototype",
+    p2Desc: "Wireframes, mockups, and a working prototype. You see the product before we commit to the full build.",
+    p3Title: "Build & Iterate",
+    p3Desc: "Weekly builds with progress demos. You steer the direction; we handle the engineering.",
+    p4Title: "Ship & Maintain",
+    p4Desc: "Deployment, monitoring, and ongoing support. We don't disappear after launch.",
+    getInTouch: "Get in touch",
+  },
   homePage: {
     hero: {
       eyebrow: 'LIVE — MULTI-DEVICE CONTROL',
@@ -433,12 +461,6 @@ const en = {
     builtIn: 'Built in Hong Kong',
   },
 
-  servicesPage: {
-    eyebrow: 'Our Services',
-    heading: 'Stream Control',
-    headingHighlight: 'Infrastructure',
-    desc: 'One control hub. Unlimited endpoints. Built for systems that demand precision, reliability, and scale without compromise.',
-  },
 
   streamArch: {
     eyebrow: 'Architecture',
@@ -1221,6 +1243,34 @@ const zh: typeof en = {
     ctaPrimary: "下載 Windows 版",
     ctaSecondary: "聯絡我們",
   },
+  servicesPage: {
+    heroEyebrow: "我們的服務",
+    heroHeading: "開發與設計",
+    heroHighlight: "為團隊而生。",
+    heroDescription: "逸城科技為需要可靠工具的團隊打造客製化系統、網頁平台與介面。從概念到部署，我們全程負責。",
+    metaBasedIn: "所在地",
+    metaBasedValue: "香港",
+    metaTeam: "團隊",
+    metaTeamValue: "精簡專注",
+    s1Title: "系統開發",
+    s1Body: "以現代技術棧打造客製化桌面與後端系統。從即時串流基礎設施到內部工具與自動化流程。",
+    s2Title: "網頁平台",
+    s2Body: "全端網頁應用——行銷網站、儀表板、後台與 API。部署於 Vercel，搭配 PostgreSQL、Stripe 與 Resend。",
+    s3Title: "UI/UX 設計",
+    s3Body: "兼顧美學與功能的介面設計。深淺色模式系統、元件庫與可擴展的互動設計。",
+    s4Title: "諮詢服務",
+    s4Body: "架構審查、效能檢測與團隊工作流程優化。我們幫你更快交付，不偷工減料。",
+    howWeWork: "我們如何工作",
+    p1Title: "需求探索",
+    p1Desc: "我們討論你的目標、限制與時程。不做假設——先釐清問題再寫程式。",
+    p2Title: "設計與原型",
+    p2Desc: "線框圖、模擬稿與可運作的原型。在投入完整開發前，你先看到產品樣貌。",
+    p3Title: "開發與迭代",
+    p3Desc: "每週建置與進度展示。你掌握方向，我們負責工程。",
+    p4Title: "上線與維護",
+    p4Desc: "部署、監控與持續支援。上線後我們不會消失。",
+    getInTouch: "聯絡我們",
+  },
   homePage: {
     hero: {
       eyebrow: 'LIVE — 多裝置即時控制',
@@ -1341,12 +1391,6 @@ const zh: typeof en = {
     builtIn: '香港製造',
   },
 
-  servicesPage: {
-    eyebrow: '我們的服務',
-    heading: '串流控制',
-    headingHighlight: '基礎設施',
-    desc: '一個控制中樞。無限節點。專為不妥協的系統構建——無論是精確性還是可靠性。',
-  },
 
   streamArch: {
     eyebrow: '架構',
