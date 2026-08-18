@@ -9,6 +9,7 @@ import { LogIn, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import { LoginBackground } from '@/components/auth/LoginBackground'
+import { BrandMark } from '@/components/brand/BrandMark'
 
 type LoginPhase = 'idle' | 'authenticating' | 'google' | 'redirecting'
 
@@ -109,20 +110,7 @@ export default function LoginPage() {
 
         <div className="text-center">
           <Link href="/" className="mb-8 inline-flex items-center gap-2.5 group">
-            <div className="relative flex h-11 w-11 items-center justify-center rounded-md border border-signal/30 bg-signal/10">
-              <svg viewBox="0 0 36 36" className="w-8 h-8">
-                <circle cx="18" cy="6" r="1.2" fill="#52525b" />
-                <circle cx="30" cy="18" r="1.2" fill="#52525b" />
-                <circle cx="18" cy="30" r="1.2" fill="#52525b" />
-                <circle cx="6" cy="18" r="1.2" fill="#52525b" />
-                <line x1="18" y1="6" x2="18" y2="14" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-                <line x1="30" y1="18" x2="22" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-                <line x1="18" y1="30" x2="18" y2="22" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-                <line x1="6" y1="18" x2="14" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-                <circle cx="18" cy="18" r="3.5" fill="#00e5cc" opacity="0.3" />
-                <circle cx="18" cy="18" r="2" fill="#00e5cc" />
-              </svg>
-            </div>
+            <BrandMark size={40} />
           </Link>
           <div className="flex items-center justify-center gap-2 mb-3">
             <span className="label-mono text-signal/70">AUTH.ENTRY</span>

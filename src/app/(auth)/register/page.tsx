@@ -4,12 +4,14 @@ import { useState, useRef } from 'react'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { signIn } from 'next-auth/react'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import { UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
 import { useTheme } from 'next-themes'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
+import { BrandMark } from '@/components/brand/BrandMark'
+import { LoginBackground } from '@/components/auth/LoginBackground'
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -73,23 +75,51 @@ export default function RegisterPage() {
   }
 
   return (
-    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }} className="space-y-6">
+    <>
+      <LoginBackground />
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="relative z-10 space-y-6"
+      >
+      <AnimatePresence>
+        {loading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="fixed inset-0 z-[80] flex items-center justify-center bg-bg-void/85 px-6 backdrop-blur-md"
+            role="status"
+            aria-live="polite"
+          >
+            <motion.div
+              initial={{ opacity: 0, scale: 0.96, y: 12 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: 8 }}
+              transition={{ duration: 0.25 }}
+              className="signal-panel-highlight w-full max-w-sm p-7 text-center"
+            >
+              <div className="relative mx-auto mb-6 flex h-16 w-16 items-center justify-center">
+                <span className="absolute inset-0 rounded-full border border-signal/30 animate-ping" />
+                <span className="absolute inset-2 rounded-full bg-signal/10 shadow-glow-signal" />
+                <svg className="relative h-7 w-7 animate-spin text-signal" fill="none" viewBox="0 0 24 24" aria-hidden="true">
+                  <circle className="opacity-20" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-90" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                </svg>
+              </div>
+              <p className="label-mono mb-3 text-signal/80">ACCOUNT.CREATING</p>
+              <h2 className="font-display text-2xl font-bold text-text-primary">{t.auth.creatingAccount}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-text-secondary">{t.auth.redirectingDesc}</p>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="text-center">
         <Link href="/" className="mb-8 inline-flex items-center gap-2.5 group">
-          <div className="relative flex h-11 w-11 items-center justify-center rounded-md border border-signal/30 bg-signal/10">
-            <svg viewBox="0 0 36 36" className="w-8 h-8">
-              <circle cx="18" cy="6" r="1.2" fill="#52525b" />
-              <circle cx="30" cy="18" r="1.2" fill="#52525b" />
-              <circle cx="18" cy="30" r="1.2" fill="#52525b" />
-              <circle cx="6" cy="18" r="1.2" fill="#52525b" />
-              <line x1="18" y1="6" x2="18" y2="14" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-              <line x1="30" y1="18" x2="22" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-              <line x1="18" y1="30" x2="18" y2="22" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-              <line x1="6" y1="18" x2="14" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-              <circle cx="18" cy="18" r="3.5" fill="#00e5cc" opacity="0.3" />
-              <circle cx="18" cy="18" r="2" fill="#00e5cc" />
-            </svg>
-          </div>
+          <BrandMark size={40} />
         </Link>
         <div className="flex items-center justify-center gap-2 mb-3">
           <span className="label-mono text-signal/70">AUTH.REGISTER</span>
@@ -188,7 +218,8 @@ export default function RegisterPage() {
           {t.auth.signIn}
         </Link>
       </p>
-    </motion.div>
+      </motion.div>
+    </>
   )
 }
 

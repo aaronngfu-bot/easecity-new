@@ -102,7 +102,7 @@ Founder handles: HK account KYC approval + invites you as Stripe team member wit
         - `price_pro_annual` = $190 USD / year
         - `price_business_monthly` = $49 USD / month
         - `price_business_annual` = $490 USD / year
-        - `price_enterprise_annual` = $2,499 USD / year (anchor; actual Enterprise deals custom-priced)
+        - `price_enterprise_annual` = $2,499 USD / year (internal anchor only — actual Enterprise deals custom-priced; not published on the pricing page, which shows "Contact us")
     - Enable **Stripe Tax** ($120/yr or 0.5% revenue minimum) — see SUBSCRIPTION_TIERS.md §6
     - Set Price metadata: `product = "ec_share"` and `tier = "pro"` / `"business"` / `"enterprise"` so webhook + checkout map cleanly
     - Enable Customer Portal (Settings → Billing → Customer Portal) and configure which features customers can self-serve

@@ -253,7 +253,7 @@ Deferred but reserved: de, fr, ru, it, tr, id-ID, vi, hi, ar (Arabic requires RT
 | D-06 | Stripe for billing (with Stripe Tax) | 2026-04-23 | Founder pick over Paddle. |
 | D-07 | EV code-signing cert | 2026-04-23 | Zero-friction SmartScreen from day 1. Cost pays back in week 1. |
 | D-08 | No free-forever tier; 14-day Pro trial only | 2026-04-23 | Founder pick, Campbell-compatible. |
-| D-09 | Tier prices: Pro $19 / Business $49 / Enterprise $2,499/yr | 2026-04-23 | Founder pick aligned with Campbell standard anchors. |
+| D-09 | Tier prices: Pro $19 / Business $49 / Enterprise custom ("Contact us") | 2026-04-23 | Founder pick aligned with Campbell standard anchors. **Superseded 2026-08:** Enterprise now shown as "Contact us" (no published price); $2,499/yr kept as internal anchor only. |
 | D-10 | Offline grace: 14d full + 30d read-only | 2026-04-23 | Founder pick; covers vacations + industrial offline use. |
 | D-11 | i18n: M1 = en + zh-HK; zh-CN deferred | 2026-04-23 | HK primary market. **Superseded by D-32 2026-04-23 (late): expanded to 7 locales.** |
 | D-12 | Signaling server on Fly.io (Go) | 2026-04-23 | Global edge, static binary, $5-40/mo. |

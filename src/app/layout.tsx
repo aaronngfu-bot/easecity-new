@@ -32,8 +32,11 @@ export const metadata: Metadata = {
   description:
     'EaseCity Technologies Limited builds tools and services for connected teams. Our first product, EC-Share, is Android device mirroring for teams.',
   icons: {
-    icon: '/images/easecity-logo.png',
-    apple: '/images/easecity-logo.png',
+    icon: [
+      { url: '/images/easecity-favicon.ico', sizes: 'any' },
+      { url: '/images/easecity-favicon.png', type: 'image/png' },
+    ],
+    apple: '/images/easecity-apple-touch-icon.png',
   },
   keywords: [
     'EaseCity',

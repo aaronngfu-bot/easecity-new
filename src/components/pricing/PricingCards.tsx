@@ -69,6 +69,7 @@ function getPlans(t: T, billing: BillingInterval) {
       cta: t.pricingPage.contactSales,
       href: '/about#contact',
       highlighted: false,
+      contactCard: true,
     },
   ]
 }
@@ -86,6 +87,7 @@ interface PlanData {
   href?: string
   highlighted: boolean
   badge?: string
+  contactCard?: boolean
 }
 
 export function PricingCards() {
@@ -112,7 +114,7 @@ export function PricingCards() {
                 className={cn(
                   'rounded-md px-4 py-2 text-sm font-semibold transition-colors',
                   billing === value
-                    ? 'bg-[var(--signal)] text-[var(--text-primary)]'
+                    ? 'bg-[var(--signal)] text-[var(--signal-ink)]'
                     : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 )}
               >
@@ -182,7 +184,7 @@ function PricingCard({ plan, whatsIncluded }: { plan: PlanData; whatsIncluded: s
     >
       {plan.highlighted && (
         <div className="absolute left-1/2 top-4 z-20 -translate-x-1/2">
-          <span className="badge bg-[var(--signal)] text-[var(--text-primary)] border-[var(--signal)]">
+          <span className="badge bg-[var(--signal)] text-[var(--signal-ink)] border-[var(--signal)]">
             {plan.badge}
           </span>
         </div>
@@ -198,10 +200,16 @@ function PricingCard({ plan, whatsIncluded }: { plan: PlanData; whatsIncluded: s
         <h3 className="font-display text-xl font-semibold text-[var(--text-primary)]">{plan.name}</h3>
         <p className="mb-5 mt-1 text-sm text-[var(--text-muted)]">{plan.tagline}</p>
 
-        <div className="mb-2 flex items-baseline gap-1">
-          <span className={cn('font-display text-4xl font-semibold tabular-nums tracking-tight', plan.highlighted ? 'text-[var(--signal)]' : 'text-[var(--text-primary)]')}>
-            {plan.price}
-          </span>
+        <div className="mb-2 flex items-baseline gap-1 min-h-[3rem]">
+          {plan.contactCard ? (
+            <span className="font-display text-2xl font-semibold tracking-tight text-[var(--text-primary)]">
+              {plan.price}
+            </span>
+          ) : (
+            <span className={cn('font-display text-4xl font-semibold tabular-nums tracking-tight', plan.highlighted ? 'text-[var(--signal)]' : 'text-[var(--text-primary)]')}>
+              {plan.price}
+            </span>
+          )}
           {plan.period && <span className="text-sm text-[var(--text-muted)]">{plan.period}</span>}
         </div>
         <p className="mb-6 text-sm leading-relaxed text-[var(--text-secondary)]">{plan.description}</p>
@@ -211,9 +219,11 @@ function PricingCard({ plan, whatsIncluded }: { plan: PlanData; whatsIncluded: s
           disabled={isPending}
           className={cn(
             'mb-7 flex min-h-11 w-full items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-70',
-            plan.highlighted
-              ? 'bg-[var(--signal)] text-[var(--text-primary)] hover:bg-[var(--signal-light)]'
-              : 'border border-[var(--border-color)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:border-[var(--signal)] hover:text-[var(--signal)]'
+            plan.contactCard
+              ? 'bg-[var(--signal)] text-[var(--signal-ink)] hover:bg-[var(--signal-light)]'
+              : plan.highlighted
+                ? 'bg-[var(--signal)] text-[var(--signal-ink)] hover:bg-[var(--signal-light)]'
+                : 'border border-[var(--border-color)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:border-[var(--signal)] hover:text-[var(--signal)]'
           )}
         >
           {isPending ? <Loader2 size={16} className="animate-spin" /> : (

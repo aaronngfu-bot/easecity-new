@@ -40,10 +40,12 @@
     --ring: 173 100% 34%;
 
     /* Brand signal — same teal in both modes */
-    --signal: #008f82;
-    --signal-light: #00a896;
-    --signal-bright: #00e5cc;
-    --signal-soft: rgba(0, 143, 130, 0.08);
+        --signal: #008f82;
+        --signal-light: #00a896;
+        --signal-bright: #00e5cc;
+        --signal-soft: rgba(0, 143, 130, 0.08);
+        /* Text color to place ON a solid signal background (light: dark teal bg → white text) */
+        --signal-ink: #ffffff;
 
     /* Backgrounds — layered from darkest (void) to lightest (raised) */
     --bg-void: #edf1f4;
@@ -118,9 +120,11 @@
     --ring: 173 100% 45%;
 
     --signal: #00e5cc;
-    --signal-light: #35f5e0;
-    --signal-bright: #00e5cc;
-    --signal-soft: rgba(0, 229, 204, 0.08);
+        --signal-light: #35f5e0;
+        --signal-bright: #00e5cc;
+        --signal-soft: rgba(0, 229, 204, 0.08);
+        /* Text color to place ON a solid signal background (dark: bright cyan bg → near-black text) */
+        --signal-ink: #031312;
 
     --bg-void: #030506;
     --bg-base: #07090b;
@@ -449,7 +453,7 @@
   border-radius: 0.5rem;
   border: 1px solid transparent;
   background: var(--signal);
-  color: var(--text-primary);
+  color: var(--signal-ink);
   padding: 0.75rem 1rem;
   font-size: 0.875rem;
   font-weight: 700;
@@ -458,6 +462,7 @@
 }
 .signal-cta:hover {
   background: var(--signal-light);
+  color: var(--signal-ink);
   transform: translateY(-1px);
 }
 

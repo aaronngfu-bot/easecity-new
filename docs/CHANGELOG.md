@@ -1,7 +1,33 @@
 # MUPhone / EC-Share — Engineering Changelog
 
 所有從 Cursor 介入到目前狀態的實際改動記錄。
-最後更新：2026-05-11
+最後更新：2026-08-19
+
+## 2026-08-19 — Web polish: dark-mode contrast, transparent favicon, theme-aware logo, services page, Enterprise → Contact us
+
+### Theme
+- 新增 `--signal-ink` token（solid signal 背景上的文字色），修正 dark-mode 淺藍底 + 白字對比度不足：light=白字、dark=近黑字。
+- 將 `.signal-cta`、`.pill-cta`、PricingCards 內所有 `bg-[var(--signal)] text-[var(--text-primary)]` 改為 `text-[var(--signal-ink)]`。
+
+### Brand / assets
+- 新增透明 favicon 組（`easecity-favicon.ico` / `.png` / `easecity-apple-touch-icon.png`），取代原白底 `easecity-logo.png`。
+- 新增 `src/components/brand/BrandMark.tsx`：主題響應的品牌標記（訊號中心 + 四向節點），採 CSS 變數、透明背景。
+- PillNav、Footer、login/register 頁統一改為 BrandMark；導覽列加入 wordmark。
+
+### Auth animations
+- `LoginBackground` 改為動態浮動訊號節點背景（純 CSS，尊重 reduced-motion）。
+- register 頁補上與 login 一致的 AnimatePresence loading 遮罩 + LoginBackground。
+
+### Navigation
+- 手機漢堡按鈕改三條線 + 轉 X 動畫；mobile popover 加滑入動畫與更精緻樣式。
+
+### Services page
+- 服務頁新增「過往案例」區（3 張照片級 AI 生成圖 + 動畫卡片）、「如何取得報價」三步流程 + 電子郵件 CTA。
+- 服務卡片與流程卡片補上 whileInView 淡入動畫。
+
+### Pricing
+- Enterprise 定價由「From $2,499/yr」改為「Contact us／聯絡我們」；`$2,499` 保留為內部 anchor（見 SUBSCRIPTION_TIERS.md §4、D-09）。
+- 同步 metadata、CommandPalette、chat system prompt、docs。
 
 ## 2026-05-11 — Logout, JWKS, Redis JWT deny-list, download manifest discovery, Stripe catalog verify
 

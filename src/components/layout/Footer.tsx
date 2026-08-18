@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
+import { BrandMark } from '@/components/brand/BrandMark'
 
 export function Footer() {
   const { t } = useLanguage()
@@ -33,20 +34,7 @@ export function Footer() {
         <div className="mb-12 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5">
           <div className="lg:col-span-2">
             <Link href="/" className="group mb-4 inline-flex items-center gap-2.5">
-              <div className="relative flex h-9 w-9 items-center justify-center rounded-md border border-signal/30 bg-signal/10">
-                <svg viewBox="0 0 36 36" className="w-full h-full">
-                  <circle cx="18" cy="6" r="1.2" fill="#52525b" />
-                  <circle cx="30" cy="18" r="1.2" fill="#52525b" />
-                  <circle cx="18" cy="30" r="1.2" fill="#52525b" />
-                  <circle cx="6" cy="18" r="1.2" fill="#52525b" />
-                  <line x1="18" y1="6" x2="18" y2="14" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-                  <line x1="30" y1="18" x2="22" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-                  <line x1="18" y1="30" x2="18" y2="22" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-                  <line x1="6" y1="18" x2="14" y2="18" stroke="#52525b" strokeWidth="0.8" opacity="0.6" />
-                  <circle cx="18" cy="18" r="3.5" fill="var(--signal)" opacity="0.3" />
-                  <circle cx="18" cy="18" r="2" fill="var(--signal)" />
-                </svg>
-              </div>
+              <BrandMark size={36} />
               <div className="flex flex-col leading-none">
                 <span className="font-display text-base font-semibold tracking-[-0.03em] text-text-primary">EaseCity</span>
                 <span className="font-mono text-[9px] uppercase tracking-[0.18em] text-text-muted">Technologies Limited</span>

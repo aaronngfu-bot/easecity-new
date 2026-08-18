@@ -21,8 +21,6 @@ export default function PublicLayout({
       <div className="pointer-events-none fixed inset-0 z-[1] control-grid opacity-20" />
 
       <PillNav
-        logo="/images/easecity-pill-logo.svg"
-        logoAlt="easecity"
         items={navItems}
       />
       <main className="relative z-[2] min-h-screen">{children}</main>

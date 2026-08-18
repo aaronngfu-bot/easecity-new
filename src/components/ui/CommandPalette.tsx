@@ -91,7 +91,7 @@ export function CommandPalette() {
       plan('/pricing#trial', 'Trial — 14 days free', 'No credit card required', Cpu),
       plan('/pricing#pro', 'Pro — $19/mo', 'Individual Android mirroring', Zap),
       plan('/pricing#business', 'Business — $49/mo', 'Team sharing and audit log', ShieldCheck),
-      plan('/pricing#enterprise', 'Enterprise — From $2,499/yr', 'SSO, RBAC, on-prem options', Building2),
+      plan('/pricing#enterprise', 'Enterprise — Contact us', 'SSO, RBAC, on-prem options', Building2),
 
       action('copy-email', 'Copy contact email', 'hello@easecity.hk → clipboard', MailIcon, async () => {
         try {

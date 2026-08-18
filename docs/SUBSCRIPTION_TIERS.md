@@ -13,7 +13,7 @@
 
 | | **Trial (14 days)** | **Pro** | **Business** | **Enterprise** |
 |---|---|---|---|---|
-| **Monthly price** | Free for 14 days | **$19** | **$49** | Custom (**from $2,499/yr / 50 seats**) |
+| **Monthly price** | Free for 14 days | **$19** | **$49** | Custom (**contact us**) |
 | **Annual price** | — | **$190 (17% off)** | **$490 (17% off)** | Custom, annual-only |
 | **Post-trial behavior** | Convert to paid or lock to reminder screen | — | — | — |
 | **Graduation trigger** *(why you must upgrade)* | — | "I need to show someone outside my network" | "Legal says no SSO, no deal" | — |
@@ -81,12 +81,12 @@ Some features are in every tier so they never become a purchasing friction:
 
 ## 4. Pricing anchor methodology
 
-We land at **$19 / $49 / $2,499** through Campbell's anchoring framework:
+We land at **$19 / $49 / custom (contact us)** through Campbell's anchoring framework. **Note (2026-08):** the Enterprise tier is now displayed publicly as *"Contact us"* rather than a fixed anchor price. The $2,499 figure below remains an **internal** floor for scoping enterprise deals, not a published price.
 
 1. **Price against value per month to the buyer**, not cost-plus.
 2. **Pro at $19**: QA/dev hourly rate is $30-60 globally. If EC-Share saves 1 hour/month → 2x ROI minimum. $19 is above "impulse purchase" ($10) and below "need boss approval" ($25-30).
 3. **Business at $49**: fits most IC/team-lead credit cards without expense report. The jump from $19 → $49 (2.6x) is industry-standard for team tiers.
-4. **Enterprise anchor $2,499/yr/50-seats = $50/seat/year**: intentionally **not** the lowest price on the market. Low anchors attract customers who won't pay for CSM. $2,499 is the "you're serious enough for our attention" floor; upsell on audit retention, SSO provider passthrough, custom RBAC.
+4. **Enterprise anchor (internal only) $2,499/yr/50-seats = $50/seat/year**: intentionally **not** the lowest price on the market. Low anchors attract customers who won't pay for CSM. The public-facing price is now *"Contact us"* — the anchor stays internal as the "you're serious enough for our attention" floor; upsell on audit retention, SSO provider passthrough, custom RBAC.
 5. **Annual discount = 2 months free (17%)** — industry standard; any deeper discount leaves money on the table.
 
 ### Pricing test plan
@@ -255,7 +255,7 @@ You asked me to call this. **Buy an EV (Extended Validation) code-signing cert**
 | S-01 | Tier structure | **No free forever** — Trial (14d) → Pro → Business → Enterprise |
 | S-02 | Pro price | $19/mo or $190/yr |
 | S-03 | Business price | $49/mo or $490/yr |
-| S-04 | Enterprise anchor floor | $2,499/yr / 50 seats ($50/seat/yr) |
+| S-04 | Enterprise anchor floor | **Internal only** — $2,499/yr / 50 seats ($50/seat/yr); displayed publicly as "Contact us" |
 | S-05 | Billing provider | **Stripe** (with Stripe Tax) |
 | S-06 | Code-signing cert | **EV cert** (procure early, long lead time) |
 | S-07 | Offline grace | 14 days full + 30 days read-only |
@@ -269,6 +269,6 @@ You asked me to call this. **Buy an EV (Extended Validation) code-signing cert**
 ## 10. Still open (small items)
 
 - [ ] Decide annual pricing display: show monthly-equivalent ($190/yr ≈ $15.83/mo) or annual total ($190)? Recommendation: show monthly-equivalent prominently with "billed annually" in small text.
-- [ ] Enterprise pricing page: public or "contact sales"? Recommendation: "Starting at $2,499/yr" displayed + contact form.
+- [x] Enterprise pricing: **"Contact us"** (no published price). Resolved 2026-08: the Enterprise card shows "Contact us" with a CTA to the contact form. Internal anchor $2,499/yr remains for scoping only.
 - [ ] Chinese/HK local pricing HKD equivalents for domestic market.
 - [ ] Does Business seat floor (3) hold after first 10 customers? Review at M3+30 days.

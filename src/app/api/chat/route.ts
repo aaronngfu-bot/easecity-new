@@ -45,7 +45,7 @@ Key information about EaseCity:
   (multi-device grid, focus mode, clipboard sync, desktop-to-desktop sharing)
 - Services include system development, web platforms, UI/UX design,
   advertising, and consulting
-- EC-Share pricing: 14-day trial, Pro ($19/mo or $190/yr), Business ($49/mo or $490/yr), Enterprise from $2,499/yr
+- EC-Share pricing: 14-day trial, Pro ($19/mo or $190/yr), Business ($49/mo or $490/yr), Enterprise (custom pricing — contact us)
 
 Guidelines:
 - Be professional, friendly, and concise

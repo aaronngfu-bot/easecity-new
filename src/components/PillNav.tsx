@@ -5,6 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { useLanguage } from '@/context/LanguageContext'
 import { ThemeToggle } from '@/components/ThemeToggle'
+import { BrandMark } from '@/components/brand/BrandMark'
 import './PillNav.css'
 
 interface NavItem {
@@ -15,13 +16,11 @@ interface NavItem {
 }
 
 interface PillNavProps {
-  logo: string
-  logoAlt?: string
   items: NavItem[]
   className?: string
 }
 
-export default function PillNav({ logo, logoAlt = 'Logo', items, className = '' }: PillNavProps) {
+export default function PillNav({ items, className = '' }: PillNavProps) {
   const router = useRouter()
   const pathname = usePathname()
   const { language, setLanguage, t } = useLanguage()
@@ -36,8 +35,10 @@ export default function PillNav({ logo, logoAlt = 'Logo', items, className = '' 
     <div className="pill-nav-container">
       <nav className={`pill-nav ${className}`} aria-label="Primary">
         <Link className="pill-logo" href="/" aria-label="Home">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src={logo} alt={logoAlt} />
+          <BrandMark size={24} />
+          <span className="pill-wordmark">
+            <span className="pill-wordmark-brand">easecity</span>
+          </span>
         </Link>
 
         <div className="pill-nav-items desktop-only">
@@ -101,10 +102,12 @@ export default function PillNav({ logo, logoAlt = 'Logo', items, className = '' 
         </button>
 
         <button
-          className="mobile-menu-button mobile-only"
+          className={`mobile-menu-button mobile-only ${mobileMenuOpen ? 'is-open' : ''}`}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label="Toggle menu"
+          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-expanded={mobileMenuOpen}
         >
+          <span className="hamburger-line" />
           <span className="hamburger-line" />
           <span className="hamburger-line" />
         </button>

@@ -29,7 +29,8 @@
 .pill-logo {
   display: flex;
   align-items: center;
-  padding: 4px 8px;
+  gap: 8px;
+  padding: 4px 10px 4px 8px;
   border-radius: 9999px;
   transition: background-color 150ms ease;
 }
@@ -38,9 +39,18 @@
   background: var(--signal-soft);
 }
 
-.pill-logo img {
-  height: 22px;
-  width: auto;
+.pill-wordmark {
+  display: flex;
+  flex-direction: column;
+  line-height: 1;
+}
+
+.pill-wordmark-brand {
+  font-family: var(--font-display), system-ui, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
 }
 
 .pill-nav-items {
@@ -149,7 +159,7 @@
   border-radius: 9999px;
   border: none;
   background: var(--signal);
-  color: var(--text-primary);
+  color: var(--signal-ink);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -164,33 +174,72 @@
 .mobile-menu-button {
   display: none;
   flex-direction: column;
+  justify-content: center;
   gap: 4px;
+  width: 38px;
+  height: 34px;
   padding: 8px;
-  background: none;
-  border: none;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 9999px;
   cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.mobile-menu-button:hover {
+  border-color: var(--signal);
 }
 
 .hamburger-line {
   display: block;
-  width: 20px;
+  width: 16px;
   height: 2px;
   background: var(--text-primary);
-  border-radius: 1px;
-  transition: transform 200ms ease, opacity 200ms ease;
+  border-radius: 2px;
+  transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1), opacity 180ms ease;
+}
+
+/* Animate to an X when open */
+.mobile-menu-button.is-open .hamburger-line:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+.mobile-menu-button.is-open .hamburger-line:nth-child(2) {
+  opacity: 0;
+}
+.mobile-menu-button.is-open .hamburger-line:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
 }
 
 .mobile-menu-popover {
   position: fixed;
-  top: 60px;
+  top: 64px;
   left: 16px;
   right: 16px;
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: 12px;
+  border-radius: 16px;
   box-shadow: var(--shadow-lg);
   padding: 8px;
   z-index: 99;
+  transform-origin: top right;
+  animation: mobile-menu-in 220ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes mobile-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu-popover {
+    animation: none;
+  }
 }
 
 .mobile-menu-list {

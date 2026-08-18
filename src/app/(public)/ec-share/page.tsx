@@ -1,6 +1,8 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
+import { motion } from 'framer-motion'
 import { useLanguage } from '@/context/LanguageContext'
 import { HeroIllustration } from '@/components/illustrations/HeroIllustration'
 
@@ -231,6 +233,56 @@ export default function EcSharePage() {
                   {step.desc}
                 </p>
               </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── AI-generated scene gallery ── */}
+      <section className="section-padding bg-[var(--bg-surface)]">
+        <div className="container-max">
+          <motion.div
+            initial={{ opacity: 0, y: 24 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: '-60px' }}
+            transition={{ duration: 0.5 }}
+            className="mx-auto mb-14 max-w-2xl text-center"
+          >
+            <p className="label-mono mb-4 text-[var(--signal)]">{c.galleryBadge}</p>
+            <h2 className="font-display text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-4xl">
+              {c.galleryTitle}
+            </h2>
+            <p className="mt-4 text-[var(--text-secondary)]">{c.gallerySubtitle}</p>
+          </motion.div>
+
+          <div className="grid gap-6 md:grid-cols-3">
+            {[
+              { img: '/images/ec-share-product-hero.jpg', label: c.gallery1 },
+              { img: '/images/ec-share-scene-qa-lab.jpg', label: c.gallery2 },
+              { img: '/images/ec-share-scene-remote-control.jpg', label: c.gallery3 },
+            ].map((g, i) => (
+              <motion.figure
+                key={g.img}
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-60px' }}
+                transition={{ duration: 0.5, delay: i * 0.1 }}
+                className="group relative overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--bg-elevated)]"
+              >
+                <div className="relative aspect-[4/3] overflow-hidden">
+                  <Image
+                    src={g.img}
+                    alt={g.label}
+                    fill
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
+                </div>
+                <figcaption className="pointer-events-none absolute bottom-0 left-0 right-0 p-4">
+                  <span className="label-mono text-white/90">{g.label}</span>
+                </figcaption>
+              </motion.figure>
             ))}
           </div>
         </div>
