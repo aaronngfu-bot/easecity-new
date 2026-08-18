@@ -501,3 +501,59 @@
     animation: none !important;
   }
 }
+
+/* Auth / form component classes (login, register) */
+.signal-panel {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-md);
+}
+.signal-panel-highlight {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-strong);
+  border-radius: 0.75rem;
+  box-shadow: var(--shadow-lg);
+}
+.signal-secondary {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: border-color 150ms ease, color 150ms ease, background-color 150ms ease;
+  cursor: pointer;
+}
+.signal-secondary:hover {
+  border-color: var(--signal);
+  color: var(--signal);
+}
+.glass-input,
+.signal-input {
+  width: 100%;
+  min-height: 44px;
+  padding: 0.625rem 0.875rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  font-size: 0.875rem;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+.glass-input::placeholder,
+.signal-input::placeholder {
+  color: var(--text-faint);
+}
+.glass-input:focus,
+.signal-input:focus {
+  outline: none;
+  border-color: var(--signal);
+  box-shadow: var(--focus-ring);
+}
