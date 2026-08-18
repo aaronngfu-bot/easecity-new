@@ -67,6 +67,44 @@ function FeatureIcon({ icon }: { icon: string }) {
   }
 }
 
+function WorkflowIcon({ icon }: { icon: string }) {
+  const common = { strokeWidth: 1.8, stroke: 'currentColor', fill: 'none' } as const
+  switch (icon) {
+    case 'download':
+      return (
+        <svg viewBox="0 0 24 24" width="20" height="20" {...common}>
+          <path d="M12 3v12m0 0l-4-4m4 4l4-4" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" strokeLinecap="round" />
+        </svg>
+      )
+    case 'plug':
+      return (
+        <svg viewBox="0 0 24 24" width="20" height="20" {...common}>
+          <path d="M9 7V3m6 4V3M7 7h10v4a5 5 0 0 1-10 0V7Z" strokeLinecap="round" strokeLinejoin="round" />
+          <path d="M12 16v5" strokeLinecap="round" />
+        </svg>
+      )
+    case 'monitor':
+      return (
+        <svg viewBox="0 0 24 24" width="20" height="20" {...common}>
+          <rect x="2" y="3" width="20" height="14" rx="2" />
+          <path d="M8 21h8m-4-4v4" strokeLinecap="round" />
+        </svg>
+      )
+    case 'share':
+      return (
+        <svg viewBox="0 0 24 24" width="20" height="20" {...common}>
+          <circle cx="18" cy="5" r="3" />
+          <circle cx="6" cy="12" r="3" />
+          <circle cx="18" cy="19" r="3" />
+          <path d="M8.7 10.5l6.6-3.8M8.7 13.5l6.6 3.8" strokeLinecap="round" />
+        </svg>
+      )
+    default:
+      return null
+  }
+}
+
 export default function EcSharePage() {
   const { t } = useLanguage()
   const c = t.ecSharePage
@@ -171,16 +209,16 @@ export default function EcSharePage() {
 
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             {[
-              { n: '01', title: c.w1Title, desc: c.w1Desc },
-              { n: '02', title: c.w2Title, desc: c.w2Desc },
-              { n: '03', title: c.w3Title, desc: c.w3Desc },
-              { n: '04', title: c.w4Title, desc: c.w4Desc },
+              { icon: 'download', title: c.w1Title, desc: c.w1Desc },
+              { icon: 'plug', title: c.w2Title, desc: c.w2Desc },
+              { icon: 'monitor', title: c.w3Title, desc: c.w3Desc },
+              { icon: 'share', title: c.w4Title, desc: c.w4Desc },
             ].map((step) => (
-              <div key={step.n}>
-                <p className="font-mono text-2xl font-semibold text-[var(--signal)]">
-                  {step.n}
-                </p>
-                <h3 className="mt-3 font-display text-lg font-semibold text-[var(--text-primary)]">
+              <div key={step.title}>
+                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
+                  <WorkflowIcon icon={step.icon} />
+                </div>
+                <h3 className="font-display text-lg font-semibold text-[var(--text-primary)]">
                   {step.title}
                 </h3>
                 <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">

@@ -1,6 +1,5 @@
 'use client'
 
-import { motion } from 'framer-motion'
 import { Check, ArrowRight, Star, Shield, Cpu, Building2, Loader2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
@@ -9,8 +8,6 @@ import { useTransition, useState } from 'react'
 import { getCheckoutSessionUrl } from '@/actions/stripe'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { CountUp } from '@/components/ui/CountUp'
-import { MagneticButton } from '@/components/ui/MagneticButton'
 import {
   publicBusinessAnnualPriceId,
   publicBusinessMonthlyPriceId,
@@ -97,13 +94,11 @@ export function PricingCards() {
   const plans = getPlans(t, billing)
 
   return (
-    <section className="section-padding paper-section relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_70%_0%,rgba(0,229,204,0.16),transparent_46%)]" />
-
-      <div className="container-max relative z-10">
+    <section className="section-padding relative">
+      <div className="container-max">
         <div className="mb-10 flex justify-center">
           <div
-            className="inline-flex gap-1 rounded-md border border-paper-border bg-paper-card p-1 shadow-paper"
+            className="inline-flex gap-1 rounded-md border border-[var(--border-color)] bg-[var(--bg-surface)] p-1"
             role="radiogroup"
             aria-label="Billing interval"
           >
@@ -117,8 +112,8 @@ export function PricingCards() {
                 className={cn(
                   'rounded-md px-4 py-2 text-sm font-semibold transition-colors',
                   billing === value
-                    ? 'bg-signal text-[var(--text-primary)]'
-                    : 'text-paper-muted hover:text-paper-ink'
+                    ? 'bg-[var(--signal)] text-[var(--text-primary)]'
+                    : 'text-[var(--text-muted)] hover:text-[var(--text-primary)]'
                 )}
               >
                 {value === 'monthly' ? t.pricingPage.monthly : t.pricingPage.annual}
@@ -127,35 +122,29 @@ export function PricingCards() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-4">
           {plans.map((plan, i) => (
-            <PricingCard key={i} plan={plan} index={i} whatsIncluded={t.pricingPage.whatsIncluded} />
+            <PricingCard key={i} plan={plan} whatsIncluded={t.pricingPage.whatsIncluded} />
           ))}
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          className="mt-16 text-center"
-        >
-          <p className="mb-6 text-sm text-paper-muted">{t.pricingPage.allPlansNote}</p>
-          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-xs text-paper-muted">
+        <div className="mt-16 text-center">
+          <p className="mb-6 text-sm text-[var(--text-muted)]">{t.pricingPage.allPlansNote}</p>
+          <div className="flex flex-wrap justify-center gap-x-8 gap-y-3 text-xs text-[var(--text-muted)]">
             {[t.pricingPage.soc2, t.pricingPage.gdpr, t.pricingPage.iso, t.pricingPage.encryption].map((item) => (
               <div key={item} className="flex items-center gap-2 font-mono tracking-wide">
-                <Shield size={12} className="text-signal" />
+                <Shield size={12} className="text-[var(--signal)]" />
                 {item}
               </div>
             ))}
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   )
 }
 
-function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: number; whatsIncluded: string }) {
+function PricingCard({ plan, whatsIncluded }: { plan: PlanData; whatsIncluded: string }) {
   const [isPending, startTransition] = useTransition()
   const router = useRouter()
   const { t } = useLanguage()
@@ -166,14 +155,11 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
       router.push(plan.href)
       return
     }
-
     if (!plan.priceId) return
-
     if (!session) {
       router.push('/register?callbackUrl=/pricing')
       return
     }
-
     startTransition(async () => {
       try {
         const url = await getCheckoutSessionUrl(plan.priceId!)
@@ -185,114 +171,71 @@ function PricingCard({ plan, index, whatsIncluded }: { plan: PlanData; index: nu
     })
   }
 
-  const CtaInner = (
-    <>
-      {isPending ? (
-        <Loader2 size={16} className="animate-spin" />
-      ) : (
-        <>
-          {plan.cta}
-          <ArrowRight size={14} className="group-hover/cta:translate-x-1 transition-transform duration-200" />
-        </>
-      )}
-    </>
-  )
-
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-40px' }}
-      transition={{ duration: 0.5, delay: index * 0.1, ease: [0.21, 0.47, 0.32, 0.98] }}
+    <div
       className={cn(
-        'relative group flex flex-col overflow-hidden rounded-lg border transition duration-200',
+        'relative flex flex-col rounded-xl border transition',
         plan.highlighted
-          ? 'z-10 border-signal/40 bg-bg-surface text-text-primary shadow-panel xl:scale-105'
-          : 'border-paper-border bg-paper-card text-paper-ink shadow-paper hover:border-signal/40'
+          ? 'border-[var(--signal)] bg-[var(--bg-surface)] shadow-[0_0_0_1px_var(--signal),0_8px_30px_-12px_var(--signal)]'
+          : 'border-[var(--border-color)] bg-[var(--bg-surface)] hover:border-[var(--signal)]'
       )}
     >
       {plan.highlighted && (
-        <>
-          <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-signal to-transparent z-10" />
-          <div className="absolute left-1/2 top-0 z-10 -translate-x-1/2 -translate-y-1/2">
-            <span className="signal-badge">{plan.badge}</span>
-          </div>
-        </>
+        <div className="absolute left-1/2 top-0 z-20 -translate-x-1/2 -translate-y-1/2">
+          <span className="badge bg-[var(--signal)] text-[var(--text-primary)] border-[var(--signal)]">
+            {plan.badge}
+          </span>
+        </div>
       )}
 
-      <div className="relative z-10 flex flex-1 flex-col p-6 md:p-7">
-        <div className="mb-5 flex items-center justify-between">
-          <span className={cn('font-mono text-[10px] uppercase tracking-[0.20em]', plan.highlighted ? 'text-text-muted' : 'text-paper-muted')}>
-            PLAN.{String(index + 1).padStart(2, '0')}
-          </span>
-          <div
-            className={cn(
-              'flex h-10 w-10 items-center justify-center rounded-md border transition-colors',
-              plan.highlighted
-                ? 'border-signal/30 bg-signal/15 text-signal'
-                : 'border-paper-border bg-paper-soft text-paper-muted group-hover:text-paper-ink'
-            )}
-          >
+      <div className={cn('flex flex-1 flex-col p-6 md:p-7', plan.highlighted && 'pt-8')}>
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
             <plan.icon size={18} />
           </div>
         </div>
 
-        <h3 className={cn('font-display text-xl font-semibold tracking-[-0.03em]', plan.highlighted ? 'text-text-primary' : 'text-paper-ink')}>{plan.name}</h3>
-        <p className={cn('mb-5 mt-1 font-mono text-xs tracking-wide', plan.highlighted ? 'text-text-muted' : 'text-paper-muted')}>{plan.tagline}</p>
+        <h3 className="font-display text-xl font-semibold text-[var(--text-primary)]">{plan.name}</h3>
+        <p className="mb-5 mt-1 text-sm text-[var(--text-muted)]">{plan.tagline}</p>
 
-        <div className="flex items-baseline gap-1 mb-2">
-          <CountUp
-            value={plan.price}
-            duration={plan.highlighted ? 1100 : 900}
-            trigger="key"
-            triggerKey={plan.price}
-            className={cn(
-              'font-display text-4xl font-semibold tabular-nums tracking-[-0.04em]',
-              plan.highlighted ? 'text-signal' : 'text-paper-ink'
-            )}
-          />
-          {plan.period && <span className={cn('text-sm', plan.highlighted ? 'text-text-muted' : 'text-paper-muted')}>{plan.period}</span>}
+        <div className="mb-2 flex items-baseline gap-1">
+          <span className={cn('font-display text-4xl font-semibold tabular-nums tracking-tight', plan.highlighted ? 'text-[var(--signal)]' : 'text-[var(--text-primary)]')}>
+            {plan.price}
+          </span>
+          {plan.period && <span className="text-sm text-[var(--text-muted)]">{plan.period}</span>}
         </div>
-        <p className={cn('mb-6 text-sm leading-relaxed', plan.highlighted ? 'text-text-secondary' : 'text-paper-muted')}>{plan.description}</p>
+        <p className="mb-6 text-sm leading-relaxed text-[var(--text-secondary)]">{plan.description}</p>
 
-        {plan.highlighted ? (
-          <MagneticButton
-            onClick={handleSubscribe}
-            disabled={isPending}
-            className="group/cta signal-cta mb-7 w-full disabled:cursor-not-allowed disabled:opacity-70"
-            strength={10}
-            radius={160}
-          >
-            {CtaInner}
-          </MagneticButton>
-        ) : (
-          <button
-            onClick={handleSubscribe}
-            disabled={isPending}
-            className="group/cta mb-7 flex min-h-11 w-full items-center justify-center gap-2 rounded-md border border-paper-border bg-paper-soft px-4 text-sm font-semibold text-paper-ink transition-colors hover:border-signal/40 hover:bg-paper-card disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {CtaInner}
-          </button>
-        )}
+        <button
+          onClick={handleSubscribe}
+          disabled={isPending}
+          className={cn(
+            'mb-7 flex min-h-11 w-full items-center justify-center gap-2 rounded-lg px-4 text-sm font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-70',
+            plan.highlighted
+              ? 'bg-[var(--signal)] text-[var(--text-primary)] hover:bg-[var(--signal-light)]'
+              : 'border border-[var(--border-color)] bg-[var(--bg-elevated)] text-[var(--text-primary)] hover:border-[var(--signal)] hover:text-[var(--signal)]'
+          )}
+        >
+          {isPending ? <Loader2 size={16} className="animate-spin" /> : (
+            <>
+              {plan.cta}
+              <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+            </>
+          )}
+        </button>
 
-        <div className={cn('flex-1 border-t pt-6', plan.highlighted ? 'border-border/50' : 'border-paper-border')}>
-          <p className={cn('mb-4 font-mono text-[10px] uppercase tracking-[0.16em]', plan.highlighted ? 'text-text-muted' : 'text-paper-muted')}>{whatsIncluded}</p>
+        <div className="flex-1 border-t border-[var(--border-color)] pt-6">
+          <p className="mb-4 font-mono text-[10px] uppercase tracking-[0.16em] text-[var(--text-muted)]">{whatsIncluded}</p>
           <ul className="space-y-3">
             {plan.features.map((feature) => (
               <li key={feature} className="flex items-start gap-2.5">
-                <Check
-                  size={14}
-                  className={cn(
-                    'mt-0.5 shrink-0',
-                    plan.highlighted ? 'text-signal' : 'text-signal'
-                  )}
-                />
-                <span className={cn('text-sm leading-relaxed', plan.highlighted ? 'text-text-secondary' : 'text-paper-muted')}>{feature}</span>
+                <Check size={14} className="mt-0.5 shrink-0 text-[var(--signal)]" />
+                <span className="text-sm leading-relaxed text-[var(--text-secondary)]">{feature}</span>
               </li>
             ))}
           </ul>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
