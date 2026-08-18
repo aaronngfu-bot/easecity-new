@@ -34,9 +34,10 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: '/images/easecity-favicon.ico', sizes: 'any' },
-      { url: '/images/easecity-favicon.png', type: 'image/png' },
+      { url: '/images/easecity-favicon.png', type: 'image/png', sizes: '48x48' },
     ],
     apple: '/images/easecity-apple-touch-icon.png',
+    other: [{ rel: 'mask-icon', url: '/images/easecity-logo-light-128.png', color: '#57bcb2' }],
   },
   keywords: [
     'EaseCity',

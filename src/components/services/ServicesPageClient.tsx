@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
-import { ArrowRight, Mail, MessageSquare, Search, Send } from 'lucide-react'
+import { ArrowRight, Mail, MessageSquare, Search, Send, ArrowUpRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { PageHero } from '@/components/ui/PageHero'
 
@@ -101,7 +101,7 @@ export function ServicesPageClient() {
                 viewport={{ once: true, margin: '-60px' }}
                 variants={fadeUp}
                 whileHover={{ y: -4 }}
-                className="card p-8 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
+                className="card flex flex-col p-8 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
               >
                 <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
                   <ServiceIcon icon={service.icon} />
@@ -112,11 +112,18 @@ export function ServicesPageClient() {
                 <p className="mb-4 leading-relaxed text-[var(--text-secondary)]">
                   {service.body}
                 </p>
-                <div className="flex flex-wrap gap-2">
+                <div className="mb-5 flex flex-wrap gap-2">
                   {service.tags.map((tag) => (
                     <span key={tag} className="badge">{tag}</span>
                   ))}
                 </div>
+                <a
+                  href={`mailto:admin@easecity.hk?subject=${encodeURIComponent(c.enquireSubjectPrefix + service.title)}`}
+                  className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
+                >
+                  {c.enquireService}
+                  <ArrowUpRight size={14} />
+                </a>
               </motion.div>
             ))}
           </div>

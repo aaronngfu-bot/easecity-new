@@ -3,6 +3,8 @@
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { useState } from 'react'
+import { useSession, signOut } from 'next-auth/react'
+import { LayoutDashboard, LogOut } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { BrandMark } from '@/components/brand/BrandMark'
@@ -24,7 +26,10 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
   const router = useRouter()
   const pathname = usePathname()
   const { language, setLanguage, t } = useLanguage()
+  const { data: session, status } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const authed = status === 'authenticated'
 
   const getItemLabel = (item: NavItem) =>
     item.labelKey ? (t.nav[item.labelKey as keyof typeof t.nav] ?? item.label) : item.label
@@ -35,7 +40,7 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
     <div className="pill-nav-container">
       <nav className={`pill-nav ${className}`} aria-label="Primary">
         <Link className="pill-logo" href="/" aria-label="Home">
-          <BrandMark size={24} />
+          <BrandMark size={28} />
           <span className="pill-wordmark">
             <span className="pill-wordmark-brand">easecity</span>
           </span>
@@ -85,21 +90,48 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
 
         <ThemeToggle className="desktop-only" />
 
-        <button
-          type="button"
-          onClick={() => router.push('/login')}
-          className="pill-sign-in desktop-only"
-        >
-          <span>{t.nav.signIn}</span>
-        </button>
+        {!authed && (
+          <button
+            type="button"
+            onClick={() => router.push('/login')}
+            className="pill-sign-in desktop-only"
+          >
+            <span>{t.nav.signIn}</span>
+          </button>
+        )}
 
-        <button
-          type="button"
-          onClick={() => router.push('/signup')}
-          className="pill-cta desktop-only"
-        >
-          {t.nav.cta}
-        </button>
+        {!authed && (
+          <button
+            type="button"
+            onClick={() => router.push('/signup')}
+            className="pill-cta desktop-only"
+          >
+            {t.nav.cta}
+          </button>
+        )}
+
+        {authed && (
+          <button
+            type="button"
+            onClick={() => router.push('/dashboard')}
+            className="pill-auth desktop-only"
+            aria-label={t.auth.dashboard}
+          >
+            <LayoutDashboard size={15} />
+            <span>{t.auth.dashboard}</span>
+          </button>
+        )}
+        {authed && (
+          <button
+            type="button"
+            onClick={() => signOut({ callbackUrl: '/' })}
+            className="pill-sign-in desktop-only"
+            aria-label={t.auth.signOut}
+          >
+            <LogOut size={14} />
+            <span>{t.auth.signOut}</span>
+          </button>
+        )}
 
         <button
           className={`mobile-menu-button mobile-only ${mobileMenuOpen ? 'is-open' : ''}`}
@@ -155,30 +187,61 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
                 </li>
               )
             })}
-            <li>
-              <button
-                type="button"
-                className="mobile-menu-link w-full text-left"
-                onClick={() => {
-                  router.push('/login')
-                  setMobileMenuOpen(false)
-                }}
-              >
-                {t.nav.signIn}
-              </button>
-            </li>
-            <li>
-              <button
-                type="button"
-                className="mobile-menu-link w-full text-left"
-                onClick={() => {
-                  router.push('/signup')
-                  setMobileMenuOpen(false)
-                }}
-              >
-                {t.nav.cta}
-              </button>
-            </li>
+            {!authed && (
+              <>
+                <li>
+                  <button
+                    type="button"
+                    className="mobile-menu-link w-full text-left"
+                    onClick={() => {
+                      router.push('/login')
+                      setMobileMenuOpen(false)
+                    }}
+                  >
+                    {t.nav.signIn}
+                  </button>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className="mobile-menu-link w-full text-left font-semibold text-[var(--signal)]"
+                    onClick={() => {
+                      router.push('/signup')
+                      setMobileMenuOpen(false)
+                    }}
+                  >
+                    {t.nav.cta}
+                  </button>
+                </li>
+              </>
+            )}
+            {authed && (
+              <>
+                <li>
+                  <Link
+                    href="/dashboard"
+                    className="mobile-menu-link flex items-center gap-2"
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    <LayoutDashboard size={16} />
+                    {t.auth.dashboard}
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    type="button"
+                    className="mobile-menu-link flex w-full items-center gap-2 text-left"
+                    onClick={() => {
+                      signOut({ callbackUrl: '/' })
+                      setMobileMenuOpen(false)
+                    }}
+                  >
+                    <LogOut size={16} />
+                    {t.auth.signOut}
+                  </button>
+                </li>
+              </>
+            )}
           </ul>
         </div>
       )}
