@@ -23,6 +23,10 @@ function ServiceIcon({ icon }: { icon: string }) {
       return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4L14 12l-2-2 2.7-3.7Z" strokeLinecap="round" strokeLinejoin="round" /></svg>
     case 'ship':
       return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><path d="M12 15V3m0 0l-4 4m4-4l4 4" strokeLinecap="round" strokeLinejoin="round" /><path d="M4 21h16" strokeLinecap="round" /></svg>
+    case 'ad':
+      return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><path d="M3 11v3a1 1 0 0 0 1 1h2l4 4V6L6 10H4a1 1 0 0 0-1 1Z" strokeLinecap="round" strokeLinejoin="round" /><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12" strokeLinecap="round" /></svg>
+    case 'brand':
+      return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><path d="M12 21a9 9 0 1 1 0-18c4.97 0 9 4.03 9 9 0 1.5-1 2-2.5 2H15a2 2 0 0 0-2 2c0 .6-.5 1-1 1h0a3 3 0 0 0 0 4Z" strokeLinecap="round" strokeLinejoin="round" /><circle cx="7.5" cy="11.5" r="0.5" fill="currentColor" /><circle cx="10" cy="7.5" r="0.5" fill="currentColor" /><circle cx="14" cy="7.5" r="0.5" fill="currentColor" /></svg>
     default:
       return null
   }
@@ -37,6 +41,8 @@ export function ServicesPageClient() {
     { icon: 'web', title: c.s2Title, body: c.s2Body, tags: ['Next.js', 'Prisma', 'Stripe', 'Vercel'] },
     { icon: 'design', title: c.s3Title, body: c.s3Body, tags: ['Figma', 'Tailwind', 'Design Systems'] },
     { icon: 'consult', title: c.s4Title, body: c.s4Body, tags: ['Architecture', 'Performance', 'Process'] },
+    { icon: 'ad', title: c.s5Title, body: c.s5Body, tags: ['Google Ads', 'Meta', 'SEO'] },
+    { icon: 'brand', title: c.s6Title, body: c.s6Body, tags: ['Logo', 'Brand Identity', 'Visual System'] },
   ]
 
   const process = [
