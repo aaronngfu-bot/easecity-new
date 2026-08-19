@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, ArrowRight } from 'lucide-react'
@@ -30,13 +30,21 @@ type Stage = typeof LOADING | 'READY' | 'ERROR'
  * VLOG rail on the home page — horizontal snap-scroll of update cards, newest
  * on the left, scrollable toward older posts. Each card is a whole-card link
  * to its own `/updates/[slug]` page. Loads live posts from `/api/vlog?limit=4`;
- * shows an in-place loading/error state while fetching (no static fallback, so
- * the rail never renders stale translated placeholder posts).
+ * shows an in-place loading/error state while fetching (no static fallback).
+ *
+ * Desktop drag-to-scroll: pointer is held and the rail is dragged. CSS
+ * scroll-snap is disabled synchronously during the drag (snap-mandatory would
+ * otherwise fight the thumb back), then re-enabled on release. A real click
+ * still navigates; drags suppress the click so cards don't open mid-scroll.
+ * Mouseup/mousemove are tracked on `window` so releasing outside the rail
+ * always ends the gesture.
  */
 export function VlogTimeline() {
-  const { language } = useLanguage()
+  const { language, t } = useLanguage()
   const [posts, setPosts] = useState<DbPost[] | null>(null)
   const [status, setStatus] = useState<Stage>(LOADING)
+  const railRef = useRef<HTMLDivElement | null>(null)
+  const dragState = useRef<{ startX: number; startTop: number; scrollLeft: number; active: boolean } | null>(null)
 
   useEffect(() => {
     let active = true
@@ -60,6 +68,67 @@ export function VlogTimeline() {
       active = false
     }
   }, [language])
+
+  const startDrag = useCallback((clientX: number, clientY: number) => {
+    const rail = railRef.current
+    if (!rail) return
+    dragState.current = { startX: clientX, startTop: clientY, scrollLeft: rail.scrollLeft, active: false }
+    rail.style.scrollSnapType = 'none'
+    rail.style.cursor = 'grabbing'
+  }, [])
+
+  const moveDrag = useCallback((clientX: number, clientY: number) => {
+    const state = dragState.current
+    const rail = railRef.current
+    if (!state || !rail) return
+    const dx = clientX - state.startX
+    const dy = clientY - state.startTop
+    if (!state.active && Math.abs(dx) > 8 && Math.abs(dx) > Math.abs(dy)) {
+      state.active = true
+    }
+    if (state.active) {
+      rail.scrollLeft = state.scrollLeft - dx
+    }
+  }, [])
+
+  const endDrag = useCallback(() => {
+    if (!dragState.current) return
+    dragState.current = null
+    const rail = railRef.current
+    if (rail) {
+      rail.style.scrollSnapType = ''
+      rail.style.cursor = ''
+    }
+  }, [])
+
+  useEffect(() => {
+    const onDown = (e: PointerEvent) => {
+      if (e.button !== 0) return
+      // Only begin a potential drag from inside the track.
+      const rail = railRef.current
+      if (!rail || !rail.contains(e.target as Node)) return
+      startDrag(e.clientX, e.clientY)
+      const onMove = (ev: PointerEvent) => moveDrag(ev.clientX, ev.clientY)
+      const onUp = () => {
+        window.removeEventListener('pointermove', onMove)
+        window.removeEventListener('pointerup', onUp)
+        window.removeEventListener('pointercancel', onUp)
+        endDrag()
+      }
+      window.addEventListener('pointermove', onMove)
+      window.addEventListener('pointerup', onUp)
+      window.addEventListener('pointercancel', onUp)
+    }
+    window.addEventListener('pointerdown', onDown)
+    return () => window.removeEventListener('pointerdown', onDown)
+  }, [startDrag, moveDrag, endDrag])
+
+  const stopClickOnDrag = useCallback(
+    (e: React.MouseEvent<HTMLAnchorElement>) => {
+      if (dragState.current?.active) e.preventDefault()
+    },
+    []
+  )
 
   const items: UpdateCard[] = (posts ?? []).map((p) => ({
     date: p.publishedAt
@@ -87,11 +156,16 @@ export function VlogTimeline() {
         )}
 
         {status === 'READY' && items.length > 0 && (
-          <div className="flex snap-x snap-mandatory gap-8 overflow-x-auto pb-4 pr-4 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          <div
+            ref={railRef}
+            className="flex snap-x snap-mandatory cursor-grab gap-8 overflow-x-auto pb-4 pr-4 select-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+          >
             {items.map((item) => (
               <Link
                 key={item.slug}
                 href={`/updates/${item.slug}`}
+                onClick={stopClickOnDrag}
+                draggable={false}
                 className="group block w-[300px] max-w-[78vw] shrink-0 snap-start sm:w-[340px]"
               >
                 <article className="flex h-full w-full flex-col overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]">
@@ -125,7 +199,7 @@ export function VlogTimeline() {
             href="/updates"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
           >
-            View all updates
+            {t.companyPage.vlogCta}
             <ArrowRight size={14} />
           </Link>
         </div>
