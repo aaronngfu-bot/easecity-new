@@ -111,71 +111,75 @@ export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
           <div className="container-max">
             <SectionHeading
               badge={c.productsBadge}
-              align="center"
+              align="left"
               title={c.productsTitle}
               subtitle={c.productsSubtitle}
             />
 
-            <div className="mt-12 grid gap-6 md:grid-cols-2">
+            <div className="mt-12 grid gap-6 lg:grid-cols-2">
               {/* PRODUCT 01 — EC-Share */}
               <Link href="/ec-share" className="card group flex flex-col overflow-hidden transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]">
-                <div className="flex flex-1 flex-col p-8">
-                  <div className="mb-3 flex items-center gap-3 text-left">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)]">
-                      <svg className="h-5 w-5 text-[var(--signal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
-                      </svg>
+                <div className="flex flex-col md:flex-row">
+                  <div className="flex flex-1 flex-col p-7 md:p-8">
+                    <div className="mb-3 flex items-center gap-3 text-left">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)]">
+                        <svg className="h-5 w-5 text-[var(--signal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                        </svg>
+                      </div>
+                      <div className="text-left">
+                        <p className="label-mono">{c.product01Label}</p>
+                        <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.product01Name}</h3>
+                      </div>
                     </div>
-                    <div className="text-left">
-                      <p className="label-mono">{c.product01Label}</p>
-                      <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.product01Name}</h3>
+                    <p className="text-left leading-relaxed text-[var(--text-secondary)]">
+                      {c.product01Desc}
+                    </p>
+                    <div className="mt-4 flex gap-2">
+                      <span className="badge">Windows</span>
+                      <span className="badge">Android</span>
+                      <span className="badge">14-day trial</span>
                     </div>
+                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
+                      {t.product.pricing.cta}
+                      <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                    </span>
                   </div>
-                  <p className="text-left leading-relaxed text-[var(--text-secondary)]">
-                    {c.product01Desc}
-                  </p>
-                  <div className="mt-4 flex gap-2">
-                    <span className="badge">Windows</span>
-                    <span className="badge">Android</span>
-                    <span className="badge">14-day trial</span>
+                  <div className="relative min-h-[160px] w-full overflow-hidden bg-[var(--bg-elevated)] md:w-[45%] md:min-h-0 md:border-l md:border-[var(--border-color)]">
+                    <Image src="/images/ec-share-product-hero.jpg" alt={c.product01Name} fill sizes="(max-width: 768px) 100vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
                   </div>
-                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
-                    {t.product.pricing.cta}
-                    <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-                  </span>
-                </div>
-                <div className="relative aspect-[16/9] w-full overflow-hidden border-t border-[var(--border-color)] bg-[var(--bg-elevated)] sm:aspect-[2/1]">
-                  <Image src="/images/ec-share-product-hero.jpg" alt={c.product01Name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
                 </div>
               </Link>
 
               {/* SERVICES — Custom Development */}
-              <Link href="/services" className="card group flex flex-col overflow-hidden transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]">
-                <div className="flex flex-1 flex-col p-8">
-                  <div className="mb-3 flex items-center gap-3 text-left">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)]">
-                      <Code2 className="h-5 w-5 text-[var(--signal)]" />
+              <Link href="/services" className="card group flex flex-col overflow-hidden transition hover:shadow-[var(--shadow-md)]">
+                <div className="flex flex-col md:flex-row">
+                  <div className="flex flex-1 flex-col p-7 md:p-8">
+                    <div className="mb-3 flex items-center gap-3 text-left">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)]">
+                        <Code2 className="h-5 w-5 text-[var(--signal)]" />
+                      </div>
+                      <div className="text-left">
+                        <p className="label-mono">{c.servicesLabel}</p>
+                        <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.servicesName}</h3>
+                      </div>
                     </div>
-                    <div className="text-left">
-                      <p className="label-mono">{c.servicesLabel}</p>
-                      <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.servicesName}</h3>
+                    <p className="text-left leading-relaxed text-[var(--text-secondary)]">
+                      {c.servicesDesc}
+                    </p>
+                    <div className="mt-4 flex gap-2">
+                      <span className="badge">Web</span>
+                      <span className="badge">Desktop</span>
+                      <span className="badge">Design</span>
                     </div>
+                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
+                      {c.servicesCta}
+                      <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                    </span>
                   </div>
-                  <p className="text-left leading-relaxed text-[var(--text-secondary)]">
-                    {c.servicesDesc}
-                  </p>
-                  <div className="mt-4 flex gap-2">
-                    <span className="badge">Web</span>
-                    <span className="badge">Desktop</span>
-                    <span className="badge">Design</span>
+                  <div className="relative min-h-[160px] w-full overflow-hidden bg-[var(--bg-elevated)] md:w-[45%] md:min-h-0 md:border-l md:border-[var(--border-color)]">
+                    <Image src="/images/service-case-web-platform.jpg" alt={c.servicesName} fill sizes="(max-width: 768px) 100vw, 25vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
                   </div>
-                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
-                    {c.servicesCta}
-                    <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-                  </span>
-                </div>
-                <div className="relative aspect-[16/9] w-full overflow-hidden border-t border-[var(--border-color)] bg-[var(--bg-elevated)] sm:aspect-[2/1]">
-                  <Image src="/images/service-case-web-platform.jpg" alt={c.servicesName} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-500 group-hover:scale-[1.03]" />
                 </div>
               </Link>
             </div>
@@ -194,42 +198,35 @@ export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
               subtitle={c.servicesSubtitle}
             />
 
-            <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="mt-10 grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-6">
               {services.map((s) => (
                 <Link
                   key={s.title}
                   href={`/services/${s.slug}`}
-                  className="card group flex flex-col p-6 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
+                  className="card group flex flex-col p-5 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
                 >
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
                     <s.icon size={18} />
                   </div>
-                  <h3 className="mb-2 font-display text-base font-semibold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
+                  <h3 className="mb-1.5 font-display text-sm font-semibold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
                     {s.title}
                   </h3>
-                  <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+                  <p className="line-clamp-3 text-xs leading-relaxed text-[var(--text-secondary)]">
                     {s.body}
                   </p>
-                  <span className="mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold text-[var(--signal)]">
-                    {t.servicesPage.enquireService}
-                    <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  <span className="mt-auto inline-flex items-center gap-1 pt-3 text-xs font-semibold text-[var(--signal)]">
+                    <ArrowUpRight size={13} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
                   </span>
                 </Link>
               ))}
-            </div>
-
-            <div className="mt-8 text-center">
-              <Link href="/services" className="btn-secondary">
-                {c.servicesCta}
-              </Link>
             </div>
           </div>
         </section>
       </RevealSection>
 
-      {/* About teaser */}
+      {/* About teaser — kept tight against Services */}
       <RevealSection>
-        <section className="section-padding bg-[var(--bg-surface)]">
+        <section className="bg-[var(--bg-surface)] pb-24 pt-14 md:pb-28 md:pt-16">
           <div className="container-max">
             <div className="mx-auto max-w-3xl text-center">
               <SectionHeading
