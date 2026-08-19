@@ -1,18 +1,20 @@
 'use client'
 
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 
-interface DbPost {
+interface VlogPost {
   id: string
   slug: string
   title: string
+  title_zh: string | null
   excerpt: string | null
+  excerpt_zh: string | null
   image: string | null
-  publishedAt: string | null
+  publishedAt: string | Date | null
 }
 
 interface UpdateCard {
@@ -23,14 +25,11 @@ interface UpdateCard {
   image?: string | null
 }
 
-const LOADING = 'LOADING'
-type Stage = typeof LOADING | 'READY' | 'ERROR'
-
 /**
  * VLOG rail on the home page — horizontal snap-scroll of update cards, newest
  * on the left, scrollable toward older posts. Each card is a whole-card link
- * to its own `/updates/[slug]` page. Loads live posts from `/api/vlog?limit=4`;
- * shows an in-place loading/error state while fetching (no static fallback).
+ * to its own `/updates/[slug]` page. Posts are passed in (server-fetched, both
+ * languages) so the rail renders immediately with no client fetch / spinner.
  *
  * Desktop drag-to-scroll: pointer is held and the rail is dragged. CSS
  * scroll-snap is disabled synchronously during the drag (snap-mandatory would
@@ -39,35 +38,10 @@ type Stage = typeof LOADING | 'READY' | 'ERROR'
  * Mouseup/mousemove are tracked on `window` so releasing outside the rail
  * always ends the gesture.
  */
-export function VlogTimeline() {
+export function VlogTimeline({ posts = [] }: { posts?: VlogPost[] }) {
   const { language, t } = useLanguage()
-  const [posts, setPosts] = useState<DbPost[] | null>(null)
-  const [status, setStatus] = useState<Stage>(LOADING)
   const railRef = useRef<HTMLDivElement | null>(null)
   const dragState = useRef<{ startX: number; startTop: number; scrollLeft: number; active: boolean } | null>(null)
-
-  useEffect(() => {
-    let active = true
-    setStatus(LOADING)
-    const params = new URLSearchParams({ limit: '4', lang: language })
-    fetch(`/api/vlog?${params}`)
-      .then((r) => (r.ok ? r.json() : null))
-      .then((d) => {
-        if (!active) return
-        if (d?.success && Array.isArray(d.data) && d.data.length) {
-          setPosts(d.data)
-          setStatus('READY')
-        } else {
-          setStatus('ERROR')
-        }
-      })
-      .catch(() => {
-        if (active) setStatus('ERROR')
-      })
-    return () => {
-      active = false
-    }
-  }, [language])
 
   const startDrag = useCallback((clientX: number, clientY: number) => {
     const rail = railRef.current
@@ -130,12 +104,12 @@ export function VlogTimeline() {
     []
   )
 
-  const items: UpdateCard[] = (posts ?? []).map((p) => ({
+  const items: UpdateCard[] = posts.map((p) => ({
     date: p.publishedAt
       ? new Date(p.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
       : '',
-    title: p.title,
-    body: p.excerpt ?? '',
+    title: language === 'zh' ? p.title_zh || p.title : p.title,
+    body: (language === 'zh' ? p.excerpt_zh || p.excerpt : p.excerpt) ?? '',
     slug: p.slug,
     image: p.image,
   }))
@@ -143,19 +117,7 @@ export function VlogTimeline() {
   return (
     <div>
       <div className="relative">
-        {status === 'LOADING' && (
-          <div className="flex h-64 items-center justify-center text-sm text-[var(--text-muted)]">
-            <span className="h-5 w-5 animate-spin rounded-full border-2 border-[var(--signal)] border-t-transparent" />
-          </div>
-        )}
-
-        {status === 'ERROR' && (
-          <div className="flex h-64 items-center justify-center rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-8 text-center text-sm text-[var(--text-muted)]">
-            Updates are temporarily unavailable — check back soon.
-          </div>
-        )}
-
-        {status === 'READY' && items.length > 0 && (
+        {items.length > 0 && (
           <div
             ref={railRef}
             className="flex snap-x snap-mandatory cursor-grab gap-8 overflow-x-auto pb-4 pr-4 select-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
@@ -193,7 +155,7 @@ export function VlogTimeline() {
         )}
       </div>
 
-      {status === 'READY' && items.length > 0 && (
+      {items.length > 0 && (
         <div className="mt-8 text-center">
           <Link
             href="/updates"

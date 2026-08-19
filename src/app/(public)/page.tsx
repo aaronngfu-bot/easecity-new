@@ -1,14 +1,13 @@
-'use client'
-
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { cookies } from 'next/headers'
 import { ArrowRight, ArrowUpRight, Code2, Globe, Palette, Lightbulb, Megaphone, Fingerprint, Cpu } from 'lucide-react'
-import { useLanguage } from '@/context/LanguageContext'
+import { translations } from '@/i18n/translations'
 import { RevealSection } from '@/components/ui/RevealSection'
 import SectionHeading from '@/components/SectionHeading'
 import { BinaryField } from '@/components/hero/BinaryField'
 import { VlogTimeline } from '@/components/home/VlogTimeline'
 import { services as serviceCatalog } from '@/lib/services'
+import { prisma } from '@/lib/db'
 
 const SERVICE_ICONS: Record<string, React.ElementType> = {
   code: Code2,
@@ -19,19 +18,31 @@ const SERVICE_ICONS: Record<string, React.ElementType> = {
   brand: Fingerprint,
 }
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i = 0) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.5, delay: i * 0.07, ease: 'easeOut' as const },
-  }),
-}
+export const revalidate = 60
 
-export default function HomePage() {
-  const { t } = useLanguage()
+export default async function HomePage() {
+  const lang = cookies().get('easecity-lang')?.value === 'zh' ? 'zh' : 'en'
+  const t = translations[lang]
   const c = t.companyPage
   const c2 = t.servicesPage
+
+  // Server-fetched vlog posts (both languages) so the rail renders immediately
+  // with no client-side fetch / spinner.
+  const vlogPosts = await prisma.vlogPost.findMany({
+    where: { published: true, publishedAt: { not: null } },
+    orderBy: { publishedAt: 'desc' },
+    take: 4,
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      title_zh: true,
+      excerpt: true,
+      excerpt_zh: true,
+      image: true,
+      publishedAt: true,
+    },
+  })
 
   const services = serviceCatalog.map((s) => ({
     slug: s.slug,
@@ -92,7 +103,7 @@ export default function HomePage() {
             />
 
             <div className="mt-10">
-              <VlogTimeline />
+              <VlogTimeline posts={vlogPosts} />
             </div>
           </div>
         </section>

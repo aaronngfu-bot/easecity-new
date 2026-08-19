@@ -44,7 +44,7 @@ export const GET = withErrorHandler(async (req) => {
     posts.map((p) => ({
       id: p.id,
       slug: p.slug,
-      title: p.title_zh || p.title,
+      title: lang === 'zh' ? p.title_zh || p.title : p.title,
       excerpt: lang === 'zh' ? p.excerpt_zh || p.excerpt : p.excerpt,
       image: p.image,
       content: includeBody ? (lang === 'zh' ? p.content_zh || p.content : p.content) : undefined,

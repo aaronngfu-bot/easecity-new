@@ -22,7 +22,7 @@ export const GET = withErrorHandler(async (_req, context) => {
   return apiSuccess({
     id: post.id,
     slug: post.slug,
-    title: post.title_zh || post.title,
+    title: lang === 'zh' ? post.title_zh || post.title : post.title,
     excerpt: lang === 'zh' ? post.excerpt_zh || post.excerpt : post.excerpt,
     image: post.image,
     content: lang === 'zh' ? post.content_zh || post.content : post.content,
