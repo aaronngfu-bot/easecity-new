@@ -231,7 +231,11 @@ export function BinaryField({ className = '' }: { className?: string }) {
         const dy = p.y - mouse.y
         const dist = Math.hypot(dx, dy)
         const boost = mouse.active && dist < RADIUS ? 1 - dist / RADIUS : 0
-        const flicker = 0.72 + Math.sin(t * p.speed + p.phase) * 0.28
+        // Core (EC glyph) particles stay bright and steady so the logo is
+        // always legible; background particles flicker for the matrix feel.
+        const flicker = p.core
+          ? 0.9 + Math.sin(t * p.speed + p.phase) * 0.1
+          : 0.55 + Math.sin(t * p.speed + p.phase) * 0.4
         const a = Math.min(1, p.bright * flicker + boost * 0.7)
         const base = p.core ? lightRgb : signalRgb
         const rr = Math.round(base[0] + boost * 60)
@@ -247,6 +251,13 @@ export function BinaryField({ className = '' }: { className?: string }) {
           ctx.restore()
         } else {
           ctx.fillText(p.char, p.x, p.y)
+        }
+        // subtle glow pass for core glyph particles
+        if (p.core && boost < 0.05) {
+          ctx.save()
+          ctx.globalAlpha = a * 0.35
+          ctx.fillText(p.char, p.x, p.y)
+          ctx.restore()
         }
       }
     }
