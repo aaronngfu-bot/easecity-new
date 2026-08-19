@@ -678,6 +678,18 @@
   }
 }
 
+/* Loading card entrance — smooth fade+rise on first paint */
+@keyframes load-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 
 .ec-cursor-pos { animation: ec-cursor-nudge 3s ease-in-out infinite; }
 .ec-ripple { animation: ec-ripple 3s ease-in-out infinite; }

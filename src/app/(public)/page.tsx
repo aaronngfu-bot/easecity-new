@@ -10,6 +10,7 @@ export default async function HomePage() {
   const blogPosts = await prisma.vlogPost.findMany({
     where: { published: true, publishedAt: { not: null } },
     orderBy: { publishedAt: 'desc' },
+    take: 10,
     select: {
       id: true,
       slug: true,
