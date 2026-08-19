@@ -1,11 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, Check } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { getService } from '@/lib/services'
+import { QuoteModal } from '@/components/contact/QuoteModal'
 
 function ServiceIcon({ icon, size = 22 }: { icon: string; size?: number }) {
   const common = { strokeWidth: 1.8, stroke: 'currentColor', fill: 'none', width: size, height: size } as const
@@ -31,6 +33,7 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
   const { slug } = params
   const { t, language } = useLanguage()
   const service = getService(slug)
+  const [quoteOpen, setQuoteOpen] = useState(false)
   if (!service) notFound()
 
   const c = t.servicesPage
@@ -38,7 +41,6 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
   const body = c[service.bodyKey as keyof typeof c] as string
   const bullets = language === 'zh' ? service.bullets.zh : service.bullets.en
   const subject = language === 'zh' ? service.subject.zh : service.subject.en
-  const contactHref = `/about#contact?subject=${encodeURIComponent(`${c.enquireSubjectPrefix}${subject}`)}`
 
   return (
     <main className="relative min-h-screen bg-[var(--bg-base)]">
@@ -93,13 +95,14 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
                 {c.quoteStep1Desc}
               </p>
               <div className="mt-5 space-y-3">
-                <Link
-                  href={contactHref}
+                <button
+                  type="button"
+                  onClick={() => setQuoteOpen(true)}
                   className="flex w-full items-center justify-center gap-2 rounded-lg bg-[var(--signal)] px-4 py-3 text-sm font-semibold text-[var(--signal-ink)] transition-colors hover:bg-[var(--signal-light)]"
                 >
                   {c.requestQuote}
                   <ArrowUpRight size={16} />
-                </Link>
+                </button>
                 <a
                   href={`mailto:admin@easecity.hk?subject=${encodeURIComponent(`${subject}`)}`}
                   className="flex w-full items-center justify-center gap-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-elevated)] px-4 py-3 text-sm font-semibold text-[var(--text-primary)] transition-colors hover:border-[var(--signal)] hover:text-[var(--signal)]"
@@ -152,6 +155,8 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
           </ol>
         </div>
       </div>
+
+      <QuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} serviceSlug={service.slug} serviceTitle={title} />
     </main>
   )
 }

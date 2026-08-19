@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ArrowRight, ArrowUpRight, Code2, Globe, Palette, Lightbulb, Megaphone, Fingerprint, Cpu } from 'lucide-react'
@@ -8,6 +9,7 @@ import { RevealSection } from '@/components/ui/RevealSection'
 import SectionHeading from '@/components/SectionHeading'
 import { CompanyIllustration } from '@/components/illustrations/CompanyIllustration'
 import { VlogTimeline } from '@/components/home/VlogTimeline'
+import { QuoteModal } from '@/components/contact/QuoteModal'
 import { services as serviceCatalog } from '@/lib/services'
 
 const SERVICE_ICONS: Record<string, React.ElementType> = {
@@ -32,6 +34,7 @@ export default function HomePage() {
   const { t } = useLanguage()
   const c = t.companyPage
   const c2 = t.servicesPage
+  const [quoteFor, setQuoteFor] = useState<string | null>(null)
 
   const services = serviceCatalog.map((s) => ({
     slug: s.slug,
@@ -171,19 +174,27 @@ export default function HomePage() {
                   <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
                     <s.icon size={18} />
                   </div>
-                  <h3 className="mb-2 font-display text-base font-semibold text-[var(--text-primary)]">
-                    {s.title}
-                  </h3>
+                  <Link href={`/services/${s.slug}`}>
+                    <h3 className="mb-2 font-display text-base font-semibold text-[var(--text-primary)] transition-colors hover:text-[var(--signal)]">
+                      {s.title}
+                    </h3>
+                  </Link>
                   <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
                     {s.body}
                   </p>
-                  <Link
-                    href={`/services/${s.slug}`}
-                    className="mt-auto pt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
-                  >
-                    {t.servicesPage.enquireService}
-                    <ArrowUpRight size={14} />
-                  </Link>
+                  <div className="mt-auto flex items-center justify-between gap-2 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setQuoteFor(s.slug)}
+                      className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
+                    >
+                      {t.servicesPage.enquireService}
+                      <ArrowUpRight size={14} />
+                    </button>
+                    <Link href={`/services/${s.slug}`} className="text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]">
+                      {t.footer.linkTouch}
+                    </Link>
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -235,6 +246,15 @@ export default function HomePage() {
           </div>
         </section>
       </RevealSection>
+
+      {quoteFor && (
+        <QuoteModal
+          open
+          onClose={() => setQuoteFor(null)}
+          serviceSlug={quoteFor}
+          serviceTitle={services.find((s) => s.slug === quoteFor)?.title}
+        />
+      )}
     </main>
   )
 }

@@ -1,11 +1,13 @@
 'use client'
 
+import { useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import { ArrowRight, Mail, MessageSquare, Search, Send, ArrowUpRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { PageHero } from '@/components/ui/PageHero'
+import { QuoteModal } from '@/components/contact/QuoteModal'
 import { services as serviceCatalog } from '@/lib/services'
 
 function ServiceIcon({ icon }: { icon: string }) {
@@ -48,6 +50,7 @@ const fadeUp = {
 export function ServicesPageClient() {
   const { t } = useLanguage()
   const c = t.servicesPage
+  const [quoteFor, setQuoteFor] = useState<string | null>(null)
 
   const services = serviceCatalog.map((s) => ({
     slug: s.slug,
@@ -106,9 +109,11 @@ export function ServicesPageClient() {
                 <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
                   <ServiceIcon icon={service.icon} />
                 </div>
-                <h3 className="mb-3 font-display text-xl font-bold text-[var(--text-primary)]">
-                  {service.title}
-                </h3>
+                <Link href={`/services/${service.slug}`}>
+                  <h3 className="mb-3 font-display text-xl font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--signal)]">
+                    {service.title}
+                  </h3>
+                </Link>
                 <p className="mb-4 leading-relaxed text-[var(--text-secondary)]">
                   {service.body}
                 </p>
@@ -117,13 +122,19 @@ export function ServicesPageClient() {
                     <span key={tag} className="badge">{tag}</span>
                   ))}
                 </div>
-                <Link
-                  href={`/services/${service.slug}`}
-                  className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
-                >
-                  {c.enquireService}
-                  <ArrowUpRight size={14} />
-                </Link>
+                <div className="mt-auto flex items-center justify-between gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setQuoteFor(service.slug)}
+                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
+                  >
+                    {c.enquireService}
+                    <ArrowUpRight size={14} />
+                  </button>
+                  <Link href={`/services/${service.slug}`} className="text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]">
+                    {c.getInTouch}
+                  </Link>
+                </div>
               </motion.div>
             ))}
           </div>
@@ -285,6 +296,15 @@ export function ServicesPageClient() {
           </motion.div>
         </div>
       </section>
+
+      {quoteFor && (
+        <QuoteModal
+          open
+          onClose={() => setQuoteFor(null)}
+          serviceSlug={quoteFor}
+          serviceTitle={services.find((s) => s.slug === quoteFor)?.title}
+        />
+      )}
     </>
   )
 }
