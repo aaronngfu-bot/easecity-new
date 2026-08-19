@@ -6,7 +6,7 @@ import { ArrowRight, ArrowUpRight, Code2, Globe, Palette, Lightbulb, Megaphone, 
 import { useLanguage } from '@/context/LanguageContext'
 import { RevealSection } from '@/components/ui/RevealSection'
 import SectionHeading from '@/components/SectionHeading'
-import { CompanyIllustration } from '@/components/illustrations/CompanyIllustration'
+import { BinaryField } from '@/components/hero/BinaryField'
 import { VlogTimeline } from '@/components/home/VlogTimeline'
 import { services as serviceCatalog } from '@/lib/services'
 
@@ -74,8 +74,8 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="lg:pl-4">
-            <CompanyIllustration />
+          <div className="relative h-[320px] sm:h-[380px] lg:h-full lg:min-h-[420px] lg:pl-4">
+            <BinaryField className="h-full w-full" />
           </div>
         </div>
       </section>
