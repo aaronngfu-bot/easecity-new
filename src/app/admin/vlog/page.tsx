@@ -19,19 +19,25 @@ interface EditorState {
   id?: string
   originalSlug?: string
   title: string
+  title_zh: string
   slug: string
   excerpt: string
+  excerpt_zh: string
   image: string
   content: string
+  content_zh: string
   published: boolean
 }
 
 const EMPTY: EditorState = {
   title: '',
+  title_zh: '',
   slug: '',
   excerpt: '',
+  excerpt_zh: '',
   image: '',
   content: '',
+  content_zh: '',
   published: false,
 }
 
@@ -48,6 +54,7 @@ export default function AdminVlogPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [editor, setEditor] = useState<EditorState | null>(null)
+  const [editorLang, setEditorLang] = useState<'en' | 'zh'>('zh')
   const [saving, setSaving] = useState(false)
   const [saveMsg, setSaveMsg] = useState('')
 
@@ -82,12 +89,16 @@ export default function AdminVlogPage() {
         id: d.data.id,
         originalSlug: d.data.slug,
         title: d.data.title,
+        title_zh: d.data.title_zh ?? '',
         slug: d.data.slug,
         excerpt: d.data.excerpt ?? '',
+        excerpt_zh: d.data.excerpt_zh ?? '',
         image: d.data.image ?? '',
         content: d.data.content ?? '',
+        content_zh: d.data.content_zh ?? '',
         published: d.data.published,
       })
+      setEditorLang('zh')
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Failed to load post')
     }
@@ -108,10 +119,13 @@ export default function AdminVlogPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             title: editor.title,
+            title_zh: editor.title_zh,
             slug: editor.slug,
             excerpt: editor.excerpt,
+            excerpt_zh: editor.excerpt_zh,
             image: editor.image,
             content: editor.content,
+            content_zh: editor.content_zh,
             published: editor.published,
           }),
         })
@@ -123,10 +137,13 @@ export default function AdminVlogPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             title: editor.title,
+            title_zh: editor.title_zh,
             slug: editor.slug,
             excerpt: editor.excerpt,
+            excerpt_zh: editor.excerpt_zh,
             image: editor.image,
             content: editor.content,
+            content_zh: editor.content_zh,
             published: editor.published,
           }),
         })
@@ -184,17 +201,37 @@ export default function AdminVlogPage() {
         >
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-lg font-semibold text-text-primary">{editor.originalSlug ? 'Edit post' : 'New post'}</h2>
-            <button onClick={() => setEditor(null)} className="text-sm text-text-muted hover:text-text-primary">Cancel</button>
+            <div className="flex items-center gap-3">
+              {editorLang === 'zh' && (
+                <span className="text-xs text-status-success">繁中</span>
+              )}
+              <button onClick={() => setEditor(null)} className="text-sm text-text-muted hover:text-text-primary">Cancel</button>
+            </div>
+          </div>
+
+          <div className="mb-4 inline-flex rounded-md border border-border bg-bg-elevated p-0.5 text-sm">
+            {(['en', 'zh'] as const).map((lang) => (
+              <button
+                key={lang}
+                type="button"
+                onClick={() => setEditorLang(lang)}
+                className={`rounded px-3 py-1.5 transition-colors ${editorLang === lang ? 'bg-signal text-signal-ink' : 'text-text-muted hover:text-text-primary'}`}
+              >
+                {lang === 'en' ? 'EN' : '繁中'}
+              </button>
+            ))}
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1.5 block text-sm font-medium text-text-secondary">Title</label>
+              <label className="mb-1.5 block text-sm font-medium text-text-secondary">
+                {editorLang === 'en' ? 'Title' : '標題（繁中）'}
+              </label>
               <input
-                value={editor.title}
-                onChange={(e) => setEditor({ ...editor, title: e.target.value })}
+                value={editorLang === 'en' ? editor.title : editor.title_zh}
+                onChange={(e) => setEditor({ ...editor, ...(editorLang === 'en' ? { title: e.target.value } : { title_zh: e.target.value }) })}
                 className="glass-input"
-                placeholder="Brand refresh & transparent mark"
+                placeholder={editorLang === 'en' ? 'Brand refresh & transparent mark' : '品牌重塑與透明標記'}
               />
             </div>
             <div>
@@ -208,7 +245,7 @@ export default function AdminVlogPage() {
                 />
                 <button
                   type="button"
-                  onClick={() => setEditor({ ...editor, slug: slugify(editor.title) })}
+                  onClick={() => setEditor({ ...editor, slug: slugify(editorLang === 'en' ? editor.title : editor.title_zh) })}
                   className="signal-secondary shrink-0"
                   title="Auto-generate from title"
                 >
@@ -219,10 +256,12 @@ export default function AdminVlogPage() {
           </div>
 
           <div className="mt-4">
-            <label className="mb-1.5 block text-sm font-medium text-text-secondary">Excerpt (optional)</label>
+            <label className="mb-1.5 block text-sm font-medium text-text-secondary">
+              {editorLang === 'en' ? 'Excerpt (optional)' : '摘要（繁中，選填）'}
+            </label>
             <input
-              value={editor.excerpt}
-              onChange={(e) => setEditor({ ...editor, excerpt: e.target.value })}
+              value={editorLang === 'en' ? editor.excerpt : editor.excerpt_zh}
+              onChange={(e) => setEditor({ ...editor, ...(editorLang === 'en' ? { excerpt: e.target.value } : { excerpt_zh: e.target.value }) })}
               className="glass-input"
               placeholder="One-line summary shown on the timeline"
             />
@@ -288,10 +327,12 @@ export default function AdminVlogPage() {
           </div>
 
           <div className="mt-4">
-            <label className="mb-1.5 block text-sm font-medium text-text-secondary">Content (Markdown)</label>
+            <label className="mb-1.5 block text-sm font-medium text-text-secondary">
+              {editorLang === 'en' ? 'Content (Markdown)' : '內容（繁中，Markdown）'}
+            </label>
             <textarea
-              value={editor.content}
-              onChange={(e) => setEditor({ ...editor, content: e.target.value })}
+              value={editorLang === 'en' ? editor.content : editor.content_zh}
+              onChange={(e) => setEditor({ ...editor, ...(editorLang === 'en' ? { content: e.target.value } : { content_zh: e.target.value }) })}
               rows={14}
               className="glass-input resize-y font-mono text-sm"
               placeholder={'## What shipped\n\n- item one\n- item two\n\nDetails here…'}

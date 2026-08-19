@@ -1,20 +1,29 @@
 import type { Metadata } from 'next'
-import Image from 'next/image'
+import { cookies } from 'next/headers'
 import { prisma } from '@/lib/db'
-import { Calendar } from 'lucide-react'
-import ReactMarkdown from 'react-markdown'
-import remarkGfm from 'remark-gfm'
+import { UpdatesList } from '@/components/updates/UpdatesList'
 
-export const metadata: Metadata = {
-  title: 'Updates',
+export const revalidate = 0
+
+export async function generateMetadata(): Promise<Metadata> {
+  const lang = cookies().get('easecity-lang')?.value === 'zh' ? 'zh' : 'en'
+  return { title: lang === 'zh' ? '全部動態' : 'Updates' }
 }
 
-export const revalidate = 60
-
 export default async function VlogPage() {
+  const lang = cookies().get('easecity-lang')?.value === 'zh' ? 'zh' : 'en'
   const posts = await prisma.vlogPost.findMany({
     where: { published: true, publishedAt: { not: null } },
     orderBy: { publishedAt: 'desc' },
+    select: {
+      id: true,
+      slug: true,
+      title: true,
+      title_zh: true,
+      excerpt: true,
+      excerpt_zh: true,
+      publishedAt: true,
+    },
   })
 
   return (
@@ -23,41 +32,14 @@ export default async function VlogPage() {
       <div className="container-max relative z-10 max-w-3xl py-28 md:py-36">
         <p className="label-mono mb-3 text-[var(--signal)]">UPDATES</p>
         <h1 className="font-display text-4xl font-bold tracking-tight text-[var(--text-primary)] md:text-5xl">
-          What we&apos;ve been building
+          {lang === 'zh' ? '我們一直在建構的事' : "What we've been building"}
         </h1>
         <p className="mt-4 max-w-2xl text-[var(--text-secondary)]">
-          A running log of recent work, releases, and product notes.
+          {lang === 'zh' ? '近期工作、發佈與產品紀錄的可搜尋日誌。' : 'A searchable log of recent work, releases, and product notes.'}
         </p>
 
-        <div className="mt-12 space-y-10">
-          {posts.length === 0 ? (
-            <div className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-8 text-center text-sm text-[var(--text-muted)]">
-              No updates yet — check back soon.
-            </div>
-          ) : (
-            posts.map((post) => (
-              <article key={post.id} className="overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)]">
-                {post.image && (
-                  <div className="relative aspect-[16/7] overflow-hidden bg-[var(--bg-elevated)]">
-                    <Image src={post.image} alt={post.title} fill sizes="(max-width: 768px) 100vw, 720px" className="object-cover" />
-                  </div>
-                )}
-                <div className="p-6 md:p-8">
-                  <div className="mb-3 flex items-center gap-2">
-                    <Calendar size={13} className="text-[var(--signal)]" />
-                    <span className="label-mono">
-                      {post.publishedAt ? new Date(post.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : ''}
-                    </span>
-                  </div>
-                  <h2 className="font-display text-2xl font-semibold text-[var(--text-primary)]">{post.title}</h2>
-                  {post.excerpt && <p className="mt-2 text-sm text-[var(--text-muted)]">{post.excerpt}</p>}
-                  <div className="prose-async mt-5">
-                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{post.content}</ReactMarkdown>
-                  </div>
-                </div>
-              </article>
-            ))
-          )}
+        <div className="mt-10">
+          <UpdatesList posts={posts} />
         </div>
       </div>
     </main>

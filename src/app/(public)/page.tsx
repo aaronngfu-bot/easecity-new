@@ -86,13 +86,13 @@ export default function HomePage() {
           <div className="container-max">
             <SectionHeading
               badge={c.vlogBadge}
-              align="center"
+              align="right"
               title={c.vlogTitle}
               subtitle={c.vlogSubtitle}
             />
 
             <div className="mt-10">
-              <VlogTimeline fallback={c.vlogItems} />
+              <VlogTimeline />
             </div>
           </div>
         </section>

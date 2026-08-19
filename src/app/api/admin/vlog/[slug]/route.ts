@@ -23,8 +23,11 @@ export const GET = withErrorHandler(async (_req, context) => {
     id: post.id,
     slug: post.slug,
     title: post.title,
+    title_zh: post.title_zh,
     excerpt: post.excerpt,
+    excerpt_zh: post.excerpt_zh,
     content: post.content,
+    content_zh: post.content_zh,
     published: post.published,
     publishedAt: post.publishedAt?.toISOString() ?? null,
     updatedAt: post.updatedAt.toISOString(),
@@ -33,6 +36,7 @@ export const GET = withErrorHandler(async (_req, context) => {
 
 const vlogPatchSchema = z.object({
   title: z.string().min(1).max(160).optional(),
+  title_zh: z.string().max(160).nullable().optional(),
   slug: z
     .string()
     .min(1)
@@ -40,8 +44,10 @@ const vlogPatchSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'lowercase letters, numbers, and hyphens only')
     .optional(),
   excerpt: z.string().max(300).nullable().optional(),
+  excerpt_zh: z.string().max(300).nullable().optional(),
   image: z.string().max(2_000_000).nullable().optional(),
   content: z.string().min(1).optional(),
+  content_zh: z.string().min(1).nullable().optional(),
   published: z.boolean().optional(),
   publishedAt: z.string().datetime().nullable().optional(),
 })

@@ -7,7 +7,7 @@ interface SectionHeadingProps {
   badge?: string;        // 上方小標籤,例如「FEATURES」
   title: string;         // 主標題,例如「核心功能」
   subtitle?: string;     // 副標題說明
-  align?: "center" | "left";
+  align?: "center" | "left" | "right";
   /** 順序 stagger 模式：badge → title → subtitle 每段相隔呢個秒數；不設則維持原有節奏 */
   stepDelay?: number;
 }
@@ -56,7 +56,11 @@ export default function SectionHeading({
       : Math.min(tokens.length * 0.05, 0.7) + 0.1;
 
   const alignClass =
-    align === "center" ? "items-center text-center" : "items-start text-left";
+    align === "center"
+      ? "items-center text-center"
+      : align === "right"
+        ? "items-end text-right"
+        : "items-start text-left";
 
   return (
     <div className={`flex flex-col ${alignClass} gap-4`}>
@@ -76,7 +80,11 @@ export default function SectionHeading({
       {/* 主標題:逐字淡入 + 上移 */}
       <h2
         className={`flex flex-wrap font-display text-3xl font-bold tracking-[-0.035em] text-foreground sm:text-4xl md:text-5xl ${
-          align === "center" ? "justify-center" : "justify-start"
+          align === "center"
+            ? "justify-center"
+            : align === "right"
+              ? "justify-end"
+              : "justify-start"
         }`}
       >
         {tokens.map((token, i) => (
