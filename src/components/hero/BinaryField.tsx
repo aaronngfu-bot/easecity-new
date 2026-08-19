@@ -36,6 +36,8 @@ export function BinaryField({ className = '' }: { className?: string }) {
     let dpr = 1
     let raf = 0
     let t = 0
+    let maskW = 0
+    let maskH = 0
     type P = {
       bx: number; by: number; x: number; y: number
       vx: number; vy: number
@@ -71,17 +73,69 @@ export function BinaryField({ className = '' }: { className?: string }) {
       const o = off.getContext('2d')
       if (!o) return
       o.clearRect(0, 0, cw, ch)
-      const min = Math.min(cw, ch)
-      const fontSize = Math.max(60, Math.min(min * 0.72, 220))
-      o.font = `700 ${fontSize}px "Syne", "Instrument Sans", system-ui, sans-serif`
-      o.textAlign = 'center'
-      o.textBaseline = 'middle'
+
+      // EC mark as pure geometry (no font dependency). Layout is verified:
+      // E (vertical + 3 bars) on the left, solid C (annulus open right) on the
+      // right, clearly separated.
+      const mn = Math.min(cw, ch)
+      const u = Math.max(14, mn * 0.05)
+      const hh = mn * 0.3
+      const ew = mn * 0.2
+      const gap = mn * 0.06
+      const cy = ch / 2
+      const total = ew + gap + 2 * hh
+      const x0 = (cw - total) / 2
+      const eLeft = x0
+      const cCx = x0 + ew + gap + hh
+
+      o.strokeStyle = '#fff'
       o.fillStyle = '#fff'
-      o.fillText('EC', cw / 2 - fontSize * 0.02, ch / 2)
+      o.lineWidth = u
+      o.lineCap = 'round'
+      o.lineJoin = 'round'
+
+      // E
+      o.beginPath()
+      o.moveTo(eLeft, cy - hh)
+      o.lineTo(eLeft, cy + hh)
+      o.moveTo(eLeft, cy - hh)
+      o.lineTo(eLeft + ew, cy - hh)
+      o.moveTo(eLeft, cy)
+      o.lineTo(eLeft + ew, cy)
+      o.moveTo(eLeft, cy + hh)
+      o.lineTo(eLeft + ew, cy + hh)
+      o.stroke()
+
+      // C — solid annular sector open to the right (gap on the right, arc
+      // wraps the left through π)
+      const rOut = hh
+      const rIn = rOut - u * 0.9
+      const a0 = (115 * Math.PI) / 180
+      const a1 = (245 * Math.PI) / 180
+      const steps = 120
+      o.beginPath()
+      for (let i = 0; i <= steps; i++) {
+        const ang = a0 + ((a1 - a0) * i) / steps
+        const px = cCx + rOut * Math.cos(ang)
+        const py = cy + rOut * Math.sin(ang)
+        if (i === 0) o.moveTo(px, py)
+        else o.lineTo(px, py)
+      }
+      for (let i = steps; i >= 0; i--) {
+        const ang = a0 + ((a1 - a0) * i) / steps
+        const px = cCx + rIn * Math.cos(ang)
+        const py = cy + rIn * Math.sin(ang)
+        o.lineTo(px, py)
+      }
+      o.closePath()
+      o.fill()
+
       mask = o.getImageData(0, 0, cw, ch).data
+      maskW = cw
+      maskH = ch
     }
 
-    const CELL = 17
+    const CELL = 11
 
     function rebuild() {
       if (!mask) return
@@ -92,12 +146,14 @@ export function BinaryField({ className = '' }: { className?: string }) {
         for (let c = 0; c < cols; c++) {
           const x = c * CELL + CELL / 2
           const y = r * CELL + CELL / 2
-          const ix = Math.min(Math.floor(x), W - 1)
-          const iy = Math.min(Math.floor(y), H - 1)
-          const idx = (iy * W + ix) * 4
+          // sample the mask using ITS OWN integer dims (maskW/maskH), not the
+          // float W/H — a .5 rounding mismatch here scrambled the EC glyph
+          const ix = Math.min(Math.floor(x), maskW - 1)
+          const iy = Math.min(Math.floor(y), maskH - 1)
+          const idx = (iy * maskW + ix) * 4
           const alpha = mask[idx + 3] ?? 0
-          const isCore = alpha > 120
-          const isBg = !isCore && Math.random() < 0.22
+          const isCore = alpha > 100
+          const isBg = !isCore && Math.random() < 0.12
           if (!isCore && !isBg) continue
           particles.push({
             bx: x, by: y, x, y, vx: 0, vy: 0,
