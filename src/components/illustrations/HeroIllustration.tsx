@@ -1,34 +1,43 @@
 'use client'
 
 /**
- * EC-Share hero illustration — a large "control hub with surrounding
- * devices" composition. A central desktop console shows a 2x3 device grid;
- * six Android devices orbit it with signal streams flowing inward, and the
- * focused device gets a highlight ring. Pure SVG + CSS animation,
- * theme-aware, no scroll-triggered opacity.
+ * EC-Share hero illustration — a symmetric "control hub surrounded by
+ * devices" composition. Six Android devices arranged evenly (two per side,
+ * none clipped), a large readable central console with a 2x3 grid, and
+ * signal streams flowing inward with a highlighted active path. Pure SVG +
+ * CSS, theme-aware, no scroll-triggered opacity.
  */
 export function HeroIllustration() {
-  const hub = { x: 450, y: 260 }
-  // surrounding devices: [x, y, focused]
+  const hub = { x: 450, y: 240 }
+  // six devices, symmetric: 2 top, 2 mid-sides, 2 bottom — with safe margins
   const devices = [
-    { x: 130, y: 110, focused: false },
-    { x: 450, y: 70, focused: false },
-    { x: 770, y: 110, focused: false },
-    { x: 130, y: 410, focused: false },
-    { x: 770, y: 410, focused: false },
-    { x: 450, y: 470, focused: false },
+    { x: 200, y: 78, active: false },
+    { x: 700, y: 78, active: false },
+    { x: 120, y: 235, active: false },
+    { x: 780, y: 235, active: false },
+    { x: 200, y: 385, active: false },
+    { x: 700, y: 385, active: false },
   ]
+  // highlight the top-right device as the "active" stream
+  devices[1].active = true
 
   return (
-    <svg viewBox="0 0 900 560" fill="none" aria-hidden="true" className="mx-auto w-full">
+    <svg viewBox="0 0 900 520" fill="none" aria-hidden="true" className="mx-auto w-full">
       <defs>
         <linearGradient id="hi-screen" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="var(--signal)" stopOpacity="0.14" />
           <stop offset="100%" stopColor="var(--signal)" stopOpacity="0.03" />
         </linearGradient>
+        <radialGradient id="hi-bg" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stopColor="var(--signal)" stopOpacity="0.16" />
+          <stop offset="100%" stopColor="var(--signal)" stopOpacity="0" />
+        </radialGradient>
       </defs>
 
-      {/* ── signal streams: devices → hub ── */}
+      {/* ambient backdrop glow — stronger, centered on console */}
+      <ellipse cx={hub.x} cy={hub.y} rx="250" ry="200" fill="url(#hi-bg)" />
+
+      {/* signal streams: devices → hub, active one solid + bold */}
       {devices.map((d, i) => (
         <g key={`stream-${i}`}>
           <line
@@ -36,100 +45,94 @@ export function HeroIllustration() {
             y1={d.y}
             x2={hub.x}
             y2={hub.y}
-            stroke="var(--signal)"
-            strokeWidth="1"
-            strokeOpacity="0.2"
-            strokeDasharray="3 5"
+            stroke={d.active ? 'var(--signal)' : 'var(--border-strong)'}
+            strokeWidth={d.active ? 2 : 1}
+            strokeOpacity={d.active ? 0.85 : 0.28}
+            strokeDasharray={d.active ? undefined : '4 6'}
           />
-          <circle r="2.8" fill="var(--signal)" className="hi-stream">
+          <circle r={d.active ? 3.4 : 2.4} fill="var(--signal)" className={d.active ? 'hi-stream-active' : 'hi-stream'}>
             <animateMotion
-              dur="2.6s"
+              dur={d.active ? '2s' : '3.2s'}
               repeatCount="indefinite"
-              begin={`${(i % 3) * 0.85}s`}
+              begin={`${(i % 4) * 0.7}s`}
               path={`M ${d.x} ${d.y} L ${hub.x} ${hub.y}`}
             />
           </circle>
         </g>
       ))}
 
-      {/* ── central console ── */}
+      {/* central console — large + readable grid */}
       <g>
-        <rect x="280" y="150" width="340" height="230" rx="16" fill="var(--bg-surface)" stroke="var(--signal)" strokeWidth="1.8" />
+        <rect x="300" y="130" width="300" height="240" rx="16" fill="var(--bg-surface)" stroke="var(--signal)" strokeWidth="1.8" />
         {/* screen inner */}
-        <rect x="300" y="170" width="300" height="180" rx="10" fill="var(--bg-base)" stroke="var(--border-color)" />
-        {/* 2x3 device grid on screen */}
+        <rect x="318" y="150" width="264" height="184" rx="10" fill="var(--bg-base)" stroke="var(--border-color)" />
+        {/* 2x3 grid, larger cells with a visible phone glyph */}
         {[0, 1, 2].map((row) =>
-          [0, 1].map((col) => (
-            <g key={`${row}-${col}`}>
-              <rect
-                x={312 + col * 146}
-                y={182 + row * 56}
-                width="130"
-                height="48"
-                rx="6"
-                fill="var(--bg-elevated)"
-                stroke={row === 1 && col === 0 ? 'var(--signal)' : 'var(--border-color)'}
-                strokeWidth={row === 1 && col === 0 ? 1.6 : 0.8}
-              />
-              {/* screen content lines */}
-              <rect x={320 + col * 146} y={190 + row * 56} width="60" height="5" rx="2.5" fill="var(--border-strong)" opacity="0.5" />
-              <rect x={320 + col * 146} y={202 + row * 56} width="44" height="5" rx="2.5" fill="var(--border-color)" opacity="0.5" />
-            </g>
-          ))
+          [0, 1].map((col) => {
+            const focused = row === 1 && col === 0
+            const x = 330 + col * 124
+            const y = 162 + row * 57
+            return (
+              <g key={`${row}-${col}`}>
+                <rect
+                  x={x}
+                  y={y}
+                  width="112"
+                  height="48"
+                  rx="7"
+                  fill="var(--bg-elevated)"
+                  stroke={focused ? 'var(--signal)' : 'var(--border-color)'}
+                  strokeWidth={focused ? 1.8 : 0.9}
+                />
+                {/* mini phone: status bar + app dots */}
+                <rect x={x + 10} y={y + 9} width="60" height="6" rx="3" fill={focused ? 'var(--signal)' : 'var(--border-strong)'} opacity="0.7" />
+                {[0, 1, 2].map((r2) =>
+                  [0, 1].map((c2) => (
+                    <rect key={`${r2}-${c2}`} x={x + 10 + c2 * 14} y={y + 22 + r2 * 12} width="9" height="9" rx="2.5" fill={focused ? 'var(--signal)' : 'var(--border-color)'} opacity="0.75" />
+                  ))
+                )}
+              </g>
+            )
+          })
         )}
-        {/* console base */}
-        <rect x="420" y="380" width="60" height="12" rx="4" fill="var(--border-strong)" />
-        <rect x="435" y="392" width="30" height="8" rx="2" fill="var(--border-color)" />
+        {/* console stand */}
+        <rect x="420" y="370" width="60" height="14" rx="4" fill="var(--border-strong)" />
+        <rect x="436" y="384" width="28" height="8" rx="2" fill="var(--border-color)" />
         {/* status dot */}
-        <circle cx="330" cy="195" r="4" fill="var(--signal)" className="hi-dot" />
+        <circle cx="336" cy="170" r="4" fill="var(--signal)" className="hi-dot" />
       </g>
 
-      {/* ── surrounding devices ── */}
+      {/* surrounding devices — symmetric, none clipped */}
       {devices.map((d, i) => (
         <g key={`dev-${i}`} transform={`translate(${d.x}, ${d.y})`}>
-          <rect x="-26" y="-52" width="52" height="104" rx="10" fill="var(--bg-surface)" stroke="var(--border-strong)" strokeWidth="1.3" />
-          <rect x="-18" y="-42" width="36" height="60" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+          <rect x="-24" y="-46" width="48" height="92" rx="9" fill="var(--bg-surface)" stroke={d.active ? 'var(--signal)' : 'var(--border-strong)'} strokeWidth={d.active ? 1.6 : 1.1} />
+          <rect x="-16" y="-37" width="32" height="54" rx="4" fill="var(--bg-elevated)" stroke="var(--border-color)" />
+          {/* screen hint */}
+          <rect x="-10" y="-30" width="20" height="3" rx="1.5" fill="var(--border-strong)" opacity="0.7" />
+          <rect x="-10" y="-22" width="14" height="3" rx="1.5" fill="var(--border-color)" opacity="0.6" />
           {/* home indicator */}
-          <rect x="-10" y="38" width="20" height="4" rx="2" fill="var(--border-strong)" />
-          {/* glow for one device */}
-          {i === 1 && (
-            <rect x="-30" y="-56" width="60" height="112" rx="13" fill="none" stroke="var(--signal)" strokeWidth="1.2" className="hi-focus" />
-          )}
+          <rect x="-8" y="34" width="16" height="3.5" rx="1.75" fill="var(--border-strong)" />
+          {/* active ring */}
+          {d.active && <rect x="-28" y="-50" width="56" height="100" rx="12" fill="none" stroke="var(--signal)" strokeWidth="1.2" className="hi-focus" />}
         </g>
       ))}
 
-      {/* ── ambient particles ── */}
-      {[
-        { x: 250, y: 90, d: 0 },
-        { x: 650, y: 85, d: 0.7 },
-        { x: 90, y: 300, d: 1.4 },
-        { x: 810, y: 300, d: 2.1 },
-        { x: 250, y: 490, d: 0.4 },
-        { x: 650, y: 495, d: 1.1 },
-      ].map((p, i) => (
-        <circle key={`amb-${i}`} cx={p.x} cy={p.y} r="2" fill="var(--signal)" className="hi-amb" style={{ animationDelay: `${p.d}s` }} />
-      ))}
-
       <style jsx>{`
-        .hi-stream { filter: drop-shadow(0 0 4px var(--signal)); }
+        .hi-stream { opacity: 0.75; }
+        .hi-stream-active { filter: drop-shadow(0 0 5px var(--signal)); }
         .hi-dot { animation: hi-blink 2s ease-in-out infinite; }
         .hi-focus { animation: hi-focus-pulse 2.8s ease-in-out infinite; }
-        .hi-amb { animation: hi-amb-pulse 3.4s ease-in-out infinite; }
         @keyframes hi-blink {
           0%, 100% { opacity: 1; }
           50% { opacity: 0.35; }
         }
         @keyframes hi-focus-pulse {
           0%, 100% { opacity: 1; }
-          50% { opacity: 0.35; }
-        }
-        @keyframes hi-amb-pulse {
-          0%, 100% { opacity: 0.6; transform: translateY(0); }
-          50% { opacity: 0.15; transform: translateY(-6px); }
+          50% { opacity: 0.4; }
         }
         @media (prefers-reduced-motion: reduce) {
-          .hi-stream, .hi-dot, .hi-focus, .hi-amb { animation: none !important; opacity: 0.6; }
-          .hi-stream animateMotion { display: none; }
+          .hi-stream, .hi-stream-active, .hi-dot, .hi-focus { animation: none !important; opacity: 0.7; }
+          .hi-stream animateMotion, .hi-stream-active animateMotion { display: none; }
         }
       `}</style>
     </svg>

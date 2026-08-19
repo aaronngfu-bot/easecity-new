@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import { DownloadPageClient } from './DownloadPageClient'
 
 export const metadata: Metadata = {
-  title: 'Download EC-Share',
+  title: 'Download',
   description:
     'Download EC-Share for Windows. Installer hosting and signed release artifacts are prepared for dl.easecity.hk.',
 }

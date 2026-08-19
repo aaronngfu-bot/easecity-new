@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { ArrowLeft, ArrowUpRight, Check } from 'lucide-react'
+import { ArrowUpRight, Check } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { getService } from '@/lib/services'
 
@@ -44,11 +44,6 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
     <main className="relative min-h-screen bg-[var(--bg-base)]">
       <div aria-hidden className="absolute inset-0 bg-grid opacity-30" />
       <div className="container-max relative z-10 max-w-4xl py-28 md:py-36">
-        <Link href="/services" className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]">
-          <ArrowLeft size={14} />
-          {t.nav.services}
-        </Link>
-
         <div className="mt-8">
           <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--signal-soft)] text-[var(--signal)]">
             <ServiceIcon icon={service.icon} />

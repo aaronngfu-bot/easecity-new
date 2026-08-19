@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
 import Image from 'next/image'
 import { prisma } from '@/lib/db'
-import { Calendar, ArrowLeft } from 'lucide-react'
+import { Calendar } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -22,13 +21,6 @@ export default async function VlogPage() {
     <main className="relative min-h-screen bg-[var(--bg-base)]">
       <div aria-hidden className="absolute inset-0 bg-grid opacity-30" />
       <div className="container-max relative z-10 max-w-3xl py-28 md:py-36">
-        <div className="mb-4">
-          <Link href="/" className="inline-flex items-center gap-1.5 text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]">
-            <ArrowLeft size={14} />
-            Back to home
-          </Link>
-        </div>
-
         <p className="label-mono mb-3 text-[var(--signal)]">UPDATES</p>
         <h1 className="font-display text-4xl font-bold tracking-tight text-[var(--text-primary)] md:text-5xl">
           What we&apos;ve been building
