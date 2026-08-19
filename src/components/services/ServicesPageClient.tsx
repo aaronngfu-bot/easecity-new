@@ -95,47 +95,35 @@ export function ServicesPageClient() {
       <section className="section-padding">
         <div className="container-max">
           <div className="grid gap-6 md:grid-cols-2">
-            {services.map((service, i) => (
-              <motion.div
+            {services.map((service) => (
+              <div
                 key={service.title}
-                custom={i}
-                initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true, margin: '-60px' }}
-                variants={fadeUp}
-                whileHover={{ y: -4 }}
-                className="card flex flex-col p-8 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
+                className="card flex flex-col p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
               >
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
+                <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
                   <ServiceIcon icon={service.icon} />
                 </div>
                 <Link href={`/services/${service.slug}`}>
-                  <h3 className="mb-3 font-display text-xl font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--signal)]">
+                  <h3 className="mb-2 font-display text-xl font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--signal)]">
                     {service.title}
                   </h3>
                 </Link>
                 <p className="mb-4 leading-relaxed text-[var(--text-secondary)]">
                   {service.body}
                 </p>
-                <div className="mb-5 flex flex-wrap gap-2">
+                <div className="mb-4 flex flex-wrap gap-2">
                   {service.tags.map((tag) => (
                     <span key={tag} className="badge">{tag}</span>
                   ))}
                 </div>
-                <div className="mt-auto flex items-center justify-between gap-3">
-                  <button
-                    type="button"
-                    onClick={() => setQuoteFor(service.slug)}
-                    className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
-                  >
-                    {c.enquireService}
-                    <ArrowUpRight size={14} />
-                  </button>
-                  <Link href={`/services/${service.slug}`} className="text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]">
-                    {c.getInTouch}
-                  </Link>
-                </div>
-              </motion.div>
+                <Link
+                  href={`/services/${service.slug}`}
+                  className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
+                >
+                  {c.enquireService}
+                  <ArrowUpRight size={14} />
+                </Link>
+              </div>
             ))}
           </div>
         </div>
@@ -278,13 +266,13 @@ export function ServicesPageClient() {
             whileInView="visible"
             viewport={{ once: true }}
             variants={fadeUp}
-            className="mt-12 text-center"
+            className="mt-10 text-center"
           >
             <div className="flex flex-col items-center gap-4">
-              <Link href="/about#contact" className="btn-primary px-7 py-3 text-sm">
+              <button type="button" onClick={() => setQuoteFor('')} className="btn-primary px-7 py-3 text-sm">
                 {c.requestQuote}
                 <ArrowRight size={16} />
-              </Link>
+              </button>
               <a
                 href="mailto:admin@easecity.hk"
                 className="inline-flex items-center gap-2 text-sm text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]"
@@ -297,12 +285,12 @@ export function ServicesPageClient() {
         </div>
       </section>
 
-      {quoteFor && (
+      {quoteFor !== null && (
         <QuoteModal
           open
           onClose={() => setQuoteFor(null)}
-          serviceSlug={quoteFor}
-          serviceTitle={services.find((s) => s.slug === quoteFor)?.title}
+          serviceSlug={quoteFor || undefined}
+          serviceTitle={quoteFor ? services.find((s) => s.slug === quoteFor)?.title : undefined}
         />
       )}
     </>
