@@ -13,7 +13,7 @@ export function BlogPageHeader() {
   const zh = language === 'zh'
   return (
     <>
-      <p className="label-mono mb-3 text-[var(--signal)]">BLOG</p>
+      <p className="label-mono mb-3 text-[var(--signal)]">{zh ? '部落格' : 'BLOG'}</p>
       <h1 className="font-display text-4xl font-bold tracking-tight text-[var(--text-primary)] md:text-5xl">
         {zh ? '我們一直在建構的事' : "What we've been building"}
       </h1>
