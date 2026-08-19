@@ -3,13 +3,61 @@
 import { useEffect, useRef } from 'react'
 
 /**
- * BinaryField — an interactive "matrix" hero visual. A field of 0/1 glyph
- * particles forms the "EC" brand mark (brighter, denser at the center) over a
- * sparse grid of dim background glyphs. Moving the mouse pushes nearby
- * particles away; they spring back, brighten and scale up while repelled.
- * Theme-aware (reads --signal / --signal-light), reduced-motion aware,
- * DPR-aware, and fully cleaned up on unmount.
+ * BinaryField — an interactive "matrix" hero visual. 0/1 glyph particles form
+ * the EC brand mark (bright, full density) over a sparser background field;
+ * the mouse repels nearby particles (spring-back, brighten, scale).
+ *
+ * The EC mark is defined as a CHARACTER GRID (not canvas drawing + sampling).
+ * That was the fix for every prior failure: drawing/sampling produced glyphs
+ * that were too thick, too sparse, mis-centered, or invisible at the flicker
+ * trough. A fixed grid makes the stroke width, density, and centering fully
+ * predictable at ANY canvas size.
+ *
+ * Theme-aware (--signal / --signal-light), reduced-motion aware, DPR aware,
+ * fully cleaned up on unmount.
  */
+
+// EC glyph grid: '#' = letter particle, '.' = empty. 21 cols × 11 rows.
+// E = vertical stem + top arm + short mid arm + bottom arm.
+// C = thin ring, open to the right (gap around angle 0°).
+const GLYPH_ROWS = 11
+const E_COLS = 9
+const C_COLS = 9
+const GAP_COLS = 3
+const GLYPH_COLS = E_COLS + GAP_COLS + C_COLS
+
+function buildGlyphGrid(): boolean[][] {
+  const grid: boolean[][] = Array.from({ length: GLYPH_ROWS }, () =>
+    Array(GLYPH_COLS).fill(false)
+  )
+  // E (cols 0..8)
+  for (let r = 0; r < GLYPH_ROWS; r++) grid[r][0] = true // vertical stem
+  for (let c = 0; c < E_COLS; c++) grid[0][c] = true // top arm
+  for (let c = 0; c < 5; c++) grid[4][c] = true // short mid arm
+  for (let c = 0; c < E_COLS; c++) grid[GLYPH_ROWS - 1][c] = true // bottom arm
+  // C (cols E_COLS+GAP .. +C_COLS), thin ring open right
+  const cStart = E_COLS + GAP_COLS
+  const cx = C_COLS / 2
+  const cy = (GLYPH_ROWS - 1) / 2
+  const rOut = 5.0
+  const rIn = 3.6
+  const gapDeg = 35
+  for (let r = 0; r < GLYPH_ROWS; r++) {
+    for (let c = 0; c < C_COLS; c++) {
+      const x = c + 0.5 - cx
+      const y = r + 0.5 - cy
+      const d = Math.hypot(x, y)
+      if (d >= rIn && d <= rOut) {
+        const ang = (Math.atan2(y, x) * 180) / Math.PI
+        if (!(ang >= -gapDeg && ang <= gapDeg)) grid[r][cStart + c] = true
+      }
+    }
+  }
+  return grid
+}
+
+const GLYPH_GRID = buildGlyphGrid()
+
 export function BinaryField({ className = '' }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -18,7 +66,6 @@ export function BinaryField({ className = '' }: { className?: string }) {
     if (!canvasEl) return
     const ctxEl = canvasEl.getContext('2d')
     if (!ctxEl) return
-    // Non-null aliases so TS keeps the narrowed types inside closures below.
     const canvas: HTMLCanvasElement = canvasEl
     const ctx: CanvasRenderingContext2D = ctxEl
 
@@ -36,8 +83,7 @@ export function BinaryField({ className = '' }: { className?: string }) {
     let dpr = 1
     let raf = 0
     let t = 0
-    let maskW = 0
-    let maskH = 0
+    let cell = 14
     type P = {
       bx: number; by: number; x: number; y: number
       vx: number; vy: number
@@ -48,7 +94,6 @@ export function BinaryField({ className = '' }: { className?: string }) {
       speed: number
     }
     let particles: P[] = []
-    let mask: Uint8ClampedArray | null = null
 
     function hexToRgb(hex: string): [number, number, number] {
       const h = hex.replace('#', '')
@@ -66,103 +111,68 @@ export function BinaryField({ className = '' }: { className?: string }) {
       lightRgb = hexToRgb(signalLight || '#00e5cc')
     }
 
-    function buildMask(cw: number, ch: number) {
-      const off = document.createElement('canvas')
-      off.width = cw
-      off.height = ch
-      const o = off.getContext('2d')
-      if (!o) return
-      o.clearRect(0, 0, cw, ch)
-
-      // EC mark as pure geometry (no font dependency). Layout tuned against the
-      // real 646×380 canvas via PIL: letters fill the frame, equal height, thick
-      // solid band, C opens right, and a small right bias offsets the open-C
-      // visual left-lean so the whole mark reads as centered.
-      const hh = ch * 0.34 // letter half-height (= C outer radius)
-      const ew = hh * 0.72 // E width
-      const band = hh * 0.6 // stroke width for both E bars and C band (thick = solid)
-      const gap = hh * 0.16
-      const cy = ch / 2
-      const total = ew + gap + 2 * hh
-      // right bias compensates the open-C's sparse right side so the mark's
-      // visual center lands on the canvas center (measured -21px off at bias 18)
-      const x0 = (cw - total) / 2 + 39
-      const eLeft = x0
-      const cCx = x0 + ew + gap + hh
-
-      o.strokeStyle = '#fff'
-      o.fillStyle = '#fff'
-      o.lineWidth = band
-      o.lineCap = 'round'
-      o.lineJoin = 'round'
-
-      // E
-      o.beginPath()
-      o.moveTo(eLeft, cy - hh)
-      o.lineTo(eLeft, cy + hh)
-      o.moveTo(eLeft, cy - hh)
-      o.lineTo(eLeft + ew, cy - hh)
-      o.moveTo(eLeft, cy)
-      o.lineTo(eLeft + ew, cy)
-      o.moveTo(eLeft, cy + hh)
-      o.lineTo(eLeft + ew, cy + hh)
-      o.stroke()
-
-      // C — solid annular sector open to the right. Arc spans 45°→315° clockwise
-      // (0°=right, 90°=down), wrapping through the left (180°) so the C reaches
-      // full letter height while the gap opens right.
-      const rOut = hh
-      const rIn = rOut - band
-      const a0 = (45 * Math.PI) / 180
-      const a1 = (315 * Math.PI) / 180
-      const steps = 200
-      o.beginPath()
-      for (let i = 0; i <= steps; i++) {
-        const ang = a0 + ((a1 - a0) * i) / steps
-        const px = cCx + rOut * Math.cos(ang)
-        const py = cy + rOut * Math.sin(ang)
-        if (i === 0) o.moveTo(px, py)
-        else o.lineTo(px, py)
-      }
-      for (let i = steps; i >= 0; i--) {
-        const ang = a0 + ((a1 - a0) * i) / steps
-        const px = cCx + rIn * Math.cos(ang)
-        const py = cy + rIn * Math.sin(ang)
-        o.lineTo(px, py)
-      }
-      o.closePath()
-      o.fill()
-
-      mask = o.getImageData(0, 0, cw, ch).data
-      maskW = cw
-      maskH = ch
-    }
-
-    const CELL = 11
+    // Center of the glyph block, in glyph-grid units.
+    const glyphCenterCol = GLYPH_COLS / 2
 
     function rebuild() {
-      if (!mask) return
-      const cols = Math.ceil(W / CELL)
-      const rows = Math.ceil(H / CELL)
+      // cell = glyph size in px, fit so the mark is ~58% of the smaller canvas
+      // dimension and never overflows the width; mark stays centered at any size.
+      const scale = Math.min((H * 0.58) / GLYPH_ROWS, (W * 0.7) / GLYPH_COLS)
+      cell = Math.max(7, scale)
+      const markW = GLYPH_COLS * cell
+      const markH = GLYPH_ROWS * cell
+      // half-cell right bias: the open-C reads lighter on its right side, so the
+      // geometric center drifts left of the visual center
+      const x0 = (W - markW) / 2 + cell * 0.5
+      const y0 = (H - markH) / 2
+
       particles = []
+
+      // letter particles — full density inside the glyph
+      for (let r = 0; r < GLYPH_ROWS; r++) {
+        for (let c = 0; c < GLYPH_COLS; c++) {
+          if (!GLYPH_GRID[r][c]) continue
+          particles.push({
+            bx: x0 + c * cell + cell / 2,
+            by: y0 + r * cell + cell / 2,
+            x: x0 + c * cell + cell / 2,
+            y: y0 + r * cell + cell / 2,
+            vx: 0, vy: 0,
+            char: '1',
+            core: true,
+            bright: 0.85 + Math.random() * 0.15,
+            phase: Math.random() * Math.PI * 2,
+            speed: 0.5 + Math.random() * 1.0,
+          })
+        }
+      }
+
+      // background field — density falls off with distance from the glyph center
+      const gcx = x0 + glyphCenterCol * cell
+      const gcy = y0 + (GLYPH_ROWS / 2) * cell
+      const cols = Math.ceil(W / cell)
+      const rows = Math.ceil(H / cell)
+      const maxDist = Math.hypot(W, H) / 2
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-          const x = c * CELL + CELL / 2
-          const y = r * CELL + CELL / 2
-          // sample the mask using ITS OWN integer dims (maskW/maskH), not the
-          // float W/H — a .5 rounding mismatch here scrambled the EC glyph
-          const ix = Math.min(Math.floor(x), maskW - 1)
-          const iy = Math.min(Math.floor(y), maskH - 1)
-          const idx = (iy * maskW + ix) * 4
-          const alpha = mask[idx + 3] ?? 0
-          const isCore = alpha > 100
-          const isBg = !isCore && Math.random() < 0.12
-          if (!isCore && !isBg) continue
+          const px = c * cell + cell / 2
+          const py = r * cell + cell / 2
+          // skip if inside the glyph block area (already handled)
+          const gx = (px - x0) / cell
+          const gy = (py - y0) / cell
+          if (gx >= -0.5 && gx < GLYPH_COLS + 0.5 && gy >= -0.5 && gy < GLYPH_ROWS + 0.5) {
+            if (gx >= 0 && gx < GLYPH_COLS && gy >= 0 && gy < GLYPH_ROWS && GLYPH_GRID[Math.floor(gy)][Math.floor(gx)]) {
+              continue
+            }
+          }
+          const dist = Math.hypot(px - gcx, py - gcy)
+          const density = Math.max(0.04, 0.32 * (1 - dist / maxDist))
+          if (Math.random() > density) continue
           particles.push({
-            bx: x, by: y, x, y, vx: 0, vy: 0,
+            bx: px, by: py, x: px, y: py, vx: 0, vy: 0,
             char: Math.random() > 0.5 ? '1' : '0',
-            core: isCore,
-            bright: isCore ? 0.8 + Math.random() * 0.2 : 0.18 + Math.random() * 0.14,
+            core: false,
+            bright: 0.12 + Math.random() * 0.2,
             phase: Math.random() * Math.PI * 2,
             speed: 0.6 + Math.random() * 1.6,
           })
@@ -172,7 +182,7 @@ export function BinaryField({ className = '' }: { className?: string }) {
 
     function drawStatic() {
       ctx.clearRect(0, 0, W, H)
-      ctx.font = `${CELL * 0.92}px "JetBrains Mono", "Courier New", monospace`
+      ctx.font = `${cell * 0.9}px "JetBrains Mono", "Courier New", monospace`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       for (const p of particles) {
@@ -194,12 +204,11 @@ export function BinaryField({ className = '' }: { className?: string }) {
       canvas.style.width = `${W}px`
       canvas.style.height = `${H}px`
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      buildMask(Math.round(W), Math.round(H))
       rebuild()
       if (reduceMotion) drawStatic()
     }
 
-    const RADIUS = 130
+    const RADIUS = Math.max(90, cell * 10)
 
     function step() {
       t += 0.016
@@ -220,13 +229,13 @@ export function BinaryField({ className = '' }: { className?: string }) {
         p.vy *= 0.86
         p.x += p.vx
         p.y += p.vy
-        if (Math.random() < 0.02) p.char = p.char === '1' ? '0' : '1'
+        if (!p.core && Math.random() < 0.02) p.char = p.char === '1' ? '0' : '1'
       }
     }
 
     function draw() {
       ctx.clearRect(0, 0, W, H)
-      ctx.font = `${CELL * 0.92}px "JetBrains Mono", "Courier New", monospace`
+      ctx.font = `${cell * 0.9}px "JetBrains Mono", "Courier New", monospace`
       ctx.textAlign = 'center'
       ctx.textBaseline = 'middle'
       for (const p of particles) {
@@ -234,13 +243,11 @@ export function BinaryField({ className = '' }: { className?: string }) {
         const dy = p.y - mouse.y
         const dist = Math.hypot(dx, dy)
         const boost = mouse.active && dist < RADIUS ? 1 - dist / RADIUS : 0
-        // Core (EC glyph) particles are drawn at full, steady brightness so the
-        // logo is ALWAYS legible; only background particles flicker. (Brightness
-        // variation on core ran ~0.64–0.8 alpha, which read as invisible on the
-        // dark hero — the user saw "no EC".)
+        // Core glyph particles are drawn at constant full brightness so the logo
+        // is always legible; only background particles flicker.
         const a = p.core
           ? p.bright
-          : Math.min(1, p.bright * (0.55 + Math.sin(t * p.speed + p.phase) * 0.4))
+          : Math.min(1, p.bright * (0.55 + Math.sin(t * p.speed + p.phase) * 0.4) + boost * 0.5)
         const base = p.core ? lightRgb : signalRgb
         const rr = Math.round(base[0] + boost * 60)
         const gg = Math.round(base[1] + boost * 60)
@@ -292,13 +299,6 @@ export function BinaryField({ className = '' }: { className?: string }) {
       if (reduceMotion) drawStatic()
     })
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
-    let fontsReady = false
-    const onFonts = () => {
-      if (fontsReady) return
-      fontsReady = true
-      resize()
-    }
-    if (document.fonts?.ready) document.fonts.ready.then(onFonts)
 
     return () => {
       cancelAnimationFrame(raf)
