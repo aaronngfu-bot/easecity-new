@@ -155,15 +155,10 @@ function DeviceScreen({ d, w, h, s = 1 }: { d: Device; w: number; h: number; s?:
       <rect x={w - 8} y={1.5} width={5 * s} height={3.2 * s} rx={1} fill="#fff" opacity="0.85" />
       {/* in-progress operation (animated) */}
       <ActivityContent activity={d.activity} w={w} h={h} s={s} />
-      {/* remote cursor — standard pointer shape */}
-      <g className="ec-cursor">
-        <path
-          d={`M ${cursorX} ${cursorY} l 0 10 l 3 -2.5 l 2 3.2 l 1.6 -1.2 l -2 -3.1 l 3.4 -0.6 z`}
-          fill="#fff"
-          stroke="rgba(0,0,0,0.55)"
-          strokeWidth="0.5"
-        />
-        <circle className="ec-ripple" cx={cursorX + 2} cy={cursorY + 6} r="2.6" fill="none" stroke="#fff" strokeWidth="0.9" />
+      {/* remote cursor — a simple dot */}
+      <g className="ec-cursor-pos">
+        <circle cx={cursorX} cy={cursorY} r="2.2" fill="#fff" stroke="rgba(0,0,0,0.5)" strokeWidth="0.6" />
+        <circle className="ec-ripple" cx={cursorX} cy={cursorY} r="4" fill="none" stroke="#fff" strokeWidth="0.9" />
       </g>
     </>
   )
@@ -288,65 +283,6 @@ export function HeroIllustration() {
           </div>
         ))}
       </div>
-
-      <style jsx>{`
-        .ec-pulse { filter: drop-shadow(0 0 4px var(--signal)); }
-        .ec-cursor { animation: ec-cursor-nudge 3s ease-in-out infinite; }
-        .ec-ripple { animation: ec-ripple 3s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-        .ec-device { transition: filter 0.25s ease; }
-        .ec-device:hover { filter: drop-shadow(0 0 8px var(--signal)); }
-
-        /* per-device operation animations — shared by device + its monitor tile */
-        .ec-act-scroll { animation: ec-scroll 3.2s ease-in-out infinite; }
-        .ec-act-chat { animation: ec-chat-pop 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-        .ec-typing { animation: ec-typing 1.4s ease-in-out infinite; }
-        .ec-progress { animation: ec-progress 3.2s linear infinite; transform-box: fill-box; transform-origin: left center; }
-        .ec-act-gallery { animation: ec-gallery 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-        .ec-toggle { animation: ec-toggle 3.2s ease-in-out infinite; }
-
-        @keyframes ec-cursor-nudge {
-          0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(2px, 2px); }
-        }
-        @keyframes ec-ripple {
-          0%, 20% { opacity: 0; transform: scale(0.4); }
-          40% { opacity: 0.9; transform: scale(1); }
-          60% { opacity: 0.4; transform: scale(1.4); }
-          80%, 100% { opacity: 0; transform: scale(1.8); }
-        }
-        @keyframes ec-scroll {
-          0%, 30% { transform: translateY(0); }
-          55%, 85% { transform: translateY(-8px); }
-          100% { transform: translateY(0); }
-        }
-        @keyframes ec-chat-pop {
-          0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-6px); }
-        }
-        @keyframes ec-typing {
-          0%, 100% { opacity: 0.3; }
-          50% { opacity: 1; }
-        }
-        @keyframes ec-progress {
-          0% { transform: scaleX(0.15); }
-          50% { transform: scaleX(1); }
-          100% { transform: scaleX(0.15); }
-        }
-        @keyframes ec-gallery {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.04); }
-        }
-        @keyframes ec-toggle {
-          0%, 100% { transform: translateX(-4px); }
-          50% { transform: translateX(4px); }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .ec-cursor, .ec-ripple, .ec-act-scroll, .ec-act-chat, .ec-typing,
-          .ec-progress, .ec-act-gallery, .ec-toggle { animation: none !important; }
-          .ec-pulse animateMotion { display: none; }
-        }
-      `}</style>
     </div>
   )
 }

@@ -638,3 +638,63 @@
   border-color: var(--signal);
   box-shadow: var(--focus-ring);
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   EC-Share hero illustration — device operation animations
+   (global: styled-jsx scoping does not reach SVG child elements)
+   ═══════════════════════════════════════════════════════════════ */
+.ec-cursor-pos { animation: ec-cursor-nudge 3s ease-in-out infinite; }
+.ec-ripple { animation: ec-ripple 3s ease-in-out infinite; }
+.ec-act-scroll { animation: ec-scroll 3.2s ease-in-out infinite; }
+.ec-act-chat { animation: ec-chat-pop 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.ec-typing { animation: ec-typing 1.4s ease-in-out infinite; }
+.ec-progress { animation: ec-progress 3.2s linear infinite; transform-box: fill-box; transform-origin: left center; }
+.ec-act-gallery { animation: ec-gallery 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.ec-toggle { animation: ec-toggle 3.2s ease-in-out infinite; }
+
+@keyframes ec-cursor-nudge {
+  0%, 100% { transform: translate(0, 0); }
+  50% { transform: translate(2px, 2px); }
+}
+@keyframes ec-ripple {
+  0%, 20% { opacity: 0; transform: scale(0.4); }
+  40% { opacity: 0.9; transform: scale(1); }
+  60% { opacity: 0.4; transform: scale(1.4); }
+  80%, 100% { opacity: 0; transform: scale(1.8); }
+}
+@keyframes ec-scroll {
+  0%, 30% { transform: translateY(0); }
+  55%, 85% { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
+}
+@keyframes ec-chat-pop {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
+@keyframes ec-typing {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+@keyframes ec-progress {
+  0% { transform: scaleX(0.15); }
+  50% { transform: scaleX(1); }
+  100% { transform: scaleX(0.15); }
+}
+@keyframes ec-gallery {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+@keyframes ec-toggle {
+  0%, 100% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ec-cursor-pos, .ec-ripple, .ec-act-scroll, .ec-act-chat, .ec-typing,
+  .ec-progress, .ec-act-gallery, .ec-toggle { animation: none !important; }
+}
+.ec-pulse { filter: drop-shadow(0 0 4px var(--signal)); }
+.ec-device { transition: filter 0.25s ease; }
+.ec-device:hover { filter: drop-shadow(0 0 8px var(--signal)); }
+@media (prefers-reduced-motion: reduce) {
+  .ec-pulse animateMotion { display: none; }
+}
