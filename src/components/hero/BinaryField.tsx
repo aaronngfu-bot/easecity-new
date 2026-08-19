@@ -74,23 +74,25 @@ export function BinaryField({ className = '' }: { className?: string }) {
       if (!o) return
       o.clearRect(0, 0, cw, ch)
 
-      // EC mark as pure geometry (no font dependency). Layout is verified:
-      // E (vertical + 3 bars) on the left, solid C (annulus open right) on the
-      // right, clearly separated.
-      const mn = Math.min(cw, ch)
-      const u = Math.max(14, mn * 0.05)
-      const hh = mn * 0.3
-      const ew = mn * 0.2
-      const gap = mn * 0.06
+      // EC mark as pure geometry (no font dependency). Layout tuned against the
+      // real 646×380 canvas via PIL: letters fill the frame, equal height, thick
+      // solid band, C opens right, and a small right bias offsets the open-C
+      // visual left-lean so the whole mark reads as centered.
+      const hh = ch * 0.34 // letter half-height (= C outer radius)
+      const ew = hh * 0.72 // E width
+      const band = hh * 0.6 // stroke width for both E bars and C band (thick = solid)
+      const gap = hh * 0.16
       const cy = ch / 2
       const total = ew + gap + 2 * hh
-      const x0 = (cw - total) / 2
+      // right bias compensates the open-C's sparse right side so the mark's
+      // visual center lands on the canvas center (measured -21px off at bias 18)
+      const x0 = (cw - total) / 2 + 39
       const eLeft = x0
       const cCx = x0 + ew + gap + hh
 
       o.strokeStyle = '#fff'
       o.fillStyle = '#fff'
-      o.lineWidth = u
+      o.lineWidth = band
       o.lineCap = 'round'
       o.lineJoin = 'round'
 
@@ -106,13 +108,14 @@ export function BinaryField({ className = '' }: { className?: string }) {
       o.lineTo(eLeft + ew, cy + hh)
       o.stroke()
 
-      // C — solid annular sector open to the right (gap on the right, arc
-      // wraps the left through π)
+      // C — solid annular sector open to the right. Arc spans 45°→315° clockwise
+      // (0°=right, 90°=down), wrapping through the left (180°) so the C reaches
+      // full letter height while the gap opens right.
       const rOut = hh
-      const rIn = rOut - u * 0.9
-      const a0 = (115 * Math.PI) / 180
-      const a1 = (245 * Math.PI) / 180
-      const steps = 120
+      const rIn = rOut - band
+      const a0 = (45 * Math.PI) / 180
+      const a1 = (315 * Math.PI) / 180
+      const steps = 200
       o.beginPath()
       for (let i = 0; i <= steps; i++) {
         const ang = a0 + ((a1 - a0) * i) / steps
@@ -231,12 +234,13 @@ export function BinaryField({ className = '' }: { className?: string }) {
         const dy = p.y - mouse.y
         const dist = Math.hypot(dx, dy)
         const boost = mouse.active && dist < RADIUS ? 1 - dist / RADIUS : 0
-        // Core (EC glyph) particles stay bright and steady so the logo is
-        // always legible; background particles flicker for the matrix feel.
-        const flicker = p.core
-          ? 0.9 + Math.sin(t * p.speed + p.phase) * 0.1
-          : 0.55 + Math.sin(t * p.speed + p.phase) * 0.4
-        const a = Math.min(1, p.bright * flicker + boost * 0.7)
+        // Core (EC glyph) particles are drawn at full, steady brightness so the
+        // logo is ALWAYS legible; only background particles flicker. (Brightness
+        // variation on core ran ~0.64–0.8 alpha, which read as invisible on the
+        // dark hero — the user saw "no EC".)
+        const a = p.core
+          ? p.bright
+          : Math.min(1, p.bright * (0.55 + Math.sin(t * p.speed + p.phase) * 0.4))
         const base = p.core ? lightRgb : signalRgb
         const rr = Math.round(base[0] + boost * 60)
         const gg = Math.round(base[1] + boost * 60)
@@ -251,13 +255,6 @@ export function BinaryField({ className = '' }: { className?: string }) {
           ctx.restore()
         } else {
           ctx.fillText(p.char, p.x, p.y)
-        }
-        // subtle glow pass for core glyph particles
-        if (p.core && boost < 0.05) {
-          ctx.save()
-          ctx.globalAlpha = a * 0.35
-          ctx.fillText(p.char, p.x, p.y)
-          ctx.restore()
         }
       }
     }
