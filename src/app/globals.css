@@ -698,3 +698,33 @@
 @media (prefers-reduced-motion: reduce) {
   .ec-pulse animateMotion { display: none; }
 }
+
+/* EC-Share hero — multi-operation animations (device + mirrored tile sync) */
+.ec-row-highlight { animation: ec-highlight-y 2.8s ease-in-out infinite; }
+.ec-row-highlight-2 { animation: ec-highlight-y 2.8s ease-in-out 1.4s infinite; }
+.ec-send { animation: ec-send 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.ec-spin { animation: ec-spin 3s linear infinite; transform-box: fill-box; transform-origin: center; }
+.ec-volume { animation: ec-volume 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.ec-toggle { animation: ec-toggle 3.2s ease-in-out infinite; }
+.ec-toggle-2 { animation: ec-toggle 3.2s ease-in-out 1.6s infinite; }
+
+@keyframes ec-highlight-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(16px); }
+}
+@keyframes ec-send {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+}
+@keyframes ec-spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+@keyframes ec-volume {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(0.5); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ec-row-highlight, .ec-row-highlight-2, .ec-send, .ec-spin, .ec-volume,
+  .ec-toggle, .ec-toggle-2 { animation: none !important; }
+}
