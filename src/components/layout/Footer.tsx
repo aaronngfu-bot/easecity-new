@@ -43,12 +43,6 @@ export function Footer() {
             <p className="max-w-xs text-sm leading-relaxed text-text-secondary">
               {t.footer.brandDesc}
             </p>
-            <div className="mt-6 inline-flex items-center gap-2 rounded-sm border border-signal/25 bg-signal/10 px-2.5 py-1">
-              <div className="h-1.5 w-1.5 rounded-full bg-signal animate-signal-pulse" />
-              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-signal">
-                {t.footer.statusOnline}
-              </span>
-            </div>
           </div>
 
           {Object.entries(footerLinks).map(([group, links]) => (

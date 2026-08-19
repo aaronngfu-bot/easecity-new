@@ -159,70 +159,62 @@ export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
             />
 
             <div className="mt-12 grid gap-6 lg:grid-cols-2">
-              {/* PRODUCT 01 — EC-Share */}
-              <Link href="/ec-share" className="card group flex flex-col overflow-hidden transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]">
-                <div className="flex flex-col md:flex-row">
-                  <div className="flex flex-1 flex-col p-7 md:p-8">
-                    <div className="mb-3 flex items-center gap-3 text-left">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)]">
-                        <svg className="h-5 w-5 text-[var(--signal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
-                        </svg>
-                      </div>
-                      <div className="text-left">
-                        <p className="label-mono">{c.product01Label}</p>
-                        <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.product01Name}</h3>
-                      </div>
-                    </div>
-                    <p className="text-left leading-relaxed text-[var(--text-secondary)]">
-                      {c.product01Desc}
-                    </p>
-                    <div className="mt-4 flex gap-2">
-                      <span className="badge">Windows</span>
-                      <span className="badge">Android</span>
-                      <span className="badge">14-day trial</span>
-                    </div>
-                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
-                      {t.product.pricing.cta}
-                      <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-                    </span>
+              {/* EC-Share */}
+              <Link href="/ec-share" className="card group relative flex flex-col overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-8">
+                <div className="mb-3 flex items-center gap-3 text-left">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)]">
+                    <svg className="h-5 w-5 text-[var(--signal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
+                    </svg>
                   </div>
-                  <div className="relative flex min-h-[160px] w-full items-center justify-center overflow-hidden bg-[var(--bg-elevated)] p-2 md:w-[45%] md:min-h-0 md:border-l md:border-[var(--border-color)]">
-                    <DeviceGridArt className="h-full max-h-[200px] w-full transition-transform duration-500 group-hover:scale-[1.03]" />
+                  <div className="text-left">
+                    <p className="label-mono">{c.product01Label}</p>
+                    <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.product01Name}</h3>
                   </div>
                 </div>
+                <p className="max-w-sm text-left leading-relaxed text-[var(--text-secondary)]">
+                  {c.product01Desc}
+                </p>
+                <div className="mt-4 flex gap-2">
+                  <span className="badge">Windows</span>
+                  <span className="badge">Android</span>
+                  <span className="badge">14-day trial</span>
+                </div>
+                <div className="pointer-events-none absolute bottom-4 right-4 text-[var(--signal)] opacity-70">
+                  <DeviceGridArt className="h-20 w-20" />
+                </div>
+                <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
+                  {t.product.pricing.cta}
+                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                </span>
               </Link>
 
-              {/* SERVICES — Custom Development */}
-              <Link href="/services" className="card group flex flex-col overflow-hidden transition hover:shadow-[var(--shadow-md)]">
-                <div className="flex flex-col md:flex-row">
-                  <div className="flex flex-1 flex-col p-7 md:p-8">
-                    <div className="mb-3 flex items-center gap-3 text-left">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)]">
-                        <Code2 className="h-5 w-5 text-[var(--signal)]" />
-                      </div>
-                      <div className="text-left">
-                        <p className="label-mono">{c.servicesLabel}</p>
-                        <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.servicesName}</h3>
-                      </div>
-                    </div>
-                    <p className="text-left leading-relaxed text-[var(--text-secondary)]">
-                      {c.servicesDesc}
-                    </p>
-                    <div className="mt-4 flex gap-2">
-                      <span className="badge">Web</span>
-                      <span className="badge">Desktop</span>
-                      <span className="badge">Design</span>
-                    </div>
-                    <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
-                      {c.servicesCta}
-                      <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-                    </span>
+              {/* Custom Development */}
+              <Link href="/services" className="card group relative flex flex-col overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-8">
+                <div className="mb-3 flex items-center gap-3 text-left">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)]">
+                    <Code2 className="h-5 w-5 text-[var(--signal)]" />
                   </div>
-                  <div className="relative flex min-h-[160px] w-full items-center justify-center overflow-hidden bg-[var(--bg-elevated)] p-2 md:w-[45%] md:min-h-0 md:border-l md:border-[var(--border-color)]">
-                    <CodeArt className="h-full max-h-[200px] w-full transition-transform duration-500 group-hover:scale-[1.03]" />
+                  <div className="text-left">
+                    <p className="label-mono">{c.servicesLabel}</p>
+                    <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.servicesName}</h3>
                   </div>
                 </div>
+                <p className="max-w-sm text-left leading-relaxed text-[var(--text-secondary)]">
+                  {c.servicesDesc}
+                </p>
+                <div className="mt-4 flex gap-2">
+                  <span className="badge">Web</span>
+                  <span className="badge">Desktop</span>
+                  <span className="badge">Design</span>
+                </div>
+                <div className="pointer-events-none absolute bottom-4 right-4 text-[var(--signal)] opacity-70">
+                  <CodeArt className="h-20 w-20" />
+                </div>
+                <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
+                  {c.servicesCta}
+                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                </span>
               </Link>
             </div>
           </div>
