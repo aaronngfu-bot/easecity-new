@@ -9,7 +9,7 @@ import { logAction } from '@/lib/audit'
 
 export const dynamic = 'force-dynamic'
 
-const vlogSchema = z.object({
+const blogSchema = z.object({
   title: z.string().min(1).max(160),
   title_zh: z.string().max(160).optional().nullable(),
   slug: z
@@ -55,7 +55,7 @@ export const POST = withErrorHandler(async (req) => {
   if (!isAdmin(session.user.role)) throw new ForbiddenError()
 
   const body = await req.json()
-  const data = vlogSchema.parse(body)
+  const data = blogSchema.parse(body)
 
   const existing = await prisma.vlogPost.findUnique({ where: { slug: data.slug } })
   if (existing) return apiError('SLUG_EXISTS', 'A post with this slug already exists', 409)
@@ -77,7 +77,7 @@ export const POST = withErrorHandler(async (req) => {
 
   await logAction({
     userId: session.user.id,
-    action: 'vlog.create',
+    action: 'blog.create',
     targetType: 'VlogPost',
     targetId: post.id,
     changes: { title: post.title, slug: post.slug },

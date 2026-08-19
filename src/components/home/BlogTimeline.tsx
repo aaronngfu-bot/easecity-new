@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 
-interface VlogPost {
+interface BlogPost {
   id: string
   slug: string
   title: string
@@ -28,7 +28,7 @@ interface UpdateCard {
 /**
  * VLOG rail on the home page — horizontal snap-scroll of update cards, newest
  * on the left, scrollable toward older posts. Each card is a whole-card link
- * to its own `/updates/[slug]` page. Posts are passed in (server-fetched, both
+ * to its own `/blog/[slug]` page. Posts are passed in (server-fetched, both
  * languages) so the rail renders immediately with no client fetch / spinner.
  *
  * Desktop drag-to-scroll: pointer is held and the rail is dragged. CSS
@@ -38,7 +38,7 @@ interface UpdateCard {
  * Mouseup/mousemove are tracked on `window` so releasing outside the rail
  * always ends the gesture.
  */
-export function VlogTimeline({ posts = [] }: { posts?: VlogPost[] }) {
+export function BlogTimeline({ posts = [] }: { posts?: BlogPost[] }) {
   const { language, t } = useLanguage()
   const railRef = useRef<HTMLDivElement | null>(null)
   const dragState = useRef<{ startX: number; startTop: number; scrollLeft: number; active: boolean } | null>(null)
@@ -125,7 +125,7 @@ export function VlogTimeline({ posts = [] }: { posts?: VlogPost[] }) {
             {items.map((item) => (
               <Link
                 key={item.slug}
-                href={`/updates/${item.slug}`}
+                href={`/blog/${item.slug}`}
                 onClick={stopClickOnDrag}
                 draggable={false}
                 className="group block w-[300px] max-w-[78vw] shrink-0 snap-start sm:w-[340px]"
@@ -158,10 +158,10 @@ export function VlogTimeline({ posts = [] }: { posts?: VlogPost[] }) {
       {items.length > 0 && (
         <div className="mt-8 text-center">
           <Link
-            href="/updates"
+            href="/blog"
             className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
           >
-            {t.companyPage.vlogCta}
+            {t.companyPage.blogCta}
             <ArrowRight size={14} />
           </Link>
         </div>

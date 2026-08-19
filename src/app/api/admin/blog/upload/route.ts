@@ -19,7 +19,7 @@ const uploadSchema = z.object({
 })
 
 /**
- * Admin VLOG image upload → Vercel Blob. Returns the public URL to store
+ * Admin blog image upload → Vercel Blob. Returns the public URL to store
  * on the VlogPost.image column. Requires BLOB_READ_WRITE_TOKEN in env.
  */
 export const POST = withErrorHandler(async (req) => {
@@ -42,9 +42,9 @@ export const POST = withErrorHandler(async (req) => {
   if (buf.length === 0) return apiError('EMPTY', 'Empty file', 400)
   if (buf.length > MAX_SIZE) return apiError('TOO_LARGE', 'Image exceeds 5MB limit', 400)
 
-  // sanitize filename, prefix under vlog/
+  // sanitize filename, prefix under blog/
   const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, '-').toLowerCase()
-  const blob = await put(`vlog/${Date.now()}-${safeName}`, buf, {
+  const blob = await put(`blog/${Date.now()}-${safeName}`, buf, {
     access: 'public',
     contentType,
     addRandomSuffix: false,

@@ -16,11 +16,11 @@ interface PostListItem {
 }
 
 /**
- * Searchable list of all published vlog posts — a compact table-like layout
- * with no cover images, used to find past updates by keyword (searches both
+ * Searchable list of all published blog posts — a compact table-like layout
+ * with no cover images, used to find past posts by keyword (searches both
  * the English and Chinese fields). Each row links to its own page.
  */
-export function UpdatesList({ posts }: { posts: PostListItem[] }) {
+export function BlogList({ posts }: { posts: PostListItem[] }) {
   const { language } = useLanguage()
   const [q, setQ] = useState('')
 
@@ -50,21 +50,21 @@ export function UpdatesList({ posts }: { posts: PostListItem[] }) {
           type="search"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Search updates…"
+          placeholder="Search posts…"
           className="w-full rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] py-3 pl-11 pr-4 text-sm text-[var(--text-primary)] outline-none transition-colors placeholder:text-[var(--text-muted)] focus:border-[var(--signal)]"
         />
       </label>
 
       {filtered.length === 0 ? (
         <div className="mt-8 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-8 text-center text-sm text-[var(--text-muted)]">
-          {posts.length === 0 ? 'No updates yet — check back soon.' : 'No updates match your search.'}
+          {posts.length === 0 ? 'No posts yet — check back soon.' : 'No posts match your search.'}
         </div>
       ) : (
         <ul className="mt-8 divide-y divide-[var(--border-color)] overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)]">
           {filtered.map((post) => (
             <li key={post.id}>
               <Link
-                href={`/updates/${post.slug}`}
+                href={`/blog/${post.slug}`}
                 className="group flex items-start justify-between gap-4 px-6 py-5 transition-colors hover:bg-[var(--bg-elevated)]"
               >
                 <div className="min-w-0">

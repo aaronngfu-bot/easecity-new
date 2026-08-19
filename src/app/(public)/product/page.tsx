@@ -4,7 +4,6 @@ import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useLanguage } from '@/context/LanguageContext'
 import { MacbookScroll } from '@/components/ui/macbook-scroll'
-import CyberneticBentoGrid from '@/components/ui/cybernetic-bento-grid'
 import { ComparisonTable } from '@/components/ui/comparison-table'
 import type { FeatureRow, Product } from '@/components/ui/comparison-table'
 
@@ -102,8 +101,6 @@ export default function ProductPage() {
           />
         </div>
       </section>
-
-      <CyberneticBentoGrid />
 
       <ComparisonTable
         eyebrow="COMPARISON"

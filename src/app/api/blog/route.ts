@@ -5,7 +5,7 @@ import { prisma } from '@/lib/db'
 export const dynamic = 'force-dynamic'
 
 /**
- * Public VLOG listing — returns published posts only (newest first).
+ * Public blog listing — returns published posts only (newest first).
  * Supports ?limit= for pagination via apiPaginated and ?lang=zh to select
  * the Chinese title/excerpt (falls back to English when a locale field is
  * missing).

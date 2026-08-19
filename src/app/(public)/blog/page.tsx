@@ -1,16 +1,16 @@
 import type { Metadata } from 'next'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/db'
-import { UpdatesList } from '@/components/updates/UpdatesList'
+import { BlogList } from '@/components/updates/BlogList'
 
 export const revalidate = 0
 
 export async function generateMetadata(): Promise<Metadata> {
   const lang = cookies().get('easecity-lang')?.value === 'zh' ? 'zh' : 'en'
-  return { title: lang === 'zh' ? '全部動態' : 'Updates' }
+  return { title: lang === 'zh' ? '部落格' : 'Blog' }
 }
 
-export default async function VlogPage() {
+export default async function BlogPage() {
   const lang = cookies().get('easecity-lang')?.value === 'zh' ? 'zh' : 'en'
   const posts = await prisma.vlogPost.findMany({
     where: { published: true, publishedAt: { not: null } },
@@ -30,7 +30,7 @@ export default async function VlogPage() {
     <main className="relative min-h-screen bg-[var(--bg-base)]">
       <div aria-hidden className="absolute inset-0 bg-grid opacity-30" />
       <div className="container-max relative z-10 max-w-3xl py-28 md:py-36">
-        <p className="label-mono mb-3 text-[var(--signal)]">UPDATES</p>
+        <p className="label-mono mb-3 text-[var(--signal)]">BLOG</p>
         <h1 className="font-display text-4xl font-bold tracking-tight text-[var(--text-primary)] md:text-5xl">
           {lang === 'zh' ? '我們一直在建構的事' : "What we've been building"}
         </h1>
@@ -39,7 +39,7 @@ export default async function VlogPage() {
         </p>
 
         <div className="mt-10">
-          <UpdatesList posts={posts} />
+          <BlogList posts={posts} />
         </div>
       </div>
     </main>

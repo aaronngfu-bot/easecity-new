@@ -36,7 +36,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export const dynamic = 'force-dynamic'
 
-export default async function VlogDetailPage({ params }: Props) {
+export default async function BlogDetailPage({ params }: Props) {
   const { slug } = await params
   const post = await prisma.vlogPost.findFirst({
     where: { slug, published: true, publishedAt: { not: null } },

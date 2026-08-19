@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { Plus, Trash2, Eye, EyeOff, Loader2, RefreshCw } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
-interface VlogItem {
+interface BlogItem {
   id: string
   slug: string
   title: string
@@ -49,8 +49,8 @@ function slugify(s: string) {
     .replace(/^-+|-+$/g, '')
 }
 
-export default function AdminVlogPage() {
-  const [items, setItems] = useState<VlogItem[]>([])
+export default function AdminBlogPage() {
+  const [items, setItems] = useState<BlogItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [editor, setEditor] = useState<EditorState | null>(null)
@@ -61,7 +61,7 @@ export default function AdminVlogPage() {
   const load = useCallback(async () => {
     setLoading(true)
     try {
-      const res = await fetch('/api/admin/vlog')
+      const res = await fetch('/api/admin/blog')
       const d = await res.json()
       if (!res.ok || !d.success) throw new Error(d.error?.message || 'Failed to load')
       setItems(d.data)
@@ -81,7 +81,7 @@ export default function AdminVlogPage() {
   const openEdit = async (slug: string) => {
     setSaveMsg('')
     try {
-      const res = await fetch(`/api/admin/vlog/${slug}`)
+      const res = await fetch(`/api/admin/blog/${slug}`)
       const d = await res.json()
       if (!res.ok) throw new Error('Failed to load post')
       // GET returns full post with content
@@ -114,7 +114,7 @@ export default function AdminVlogPage() {
     setSaveMsg('')
     try {
       if (editor.originalSlug) {
-        const res = await fetch(`/api/admin/vlog/${editor.originalSlug}`, {
+        const res = await fetch(`/api/admin/blog/${editor.originalSlug}`, {
           method: 'PATCH',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -132,7 +132,7 @@ export default function AdminVlogPage() {
         const d = await res.json()
         if (!res.ok || !d.success) throw new Error(d.error?.message || 'Save failed')
       } else {
-        const res = await fetch('/api/admin/vlog', {
+        const res = await fetch('/api/admin/blog', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -163,7 +163,7 @@ export default function AdminVlogPage() {
   const remove = async (slug: string) => {
     if (!confirm(`Delete "${slug}"? This cannot be undone.`)) return
     try {
-      await fetch(`/api/admin/vlog/${slug}`, { method: 'DELETE' })
+      await fetch(`/api/admin/blog/${slug}`, { method: 'DELETE' })
       load()
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Delete failed')
@@ -174,8 +174,8 @@ export default function AdminVlogPage() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <p className="label-mono mb-2 text-signal">ADMIN.VLOG</p>
-          <h1 className="font-display text-3xl font-semibold tracking-[-0.05em] text-text-primary">Updates / VLOG</h1>
+          <p className="label-mono mb-2 text-signal">ADMIN.BLOG</p>
+          <h1 className="font-display text-3xl font-semibold tracking-[-0.05em] text-text-primary">Blog</h1>
           <p className="mt-1 text-sm text-text-secondary">Markdown posts shown on the public site timeline.</p>
         </div>
         <div className="flex items-center gap-2">
@@ -303,7 +303,7 @@ export default function AdminVlogPage() {
                           binary += part
                         }
                         const data = btoa(binary)
-                        const res = await fetch('/api/admin/vlog/upload', {
+                        const res = await fetch('/api/admin/blog/upload', {
                           method: 'POST',
                           headers: { 'Content-Type': 'application/json' },
                           body: JSON.stringify({ filename: file.name, contentType: file.type, data }),

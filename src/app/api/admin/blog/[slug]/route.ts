@@ -34,7 +34,7 @@ export const GET = withErrorHandler(async (_req, context) => {
   })
 })
 
-const vlogPatchSchema = z.object({
+const blogPatchSchema = z.object({
   title: z.string().min(1).max(160).optional(),
   title_zh: z.string().max(160).nullable().optional(),
   slug: z
@@ -59,7 +59,7 @@ export const PATCH = withErrorHandler(async (req, context) => {
 
   const { slug } = await context.params
   const body = await req.json()
-  const data = vlogPatchSchema.parse(body)
+  const data = blogPatchSchema.parse(body)
 
   const existing = await prisma.vlogPost.findUnique({ where: { slug } })
   if (!existing) throw new NotFoundError('Post not found')
@@ -94,7 +94,7 @@ export const PATCH = withErrorHandler(async (req, context) => {
 
   await logAction({
     userId: session.user.id,
-    action: 'vlog.update',
+    action: 'blog.update',
     targetType: 'VlogPost',
     targetId: post.id,
     changes: { title: post.title, slug: post.slug, published: post.published },
@@ -124,7 +124,7 @@ export const DELETE = withErrorHandler(async (req, context) => {
 
   await logAction({
     userId: session.user.id,
-    action: 'vlog.delete',
+    action: 'blog.delete',
     targetType: 'VlogPost',
     targetId: existing.id,
     changes: { title: existing.title, slug: existing.slug },

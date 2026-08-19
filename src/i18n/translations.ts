@@ -271,11 +271,11 @@ const en = {
         servicesTitle: "Custom development, end to end",
         servicesSubtitle: "From low-latency infrastructure to polished web products — one team, full ownership.",
         servicesCta: "Explore all services",
-        vlogBadge: "UPDATES",
-            vlogTitle: "What we've been building",
-            vlogSubtitle: "A running log of recent work, releases, and product notes.",
-            vlogCta: "View all updates",
-        vlogItems: [
+        blogBadge: "BLOG",
+            blogTitle: "What we've been building",
+            blogSubtitle: "A running log of recent work, releases, and product notes.",
+            blogCta: "View all posts",
+        blogItems: [
           { date: '2026-08', title: 'Brand refresh & transparent mark', body: 'Shipped a new interlocking brand mark, transparent favicon set, and a unified dark/light theme token system across the site.' },
           { date: '2026-08', title: 'Pricing clarity', body: 'Enterprise tier moved to a contact-driven model; transparent self-serve pricing for solo and team plans.' },
           { date: '2026-07', title: 'Products & services split', body: 'Separated the product surface from the services studio so each communicates its own value.' },
@@ -1316,11 +1316,11 @@ const zh: typeof en = {
         servicesTitle: "客製化開發，一條龍",
         servicesSubtitle: "從低延遲基礎設施到精緻網頁產品——一個團隊，全程負責。",
         servicesCta: "探索全部服務",
-        vlogBadge: "動態",
-            vlogTitle: "我們最近在做什麼",
-            vlogSubtitle: "近期工作、發佈與產品紀錄的持續日誌。",
-            vlogCta: "查看全部動態",
-        vlogItems: [
+        blogBadge: "部落格",
+            blogTitle: "我們最近在做什麼",
+            blogSubtitle: "近期工作、發佈與產品紀錄的持續日誌。",
+            blogCta: "查看全部貼文",
+        blogItems: [
           { date: '2026-08', title: '品牌重塑與透明標記', body: '推出全新交疊品牌標記、透明 favicon 組，以及全站統一的深淺色 theme token 系統。' },
           { date: '2026-08', title: '定價更清晰', body: '企業版改為聯絡制；個人與團隊方案維持透明的自助訂閱。' },
           { date: '2026-07', title: '產品與服務分家', body: '將產品頁面與服務工作室分開，讓各自傳達自己的價值。' },
