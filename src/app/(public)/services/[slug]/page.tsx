@@ -5,7 +5,6 @@ import { notFound } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowLeft, ArrowUpRight, Check } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { use } from 'react'
 import { getService } from '@/lib/services'
 
 function ServiceIcon({ icon, size = 22 }: { icon: string; size?: number }) {
@@ -28,8 +27,8 @@ function ServiceIcon({ icon, size = 22 }: { icon: string; size?: number }) {
   }
 }
 
-export default function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
-  const { slug } = use(params)
+export default function ServiceDetailPage({ params }: { params: { slug: string } }) {
+  const { slug } = params
   const { t, language } = useLanguage()
   const service = getService(slug)
   if (!service) notFound()
@@ -115,6 +114,47 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
               </div>
             </div>
           </div>
+        </div>
+
+        {/* Delivery process — from brief to sign-off */}
+        <div className="mt-16">
+          <div className="mb-8">
+            <p className="label-mono mb-3 text-[var(--signal)]">{c.processBadge}</p>
+            <h2 className="font-display text-2xl font-bold tracking-tight text-[var(--text-primary)] md:text-3xl">
+              {c.processTitle}
+            </h2>
+            <p className="mt-2 text-sm text-[var(--text-secondary)]">{c.processSubtitle}</p>
+          </div>
+
+          <ol className="relative space-y-0">
+            {[
+              { num: '01', title: c.p1Title, desc: c.p1Desc },
+              { num: '02', title: c.p2Title, desc: c.p2Desc },
+              { num: '03', title: c.p3Title, desc: c.p3Desc },
+              { num: '04', title: c.p4Title, desc: c.p4Desc },
+            ].map((step, i) => (
+              <motion.li
+                key={step.num}
+                initial={{ opacity: 0, x: -16 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true, margin: '-40px' }}
+                transition={{ duration: 0.45, delay: i * 0.08 }}
+                className="relative flex gap-5 pb-8 last:pb-0"
+              >
+                {/* vertical connector */}
+                {i < 3 && (
+                  <span aria-hidden className="absolute left-[22px] top-12 bottom-0 w-px bg-[var(--border-strong)]" />
+                )}
+                <div className="relative z-10 flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-[var(--signal)] bg-[var(--bg-surface)] font-mono text-sm font-semibold text-[var(--signal)]">
+                  {step.num}
+                </div>
+                <div className="pt-1">
+                  <h3 className="font-display text-lg font-semibold text-[var(--text-primary)]">{step.title}</h3>
+                  <p className="mt-1 max-w-xl text-sm leading-relaxed text-[var(--text-secondary)]">{step.desc}</p>
+                </div>
+              </motion.li>
+            ))}
+          </ol>
         </div>
       </div>
     </main>

@@ -390,6 +390,9 @@ const en = {
             contactEmailHint: "Prefer email? Write to us directly at",
             enquireService: "Enquire about this service",
             enquireSubjectPrefix: "Enquiry: ",
+            processBadge: "HOW WE DELIVER",
+            processTitle: "From brief to sign-off",
+            processSubtitle: "Every engagement follows the same four stages — you always know where the project stands.",
       },
   securityPage: {
     heroEyebrow: "Trust",
@@ -1417,6 +1420,9 @@ const zh: typeof en = {
             contactEmailHint: "偏好用電郵？直接寫信給我們：",
             enquireService: "查詢此服務",
             enquireSubjectPrefix: "查詢：",
+            processBadge: "交付流程",
+            processTitle: "從提出到驗收",
+            processSubtitle: "每個專案都走同樣的四個階段——你隨時掌握專案進度。",
       },
   securityPage: {
     heroEyebrow: "信任",

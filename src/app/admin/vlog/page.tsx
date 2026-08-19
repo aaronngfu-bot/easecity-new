@@ -237,30 +237,51 @@ export default function AdminVlogPage() {
               )}
               <div className="flex-1 space-y-2">
                 <input
-                  value={editor.image.startsWith('data:') ? '' : editor.image}
+                  value={editor.image}
                   onChange={(e) => setEditor({ ...editor, image: e.target.value })}
                   className="glass-input"
-                  placeholder="URL, or upload a file below"
+                  placeholder="Image URL (or upload below)"
                 />
                 <label className="inline-flex cursor-pointer items-center gap-2 text-xs text-text-muted hover:text-signal">
                   <input
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(e) => {
+                    onChange={async (e) => {
                       const file = e.target.files?.[0]
                       if (!file) return
-                      const reader = new FileReader()
-                      reader.onload = () => {
-                        if (reader.result) {
-                          setEditor((prev) => (prev ? { ...prev, image: reader.result as string } : prev))
+                      setSaving(true)
+                      setSaveMsg('Uploading…')
+                      try {
+                        const buf = await file.arrayBuffer()
+                        const bytes = new Uint8Array(buf)
+                        let binary = ''
+                        const chunk = 0x8000
+                        for (let i = 0; i < bytes.length; i += chunk) {
+                          const end = Math.min(i + chunk, bytes.length)
+                          let part = ''
+                          for (let j = i; j < end; j++) part += String.fromCharCode(bytes[j])
+                          binary += part
                         }
+                        const data = btoa(binary)
+                        const res = await fetch('/api/admin/vlog/upload', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ filename: file.name, contentType: file.type, data }),
+                        })
+                        const d = await res.json()
+                        if (!res.ok || !d.success) throw new Error(d.error?.message || 'Upload failed')
+                        setEditor((prev) => (prev ? { ...prev, image: d.data.url } : prev))
+                        setSaveMsg('Uploaded ✓')
+                      } catch (err) {
+                        setSaveMsg(err instanceof Error ? err.message : 'Upload failed')
+                      } finally {
+                        setSaving(false)
                       }
-                      reader.readAsDataURL(file)
                     }}
                   />
                   <span className="signal-secondary min-h-0 px-3 py-1.5 text-xs">Upload image</span>
-                  Upload from this device (stored inline)
+                  Uploads to Vercel Blob storage
                 </label>
               </div>
             </div>
