@@ -36,7 +36,7 @@ function buildGlyphGrid(): boolean[][] {
     grid[r][0] = true
     grid[r][1] = true
   }
-  for (let c = 0; c < E_COLS; c++) grid[0][c] = true // top arm
+  for (let c = 0; c < 8; c++) grid[0][c] = true // top arm (8 wide, matches bottom)
   for (let c = 0; c < 6; c++) grid[4][c] = true // short mid arm
   for (let c = 0; c < 8; c++) grid[9][c] = true // bottom arm (one row up)
   // C (cols E_COLS+GAP .. +C_COLS), thin ring open right
@@ -170,7 +170,7 @@ export function BinaryField({ className = '' }: { className?: string }) {
             }
           }
           const dist = Math.hypot(px - gcx, py - gcy)
-          const density = Math.max(0.08, 0.42 * (1 - dist / maxDist))
+          const density = Math.max(0.12, 0.55 * (1 - dist / maxDist))
           if (Math.random() > density) continue
           particles.push({
             bx: px, by: py, x: px, y: py, vx: 0, vy: 0,
