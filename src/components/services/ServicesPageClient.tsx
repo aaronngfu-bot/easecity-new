@@ -96,18 +96,17 @@ export function ServicesPageClient() {
         <div className="container-max">
           <div className="grid gap-6 md:grid-cols-2">
             {services.map((service) => (
-              <div
+              <Link
                 key={service.title}
-                className="card flex flex-col p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
+                href={`/services/${service.slug}`}
+                className="card group flex flex-col p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
               >
                 <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
                   <ServiceIcon icon={service.icon} />
                 </div>
-                <Link href={`/services/${service.slug}`}>
-                  <h3 className="mb-2 font-display text-xl font-bold text-[var(--text-primary)] transition-colors hover:text-[var(--signal)]">
-                    {service.title}
-                  </h3>
-                </Link>
+                <h3 className="mb-2 font-display text-xl font-bold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
+                  {service.title}
+                </h3>
                 <p className="mb-4 leading-relaxed text-[var(--text-secondary)]">
                   {service.body}
                 </p>
@@ -116,14 +115,11 @@ export function ServicesPageClient() {
                     <span key={tag} className="badge">{tag}</span>
                   ))}
                 </div>
-                <Link
-                  href={`/services/${service.slug}`}
-                  className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
-                >
+                <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
                   {c.enquireService}
-                  <ArrowUpRight size={14} />
-                </Link>
-              </div>
+                  <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                </span>
+              </Link>
             ))}
           </div>
         </div>

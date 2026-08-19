@@ -159,29 +159,25 @@ export default function HomePage() {
 
             <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {services.map((s) => (
-                <div
+                <Link
                   key={s.title}
-                  className="card flex flex-col p-6 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
+                  href={`/services/${s.slug}`}
+                  className="card group flex flex-col p-6 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
                 >
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
                     <s.icon size={18} />
                   </div>
-                  <Link href={`/services/${s.slug}`}>
-                    <h3 className="mb-2 font-display text-base font-semibold text-[var(--text-primary)] transition-colors hover:text-[var(--signal)]">
-                      {s.title}
-                    </h3>
-                  </Link>
+                  <h3 className="mb-2 font-display text-base font-semibold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
+                    {s.title}
+                  </h3>
                   <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
                     {s.body}
                   </p>
-                  <Link
-                    href={`/services/${s.slug}`}
-                    className="mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
-                  >
+                  <span className="mt-auto inline-flex items-center gap-1.5 pt-4 text-sm font-semibold text-[var(--signal)]">
                     {t.servicesPage.enquireService}
-                    <ArrowUpRight size={14} />
-                  </Link>
-                </div>
+                    <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
+                  </span>
+                </Link>
               ))}
             </div>
 
