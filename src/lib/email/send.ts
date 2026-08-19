@@ -16,6 +16,7 @@ interface SendContactEmailParams {
   name: string
   email: string
   company?: string
+  phone?: string
   subject: string
   message: string
 }
@@ -28,7 +29,7 @@ interface SendOtpEmailParams {
 
 export async function sendContactEmail(params: SendContactEmailParams) {
   const resend = getResend()
-  const { name, email, company, subject, message } = params
+  const { name, email, company, phone, subject, message } = params
   const toEmail = process.env.CONTACT_EMAIL_TO || 'hello@easecity.hk'
 
   const { data, error } = await resend.emails.send({
@@ -54,6 +55,11 @@ export async function sendContactEmail(params: SendContactEmailParams) {
           <tr>
             <td style="padding: 8px 12px; font-weight: bold; color: #666;">Company</td>
             <td style="padding: 8px 12px;">${escapeHtml(company)}</td>
+          </tr>` : ''}
+          ${phone ? `
+          <tr style="background: #f9f9f9;">
+            <td style="padding: 8px 12px; font-weight: bold; color: #666;">Phone</td>
+            <td style="padding: 8px 12px;">${escapeHtml(phone)}</td>
           </tr>` : ''}
           <tr style="background: #f9f9f9;">
             <td style="padding: 8px 12px; font-weight: bold; color: #666;">Subject</td>

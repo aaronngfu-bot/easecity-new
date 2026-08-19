@@ -25,6 +25,7 @@ export const POST = withErrorHandler(async (req) => {
       name: data.name,
       email: data.email,
       company: data.company || null,
+      phone: data.phone || null,
       subject: data.subject,
       message: data.message,
       ipAddress: ip,

@@ -18,6 +18,12 @@ export const contactSchema = z.object({
     .trim()
     .optional()
     .or(z.literal('')),
+  phone: z
+    .string()
+    .max(30, 'Phone number must be at most 30 characters')
+    .trim()
+    .optional()
+    .or(z.literal('')),
   subject: z
     .string()
     .min(1, 'Please select a subject')

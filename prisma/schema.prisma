@@ -207,6 +207,7 @@ model ContactSubmission {
   name      String
   email     String
   company   String?
+  phone     String?
   subject   String
   message   String
   status    String   @default("new") // new, read, replied, archived
