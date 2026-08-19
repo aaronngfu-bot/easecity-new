@@ -30,11 +30,15 @@ function buildGlyphGrid(): boolean[][] {
   const grid: boolean[][] = Array.from({ length: GLYPH_ROWS }, () =>
     Array(GLYPH_COLS).fill(false)
   )
-  // E (cols 0..8)
-  for (let r = 0; r < GLYPH_ROWS; r++) grid[r][0] = true // vertical stem
+  // E (cols 0..8): 2-cell vertical stem, arms 1 row thick. Bottom arm sits one
+  // row up (row 9) to align with the C's lower arc, and is 8 wide.
+  for (let r = 0; r < GLYPH_ROWS - 1; r++) {
+    grid[r][0] = true
+    grid[r][1] = true
+  }
   for (let c = 0; c < E_COLS; c++) grid[0][c] = true // top arm
-  for (let c = 0; c < 5; c++) grid[4][c] = true // short mid arm
-  for (let c = 0; c < E_COLS; c++) grid[GLYPH_ROWS - 1][c] = true // bottom arm
+  for (let c = 0; c < 6; c++) grid[4][c] = true // short mid arm
+  for (let c = 0; c < 8; c++) grid[9][c] = true // bottom arm (one row up)
   // C (cols E_COLS+GAP .. +C_COLS), thin ring open right
   const cStart = E_COLS + GAP_COLS
   const cx = C_COLS / 2
@@ -115,9 +119,9 @@ export function BinaryField({ className = '' }: { className?: string }) {
     const glyphCenterCol = GLYPH_COLS / 2
 
     function rebuild() {
-      // cell = glyph size in px, fit so the mark is ~58% of the smaller canvas
+      // cell = glyph size in px, fit so the mark is ~66% of the smaller canvas
       // dimension and never overflows the width; mark stays centered at any size.
-      const scale = Math.min((H * 0.58) / GLYPH_ROWS, (W * 0.7) / GLYPH_COLS)
+      const scale = Math.min((H * 0.66) / GLYPH_ROWS, (W * 0.78) / GLYPH_COLS)
       cell = Math.max(7, scale)
       const markW = GLYPH_COLS * cell
       const markH = GLYPH_ROWS * cell
@@ -166,7 +170,7 @@ export function BinaryField({ className = '' }: { className?: string }) {
             }
           }
           const dist = Math.hypot(px - gcx, py - gcy)
-          const density = Math.max(0.04, 0.32 * (1 - dist / maxDist))
+          const density = Math.max(0.08, 0.42 * (1 - dist / maxDist))
           if (Math.random() > density) continue
           particles.push({
             bx: px, by: py, x: px, y: py, vx: 0, vy: 0,
@@ -230,6 +234,7 @@ export function BinaryField({ className = '' }: { className?: string }) {
         p.x += p.vx
         p.y += p.vy
         if (!p.core && Math.random() < 0.02) p.char = p.char === '1' ? '0' : '1'
+        else if (p.core && Math.random() < 0.015) p.char = p.char === '1' ? '0' : '1'
       }
     }
 
