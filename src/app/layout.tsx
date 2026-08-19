@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Instrument_Sans, JetBrains_Mono, Syne } from 'next/font/google'
+import { cookies } from 'next/headers'
 import './globals.css'
 import { LanguageProvider } from '@/context/LanguageContext'
 import { SessionProvider } from '@/components/providers/SessionProvider'
@@ -84,9 +85,21 @@ export default function RootLayout({
 }: {
   children: React.ReactNode
 }) {
+  // Resolve the initial language server-side from the cookie so the SSR HTML
+  // already matches what the client will render — eliminating the hydration
+  // mismatch that previously surfaced as a "text content does not match" error
+  // and a brief English→Chinese flash on refresh.
+  let initialLang: 'en' | 'zh' = 'en'
+  try {
+    const v = cookies().get('easecity-lang')?.value
+    if (v === 'zh') initialLang = 'zh'
+  } catch {
+    /* cookies unavailable at build/prerender — default to en */
+  }
+
   return (
     <html
-      lang="en"
+      lang={initialLang === 'zh' ? 'zh-HK' : 'en'}
       className={`${instrumentSans.variable} ${jetbrainsMono.variable} ${syne.variable}`}
       suppressHydrationWarning
     >
@@ -100,7 +113,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <SessionProvider>
-            <LanguageProvider>{children}</LanguageProvider>
+            <LanguageProvider initialLang={initialLang}>{children}</LanguageProvider>
           </SessionProvider>
         </ThemeProvider>
       </body>

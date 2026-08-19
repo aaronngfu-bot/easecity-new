@@ -17,24 +17,34 @@ interface Token {
   trailingSpace: boolean;
 }
 
-const CJK_RUN = /[\u3000-\u9fff\uf900-\ufaff\uff00-\uffef]|[^\u3000-\u9fff\uf900-\ufaff\uff00-\uffef]+/g;
+const CJK = /[\u3000-\u9fff\uf900-\ufaff\uff00-\uffef]/;
 
-/**
- * CJK-aware tokenization：中文逐字成 token（可自由換行），
- * 拉丁文整個單詞一個 token（避免單詞中間斷行）。
- */
+/** CJK-aware tokenization. Each continuous run of CJK characters is ONE token
+ *  (no per-character splitting — splits were inflating letter-spacing on
+ *  Chinese titles and making them read as garbled/English-spaced). Latin words
+ *  are grouped per word so a single word never word-breaks mid-token. */
 function tokenize(title: string): Token[] {
   const tokens: Token[] = [];
-  const words = title.split(" ");
-  words.forEach((word, wi) => {
-    if (!word) return;
-    const runs = word.match(CJK_RUN) ?? [word];
-    runs.forEach((run, ri) => {
-      tokens.push({
-        text: run,
-        trailingSpace: ri === runs.length - 1 && wi < words.length - 1,
-      });
-    });
+  const parts = title.split(/\s+/).filter(Boolean);
+  parts.forEach((word, wi) => {
+    const isLastWord = wi === parts.length - 1;
+    let buffer = "";
+    const flush = (last: boolean) => {
+      if (!buffer) return;
+      tokens.push({ text: buffer, trailingSpace: last && !isLastWord });
+      buffer = "";
+    };
+    // Walk chars within the word; join same-class chars (CJK vs non-CJK).
+    for (let i = 0; i < word.length; i++) {
+      const ch = word[i];
+      const cjk = CJK.test(ch);
+      const bufCJK = buffer ? CJK.test(buffer[0]) : null;
+      if (bufCJK !== null && bufCJK !== cjk) {
+        flush(false);
+      }
+      buffer += ch;
+    }
+    flush(true);
   });
   return tokens;
 }

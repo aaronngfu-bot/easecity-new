@@ -19,7 +19,7 @@
   :root {
     /* shadcn-compatible HSL tokens (compat layer for border-bg and
        bg-card etc. that reference hsl(var(--x)) in tailwind.config) */
-    --background: 0 0% 98%;
+    --background: 200 18% 94%;
     --foreground: 175 60% 8%;
     --card: 0 0% 100%;
     --card-foreground: 175 60% 8%;
@@ -47,12 +47,14 @@
         /* Text color to place ON a solid signal background (light: dark teal bg → white text) */
         --signal-ink: #ffffff;
 
-    /* Backgrounds — layered from darkest (void) to lightest (raised) */
-    --bg-void: #edf1f4;
-    --bg-base: #f4f7f8;
-    --bg-surface: #fafcfc;
-    --bg-elevated: #eef2f4;
-    --bg-raised: #e6ebee;
+    /* Backgrounds — layered from deepest (void) to lightest (raised).
+       Tinted gray range rather than pure white so sections read as distinct
+       surfaces and the page doesn't glare. */
+    --bg-void: #e7ecee;
+    --bg-base: #edf1f3;
+    --bg-surface: #f5f7f8;
+    --bg-elevated: #eaeef0;
+    --bg-raised: #dfe6e8;
 
     /* Text */
     --text-primary: #07100f;
@@ -89,7 +91,7 @@
     --focus-ring: 0 0 0 3px rgba(0, 143, 130, 0.20);
 
     /* Body background */
-    --body-bg: #f5f8f8;
+    --body-bg: #edf1f3;
     --body-text: #07100f;
 
     /* Container overlay (grid lines, very subtle) */
@@ -99,9 +101,9 @@
   /* ── DARK (.dark class on <html>) ───────────────────────────── */
   .dark {
     /* shadcn-compatible HSL tokens (dark) */
-    --background: 210 22% 4%;
+    --background: 214 26% 6%;
     --foreground: 180 13% 96%;
-    --card: 210 18% 8%;
+    --card: 214 22% 10%;
     --card-foreground: 180 13% 96%;
     --popover: 210 18% 8%;
     --popover-foreground: 180 13% 96%;
@@ -126,11 +128,11 @@
         /* Text color to place ON a solid signal background (dark: bright cyan bg → near-black text) */
         --signal-ink: #031312;
 
-    --bg-void: #030506;
-    --bg-base: #07090b;
-    --bg-surface: #0d1115;
-    --bg-elevated: #141a1e;
-    --bg-raised: #1c2329;
+    --bg-void: #07090d;
+    --bg-base: #0b0f14;
+    --bg-surface: #12171d;
+    --bg-elevated: #1a212a;
+    --bg-raised: #232c36;
 
     --text-primary: #f5f8f8;
     --text-secondary: #c6d1d0;
@@ -159,7 +161,7 @@
 
     --focus-ring: 0 0 0 3px rgba(0, 229, 204, 0.20);
 
-    --body-bg: #030506;
+    --body-bg: #0b0f14;
     --body-text: #f5f8f8;
 
     --grid-line: rgba(255, 255, 255, 0.03);
@@ -639,10 +641,44 @@
   box-shadow: var(--focus-ring);
 }
 
-/* ═══════════════════════════════════════════════════════════════
-   EC-Share hero illustration — device operation animations
-   (global: styled-jsx scoping does not reach SVG child elements)
-   ═══════════════════════════════════════════════════════════════ */
+/* Theme-switch circular reveal via View Transitions API.
+   The reveal circle expands from the toggle button toward the far corner;
+   driven by --x/--y (button center) and --r (radius to cover the viewport). */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(root) {
+  /* old snapshot slides/fades out under the expanding circle */
+  animation: none;
+}
+
+::view-transition-new(root) {
+  clip-path: circle(var(--r) at var(--x) var(--y));
+  animation: theme-circle-reveal 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes theme-circle-reveal {
+  from {
+    clip-path: circle(0px at var(--x) var(--y));
+    opacity: 0.6;
+  }
+  to {
+    clip-path: circle(var(--r) at var(--x) var(--y));
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-new(root),
+  ::view-transition-old(root) {
+    animation: none !important;
+  }
+}
+
+
 .ec-cursor-pos { animation: ec-cursor-nudge 3s ease-in-out infinite; }
 .ec-ripple { animation: ec-ripple 3s ease-in-out infinite; }
 .ec-act-scroll { animation: ec-scroll 3.2s ease-in-out infinite; }
