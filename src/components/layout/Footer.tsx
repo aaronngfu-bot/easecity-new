@@ -83,11 +83,6 @@ export function Footer() {
             <Link href="/legal/terms" className="text-xs text-text-muted transition-colors hover:text-signal">
               Terms of Service
             </Link>
-            <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-muted">v1.0.0</span>
-            <div className="flex items-center gap-1.5">
-              <div className="h-1.5 w-1.5 rounded-full bg-signal/60" />
-              <span className="text-xs text-text-muted">{t.footer.builtIn}</span>
-            </div>
           </div>
         </div>
       </div>
