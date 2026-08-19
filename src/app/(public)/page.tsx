@@ -80,6 +80,24 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* VLOG / updates log — active proof, surfaced early */}
+      <RevealSection>
+        <section className="section-padding">
+          <div className="container-max">
+            <SectionHeading
+              badge={c.vlogBadge}
+              align="center"
+              title={c.vlogTitle}
+              subtitle={c.vlogSubtitle}
+            />
+
+            <div className="mt-10">
+              <VlogTimeline fallback={c.vlogItems} />
+            </div>
+          </div>
+        </section>
+      </RevealSection>
+
       {/* Products */}
       <RevealSection>
         <section className="section-padding">
@@ -185,24 +203,6 @@ export default function HomePage() {
               <Link href="/services" className="btn-secondary">
                 {c.servicesCta}
               </Link>
-            </div>
-          </div>
-        </section>
-      </RevealSection>
-
-      {/* VLOG / updates log */}
-      <RevealSection>
-        <section className="section-padding">
-          <div className="container-max">
-            <SectionHeading
-              badge={c.vlogBadge}
-              align="center"
-              title={c.vlogTitle}
-              subtitle={c.vlogSubtitle}
-            />
-
-            <div className="mx-auto mt-12 max-w-3xl">
-              <VlogTimeline fallback={c.vlogItems} />
             </div>
           </div>
         </section>
