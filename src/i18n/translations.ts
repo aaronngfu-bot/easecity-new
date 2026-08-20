@@ -565,6 +565,8 @@ const en = {
     linkPartner: 'Partnership',
     linkEnterprise: 'Enterprise',
     builtIn: 'Built in Hong Kong',
+    linkPrivacy: 'Privacy Policy',
+    linkTerms: 'Terms of Service',
   },
 
 
@@ -1614,6 +1616,8 @@ const zh: typeof en = {
     linkPartner: '合作夥伴',
     linkEnterprise: '企業方案',
     builtIn: '香港製造',
+    linkPrivacy: '隱私權政策',
+    linkTerms: '服務條款',
   },
 
 

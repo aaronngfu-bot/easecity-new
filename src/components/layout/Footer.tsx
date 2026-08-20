@@ -72,10 +72,10 @@ export function Footer() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-5">
             <Link href="/legal/privacy" className="text-xs text-text-muted transition-colors hover:text-signal">
-              Privacy Policy
+              {t.footer.linkPrivacy}
             </Link>
             <Link href="/legal/terms" className="text-xs text-text-muted transition-colors hover:text-signal">
-              Terms of Service
+              {t.footer.linkTerms}
             </Link>
           </div>
         </div>

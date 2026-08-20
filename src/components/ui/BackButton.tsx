@@ -23,7 +23,7 @@ export function BackButton() {
   const label = language === 'zh' ? '返回' : 'Back'
 
   return (
-    <div className="mt-6">
+    <div className="mt-20">
       <div className="container-max">
         <button
           type="button"
