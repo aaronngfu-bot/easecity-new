@@ -7,7 +7,7 @@ import { isAdmin } from '@/lib/permissions'
 
 export const dynamic = 'force-dynamic'
 
-const MAX_SIZE = 2 * 1024 * 1024 // 2MB — keep the data URL within function body limits
+const MAX_SIZE = 2 * 1024 * 1024 // 2MB base64 → ~2.8MB data URL, within zod(5M)/function body limits
 const ALLOWED = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif']
 
 const uploadSchema = z.object({

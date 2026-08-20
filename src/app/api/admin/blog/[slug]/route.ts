@@ -45,7 +45,7 @@ const blogPatchSchema = z.object({
     .optional(),
   excerpt: z.string().max(300).nullable().optional(),
   excerpt_zh: z.string().max(300).nullable().optional(),
-  image: z.string().max(2_000_000).nullable().optional(),
+  image: z.string().max(5_000_000).nullable().optional(),
   content: z.string().min(1).optional(),
   content_zh: z.string().min(1).nullable().optional(),
   published: z.boolean().optional(),
