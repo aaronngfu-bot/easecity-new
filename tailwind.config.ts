@@ -72,9 +72,9 @@ const config: Config = {
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
   			signal: {
-  				DEFAULT: '#00e5cc',
-  				light: '#35f5e0',
-  				deep: '#008f82',
+  				DEFAULT: 'var(--signal)',
+  				light: 'var(--signal-light)',
+  				deep: 'var(--signal)',
   				dim: '#003f3a',
   				veil: '#00e5cc1f',
   				glow: '#00e5cc2e'
