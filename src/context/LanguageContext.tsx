@@ -29,6 +29,25 @@ function detectBrowserLanguage(): Language {
   return /^(zh|yue|zh-hk|zh-tw|zh-mo|zh-cn)/.test(nav) ? 'zh' : 'en'
 }
 
+const SITE_TITLE: Record<Language, string> = {
+  en: 'EaseCity — Web services, system architecture & AI',
+  zh: 'EaseCity — 網上服務、系統架構與 AI',
+}
+
+// Substring before " | EaseCity" template suffix, used to keep a per-page part.
+const templateSeparator = ' | '
+
+function applyDocumentTitle(lang: Language) {
+  if (typeof document === 'undefined') return
+  const current = document.title
+  const idx = current.lastIndexOf(templateSeparator)
+  // Keep the per-page segment (e.g. "Blog" / "Products") when present, and
+  // localize the site-title suffix only.
+  const segment = idx > 0 ? current.slice(0, idx) : ''
+  document.title = segment ? `${segment}${templateSeparator}EaseCity` : SITE_TITLE[lang]
+  document.documentElement.lang = lang === 'zh' ? 'zh-HK' : 'en'
+}
+
 export function LanguageProvider({ children, initialLang }: LanguageProviderProps) {
   // The initial value is fully decided before first render on BOTH server and
   // client: server passes initialLang (from cookie); if the client has a stored
@@ -47,7 +66,7 @@ export function LanguageProvider({ children, initialLang }: LanguageProviderProp
   })
 
   useEffect(() => {
-    document.documentElement.lang = language === 'zh' ? 'zh-HK' : 'en'
+    applyDocumentTitle(language)
     try {
       localStorage.setItem(STORAGE_KEY, language)
     } catch {
