@@ -137,9 +137,9 @@ export function HomeContent() {
                     {c.product01Desc}
                   </p>
                   <div className="mt-4 flex gap-2">
-                    <span className="badge">Windows</span>
-                    <span className="badge">Android</span>
-                    <span className="badge">14-day trial</span>
+                    <span className="badge">{c.badgeWindows}</span>
+                    <span className="badge">{c.badgeAndroid}</span>
+                    <span className="badge">{c.badgeTrial}</span>
                   </div>
                   <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
                     {t.product.pricing.cta}
@@ -156,9 +156,9 @@ export function HomeContent() {
                     {c.servicesDesc}
                   </p>
                   <div className="mt-4 flex gap-2">
-                    <span className="badge">Web</span>
-                    <span className="badge">Desktop</span>
-                    <span className="badge">Design</span>
+                    <span className="badge">{c.badgeWeb}</span>
+                    <span className="badge">{c.badgeDesktop}</span>
+                    <span className="badge">{c.badgeDesign}</span>
                   </div>
                   <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
                     {c.servicesCta}
@@ -189,12 +189,12 @@ export function HomeContent() {
                   href={`/services/${s.slug}`}
                   className="group block [perspective:1000px]"
                 >
-                  <div className="relative h-44 w-full transition-transform duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] md:h-52">
+                  <div className="relative h-[13rem] w-full transition-transform duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)] sm:h-52 md:h-56">
                     {/* FRONT */}
                     <div className="card absolute inset-0 flex flex-col justify-between p-4 [backface-visibility:hidden]">
                       <div className="flex items-start justify-between">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
-                          <ServiceIcon icon={s.icon} size={22} />
+                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
+                          <ServiceIcon icon={s.icon} size={24} />
                         </div>
                         <span className="text-[var(--signal)]">
                           <ArrowUpRight size={15} />
@@ -204,7 +204,7 @@ export function HomeContent() {
                         <h3 className="font-display text-sm font-bold leading-snug text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
                           {s.title}
                         </h3>
-                        <p className="mt-1.5 line-clamp-3 text-xs leading-relaxed text-[var(--text-secondary)]">
+                        <p className="mt-2 line-clamp-4 text-xs leading-relaxed text-[var(--text-secondary)] sm:line-clamp-3">
                           {s.body}
                         </p>
                       </div>
@@ -214,10 +214,10 @@ export function HomeContent() {
                       <h3 className="font-display text-sm font-bold leading-snug text-[var(--text-primary)]">
                         {s.title}
                       </h3>
-                      <ul className="space-y-1.5">
+                      <ul className="space-y-2">
                         {s.bullets.map((b) => (
-                          <li key={b} className="flex items-start gap-1.5 text-[11px] leading-snug text-[var(--text-secondary)]">
-                            <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-[var(--signal)]" />
+                          <li key={b} className="flex items-start gap-1.5 text-[11px] leading-snug text-[var(--text-secondary)] sm:text-xs">
+                            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--signal)]" />
                             <span className="line-clamp-2">{b}</span>
                           </li>
                         ))}

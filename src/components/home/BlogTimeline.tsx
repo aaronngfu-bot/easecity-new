@@ -119,7 +119,7 @@ export function BlogTimeline({ posts = [], loading = false }: { posts?: BlogPost
       <div className="relative">
         {loading && (
           <div className="flex gap-8 overflow-hidden pb-4">
-            {[0, 1, 2].map((i) => (
+            {[0, 1, 2, 3].map((i) => (
               <div key={i} className="w-[300px] shrink-0 sm:w-[340px]">
                 <div className="overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)]">
                   <div className="aspect-[16/9] animate-pulse bg-[var(--bg-elevated)]" />
