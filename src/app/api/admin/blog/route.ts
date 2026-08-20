@@ -19,7 +19,7 @@ const blogSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'lowercase letters, numbers, and hyphens only'),
   excerpt: z.string().max(300).optional().nullable(),
   excerpt_zh: z.string().max(300).optional().nullable(),
-  image: z.string().max(5_000_000).optional().nullable(),
+  image: z.string().max(2000).optional().nullable(),
   content: z.string().min(1),
   content_zh: z.string().min(1).optional().nullable(),
   published: z.boolean().optional(),
