@@ -40,3 +40,6 @@ Thumbs.db
 
 .vercel
 .env*
+
+# workspace plans (not part of the site)
+.hermes/

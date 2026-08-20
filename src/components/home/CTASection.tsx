@@ -81,7 +81,7 @@ export function CTASection() {
               </Link>
             </Magnetic>
             <Link
-              href="/product"
+              href="/ec-share"
               className="group inline-flex items-stretch rounded-lg overflow-hidden border border-border bg-card hover:border-signal/40 hover:bg-signal/5 text-foreground transition-colors"
             >
               <span className="px-5 py-3 font-semibold text-sm tracking-wide">
