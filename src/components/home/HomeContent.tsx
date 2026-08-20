@@ -251,6 +251,38 @@ export function HomeContent() {
           </div>
         </section>
       </RevealSection>
+
+      {/* Process — transparent four-step collaboration */}
+      <RevealSection>
+        <section className="section-padding bg-[var(--bg-surface)]">
+          <div className="container-max">
+            <SectionHeading
+              badge={c.processBadge}
+              align="center"
+              title={c.processTitle}
+              subtitle={c.processSubtitle}
+            />
+
+            <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-4">
+              {[
+                { n: '01', t: c.processS1Title, time: c.processS1Time, d: c.processS1Desc },
+                { n: '02', t: c.processS2Title, time: c.processS2Time, d: c.processS2Desc },
+                { n: '03', t: c.processS3Title, time: c.processS3Time, d: c.processS3Desc },
+                { n: '04', t: c.processS4Title, time: c.processS4Time, d: c.processS4Desc },
+              ].map((s) => (
+                <div key={s.n} className="relative">
+                  <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--signal)] bg-[var(--bg-surface)] font-mono text-sm font-semibold text-[var(--signal)]">
+                    {s.n}
+                  </div>
+                  <span className="label-mono mt-4 block text-[var(--signal)]">{s.time}</span>
+                  <h3 className="mt-1 font-display text-lg font-semibold text-[var(--text-primary)]">{s.t}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{s.d}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </RevealSection>
     </main>
   )
 }
