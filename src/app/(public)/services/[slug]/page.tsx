@@ -45,7 +45,7 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
   return (
     <main className="relative min-h-screen bg-[var(--bg-base)]">
       <div aria-hidden className="absolute inset-0 bg-grid opacity-30" />
-      <div className="container-max relative z-10 max-w-4xl py-28 md:py-36">
+      <div className="container-max relative z-10 max-w-4xl pt-2 pb-24 md:pb-32">
         <div className="mt-8">
           <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-xl bg-[var(--signal-soft)] text-[var(--signal)]">
             <ServiceIcon icon={service.icon} />

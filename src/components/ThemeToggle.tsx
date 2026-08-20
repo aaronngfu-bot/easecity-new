@@ -69,8 +69,8 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
           ],
         },
         {
-          duration: 520,
-          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          duration: 800,
+          easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
           fill: 'forwards',
           pseudoElement: '::view-transition-new(root)',
         }
