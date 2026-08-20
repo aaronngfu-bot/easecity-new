@@ -315,6 +315,41 @@ export function HomeContent() {
           </div>
         </section>
       </RevealSection>
+
+      {/* Testimonials — no avatars/people, only words */}
+      <RevealSection>
+        <section className="section-padding bg-[var(--bg-surface)]">
+          <div className="container-max">
+            <SectionHeading
+              badge={c.testimBadge}
+              align="center"
+              title={c.testimTitle}
+              subtitle={c.testimSubtitle}
+            />
+
+            <div className="mt-12 grid gap-6 md:grid-cols-3">
+              {[
+                { q: c.t1Quote, n: c.t1Name, r: c.t1Role },
+                { q: c.t2Quote, n: c.t2Name, r: c.t2Role },
+                { q: c.t3Quote, n: c.t3Name, r: c.t3Role },
+              ].map((tm) => (
+                <figure key={tm.n} className="card flex h-full flex-col p-7">
+                  <div className="mb-4 flex items-center gap-1 text-[var(--amber)]" aria-label="5 stars">
+                    {'★★★★★'.split('').map((s, i) => <span key={i}>{s}</span>)}
+                  </div>
+                  <blockquote className="flex-1 text-[var(--text-secondary)] leading-relaxed">
+                    &ldquo;{tm.q}&rdquo;
+                  </blockquote>
+                  <figcaption className="mt-5 border-t border-[var(--border-color)] pt-4">
+                    <p className="font-semibold text-[var(--text-primary)]">{tm.n}</p>
+                    <p className="label-mono mt-0.5 text-[var(--text-muted)]">{tm.r}</p>
+                  </figcaption>
+                </figure>
+              ))}
+            </div>
+          </div>
+        </section>
+      </RevealSection>
     </main>
   )
 }
