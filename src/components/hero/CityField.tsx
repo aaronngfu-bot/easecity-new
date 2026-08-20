@@ -26,7 +26,9 @@ type P = {
   white: boolean // white vs teal
 }
 
-type Light = { x: number; y: number; bx: number; by: number; vx: number; vy: number; ch: string; phase: number; speed: number; base: number }
+type Light = { x: number; y: number; bld: number; ch: string; phase: number; speed: number; base: number }
+
+type Bld = { x: number; y: number; w: number; h: number; ox: number; oy: number; vx: number; vy: number }
 
 /**
  * CityField — a golden Hong Kong harbour skyline drawn entirely in 0/1
@@ -81,6 +83,8 @@ export function CityField({ className = '' }: { className?: string }) {
     let sky: P[] = []
     let beacons: P[] = []
     let lights: Light[] = []
+    let buildings: Bld[] = []
+    let waterlineRect: { x: number; y: number; w: number; h: number } | null = null
 
     function hexToRgb(hex: string): [number, number, number] {
       const h = hex.replace('#', '')
@@ -161,6 +165,9 @@ export function CityField({ className = '' }: { className?: string }) {
               roof[i] = top + Math.round(u * depth)
             }
           }
+          // record building bbox (for spring bounce)
+          const bldIdx = buildings.length
+          buildings.push({ x: X(c) - cell, y: yOf(top) - cell, w: (w + 1) * cell, h: groundY - yOf(top) + cell, ox: 0, oy: 0, vx: 0, vy: 0 })
           // bright outline
           for (let i = 0; i < w; i++) d(bit(), X(c + i), yOf(roof[i]), goldLight, 0.85)
           for (let rr = roof[0]; rr < ROWS; rr++) d('1', X(c), yOf(rr), goldLight, 0.8)
@@ -170,9 +177,7 @@ export function CityField({ className = '' }: { className?: string }) {
             for (let rr = roof[i] + 1; rr < ROWS - 1; rr++) {
               d(bit(), X(c + i), yOf(rr), gold, 0.58)
               if (rand() < 0.065) {
-                const lx = X(c + i)
-                const ly = yOf(rr)
-                lights.push({ x: lx, y: ly, bx: lx, by: ly, vx: 0, vy: 0, ch: '1', phase: rand() * 6, speed: 0.7 + rand() * 2.2, base: 0.55 + rand() * 0.45 })
+                lights.push({ x: X(c + i), y: yOf(rr), bld: bldIdx, ch: '1', phase: rand() * 6, speed: 0.7 + rand() * 2.2, base: 0.55 + rand() * 0.45 })
               }
             }
           }
@@ -183,13 +188,18 @@ export function CityField({ className = '' }: { className?: string }) {
       // ── landmarks: drawn over cleared gaps (no double density) ──
       const colAt = (fx: number) => Math.round((fx * W - x0) / cell)
       const clearSpan = (c0: number, c1: number, topRow: number) => {
-        g.clearRect(X(c0) - cell, yOf(topRow) - cell, (c1 - c0 + 3) * cell, groundY - yOf(topRow) + cell * 2)
+        const x = X(c0) - cell
+        const y = yOf(topRow) - cell
+        const w = (c1 - c0 + 3) * cell
+        const h = groundY - yOf(topRow) + cell * 2
+        g.clearRect(x, y, w, h)
+        buildings.push({ x, y, w, h, ox: 0, oy: 0, vx: 0, vy: 0 })
       }
 
       // Convention & Exhibition Centre — low arcs (far left)
       {
-        clearSpan(colAt(0.04), colAt(0.24), ROWS - 6)
-        const arcs: [number, number, number][] = [[0.09, 0.055, 0.05], [0.165, 0.07, 0.04]]
+        clearSpan(colAt(0.03), colAt(0.17), ROWS - 6)
+        const arcs: [number, number, number][] = [[0.06, 0.04, 0.04], [0.13, 0.045, 0.03]]
         for (const [cx, hw, hh] of arcs) {
           const steps = Math.floor((hw * 2 * W) / cell)
           for (let i = 0; i <= steps; i++) {
@@ -209,7 +219,7 @@ export function CityField({ className = '' }: { className?: string }) {
 
       // Bank of China tower — X bracing over a cleared column
       {
-        const cB = colAt(0.44)
+        const cB = colAt(0.2)
         const w = 7
         const h = Math.min(ROWS - 2, small ? 24 : 34)
         const top = ROWS - 1 - h
@@ -300,6 +310,7 @@ export function CityField({ className = '' }: { className?: string }) {
       }
 
       // ── waterline: dense dashed digit row ──
+      waterlineRect = { x: x0 - cell, y: groundY - cell, w: COLS * cell + cell * 2, h: cell * 2 }
       for (let cc = 0; cc < COLS; cc++) {
         if (rand() < 0.8) d(bit(), X(cc), groundY + cell * 0.4, gold, 0.5)
       }
@@ -309,6 +320,8 @@ export function CityField({ className = '' }: { className?: string }) {
       sky = []
       beacons = beacons.filter(() => false)
       lights = []
+      buildings = []
+      waterlineRect = null
       const rand = mulberry32(777)
       const small = W < 640
       const bgCell = small ? 26 : 28
@@ -359,6 +372,8 @@ export function CityField({ className = '' }: { className?: string }) {
       radiusPx = 120
       beacons = []
       lights = []
+      buildings = []
+      waterlineRect = null
       buildSky()
       if (reduceMotion) drawStatic()
     }
@@ -427,23 +442,26 @@ export function CityField({ className = '' }: { className?: string }) {
         p.y += p.vy
         if (Math.random() < 0.02) p.ch = p.ch === '1' ? '0' : '1'
       }
-      // twinkle lights repel from the cursor like the sky digits
-      for (const l of lights) {
-        const dx = l.x - mouse.x
-        const dy = l.y - mouse.y
+      // buildings spring away from the cursor
+      for (const b of buildings) {
+        const cx = b.x + b.w / 2
+        const cy = b.y + b.h / 2
+        const dx = cx - mouse.x
+        const dy = cy - mouse.y
         const dist = Math.hypot(dx, dy)
-        if (mouse.active && dist < radiusPx && dist > 0.01) {
-          const force = 1 - dist / radiusPx
-          const ang = Math.atan2(dy, dx)
-          l.vx += Math.cos(ang) * force * 2.2
-          l.vy += Math.sin(ang) * force * 2.2
+        if (mouse.active && dist < radiusPx * 2 && dist > 0.01) {
+          const force = (1 - dist / (radiusPx * 2)) * 26
+          b.vx += (dx / dist) * force
+          b.vy += (dy / dist) * force
         }
-        l.vx += (l.bx - l.x) * 0.08
-        l.vy += (l.by - l.y) * 0.08
-        l.vx *= 0.85
-        l.vy *= 0.85
-        l.x += l.vx
-        l.y += l.vy
+        b.vx += (0 - b.ox) * 0.1
+        b.vy += (0 - b.oy) * 0.1
+        b.vx *= 0.86
+        b.vy *= 0.86
+        b.ox += b.vx
+        b.oy += b.vy
+        const mag = Math.hypot(b.ox, b.oy)
+        if (mag > 28) { b.ox = (b.ox / mag) * 28; b.oy = (b.oy / mag) * 28 }
       }
     }
 
@@ -465,30 +483,41 @@ export function CityField({ className = '' }: { className?: string }) {
         ctx.fillStyle = rgba(col, a + mb * 0.4)
         ctx.fillText(p.ch, p.x, p.y)
       }
-      // city
-      ctx.drawImage(off, 0, 0, W, H)
-      // twinkle window lights on the city (flicker + drift)
+      // buildings (each springs independently from the cursor)
+      for (const b of buildings) {
+        ctx.drawImage(off, b.x * dpr, b.y * dpr, b.w * dpr, b.h * dpr, b.x + b.ox, b.y + b.oy, b.w, b.h)
+      }
+      // waterline (static)
+      if (waterlineRect) {
+        const wr = waterlineRect
+        ctx.drawImage(off, wr.x * dpr, wr.y * dpr, wr.w * dpr, wr.h * dpr, wr.x, wr.y, wr.w, wr.h)
+      }
+      // twinkle window lights (follow their building's offset)
       for (const l of lights) {
+        const b = buildings[l.bld]
         const pulse = 0.5 + 0.5 * Math.sin(t * l.speed + l.phase)
         ctx.fillStyle = rgba(goldLight, (0.25 + 0.65 * pulse) * l.base)
-        ctx.fillText(l.ch, l.x, l.y)
+        ctx.fillText(l.ch, l.x + (b ? b.ox : 0), l.y + (b ? b.oy : 0))
       }
       // water
       drawReflection()
-      // reflected twinkle (rippled, depth-faded)
+      // reflected twinkle (rippled, depth-faded, follows building offset)
       for (const l of lights) {
-        const above = groundY - l.y
+        const b = buildings[l.bld]
+        const lx = l.x + (b ? b.ox : 0)
+        const ly = l.y + (b ? b.oy : 0)
+        const above = groundY - ly
         if (above <= 0) continue
-        const ry = 2 * groundY - l.y
+        const ry = 2 * groundY - ly
         if (ry >= H) continue
         const depth = above / Math.max(1, groundY)
         const fade = 0.5 * (1 - depth * 0.7)
-        const xo = Math.sin(t * 1.2 + l.y * 0.05) * depth * 5
+        const xo = Math.sin(t * 1.2 + ly * 0.05) * depth * 5
         const pulse = 0.5 + 0.5 * Math.sin(t * l.speed + l.phase)
         const a = (0.25 + 0.65 * pulse) * l.base * fade
         if (a < 0.02) continue
         ctx.fillStyle = rgba(goldLight, a)
-        ctx.fillText(l.ch, l.x + xo, ry)
+        ctx.fillText(l.ch, lx + xo, ry)
       }
       // pulsing beacons
       for (const b of beacons) {
@@ -530,6 +559,8 @@ export function CityField({ className = '' }: { className?: string }) {
       readTheme()
       beacons = []
       lights = []
+      buildings = []
+      waterlineRect = null
       buildSky()
       if (reduceMotion) drawStatic()
     })
