@@ -643,7 +643,7 @@
 
 /* Theme-switch circular reveal via View Transitions API.
    The reveal circle expands from the toggle button toward the far corner;
-   driven by --x/--y (button center) and --r (radius to cover the viewport). */
+   driven by --vt-x/--vt-y (button center) and --vt-r (radius). */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -656,17 +656,17 @@
 }
 
 ::view-transition-new(root) {
-  clip-path: circle(var(--r) at var(--x) var(--y));
+  clip-path: circle(var(--vt-r) at var(--vt-x) var(--vt-y));
   animation: theme-circle-reveal 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 @keyframes theme-circle-reveal {
   from {
-    clip-path: circle(0px at var(--x) var(--y));
+    clip-path: circle(0px at var(--vt-x) var(--vt-y));
     opacity: 0.6;
   }
   to {
-    clip-path: circle(var(--r) at var(--x) var(--y));
+    clip-path: circle(var(--vt-r) at var(--vt-x) var(--vt-y));
     opacity: 1;
   }
 }

@@ -47,19 +47,21 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
     const y = r.top + r.height / 2
     const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
 
+    // Set the reveal origin BEFORE the transition starts so the CSS
+    // (::view-transition-new(root) + theme-circle-reveal) reads the correct
+    // --vt-x/--vt-y/--vt-r on the very first frame — otherwise the circle
+    // grows from the origin (top-left) instead of the toggle button.
+    const root = document.documentElement
+    root.style.setProperty('--vt-x', `${x}px`)
+    root.style.setProperty('--vt-y', `${y}px`)
+    root.style.setProperty('--vt-r', `${radius}px`)
+
     const transition = (document as Document & {
       startViewTransition: (cb: () => void) => { ready: Promise<void> }
     }).startViewTransition(() => {
       setTheme(next)
     })
 
-    // CSS (::view-transition-new(root) + theme-circle-reveal) reads these vars;
-    // setting them before the transition's snapshot commits keeps the reveal
-    // anchored to the button.
-    const root = document.documentElement
-    root.style.setProperty('--x', `${x}px`)
-    root.style.setProperty('--y', `${y}px`)
-    root.style.setProperty('--r', `${radius}px`)
     void transition.ready
   }
 
