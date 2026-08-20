@@ -96,11 +96,8 @@ export function ImmersionHero() {
       </span>
     ))
 
-  const signals = [c.sig1, c.sig2, c.sig3, c.sig4, c.sig5]
-
   return (
-    <>
-      <section className="relative flex min-h-[100svh] flex-col overflow-hidden bg-[var(--bg-base)]">
+    <section className="relative flex min-h-[100svh] flex-col overflow-hidden bg-[var(--bg-base)]">
         {/* Full-bleed particle field (EC glyph + drifting binary field) */}
         <div aria-hidden className="absolute inset-0">
           <BinaryField
@@ -113,6 +110,7 @@ export function ImmersionHero() {
             bgDensity={0.5}
             maxBg={420}
             maxMarkWidth={0.46}
+            float
           />
         </div>
 
@@ -121,7 +119,7 @@ export function ImmersionHero() {
           aria-hidden
           className="absolute inset-0 bg-[radial-gradient(ellipse_70%_80%_at_18%_50%,var(--bg-base)_8%,transparent_70%)] lg:bg-[radial-gradient(ellipse_55%_90%_at_12%_50%,var(--bg-base)_20%,transparent_72%)]"
         />
-        {/* Bottom fade so the hero melts into the signals strip */}
+        {/* Bottom fade so the hero melts into the next section */}
         <div aria-hidden className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[var(--bg-base)] to-transparent" />
 
         {/* Copy */}
@@ -168,9 +166,9 @@ export function ImmersionHero() {
           </div>
         </div>
 
-        {/* Scroll cue */}
+        {/* Scroll cue — points into the first content section */}
         <a
-          href="#signals"
+          href="#latest"
           aria-label={c.heroScroll}
           className="hero-rise absolute bottom-7 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]"
           style={{ animationDelay: '1.9s' }}
@@ -181,33 +179,6 @@ export function ImmersionHero() {
           </span>
           <ChevronDown size={13} className="opacity-60" />
         </a>
-      </section>
-
-      {/* Live signals ticker — the page feels alive right below the fold */}
-      <section id="signals" aria-label="signals" className="relative border-y border-[var(--border-color)] bg-[var(--bg-surface)]">
-        <div className="signals-marquee flex overflow-hidden py-3.5" role="presentation">
-          <div className="signals-track flex shrink-0 items-center">
-            {[...signals, ...signals].map((s, i) => (
-              <span key={i} className="flex items-center">
-                <span className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-[var(--signal)]">
-                  {s}
-                </span>
-                <span className="mx-8 h-1 w-1 rounded-full bg-[var(--text-faint)]" aria-hidden />
-              </span>
-            ))}
-          </div>
-          <div className="signals-track flex shrink-0 items-center" aria-hidden="true">
-            {[...signals, ...signals].map((s, i) => (
-              <span key={i} className="flex items-center">
-                <span className="font-mono text-xs font-semibold uppercase tracking-[0.18em] text-[var(--signal)]">
-                  {s}
-                </span>
-                <span className="mx-8 h-1 w-1 rounded-full bg-[var(--text-faint)]" />
-              </span>
-            ))}
-          </div>
-        </div>
-      </section>
-    </>
+    </section>
   )
 }

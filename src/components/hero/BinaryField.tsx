@@ -71,6 +71,7 @@ export function BinaryField({
   bgDensity = 1,
   maxBg = Infinity,
   maxMarkWidth = 0.78,
+  float = false,
 }: {
   className?: string
   /** Horizontal anchor of the EC glyph as a fraction of canvas width (0.5 = centered). */
@@ -87,6 +88,8 @@ export function BinaryField({
   maxBg?: number
   /** Max mark width as a fraction of canvas width (0.78 = near-full, hero uses ~0.45). */
   maxMarkWidth?: number
+  /** Background particles drift on slow sinusoidal orbits (glyph stays steady). */
+  float?: boolean
 }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -117,6 +120,8 @@ export function BinaryField({
     let bgSpacingPx = 14
     type P = {
       bx: number; by: number; x: number; y: number
+      b0x: number; b0y: number
+      fa: number; fs: number; fph: number
       vx: number; vy: number
       char: string
       core: boolean
@@ -168,6 +173,9 @@ export function BinaryField({
           particles.push({
             bx: x0 + c * cell + cell / 2,
             by: y0 + r * cell + cell / 2,
+            b0x: x0 + c * cell + cell / 2,
+            b0y: y0 + r * cell + cell / 2,
+            fa: 0, fs: 0, fph: 0,
             x: x0 + c * cell + cell / 2,
             y: y0 + r * cell + cell / 2,
             vx: 0, vy: 0,
@@ -206,7 +214,12 @@ export function BinaryField({
           if (Math.random() > density) continue
           bgCount++
           particles.push({
-            bx: px, by: py, x: px, y: py, vx: 0, vy: 0,
+            bx: px, by: py,
+            b0x: px, b0y: py,
+            fa: float ? 10 + Math.random() * 22 : 0,
+            fs: 0.1 + Math.random() * 0.25,
+            fph: Math.random() * Math.PI * 2,
+            x: px, y: py, vx: 0, vy: 0,
             char: Math.random() > 0.5 ? '1' : '0',
             core: false,
             bright: 0.35 + Math.random() * 0.45,
@@ -249,6 +262,12 @@ export function BinaryField({
       t += 0.016
       const m = mouse
       for (const p of particles) {
+        // floating background particles: the spring target itself drifts on a
+        // slow Lissajous orbit, so digits wander while the glyph stays steady.
+        if (p.fa > 0) {
+          p.bx = p.b0x + Math.sin(t * p.fs + p.fph) * p.fa
+          p.by = p.b0y + Math.cos(t * p.fs * 0.83 + p.fph * 1.7) * p.fa * 0.75
+        }
         const dx = p.x - m.x
         const dy = p.y - m.y
         const dist = Math.hypot(dx, dy)

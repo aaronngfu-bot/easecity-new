@@ -164,7 +164,7 @@ function DeviceScreen({ d, w, h, s = 1 }: { d: Device; w: number; h: number; s?:
   )
 }
 
-export function HeroIllustration() {
+export function HeroIllustration({ showFeatures = true }: { showFeatures?: boolean }) {
   const mon = { x: 268, y: 96, w: 364, h: 256 }
   const monCx = mon.x + mon.w / 2
 
@@ -270,6 +270,7 @@ export function HeroIllustration() {
       </svg>
 
       {/* feature strip — HTML with lucide icons */}
+      {showFeatures && (
       <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
         {FEATURES.map((f) => (
           <div
@@ -283,6 +284,7 @@ export function HeroIllustration() {
           </div>
         ))}
       </div>
+      )}
     </div>
   )
 }
