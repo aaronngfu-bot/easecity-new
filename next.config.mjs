@@ -28,9 +28,14 @@ const nextConfig = {
   },
 
   // Image optimization domains (add as needed)
-  images: {
-    formats: ['image/avif', 'image/webp'],
-  },
+    images: {
+      formats: ['image/avif', 'image/webp'],
+      remotePatterns: [
+        // Vercel Blob images (public store URLs: <id>.public.blob.vercel-storage.com)
+        { protocol: 'https', hostname: '*.public.blob.vercel-storage.com' },
+        { protocol: 'https', hostname: '*.blob.vercel-storage.com' },
+      ],
+    },
 
   // Powered-by header removal
   poweredByHeader: false,
