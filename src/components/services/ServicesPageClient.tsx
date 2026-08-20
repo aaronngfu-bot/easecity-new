@@ -8,35 +8,8 @@ import { ArrowRight, Mail, MessageSquare, Search, Send, ArrowUpRight } from 'luc
 import { useLanguage } from '@/context/LanguageContext'
 import { PageHero } from '@/components/ui/PageHero'
 import { QuoteModal } from '@/components/contact/QuoteModal'
+import { ServiceIcon } from '@/components/ui/ServiceIcon'
 import { services as serviceCatalog } from '@/lib/services'
-
-function ServiceIcon({ icon }: { icon: string }) {
-  const common = { strokeWidth: 1.8, stroke: 'currentColor', fill: 'none' } as const
-  switch (icon) {
-    case 'code':
-      return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><path d="M16 18l6-6-6-6M8 6l-6 6 6 6" strokeLinecap="round" strokeLinejoin="round" /></svg>
-    case 'web':
-      return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" strokeLinecap="round" /></svg>
-    case 'design':
-      return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="3" /></svg>
-    case 'consult':
-      return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><path d="M12 2a7 7 0 0 1 7 7c0 2.4-1.2 4.5-3 5.7V17h-8v-2.3A7 7 0 0 1 5 9a7 7 0 0 1 7-7Z" strokeLinecap="round" strokeLinejoin="round" /><path d="M9 21h6" strokeLinecap="round" /></svg>
-    case 'search':
-      return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><circle cx="11" cy="11" r="7" /><path d="M21 21l-4.3-4.3" strokeLinecap="round" /></svg>
-    case 'layout':
-      return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><rect x="3" y="3" width="18" height="18" rx="2" /><path d="M3 9h18M9 21V9" strokeLinecap="round" /></svg>
-    case 'build':
-      return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><path d="M14.7 6.3a4 4 0 0 0-5.4 5.4L3 18v3h3l6.3-6.3a4 4 0 0 0 5.4-5.4L14 12l-2-2 2.7-3.7Z" strokeLinecap="round" strokeLinejoin="round" /></svg>
-    case 'ship':
-      return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><path d="M12 15V3m0 0l-4 4m4-4l4 4" strokeLinecap="round" strokeLinejoin="round" /><path d="M4 21h16" strokeLinecap="round" /></svg>
-    case 'ad':
-      return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><path d="M3 11v3a1 1 0 0 0 1 1h2l4 4V6L6 10H4a1 1 0 0 0-1 1Z" strokeLinecap="round" strokeLinejoin="round" /><path d="M15 9a4 4 0 0 1 0 6M18 6a8 8 0 0 1 0 12" strokeLinecap="round" /></svg>
-    case 'brand':
-      return <svg viewBox="0 0 24 24" width="20" height="20" {...common}><path d="M12 21a9 9 0 1 1 0-18c4.97 0 9 4.03 9 9 0 1.5-1 2-2.5 2H15a2 2 0 0 0-2 2c0 .6-.5 1-1 1h0a3 3 0 0 0 0 4Z" strokeLinecap="round" strokeLinejoin="round" /><circle cx="7.5" cy="11.5" r="0.5" fill="currentColor" /><circle cx="10" cy="7.5" r="0.5" fill="currentColor" /><circle cx="14" cy="7.5" r="0.5" fill="currentColor" /></svg>
-    default:
-      return null
-  }
-}
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },

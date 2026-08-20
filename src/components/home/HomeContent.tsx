@@ -2,22 +2,14 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ArrowUpRight, Code2, Globe, Palette, Lightbulb, Megaphone, Fingerprint, Cpu } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, Code2 } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { RevealSection } from '@/components/ui/RevealSection'
 import SectionHeading from '@/components/SectionHeading'
 import { BinaryField } from '@/components/hero/BinaryField'
 import { BlogTimeline } from '@/components/home/BlogTimeline'
+import { ServiceIcon } from '@/components/ui/ServiceIcon'
 import { services as serviceCatalog } from '@/lib/services'
-
-const SERVICE_ICONS: Record<string, React.ElementType> = {
-  code: Code2,
-  web: Globe,
-  design: Palette,
-  consult: Lightbulb,
-  ad: Megaphone,
-  brand: Fingerprint,
-}
 
 export interface HomeBlogPost {
   id: string
@@ -66,7 +58,7 @@ export function HomeContent() {
 
   const services = serviceCatalog.map((s) => ({
     slug: s.slug,
-    icon: SERVICE_ICONS[s.icon] ?? Code2,
+    icon: s.icon,
     title: c2[s.titleKey as keyof typeof c2] as string,
     body: c2[s.bodyKey as keyof typeof c2] as string,
     bullets: language === 'zh' ? s.bullets.zh : s.bullets.en,
@@ -140,10 +132,7 @@ export function HomeContent() {
               {/* EC-Share */}
               <Link href="/ec-share" className="card group relative flex flex-col overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-8">
                 <div className="relative">
-                  <div className="mb-3 text-left">
-                    <p className="label-mono">{c.product01Label}</p>
-                    <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.product01Name}</h3>
-                  </div>
+                  <h3 className="mb-3 font-display text-xl font-bold text-[var(--text-primary)]">{c.product01Name}</h3>
                   <p className="text-left leading-relaxed text-[var(--text-secondary)]">
                     {c.product01Desc}
                   </p>
@@ -162,10 +151,7 @@ export function HomeContent() {
               {/* Custom Development */}
               <Link href="/services" className="card group relative flex flex-col overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-8">
                 <div className="relative">
-                  <div className="mb-3 text-left">
-                    <p className="label-mono">{c.servicesLabel}</p>
-                    <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.servicesName}</h3>
-                  </div>
+                  <h3 className="mb-3 font-display text-xl font-bold text-[var(--text-primary)]">{c.servicesName}</h3>
                   <p className="text-left leading-relaxed text-[var(--text-secondary)]">
                     {c.servicesDesc}
                   </p>
@@ -207,8 +193,8 @@ export function HomeContent() {
                     {/* FRONT */}
                     <div className="card absolute inset-0 flex flex-col justify-between p-4 [backface-visibility:hidden]">
                       <div className="flex items-start justify-between">
-                        <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
-                          <s.icon size={17} />
+                        <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
+                          <ServiceIcon icon={s.icon} size={22} />
                         </div>
                         <span className="text-[var(--signal)]">
                           <ArrowUpRight size={15} />

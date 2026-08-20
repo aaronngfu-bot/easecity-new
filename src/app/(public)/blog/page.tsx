@@ -1,15 +1,13 @@
 import type { Metadata } from 'next'
-import { cookies } from 'next/headers'
 import { prisma } from '@/lib/db'
 import { BlogList } from '@/components/updates/BlogList'
 import { BlogPageHeader } from '@/components/home/BlogPageHeader'
 
-export const revalidate = 0
+// ISR — the list is static (BlogList + BlogPageHeader are client components
+// that localize on the client), so no per-request server render / DB query.
+export const revalidate = 60
 
-export async function generateMetadata(): Promise<Metadata> {
-  const lang = cookies().get('easecity-lang')?.value === 'zh' ? 'zh' : 'en'
-  return { title: lang === 'zh' ? '部落格' : 'Blog' }
-}
+export const metadata: Metadata = { title: 'Blog' }
 
 export default async function BlogPage() {
   const posts = await prisma.vlogPost.findMany({

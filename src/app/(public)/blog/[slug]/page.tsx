@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { cookies } from 'next/headers'
 import { prisma } from '@/lib/db'
 import { BlogPostContent } from '@/components/home/BlogPostContent'
 
@@ -23,15 +22,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     select: { title: true, title_zh: true, excerpt: true, excerpt_zh: true, image: true },
   })
   if (!post) return { title: 'Post not found' }
-  const lang = cookies().get('easecity-lang')?.value === 'zh' ? 'zh' : 'en'
+  // Static metadata uses the English title; the visible post content is a
+  // client component (BlogPostContent) that localizes on the fly.
   return {
-    title: lang === 'zh' ? post.title_zh || post.title : post.title,
-    description: lang === 'zh' ? post.excerpt_zh || post.excerpt || undefined : post.excerpt || undefined,
+    title: post.title,
+    description: post.excerpt || undefined,
     openGraph: post.image ? { images: [post.image] } : undefined,
   }
 }
 
-export const dynamic = 'force-dynamic'
+// ISR — pages are pre-rendered from generateStaticParams so visits/prefetches
+// are served from the edge cache instead of a per-request server render.
+export const revalidate = 60
 
 export default async function BlogDetailPage({ params }: Props) {
   const { slug } = await params
