@@ -350,6 +350,32 @@ export function HomeContent() {
           </div>
         </section>
       </RevealSection>
+
+      {/* Frictionless CTA */}
+      <RevealSection>
+        <section className="section-padding">
+          <div className="container-max">
+            <div className="card mx-auto max-w-3xl p-10 text-center md:p-14">
+              <h2 className="font-display text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-4xl">
+                {c.homeCtaTitle}
+              </h2>
+              <p className="mx-auto mt-4 max-w-xl text-[var(--text-secondary)]">
+                {c.homeCtaSub}
+              </p>
+              <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
+                <a href="/about#contact" className="inline-flex items-center gap-2 rounded-lg bg-[var(--amber)] px-8 py-3.5 text-base font-semibold text-[var(--amber-ink)] transition-colors hover:brightness-105">
+                  {c.homeCtaBtn}
+                  <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
+                </a>
+                <a href="mailto:admin@easecity.hk" className="text-sm text-[var(--text-muted)] underline-offset-4 transition-colors hover:text-[var(--signal)]">
+                  {c.homeCtaEmail}
+                </a>
+              </div>
+              <p className="label-mono mt-6 text-[var(--text-muted)]">{c.homeCtaTrust}</p>
+            </div>
+          </div>
+        </section>
+      </RevealSection>
     </main>
   )
 }
