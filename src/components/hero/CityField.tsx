@@ -140,7 +140,7 @@ export function CityField({ className = '' }: { className?: string }) {
         const steps = Math.floor(len / (cell * 1.4))
         for (let i = 0; i <= steps; i++) {
           const u = i / steps
-          d(bit(), ax * W + (bx - ax) * W * u, ay * H + (by - ay) * H * u, gold, 0.4)
+          d(bit(), ax * W + (bx - ax) * W * u, ay * H + (by - ay) * H * u, gold, 0.55)
         }
       }
 
@@ -164,7 +164,7 @@ export function CityField({ className = '' }: { className?: string }) {
         const w = 4 + Math.floor(rand() * 7)
         if (c + w > COLS - 1) break
         const leftness = c / COLS
-        const maxH = leftness < 0.42 ? (small ? 12 : 16) : ROWS - 4
+        const maxH = leftness < 0.42 ? (small ? 14 : 20) : ROWS - 4
         const h = Math.min(ROWS - 3, 8 + Math.floor(rand() * (maxH - 8)))
         const top = ROWS - 1 - h
 
@@ -192,7 +192,7 @@ export function CityField({ className = '' }: { className?: string }) {
         // dense window grid inside
         for (let i = 1; i < w - 1; i++) {
           for (let rr = roof[i] + 1; rr < ROWS - 1; rr++) {
-            if (rand() < 0.62) d(bit(), X(c + i), yOf(rr), gold, 0.35 + rand() * 0.45)
+            if (rand() < 0.7) d(bit(), X(c + i), yOf(rr), gold, 0.35 + rand() * 0.45)
           }
         }
         c += w + (rand() < 0.3 ? 1 : 0)
@@ -301,7 +301,7 @@ export function CityField({ className = '' }: { className?: string }) {
       // Hong Kong Observation Wheel — ring, spokes, legs
       {
         const wx = 0.565 * W
-        const r = Math.min(H * 0.065, cell * 7)
+        const r = Math.min(H * 0.085, cell * 9)
         const wy = groundY - r - cell * 2
         const circ = Math.floor((2 * Math.PI * r) / (cell * 0.9))
         for (let i = 0; i < circ; i++) {
