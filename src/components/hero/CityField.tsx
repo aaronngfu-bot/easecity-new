@@ -26,7 +26,7 @@ type P = {
   white: boolean // white vs teal
 }
 
-type Light = { x: number; y: number; ch: string; phase: number; speed: number; base: number }
+type Light = { x: number; y: number; bx: number; by: number; vx: number; vy: number; ch: string; phase: number; speed: number; base: number }
 
 /**
  * CityField — a golden Hong Kong harbour skyline drawn entirely in 0/1
@@ -170,12 +170,133 @@ export function CityField({ className = '' }: { className?: string }) {
             for (let rr = roof[i] + 1; rr < ROWS - 1; rr++) {
               d(bit(), X(c + i), yOf(rr), gold, 0.58)
               if (rand() < 0.065) {
-                lights.push({ x: X(c + i), y: yOf(rr), ch: '1', phase: rand() * 6, speed: 0.7 + rand() * 2.2, base: 0.55 + rand() * 0.45 })
+                const lx = X(c + i)
+                const ly = yOf(rr)
+                lights.push({ x: lx, y: ly, bx: lx, by: ly, vx: 0, vy: 0, ch: '1', phase: rand() * 6, speed: 0.7 + rand() * 2.2, base: 0.55 + rand() * 0.45 })
               }
             }
           }
           c += w + 1
         }
+      }
+
+      // ── landmarks: drawn over cleared gaps (no double density) ──
+      const colAt = (fx: number) => Math.round((fx * W - x0) / cell)
+      const clearSpan = (c0: number, c1: number, topRow: number) => {
+        g.clearRect(X(c0) - cell, yOf(topRow) - cell, (c1 - c0 + 3) * cell, groundY - yOf(topRow) + cell * 2)
+      }
+
+      // Convention & Exhibition Centre — low arcs (far left)
+      {
+        clearSpan(colAt(0.04), colAt(0.24), ROWS - 6)
+        const arcs: [number, number, number][] = [[0.09, 0.055, 0.05], [0.165, 0.07, 0.04]]
+        for (const [cx, hw, hh] of arcs) {
+          const steps = Math.floor((hw * 2 * W) / cell)
+          for (let i = 0; i <= steps; i++) {
+            const u = (2 * i) / steps - 1
+            const x = (cx - hw) * W + u * hw * W + hw * W
+            const y = groundY - cell * 2 - hh * H * Math.sqrt(Math.max(0, 1 - u * u))
+            d(bit(), x, y, goldLight, 0.85)
+          }
+          for (let rr = 1; rr <= 3; rr++) {
+            for (let i = 0; i <= steps; i += 1) {
+              const u = (2 * i) / steps - 1
+              if (rand() < 0.7) d(bit(), (cx - hw) * W + (u + 1) * hw * W, groundY - cell * rr, gold, 0.5)
+            }
+          }
+        }
+      }
+
+      // Bank of China tower — X bracing over a cleared column
+      {
+        const cB = colAt(0.44)
+        const w = 7
+        const h = Math.min(ROWS - 2, small ? 24 : 34)
+        const top = ROWS - 1 - h
+        clearSpan(cB - 4, cB + 4, top - 5)
+        for (let i = 0; i < w; i++) d(bit(), X(cB + i), yOf(top), goldLight, 0.9)
+        for (let rr = top; rr < ROWS; rr++) {
+          d('1', X(cB), yOf(rr), goldLight, 0.8)
+          d('0', X(cB + w - 1), yOf(rr), goldLight, 0.8)
+        }
+        for (let seg = 0; seg * 6 < h; seg++) {
+          const r0 = top + seg * 6
+          for (let k = 0; k <= 6 && r0 + k < ROWS; k++) {
+            const u = k / 6
+            const l = Math.round(u * (w - 1))
+            d('1', X(cB + l), yOf(r0 + k), gold, 0.7)
+            d('0', X(cB + w - 1 - l), yOf(r0 + k), gold, 0.7)
+          }
+        }
+        for (let k = 1; k <= 4; k++) {
+          d('1', X(cB + 1), yOf(top - k), goldLight, 0.8)
+          d('1', X(cB + w - 2), yOf(top - k), goldLight, 0.8)
+        }
+      }
+
+      // IFC — tallest flat-topped tower
+      {
+        const cI = colAt(0.68)
+        const w = 8
+        const top = 1
+        clearSpan(cI - 4, cI + 4, top - 2)
+        for (let i = 0; i < w; i++) d(bit(), X(cI + i), yOf(top), goldLight, 0.95)
+        for (let rr = top; rr < ROWS; rr++) {
+          d('1', X(cI), yOf(rr), goldLight, 0.85)
+          d('0', X(cI + w - 1), yOf(rr), goldLight, 0.85)
+        }
+        for (let i = 1; i < w - 1; i++) {
+          for (let rr = top + 3; rr < ROWS - 1; rr++) {
+            if (rand() < 0.9) d(bit(), X(cI + i), yOf(rr), gold, 0.5 + rand() * 0.4)
+          }
+        }
+      }
+
+      // Central Plaza — stepped pyramid top + spire
+      {
+        const cP = colAt(0.88)
+        const w = 7
+        const h = Math.min(ROWS - 6, small ? 20 : 28)
+        const top = ROWS - 1 - h
+        clearSpan(cP - 4, cP + 4, top - 8)
+        for (let i = 0; i < w; i++) d(bit(), X(cP + i), yOf(top), goldLight, 0.9)
+        for (let rr = top; rr < ROWS; rr++) {
+          d('1', X(cP), yOf(rr), goldLight, 0.8)
+          d('0', X(cP + w - 1), yOf(rr), goldLight, 0.8)
+        }
+        for (let i = 1; i < w - 1; i++) {
+          for (let rr = top + 1; rr < ROWS - 1; rr++) {
+            if (rand() < 0.85) d(bit(), X(cP + i), yOf(rr), gold, 0.5 + rand() * 0.4)
+          }
+        }
+        for (let k = 1; k <= 3; k++) {
+          d('1', X(cP + k), yOf(top - 1), goldLight, 0.85)
+          d('1', X(cP + w - 1 - k), yOf(top - 1), goldLight, 0.85)
+        }
+        for (let k = 2; k <= 6; k++) d('1', X(cP + 3), yOf(top - k), goldLight, 0.8)
+      }
+
+      // Hong Kong Observation Wheel
+      {
+        const wx = 0.565 * W
+        const r = Math.min(H * 0.085, cell * 9)
+        const wy = groundY - r - cell * 2
+        clearSpan(colAt(0.565 - 0.05) - 1, colAt(0.565 + 0.05) + 1, ROWS - 10)
+        const circ = Math.floor((2 * Math.PI * r) / (cell * 0.9))
+        for (let i = 0; i < circ; i++) {
+          const a = (i / circ) * Math.PI * 2
+          d(bit(), wx + Math.cos(a) * r, wy + Math.sin(a) * r, goldLight, 0.85)
+        }
+        for (let s = 0; s < 8; s++) {
+          const a = (s / 8) * Math.PI * 2
+          const steps = Math.floor(r / cell)
+          for (let k = 1; k < steps; k++) {
+            d(k % 2 ? '0' : '1', wx + Math.cos(a) * k * cell, wy + Math.sin(a) * k * cell, gold, 0.55)
+          }
+        }
+        d('1', wx, wy, goldLight, 0.95)
+        d('1', wx - cell, wy + r + cell, gold, 0.7)
+        d('1', wx + cell, wy + r + cell, gold, 0.7)
       }
 
       // ── waterline: dense dashed digit row ──
@@ -306,6 +427,24 @@ export function CityField({ className = '' }: { className?: string }) {
         p.y += p.vy
         if (Math.random() < 0.02) p.ch = p.ch === '1' ? '0' : '1'
       }
+      // twinkle lights repel from the cursor like the sky digits
+      for (const l of lights) {
+        const dx = l.x - mouse.x
+        const dy = l.y - mouse.y
+        const dist = Math.hypot(dx, dy)
+        if (mouse.active && dist < radiusPx && dist > 0.01) {
+          const force = 1 - dist / radiusPx
+          const ang = Math.atan2(dy, dx)
+          l.vx += Math.cos(ang) * force * 2.2
+          l.vy += Math.sin(ang) * force * 2.2
+        }
+        l.vx += (l.bx - l.x) * 0.08
+        l.vy += (l.by - l.y) * 0.08
+        l.vx *= 0.85
+        l.vy *= 0.85
+        l.x += l.vx
+        l.y += l.vy
+      }
     }
 
     function draw() {
@@ -328,14 +467,10 @@ export function CityField({ className = '' }: { className?: string }) {
       }
       // city
       ctx.drawImage(off, 0, 0, W, H)
-      // twinkle window lights on the city (brighten near the cursor)
+      // twinkle window lights on the city (flicker + drift)
       for (const l of lights) {
         const pulse = 0.5 + 0.5 * Math.sin(t * l.speed + l.phase)
-        const dx = l.x - mouse.x
-        const dy = l.y - mouse.y
-        const dist = Math.hypot(dx, dy)
-        const boost = mouse.active && dist < radiusPx ? (1 - dist / radiusPx) * 0.7 : 0
-        ctx.fillStyle = rgba(goldLight, Math.min(1, (0.25 + 0.65 * pulse) * l.base + boost))
+        ctx.fillStyle = rgba(goldLight, (0.25 + 0.65 * pulse) * l.base)
         ctx.fillText(l.ch, l.x, l.y)
       }
       // water
