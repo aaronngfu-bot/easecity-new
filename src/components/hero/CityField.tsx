@@ -135,30 +135,30 @@ export function CityField({ className = '' }: { className?: string }) {
       }
       const bit = () => (rand() > 0.5 ? '1' : '0')
 
-      // ── single surface plane: solid filled buildings, digit texture ──
+      // ── single surface plane: solid filled, consistent buildings ──
       {
         let c = 1
         while (c < COLS - 3) {
-          const w = 4 + Math.floor(rand() * 6)
+          const w = 5 + Math.floor(rand() * 3)
           if (c + w > COLS - 1) break
           const leftness = c / COLS
-          const maxH = leftness < 0.42 ? (small ? 12 : 18) : ROWS - 4
-          const h = Math.min(ROWS - 3, 7 + Math.floor(rand() * (maxH - 7)))
+          // height profile: short left → tall right, tallest peak centre-right
+          let maxH: number
+          if (leftness < 0.28) maxH = small ? 11 : 15
+          else if (leftness < 0.38) maxH = small ? 16 : 23
+          else if (leftness < 0.55) maxH = small ? 14 : 19
+          else if (leftness < 0.72) maxH = ROWS - 1
+          else maxH = small ? 18 : 25
+          const h = Math.min(ROWS - 1, 6 + Math.floor(rand() * (maxH - 6)))
           const top = ROWS - 1 - h
+          // roof: mostly flat, occasional simple step (no domes/spires)
           const roof: number[] = new Array(w).fill(top)
-          const roll = rand()
-          if (roll < 0.18 && w >= 5) {
-            const depth = 2 + Math.floor(rand() * 2)
+          if (rand() < 0.2 && w >= 6) {
+            const depth = 1 + Math.floor(rand() * 2)
             const dir = rand() < 0.5
             for (let i = 0; i < w; i++) {
               const u = dir ? i / (w - 1) : 1 - i / (w - 1)
               roof[i] = top + Math.round(u * depth)
-            }
-          } else if (roll < 0.34 && w >= 5) {
-            const dh = 2
-            for (let i = 0; i < w; i++) {
-              const u = (2 * i) / (w - 1) - 1
-              roof[i] = top + dh - Math.round(dh * Math.sqrt(Math.max(0, 1 - u * u)))
             }
           }
           // bright outline
@@ -176,124 +176,6 @@ export function CityField({ className = '' }: { className?: string }) {
           }
           c += w + 1
         }
-      }
-
-      // ── landmarks (fixed proportions, drawn over the generic wall) ──
-      const colAt = (fx: number) => Math.round((fx * W - x0) / cell)
-
-      // Convention & Exhibition Centre — two low arcs + window rows
-      const arcs: [number, number, number][] = [
-        [0.09, 0.055, 0.05], [0.165, 0.07, 0.04],
-      ]
-      for (const [cx, hw, hh] of arcs) {
-        const steps = Math.floor((hw * 2 * W) / cell)
-        for (let i = 0; i <= steps; i++) {
-          const u = (2 * i) / steps - 1
-          const x = (cx - hw) * W + u * hw * W + hw * W
-          const y = groundY - cell * 2 - hh * H * Math.sqrt(Math.max(0, 1 - u * u))
-          d(bit(), x, y, goldLight, 0.85)
-        }
-        for (let rr = 1; rr <= 3; rr++) {
-          for (let i = 0; i <= steps; i += 1) {
-            const u = (2 * i) / steps - 1
-            if (rand() < 0.7) d(bit(), (cx - hw) * W + (u + 1) * hw * W, groundY - cell * rr, gold, 0.5)
-          }
-        }
-      }
-
-      // Bank of China tower — tall, with X bracing
-      {
-        const cB = colAt(0.44)
-        const w = 7
-        const h = Math.min(ROWS - 2, small ? 24 : 34)
-        const top = ROWS - 1 - h
-        for (let i = 0; i < w; i++) d(bit(), X(cB + i), yOf(top), goldLight, 0.9)
-        for (let rr = top; rr < ROWS; rr++) {
-          d('1', X(cB), yOf(rr), goldLight, 0.8)
-          d('0', X(cB + w - 1), yOf(rr), goldLight, 0.8)
-        }
-        // X bracing: alternating diagonals per 6-row segment
-        for (let seg = 0; seg * 6 < h; seg++) {
-          const r0 = top + seg * 6
-          for (let k = 0; k <= 6 && r0 + k < ROWS; k++) {
-            const u = k / 6
-            const l = Math.round(u * (w - 1))
-            d('1', X(cB + l), yOf(r0 + k), gold, 0.7)
-            d('0', X(cB + w - 1 - l), yOf(r0 + k), gold, 0.7)
-          }
-        }
-        // twin masts
-        for (let k = 1; k <= 4; k++) {
-          d('1', X(cB + 1), yOf(top - k), goldLight, 0.8)
-          d('1', X(cB + w - 2), yOf(top - k), goldLight, 0.8)
-        }
-      }
-
-      // IFC — tallest flat-topped tower, dense vertical windows
-      {
-        const cI = colAt(0.68)
-        const w = 8
-        const top = 1
-        for (let i = 0; i < w; i++) d(bit(), X(cI + i), yOf(top), goldLight, 0.95)
-        for (let rr = top; rr < ROWS; rr++) {
-          d('1', X(cI), yOf(rr), goldLight, 0.85)
-          d('0', X(cI + w - 1), yOf(rr), goldLight, 0.85)
-        }
-        for (let i = 1; i < w - 1; i++) {
-          for (let rr = top + 3; rr < ROWS - 1; rr++) {
-            if (rand() < 0.9) d(bit(), X(cI + i), yOf(rr), gold, 0.5 + rand() * 0.4)
-          }
-        }
-      }
-
-      // Central Plaza style — stepped pyramid top + long spire
-      {
-        const cP = colAt(0.88)
-        const w = 7
-        const h = Math.min(ROWS - 6, small ? 20 : 28)
-        const top = ROWS - 1 - h
-        for (let i = 0; i < w; i++) d(bit(), X(cP + i), yOf(top), goldLight, 0.9)
-        for (let rr = top; rr < ROWS; rr++) {
-          d('1', X(cP), yOf(rr), goldLight, 0.8)
-          d('0', X(cP + w - 1), yOf(rr), goldLight, 0.8)
-        }
-        for (let i = 1; i < w - 1; i++) {
-          for (let rr = top + 1; rr < ROWS - 1; rr++) {
-            if (rand() < 0.85) d(bit(), X(cP + i), yOf(rr), gold, 0.5 + rand() * 0.4)
-          }
-        }
-        for (let k = 1; k <= 3; k++) {
-          d('1', X(cP + k), yOf(top - 1), goldLight, 0.85)
-          d('1', X(cP + w - 1 - k), yOf(top - 1), goldLight, 0.85)
-        }
-        for (let k = 2; k <= 6; k++) d('1', X(cP + 3), yOf(top - k), goldLight, 0.8)
-        beacons.push({
-          bx: 0, by: 0, b0x: 0, b0y: 0, fa: 0, fs: 0, fph: 0, vx: 0, vy: 0,
-          x: X(cP + 3), y: yOf(top - 7), ch: '1', bright: 0.9,
-          phase: rand() * 6, speed: 1.8, white: true,
-        })
-      }
-
-      // Hong Kong Observation Wheel — ring, spokes, legs
-      {
-        const wx = 0.565 * W
-        const r = Math.min(H * 0.085, cell * 9)
-        const wy = groundY - r - cell * 2
-        const circ = Math.floor((2 * Math.PI * r) / (cell * 0.9))
-        for (let i = 0; i < circ; i++) {
-          const a = (i / circ) * Math.PI * 2
-          d(bit(), wx + Math.cos(a) * r, wy + Math.sin(a) * r, goldLight, 0.85)
-        }
-        for (let s = 0; s < 8; s++) {
-          const a = (s / 8) * Math.PI * 2
-          const steps = Math.floor(r / cell)
-          for (let k = 1; k < steps; k++) {
-            d(k % 2 ? '0' : '1', wx + Math.cos(a) * k * cell, wy + Math.sin(a) * k * cell, gold, 0.55)
-          }
-        }
-        d('1', wx, wy, goldLight, 0.95)
-        d('1', wx - cell, wy + r + cell, gold, 0.7)
-        d('1', wx + cell, wy + r + cell, gold, 0.7)
       }
 
       // ── waterline: dense dashed digit row ──
@@ -446,10 +328,14 @@ export function CityField({ className = '' }: { className?: string }) {
       }
       // city
       ctx.drawImage(off, 0, 0, W, H)
-      // twinkle window lights on the city
+      // twinkle window lights on the city (brighten near the cursor)
       for (const l of lights) {
         const pulse = 0.5 + 0.5 * Math.sin(t * l.speed + l.phase)
-        ctx.fillStyle = rgba(goldLight, (0.25 + 0.65 * pulse) * l.base)
+        const dx = l.x - mouse.x
+        const dy = l.y - mouse.y
+        const dist = Math.hypot(dx, dy)
+        const boost = mouse.active && dist < radiusPx ? (1 - dist / radiusPx) * 0.7 : 0
+        ctx.fillStyle = rgba(goldLight, Math.min(1, (0.25 + 0.65 * pulse) * l.base + boost))
         ctx.fillText(l.ch, l.x, l.y)
       }
       // water
