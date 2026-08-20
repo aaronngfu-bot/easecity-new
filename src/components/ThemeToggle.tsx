@@ -30,10 +30,10 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
     const next = isDark ? 'light' : 'dark'
     const el = btnRef.current
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const startVT = (document as Document).startViewTransition
 
-    // Bail to a plain switch when transitions aren't available or user prefers
-    // reduced motion.
-    if (!(document as Document & { startViewTransition?: unknown }).startViewTransition || reduce) {
+    // Bail to a plain switch when transitions aren't available or reduced motion.
+    if (typeof startVT !== 'function' || reduce) {
       setTheme(next)
       return
     }
@@ -43,26 +43,36 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
       setTheme(next)
       return
     }
-    const x = r.left + r.width / 2
-    const y = r.top + r.height / 2
-    const radius = Math.hypot(Math.max(x, window.innerWidth - x), Math.max(y, window.innerHeight - y))
+    // Button center in viewport coordinates (== the view-transition root box origin).
+    const cx = r.left + r.width / 2
+    const cy = r.top + r.height / 2
+    const radius = Math.hypot(Math.max(cx, window.innerWidth - cx), Math.max(cy, window.innerHeight - cy))
 
-    // Set the reveal origin BEFORE the transition starts so the CSS
-    // (::view-transition-new(root) + theme-circle-reveal) reads the correct
-    // --vt-x/--vt-y/--vt-r on the very first frame — otherwise the circle
-    // grows from the origin (top-left) instead of the toggle button.
-    const root = document.documentElement
-    root.style.setProperty('--vt-x', `${x}px`)
-    root.style.setProperty('--vt-y', `${y}px`)
-    root.style.setProperty('--vt-r', `${radius}px`)
+    const sameSize = () => setTheme(next)
 
     const transition = (document as Document & {
       startViewTransition: (cb: () => void) => { ready: Promise<void> }
-    }).startViewTransition(() => {
-      setTheme(next)
-    })
+    }).startViewTransition(sameSize)
 
-    void transition.ready
+    // Drive the circle reveal with the Web Animations API directly on the
+    // ::view-transition-new(root) pseudo-element. Anchoring at the button center
+    // (cx, cy) is precise and works reliably across View Transition-aware
+    // browsers — unlike relying on CSS vars read at an indeterminate frame.
+    transition.ready.then(() => {
+      document.documentElement.animate(
+        {
+          clipPath: [
+            `circle(0px at ${cx}px ${cy}px)`,
+            `circle(${radius}px at ${cx}px ${cy}px)`,
+          ],
+        },
+        {
+          duration: 520,
+          easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          pseudoElement: '::view-transition-new(root)',
+        }
+      )
+    })
   }
 
   const label = isDark ? 'Switch to light mode' : 'Switch to dark mode'

@@ -642,8 +642,9 @@
 }
 
 /* Theme-switch circular reveal via View Transitions API.
-   The reveal circle expands from the toggle button toward the far corner;
-   driven by --vt-x/--vt-y (button center) and --vt-r (radius). */
+   The animation itself is driven from ThemeToggle with the Web Animations
+   API on ::view-transition-new(root); here we only reset cross-fade defaults
+   so the wipe is controlled, not a fade. */
 ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
@@ -651,24 +652,12 @@
 }
 
 ::view-transition-old(root) {
-  /* old snapshot slides/fades out under the expanding circle */
   animation: none;
 }
 
 ::view-transition-new(root) {
-  clip-path: circle(var(--vt-r) at var(--vt-x) var(--vt-y));
-  animation: theme-circle-reveal 0.55s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@keyframes theme-circle-reveal {
-  from {
-    clip-path: circle(0px at var(--vt-x) var(--vt-y));
-    opacity: 0.6;
-  }
-  to {
-    clip-path: circle(var(--vt-r) at var(--vt-x) var(--vt-y));
-    opacity: 1;
-  }
+  /* WAAPI sets clip-path each frame; ensure no CSS animation fights it. */
+  animation: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
