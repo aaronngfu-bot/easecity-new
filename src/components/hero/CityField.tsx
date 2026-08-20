@@ -132,7 +132,7 @@ export function CityField({ className = '' }: { className?: string }) {
       // ── (mountain ridge removed — reference art has empty sky) ──
 
       // ── back towers: dim gold silhouettes ──
-      const backCount = small ? 7 : 12
+      const backCount = small ? 9 : 18
       for (let i = 0; i < backCount; i++) {
         const w = 5 + Math.floor(rand() * 6)
         const c0 = Math.floor(rand() * (COLS - w))
@@ -179,10 +179,10 @@ export function CityField({ className = '' }: { className?: string }) {
         // dense window grid inside
         for (let i = 1; i < w - 1; i++) {
           for (let rr = roof[i] + 1; rr < ROWS - 1; rr++) {
-            if (rand() < 0.7) d(bit(), X(c + i), yOf(rr), gold, 0.35 + rand() * 0.45)
+            if (rand() < 0.9) d(bit(), X(c + i), yOf(rr), gold, 0.4 + rand() * 0.5)
           }
         }
-        c += w + (rand() < 0.3 ? 1 : 0)
+        c += w
       }
 
       // ── landmarks (fixed proportions, drawn over the generic wall) ──

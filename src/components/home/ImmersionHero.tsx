@@ -4,20 +4,15 @@ import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { CityField } from '@/components/hero/CityField'
 
 /**
- * ImmersionHero — full-viewport "breathing" first screen.
+ * ImmersionHero — full-viewport first screen.
  *
- * Composition: the CityField canvas fills the entire section — a golden Hong
- * Kong harbour skyline built from binary 0/1 particles, with a strip
- * reflection under the waterline. Copy layers over a soft scrim so it stays
- * legible in both themes. Title characters stagger in (CSS-only, no
- * scroll-driven JS), the primary CTA is magnetic, and a scroll cue runs along
- * the bottom edge.
- *
- * Everything honors prefers-reduced-motion via the CSS classes in globals.css
- * and the canvas' own static path.
+ * Composition: a full-bleed binary-code city (the reference artwork, recolored
+ * to the brand teal, with a water reflection in the lower third) fills the
+ * section. One image per theme (dark navy / light grey). Copy layers over a
+ * soft scrim so it stays legible. Title characters stagger in (CSS-only), the
+ * primary CTA is magnetic, and a scroll cue runs along the bottom edge.
  */
 
 /** Primary CTA that leans toward the cursor within a small radius. */
@@ -89,9 +84,10 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
 
   return (
     <section className="relative flex min-h-[100svh] flex-col overflow-hidden bg-[var(--bg-base)]">
-        {/* Full-bleed living city skyline built from binary particles */}
+        {/* Full-bleed binary city (reference art, recolored to brand teal) */}
         <div aria-hidden className="absolute inset-0">
-          <CityField className="h-full w-full" />
+          <img src="/images/hero-city-light.png" alt="" className="h-full w-full object-cover object-center dark:hidden" />
+          <img src="/images/hero-city-dark.png" alt="" className="hidden h-full w-full object-cover object-center dark:block" />
         </div>
 
         {/* Legibility scrim behind the copy column */}
@@ -104,7 +100,7 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
 
         {/* Copy */}
         <div className="container-max relative z-10 flex flex-1 items-center pt-28 md:pt-32">
-          <div className="max-w-2xl pb-24 text-left">
+          <div className="max-w-2xl pb-24 text-left lg:-mt-24">
             <p className="hero-rise label-mono mb-7 flex items-center gap-2.5 text-[var(--signal)]" style={{ animationDelay: '0.15s' }}>
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--amber)] opacity-60" />
@@ -130,7 +126,7 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
             <div className="hero-rise mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center" style={{ animationDelay: '1.55s' }}>
               <MagneticCta
                 onClick={onStartProject}
-                className="rounded-lg bg-[var(--amber)] px-8 py-3.5 text-sm font-semibold text-[var(--amber-ink)] shadow-[0_0_0_0_rgba(255,184,0,0)] hover:shadow-[0_8px_30px_-6px_rgba(255,184,0,0.55)]"
+                className="rounded-lg bg-[var(--amber)] px-8 py-3.5 text-sm font-semibold text-[var(--amber-ink)] shadow-[0_0_0_0_rgba(0,229,204,0)] hover:shadow-[0_8px_30px_-6px_rgba(0,229,204,0.5)]"
               >
                 {c.heroCtaPrimary}
                 <ArrowRight size={15} />
