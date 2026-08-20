@@ -38,7 +38,7 @@ interface UpdateCard {
  * Mouseup/mousemove are tracked on `window` so releasing outside the rail
  * always ends the gesture.
  */
-export function BlogTimeline({ posts = [] }: { posts?: BlogPost[] }) {
+export function BlogTimeline({ posts = [], loading = false }: { posts?: BlogPost[]; loading?: boolean }) {
   const { language, t } = useLanguage()
   const railRef = useRef<HTMLDivElement | null>(null)
   const dragState = useRef<{ startX: number; startTop: number; scrollLeft: number; active: boolean } | null>(null)
@@ -117,7 +117,24 @@ export function BlogTimeline({ posts = [] }: { posts?: BlogPost[] }) {
   return (
     <div>
       <div className="relative">
-        {items.length > 0 && (
+        {loading && (
+          <div className="flex gap-8 overflow-hidden pb-4">
+            {[0, 1, 2].map((i) => (
+              <div key={i} className="w-[300px] shrink-0 sm:w-[340px]">
+                <div className="overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)]">
+                  <div className="aspect-[16/9] animate-pulse bg-[var(--bg-elevated)]" />
+                  <div className="space-y-2 p-5">
+                    <div className="h-3 w-24 animate-pulse rounded bg-[var(--bg-elevated)]" />
+                    <div className="h-4 w-3/4 animate-pulse rounded bg-[var(--bg-elevated)]" />
+                    <div className="h-3 w-full animate-pulse rounded bg-[var(--bg-elevated)]" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {!loading && items.length > 0 && (
           <div
             ref={railRef}
             className="flex snap-x snap-mandatory cursor-grab gap-8 overflow-x-auto pb-4 pr-4 select-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"

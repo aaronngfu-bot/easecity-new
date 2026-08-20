@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ArrowUpRight, Code2, Globe, Palette, Lightbulb, Megaphone, Fingerprint, Cpu } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -34,10 +35,34 @@ export interface HomeBlogPost {
  * language re-renders immediately; blog posts are injected from the server
  * parent (bilingual) so the rail also renders on first paint without a fetch.
  */
-export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
+export function HomeContent() {
   const { t, language } = useLanguage()
   const c = t.companyPage
   const c2 = t.servicesPage
+
+  // Client-fetch blog posts so the first paint doesn't wait on the DB. While
+  // loading, a skeleton occupies the rail; posts arrive shortly after.
+  const [blogPosts, setBlogPosts] = useState<HomeBlogPost[]>([])
+  const [blogLoading, setBlogLoading] = useState(true)
+
+  useEffect(() => {
+    let active = true
+    setBlogLoading(true)
+    const params = new URLSearchParams({ limit: '10', lang: language })
+    fetch(`/api/blog?${params}`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => {
+        if (!active) return
+        if (d?.success && Array.isArray(d.data)) setBlogPosts(d.data)
+        setBlogLoading(false)
+      })
+      .catch(() => {
+        if (active) setBlogLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [language])
 
   const services = serviceCatalog.map((s) => ({
     slug: s.slug,
@@ -94,7 +119,7 @@ export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
             />
 
             <div className="mt-10">
-              <BlogTimeline posts={blogPosts} />
+              <BlogTimeline posts={blogPosts} loading={blogLoading} />
             </div>
           </div>
         </section>
