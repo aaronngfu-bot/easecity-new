@@ -835,7 +835,7 @@
 .reveal {
   opacity: 0;
   transform: translateY(26px);
-  transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 1.15s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .reveal[data-reveal='left']  { transform: translateX(-34px); }
 .reveal[data-reveal='right'] { transform: translateX(34px); }

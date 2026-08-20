@@ -14,7 +14,7 @@ function mulberry32(seed: number) {
   }
 }
 
-type Kind = 'outline' | 'window' | 'beacon' | 'bg' | 'star'
+type Kind = 'outline' | 'window' | 'beacon' | 'bg'
 
 type P = {
   kind: Kind
@@ -27,21 +27,24 @@ type P = {
   bright: number
   phase: number
   speed: number
-  size: number
+  ref: boolean // participates in the water reflection
 }
 
 /**
- * CityField — a living city skyline built from binary particles.
+ * CityField — a living Hong Kong harbour scene built ENTIRELY from 0/1
+ * digits (no dots, no squares, no stars):
  *
- * The skyline is generated procedurally on a column grid (seeded, so stable):
- * dim back towers for depth, bright digit-outlined front buildings whose
- * height is biased lower under the copy column, warm amber windows that
- * flicker like real lights, blinking beacons on antennas, a ground line, and
- * a sparse field of floating digits in the sky. Mouse repels outline/sky
- * particles; windows and beacons stay anchored to their buildings.
+ *  - sky: floating digits, denser toward the top
+ *  - skyline: digit-outlined towers with varied silhouettes (flat / slant /
+ *    dome / tapered crown / setback), amber digit windows, amber '1' beacons
+ *  - waterline at ~62% height, then a mirrored reflection of the city in the
+ *    water: dimmed, rippled horizontally, fading with depth (Victoria
+ *    Harbour at night)
  *
- * Theme-aware (--signal / --signal-light / --amber), DPR-aware, honors
- * prefers-reduced-motion with a static frame, fully cleaned up on unmount.
+ * Seeded RNG keeps the city stable across resizes. Mouse repels outline/sky
+ * digits; windows/beacons stay anchored. Theme-aware (--signal /
+ * --signal-light / --amber), DPR-aware, reduced-motion draws one static
+ * frame, fully cleaned up on unmount.
  */
 export function CityField({ className = '' }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -68,6 +71,7 @@ export function CityField({ className = '' }: { className?: string }) {
     let t = 0
     let cell = 8
     let radiusPx = 130
+    let groundY = 0
     let parts: P[] = []
 
     function hexToRgb(hex: string): [number, number, number] {
@@ -94,50 +98,49 @@ export function CityField({ className = '' }: { className?: string }) {
         ch: '1', role: 1, bright: 0.9,
         phase: Math.random() * Math.PI * 2,
         speed: 0.5 + Math.random() * 1.0,
-        size: 1,
+        ref: false,
         ...p,
       })
     }
 
     function build() {
       parts = []
-      const rand = mulberry32(20260820)
+      const rand = mulberry32(20260821)
       const small = W < 640
-      // Dense, tall, narrow towers — a Hong Kong skyline, not a suburb.
-      const COLS = small ? 76 : 132
-      const ROWS = small ? 40 : 50
-      cell = Math.max(4, Math.min((W * 0.96) / COLS, (H * 0.55) / ROWS))
+      // Denser, larger canvas: more columns/rows than before.
+      const COLS = small ? 84 : 150
+      const ROWS = small ? 42 : 54
+      groundY = H * 0.62
+      cell = Math.max(3.5, Math.min((W * 0.97) / COLS, (H * 0.56) / ROWS))
       radiusPx = Math.max(90, cell * 12)
       const x0 = (W - COLS * cell) / 2
-      const ground = H - Math.max(12, H * 0.045)
-      const yOf = (r: number) => ground - (ROWS - 1 - r) * cell
+      const yOf = (r: number) => groundY - (ROWS - 1 - r) * cell
       const X = (c: number) => x0 + c * cell + cell / 2
 
       // ── back towers: dim silhouettes for depth ──
-      const backCount = small ? 5 : 9
+      const backCount = small ? 6 : 10
       for (let i = 0; i < backCount; i++) {
         const w = 5 + Math.floor(rand() * 6)
         const c0 = Math.floor(rand() * (COLS - w))
-        const h = Math.min(ROWS - 5, 20 + Math.floor(rand() * 24))
+        const h = Math.min(ROWS - 5, 20 + Math.floor(rand() * 26))
         const top = ROWS - 1 - h
         for (let cc = c0; cc < c0 + w; cc++) {
-          push({ kind: 'outline', x: X(cc), y: yOf(top), role: 0, bright: 0.26, ch: rand() > 0.5 ? '1' : '0' })
+          push({ kind: 'outline', x: X(cc), y: yOf(top), role: 0, bright: 0.24, ch: rand() > 0.5 ? '1' : '0', ref: rand() < 0.5 })
         }
         for (let rr = top; rr < ROWS; rr += 2) {
-          push({ kind: 'outline', x: X(c0), y: yOf(rr), role: 0, bright: 0.22, ch: '0' })
-          push({ kind: 'outline', x: X(c0 + w - 1), y: yOf(rr), role: 0, bright: 0.22, ch: '1' })
+          push({ kind: 'outline', x: X(c0), y: yOf(rr), role: 0, bright: 0.2, ch: '0', ref: rand() < 0.5 })
+          push({ kind: 'outline', x: X(c0 + w - 1), y: yOf(rr), role: 0, bright: 0.2, ch: '1', ref: rand() < 0.5 })
         }
       }
 
-      // ── front buildings: varied silhouettes (flat / slant / dome /
-      //    tapered crown / setback) + amber windows ──
+      // ── front buildings: varied silhouettes, all rendered as digits ──
       let c = 1
       while (c < COLS - 4) {
         const w = 4 + Math.floor(rand() * 7)
         if (c + w > COLS - 1) break
         const leftness = c / COLS
         // keep the copy column (left ~45%) calmer: shorter towers there
-        const maxH = leftness < 0.45 ? (small ? 18 : 26) : ROWS - 8
+        const maxH = leftness < 0.45 ? (small ? 18 : 28) : ROWS - 8
         const h = Math.min(ROWS - 6, 10 + Math.floor(rand() * (maxH - 10)))
         const top = ROWS - 1 - h
 
@@ -145,15 +148,13 @@ export function CityField({ className = '' }: { className?: string }) {
         const roof: number[] = new Array(w).fill(top)
         const roll = rand()
         if (roll < 0.22 && w >= 5) {
-          // slant roof — one side rises
           const depth = 2 + Math.floor(rand() * 3)
           const dir = rand() < 0.5
           for (let i = 0; i < w; i++) {
-            const t = dir ? i / (w - 1) : 1 - i / (w - 1)
-            roof[i] = top + Math.round(t * depth)
+            const u = dir ? i / (w - 1) : 1 - i / (w - 1)
+            roof[i] = top + Math.round(u * depth)
           }
         } else if (roll < 0.4 && w >= 5) {
-          // domed / arced roof
           const dh = 2 + Math.floor(rand() * 2)
           for (let i = 0; i < w; i++) {
             const u = (2 * i) / (w - 1) - 1
@@ -161,16 +162,14 @@ export function CityField({ className = '' }: { className?: string }) {
           }
         }
 
-        // roof outline follows the per-column roofline
         for (let i = 0; i < w; i++) {
-          push({ kind: 'outline', x: X(c + i), y: yOf(roof[i]), role: 1, bright: 0.7 + rand() * 0.3, ch: rand() > 0.45 ? '1' : '0' })
+          push({ kind: 'outline', x: X(c + i), y: yOf(roof[i]), role: 1, bright: 0.7 + rand() * 0.3, ch: rand() > 0.45 ? '1' : '0', ref: rand() < 0.7 })
         }
-        // side walls from each end's roof row down to the ground
         for (let rr = roof[0]; rr < ROWS; rr++) {
-          push({ kind: 'outline', x: X(c), y: yOf(rr), role: 1, bright: 0.65 + rand() * 0.3, ch: '1' })
+          push({ kind: 'outline', x: X(c), y: yOf(rr), role: 1, bright: 0.65 + rand() * 0.3, ch: '1', ref: rand() < 0.7 })
         }
         for (let rr = roof[w - 1]; rr < ROWS; rr++) {
-          push({ kind: 'outline', x: X(c + w - 1), y: yOf(rr), role: 1, bright: 0.65 + rand() * 0.3, ch: '0' })
+          push({ kind: 'outline', x: X(c + w - 1), y: yOf(rr), role: 1, bright: 0.65 + rand() * 0.3, ch: '0', ref: rand() < 0.7 })
         }
 
         let hasCrown = false
@@ -185,12 +184,12 @@ export function CityField({ className = '' }: { className?: string }) {
             const l = c + k
             const rgt = c + w - 1 - k
             if (rgt - l < 2) {
-              push({ kind: 'outline', x: X(l), y: yOf(rr), role: 1, bright: 0.8, ch: '1' })
-              push({ kind: 'beacon', x: X(l), y: yOf(rr) - cell * 0.8, role: 2, bright: 0.9, speed: 1.6 + rand() * 1.2 })
+              push({ kind: 'outline', x: X(l), y: yOf(rr), role: 1, bright: 0.8, ch: '1', ref: true })
+              push({ kind: 'beacon', x: X(l), y: yOf(rr) - cell * 0.8, role: 2, bright: 0.9, speed: 1.6 + rand() * 1.2, ref: true })
               break
             }
-            push({ kind: 'outline', x: X(l), y: yOf(rr), role: 1, bright: 0.7, ch: '1' })
-            push({ kind: 'outline', x: X(rgt), y: yOf(rr), role: 1, bright: 0.7, ch: '0' })
+            push({ kind: 'outline', x: X(l), y: yOf(rr), role: 1, bright: 0.7, ch: '1', ref: true })
+            push({ kind: 'outline', x: X(rgt), y: yOf(rr), role: 1, bright: 0.7, ch: '0', ref: true })
           }
         }
 
@@ -202,33 +201,33 @@ export function CityField({ className = '' }: { className?: string }) {
           const t2 = top - h2
           if (t2 >= 1) {
             for (let cc = c2; cc < c2 + w2; cc++) {
-              push({ kind: 'outline', x: X(cc), y: yOf(t2), role: 1, bright: 0.75, ch: '1' })
+              push({ kind: 'outline', x: X(cc), y: yOf(t2), role: 1, bright: 0.75, ch: '1', ref: rand() < 0.7 })
             }
             for (let rr = t2; rr < top; rr++) {
-              push({ kind: 'outline', x: X(c2), y: yOf(rr), role: 1, bright: 0.7, ch: '0' })
-              push({ kind: 'outline', x: X(c2 + w2 - 1), y: yOf(rr), role: 1, bright: 0.7, ch: '1' })
+              push({ kind: 'outline', x: X(c2), y: yOf(rr), role: 1, bright: 0.7, ch: '0', ref: rand() < 0.7 })
+              push({ kind: 'outline', x: X(c2 + w2 - 1), y: yOf(rr), role: 1, bright: 0.7, ch: '1', ref: rand() < 0.7 })
             }
           }
         }
 
-        // antenna + blinking beacon (skip when a crown already tops it)
+        // antenna + blinking '1' beacon (skip when a crown tops it)
         if (!hasCrown && h > 14 && rand() < 0.6) {
           const ac = c + Math.floor(w / 2)
           const ah = 2 + Math.floor(rand() * 3)
           const at = top - ah
           if (at >= 1) {
             for (let rr = at; rr < top; rr++) {
-              push({ kind: 'outline', x: X(ac), y: yOf(rr), role: 1, bright: 0.55, ch: '1' })
+              push({ kind: 'outline', x: X(ac), y: yOf(rr), role: 1, bright: 0.55, ch: '1', ref: rand() < 0.7 })
             }
-            push({ kind: 'beacon', x: X(ac), y: yOf(at) - cell * 0.6, role: 2, bright: 0.9, speed: 1.6 + rand() * 1.2 })
+            push({ kind: 'beacon', x: X(ac), y: yOf(at) - cell * 0.6, role: 2, bright: 0.9, speed: 1.6 + rand() * 1.2, ref: true })
           }
         }
 
-        // amber windows — follow the roofline so shaped towers glow correctly
+        // amber digit windows — follow the roofline
         for (let i = 1; i < w - 1; i++) {
           for (let rr = roof[i] + 2; rr < ROWS - 1; rr += 2) {
-            if (rand() < 0.58) {
-              push({ kind: 'window', x: X(c + i), y: yOf(rr), role: 2, bright: 0.45 + rand() * 0.5, speed: 0.35 + rand() * 0.7 })
+            if (rand() < 0.55) {
+              push({ kind: 'window', x: X(c + i), y: yOf(rr), role: 2, bright: 0.4 + rand() * 0.5, speed: 0.35 + rand() * 0.7, ch: rand() > 0.5 ? '1' : '0', ref: rand() < 0.5 })
             }
           }
         }
@@ -237,38 +236,24 @@ export function CityField({ className = '' }: { className?: string }) {
         c += w + (rand() < 0.25 ? 1 : 0)
       }
 
-      // ── ground line ──
+      // ── waterline ──
       for (let cc = 0; cc < COLS; cc += 2) {
-        push({ kind: 'outline', x: X(cc), y: ground + cell * 0.5, role: 0, bright: 0.2, ch: '1' })
+        push({ kind: 'outline', x: X(cc), y: groundY + cell * 0.4, role: 0, bright: 0.22, ch: '1' })
       }
 
-      // ── starfield: tiny twinkling dots above the skyline ──
-      const starCount = Math.round((small ? 70 : 170) * (W / 1440 + 0.4))
-      for (let i = 0; i < starCount; i++) {
-        const px = rand() * W
-        const py = rand() * H * 0.62
-        push({
-          kind: 'star', x: px, y: py,
-          role: rand() < 0.12 ? 2 : 1, // rare warm stars among bright-teal ones
-          bright: 0.25 + rand() * 0.55,
-          speed: 0.5 + rand() * 1.6,
-          size: rand() < 0.12 ? 1.7 : 1,
-        })
-      }
-
-      // ── sky: sparse floating digits, thinner near the skyline ──
-      const bgCell = small ? 30 : 34
+      // ── sky: floating digits, denser toward the top ──
+      const bgCell = small ? 26 : 28
       const cols = Math.ceil(W / bgCell)
-      const rows = Math.ceil(H / bgCell)
+      const rows = Math.ceil((H * 0.6) / bgCell)
       let bgCount = 0
-      const maxBg = small ? 200 : 420
+      const maxBg = small ? 260 : 560
       for (let r = 0; r < rows; r++) {
         for (let cc = 0; cc < cols; cc++) {
           if (bgCount >= maxBg) break
           const px = cc * bgCell + bgCell / 2
           const py = r * bgCell + bgCell / 2
-          const skyBias = 1 - (py / H) * 0.85
-          if (Math.random() > 0.5 * skyBias) continue
+          const skyBias = 1 - (py / (H * 0.6)) * 0.8
+          if (Math.random() > 0.55 * skyBias) continue
           bgCount++
           push({
             kind: 'bg', x: px, y: py,
@@ -303,6 +288,21 @@ export function CityField({ className = '' }: { className?: string }) {
       return role === 2 ? amberRgb : role === 1 ? lightRgb : sigRgb
     }
 
+    /** One digit, optionally with its water reflection. */
+    function drawDigit(p: P, rr: number, gg: number, bb: number, alpha: number, withReflection: boolean) {
+      ctx.fillStyle = `rgba(${rr},${gg},${bb},${Math.min(1, alpha)})`
+      ctx.fillText(p.ch, p.x, p.y)
+      if (!withReflection || !p.ref) return
+      const my = 2 * groundY - p.y
+      if (my > H) return
+      const depth = (my - groundY) / Math.max(1, H - groundY)
+      const ra = alpha * 0.42 * (1 - depth * 0.85)
+      if (ra < 0.02) return
+      const xo = Math.sin(t * 1.3 + my * 0.055) * (1.2 + depth * 3.2)
+      ctx.fillStyle = `rgba(${rr},${gg},${bb},${ra})`
+      ctx.fillText(p.ch, p.x + xo, my)
+    }
+
     function drawStatic() {
       ctx.clearRect(0, 0, W, H)
       ctx.textAlign = 'center'
@@ -311,19 +311,11 @@ export function CityField({ className = '' }: { className?: string }) {
       for (const p of parts) {
         const [rr, gg, bb] = rgbFor(p.role)
         if (p.kind === 'window') {
-          const s = Math.max(1.5, cell * 0.34)
-          ctx.fillStyle = `rgba(${rr},${gg},${bb},${p.bright * 0.8})`
-          ctx.fillRect(p.x - s / 2, p.y - s / 2, s, s)
+          drawDigit(p, rr, gg, bb, p.bright * 0.8, true)
         } else if (p.kind === 'beacon') {
-          ctx.fillStyle = `rgba(${rr},${gg},${bb},0.9)`
-          ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); ctx.fill()
-        } else if (p.kind === 'star') {
-          const tw = 0.55 + 0.45 * Math.sin(t * p.speed + p.phase)
-          ctx.fillStyle = `rgba(${rr},${gg},${bb},${(p.bright * tw).toFixed(3)})`
-          ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill()
+          drawDigit(p, rr, gg, bb, 0.9, true)
         } else {
-          ctx.fillStyle = `rgba(${rr},${gg},${bb},${p.bright})`
-          ctx.fillText(p.ch, p.x, p.y)
+          drawDigit(p, rr, gg, bb, p.bright, p.kind !== 'bg')
         }
       }
     }
@@ -336,7 +328,7 @@ export function CityField({ className = '' }: { className?: string }) {
           p.bx = p.b0x + Math.sin(t * p.fs + p.fph) * p.fa
           p.by = p.b0y + Math.cos(t * p.fs * 0.83 + p.fph * 1.7) * p.fa * 0.75
         }
-        if (p.kind === 'window' || p.kind === 'beacon' || p.kind === 'star') continue // anchored
+        if (p.kind === 'window' || p.kind === 'beacon') continue // anchored
         const dx = p.x - m.x
         const dy = p.y - m.y
         const dist = Math.hypot(dx, dy)
@@ -366,19 +358,10 @@ export function CityField({ className = '' }: { className?: string }) {
         if (p.kind === 'window') {
           // lights breathing: some windows go dark for part of the cycle
           const a = p.bright * Math.max(0.06, 0.15 + 0.85 * Math.sin(t * p.speed + p.phase))
-          const s = Math.max(1.5, cell * 0.34)
-          ctx.fillStyle = `rgba(${rr},${gg},${bb},${Math.min(1, a)})`
-          ctx.fillRect(p.x - s / 2, p.y - s / 2, s, s)
+          drawDigit(p, rr, gg, bb, a, true)
         } else if (p.kind === 'beacon') {
           const pulse = 0.5 + 0.5 * Math.sin(t * p.speed + p.phase)
-          ctx.fillStyle = `rgba(${rr},${gg},${bb},${0.18 * pulse})`
-          ctx.beginPath(); ctx.arc(p.x, p.y, 6, 0, Math.PI * 2); ctx.fill()
-          ctx.fillStyle = `rgba(${rr},${gg},${bb},${0.35 + 0.6 * pulse})`
-          ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); ctx.fill()
-        } else if (p.kind === 'star') {
-          const tw = 0.55 + 0.45 * Math.sin(t * p.speed + p.phase)
-          ctx.fillStyle = `rgba(${rr},${gg},${bb},${Math.min(1, p.bright * tw)})`
-          ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill()
+          drawDigit(p, rr, gg, bb, 0.35 + 0.6 * pulse, true)
         } else {
           const a = p.kind === 'bg'
             ? Math.min(1, p.bright * (0.55 + Math.sin(t * p.speed + p.phase) * 0.4))
@@ -390,8 +373,7 @@ export function CityField({ className = '' }: { className?: string }) {
           const cr = Math.round(rr + mb * 60)
           const cg = Math.round(gg + mb * 60)
           const cb = Math.round(bb + mb * 60)
-          ctx.fillStyle = `rgba(${cr},${cg},${cb},${Math.min(1, a + mb * 0.4)})`
-          ctx.fillText(p.ch, p.x, p.y)
+          drawDigit(p, cr, cg, cb, a + mb * 0.4, p.kind !== 'bg')
         }
       }
     }
