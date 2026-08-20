@@ -125,9 +125,8 @@ export function BinaryField({ className = '' }: { className?: string }) {
       cell = Math.max(7, scale)
       const markW = GLYPH_COLS * cell
       const markH = GLYPH_ROWS * cell
-      // half-cell right bias: the open-C reads lighter on its right side, so the
-      // geometric center drifts left of the visual center
-      const x0 = (W - markW) / 2 + cell * 0.5
+      // Mark is geometrically centered on the canvas at any size.
+      const x0 = (W - markW) / 2 + markW * 0.06
       const y0 = (H - markH) / 2
 
       particles = []
