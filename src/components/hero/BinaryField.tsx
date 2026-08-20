@@ -170,13 +170,13 @@ export function BinaryField({ className = '' }: { className?: string }) {
             }
           }
           const dist = Math.hypot(px - gcx, py - gcy)
-          const density = Math.max(0.12, 0.55 * (1 - dist / maxDist))
+          const density = Math.max(0.28, 0.8 * (1 - dist / maxDist))
           if (Math.random() > density) continue
           particles.push({
             bx: px, by: py, x: px, y: py, vx: 0, vy: 0,
             char: Math.random() > 0.5 ? '1' : '0',
             core: false,
-            bright: 0.12 + Math.random() * 0.2,
+            bright: 0.35 + Math.random() * 0.45,
             phase: Math.random() * Math.PI * 2,
             speed: 0.6 + Math.random() * 1.6,
           })

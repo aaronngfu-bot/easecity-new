@@ -183,8 +183,9 @@
     background: var(--body-bg);
     color: var(--body-text);
     font-family: var(--font-body), system-ui, sans-serif;
-    overflow-x: clip;
-    font-feature-settings: 'ss01', 'cv11';
+        overflow-x: clip;
+        min-width: 320px;
+        font-feature-settings: 'ss01', 'cv11';
   }
 
   /* Scrollbar — theme-aware */

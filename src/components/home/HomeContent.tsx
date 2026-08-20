@@ -70,7 +70,7 @@ export function HomeContent() {
       <section className="relative overflow-hidden bg-[var(--bg-base)]">
         <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_30%_20%,var(--signal-soft),transparent_70%)]" />
 
-        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-32 md:pt-40 lg:grid-cols-2 lg:gap-8">
+        <div className="relative z-10 container-max grid items-center gap-12 pb-20 pt-32 md:pt-40 lg:grid-cols-2 lg:gap-x-16">
           <div className="text-left">
             <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-[var(--text-primary)] sm:text-5xl md:text-6xl">
               {c.heroTitle}
