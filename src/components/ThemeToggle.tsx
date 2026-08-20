@@ -46,7 +46,9 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
     // Button center in viewport coordinates (== the view-transition root box origin).
     const cx = r.left + r.width / 2
     const cy = r.top + r.height / 2
-    const radius = Math.hypot(Math.max(cx, window.innerWidth - cx), Math.max(cy, window.innerHeight - cy))
+    // Full-viewport diagonal radius — always covers every corner (incl. the
+    // button's own corner), so the reveal never stops short of the full page.
+    const radius = Math.hypot(window.innerWidth, window.innerHeight)
 
     const sameSize = () => setTheme(next)
 
@@ -69,6 +71,7 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
         {
           duration: 520,
           easing: 'cubic-bezier(0.22, 1, 0.36, 1)',
+          fill: 'forwards',
           pseudoElement: '::view-transition-new(root)',
         }
       )

@@ -183,18 +183,8 @@
     background: var(--body-bg);
     color: var(--body-text);
     font-family: var(--font-body), system-ui, sans-serif;
-    overflow-x: auto;
+    overflow-x: clip;
     font-feature-settings: 'ss01', 'cv11';
-  }
-
-  /* Desktop (mouse/keyboard, precise pointer) only: lock the page width so
-     resizing the browser window below 768px scrolls horizontally instead of
-     breaking the layout. Touch / tablet stays fully responsive — they can't
-     resize the window. */
-  @media (hover: hover) and (pointer: fine) {
-    body {
-      min-width: 768px;
-    }
   }
 
   /* Scrollbar — theme-aware */
