@@ -23,12 +23,12 @@ export function BackButton() {
   const label = language === 'zh' ? '返回' : 'Back'
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 top-20 z-[90]">
+    <div className="mt-6">
       <div className="container-max">
         <button
           type="button"
           onClick={() => router.back()}
-          className="pointer-events-auto inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]"
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]"
           aria-label={label}
         >
           <ArrowLeft size={15} />

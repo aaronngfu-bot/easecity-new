@@ -24,8 +24,10 @@ export default function PublicLayout({
       <PillNav
         items={navItems}
       />
-      <main className="relative z-[2] min-h-screen">{children}</main>
-      <BackButton />
+      <main className="relative z-[2] min-h-screen">
+        <BackButton />
+        {children}
+      </main>
       <Footer />
 
       <ChatWidget />
