@@ -129,20 +129,7 @@ export function CityField({ className = '' }: { className?: string }) {
       }
       const bit = () => (rand() > 0.5 ? '1' : '0')
 
-      // ── mountain ridge line strung across the sky ──
-      const ridge: [number, number][] = [
-        [0.24, 0.42], [0.47, 0.3], [0.62, 0.38], [0.78, 0.43],
-      ]
-      for (let s = 0; s < ridge.length - 1; s++) {
-        const [ax, ay] = ridge[s]
-        const [bx, by] = ridge[s + 1]
-        const len = Math.hypot((bx - ax) * W, (by - ay) * H)
-        const steps = Math.floor(len / (cell * 1.4))
-        for (let i = 0; i <= steps; i++) {
-          const u = i / steps
-          d(bit(), ax * W + (bx - ax) * W * u, ay * H + (by - ay) * H * u, gold, 0.55)
-        }
-      }
+      // ── (mountain ridge removed — reference art has empty sky) ──
 
       // ── back towers: dim gold silhouettes ──
       const backCount = small ? 7 : 12
@@ -223,7 +210,7 @@ export function CityField({ className = '' }: { className?: string }) {
 
       // Bank of China tower — tall, with X bracing
       {
-        const cB = colAt(0.47)
+        const cB = colAt(0.2)
         const w = 7
         const h = Math.min(ROWS - 2, small ? 24 : 34)
         const top = ROWS - 1 - h
@@ -249,16 +236,12 @@ export function CityField({ className = '' }: { className?: string }) {
         }
       }
 
-      // IFC — very tall rounded-top tower, dense vertical windows
+      // IFC — tallest flat-topped tower, dense vertical windows
       {
         const cI = colAt(0.68)
-        const w = 6
+        const w = 8
         const top = 1
-        const dh = 2
-        for (let i = 0; i < w; i++) {
-          const u = (2 * i) / (w - 1) - 1
-          d(bit(), X(cI + i), yOf(top + dh - Math.round(dh * Math.sqrt(Math.max(0, 1 - u * u)))), goldLight, 0.95)
-        }
+        for (let i = 0; i < w; i++) d(bit(), X(cI + i), yOf(top), goldLight, 0.95)
         for (let rr = top; rr < ROWS; rr++) {
           d('1', X(cI), yOf(rr), goldLight, 0.85)
           d('0', X(cI + w - 1), yOf(rr), goldLight, 0.85)
