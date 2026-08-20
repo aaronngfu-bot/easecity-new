@@ -119,7 +119,7 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
               <span aria-hidden="true">
                 {titleChars(c.heroTitleA, 0.3)}
                 <br />
-                <span className="text-[var(--amber)]">{titleChars(c.heroTitleB, 0.3 + Array.from(c.heroTitleA).length * 0.028 + 0.15)}</span>
+                <span className="text-[var(--signal)]">{titleChars(c.heroTitleB, 0.3 + Array.from(c.heroTitleA).length * 0.028 + 0.15)}</span>
               </span>
             </h1>
 
