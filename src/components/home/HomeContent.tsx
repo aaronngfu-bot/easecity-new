@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import Image from 'next/image'
 import { ArrowRight, ArrowUpRight, Code2, Globe, Palette, Lightbulb, Megaphone, Fingerprint, Cpu } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { RevealSection } from '@/components/ui/RevealSection'
@@ -114,10 +113,8 @@ export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
 
             <div className="mt-12 grid gap-6 lg:grid-cols-2">
               {/* EC-Share */}
-              <Link href="/ec-share" className="card group relative flex flex-col justify-end overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-9">
-                <Image src="/images/product-ecshare-clean.png" alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="pointer-events-none absolute right-0 top-0 h-full w-full object-cover object-right opacity-30 transition-opacity duration-500 group-hover:opacity-40" />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[var(--bg-surface)] via-[var(--bg-surface)]/90 to-transparent" />
-                <div className="relative z-10">
+              <Link href="/ec-share" className="card group relative flex flex-col overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-9">
+                <div className="relative">
                   <div className="mb-3 text-left">
                     <p className="label-mono">{c.product01Label}</p>
                     <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.product01Name}</h3>
@@ -138,10 +135,8 @@ export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
               </Link>
 
               {/* Custom Development */}
-              <Link href="/services" className="card group relative flex flex-col justify-end overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-9">
-                <Image src="/images/product-devtool-clean.png" alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="pointer-events-none absolute right-0 top-0 h-full w-full object-cover object-right opacity-30 transition-opacity duration-500 group-hover:opacity-40" />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[var(--bg-surface)] via-[var(--bg-surface)]/90 to-transparent" />
-                <div className="relative z-10">
+              <Link href="/services" className="card group relative flex flex-col overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-9">
+                <div className="relative">
                   <div className="mb-3 text-left">
                     <p className="label-mono">{c.servicesLabel}</p>
                     <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.servicesName}</h3>
