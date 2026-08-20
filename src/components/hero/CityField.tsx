@@ -210,7 +210,7 @@ export function CityField({ className = '' }: { className?: string }) {
 
       // Bank of China tower — tall, with X bracing
       {
-        const cB = colAt(0.2)
+        const cB = colAt(0.44)
         const w = 7
         const h = Math.min(ROWS - 2, small ? 24 : 34)
         const top = ROWS - 1 - h
