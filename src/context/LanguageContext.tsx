@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
+import { usePathname } from 'next/navigation'
 import { type Language, translations, type T } from '@/i18n/translations'
 
 interface LanguageContextValue {
@@ -29,26 +30,52 @@ function detectBrowserLanguage(): Language {
   return /^(zh|yue|zh-hk|zh-tw|zh-mo|zh-cn)/.test(nav) ? 'zh' : 'en'
 }
 
-const SITE_TITLE: Record<Language, string> = {
-  en: 'EaseCity — Web services, system architecture & AI',
-  zh: 'EaseCity — 網上服務、系統架構與 AI',
+const SITE_SUFFIX: Record<Language, string> = {
+  en: 'EaseCity',
+  zh: 'EaseCity',
 }
 
-// Substring before " | EaseCity" template suffix, used to keep a per-page part.
-const templateSeparator = ' | '
+// Per-page title segments (before " | EaseCity"), localized.
+const PAGE_TITLES: Record<Language, Record<string, string>> = {
+  en: {
+    '/': 'EaseCity — Web services, system architecture & AI',
+    '/services': 'Services | EaseCity',
+    '/pricing': 'Pricing | EaseCity',
+    '/download': 'Download | EaseCity',
+    '/about': 'About | EaseCity',
+    '/ec-share': 'EC-Share | EaseCity',
+    '/blog': 'Blog | EaseCity',
+    '/login': 'Sign in | EaseCity',
+    '/register': 'Sign up | EaseCity',
+    '/legal/privacy': 'Privacy Policy | EaseCity',
+    '/legal/terms': 'Terms of Service | EaseCity',
+  },
+  zh: {
+    '/': 'EaseCity — 網上服務、系統架構與 AI',
+    '/services': '服務 | EaseCity',
+    '/pricing': '方案價格 | EaseCity',
+    '/download': '下載 | EaseCity',
+    '/about': '關於我們 | EaseCity',
+    '/ec-share': 'EC-Share | EaseCity',
+    '/blog': '部落格 | EaseCity',
+    '/login': '登入 | EaseCity',
+    '/register': '註冊 | EaseCity',
+    '/legal/privacy': '隱私權政策 | EaseCity',
+    '/legal/terms': '服務條款 | EaseCity',
+  },
+}
 
-function applyDocumentTitle(lang: Language) {
+function applyDocumentTitle(lang: Language, pathname: string) {
   if (typeof document === 'undefined') return
-  const current = document.title
-  const idx = current.lastIndexOf(templateSeparator)
-  // Keep the per-page segment (e.g. "Blog" / "Products") when present, and
-  // localize the site-title suffix only.
-  const segment = idx > 0 ? current.slice(0, idx) : ''
-  document.title = segment ? `${segment}${templateSeparator}EaseCity` : SITE_TITLE[lang]
+  // Match exact path, else fall back to a prefix match (e.g. /blog/[slug]).
+  const map = PAGE_TITLES[lang]
+  const title = map[pathname] ?? map[Object.keys(map).find((k) => k !== '/' && pathname.startsWith(k)) || '/']
+  document.title = title ?? SITE_SUFFIX[lang]
   document.documentElement.lang = lang === 'zh' ? 'zh-HK' : 'en'
 }
 
 export function LanguageProvider({ children, initialLang }: LanguageProviderProps) {
+  const pathname = usePathname()
   // The initial value is fully decided before first render on BOTH server and
   // client: server passes initialLang (from cookie); if the client has a stored
   // preference it's already in the same cookie, so we stay consistent.
@@ -66,7 +93,7 @@ export function LanguageProvider({ children, initialLang }: LanguageProviderProp
   })
 
   useEffect(() => {
-    applyDocumentTitle(language)
+    applyDocumentTitle(language, pathname)
     try {
       localStorage.setItem(STORAGE_KEY, language)
     } catch {
@@ -77,7 +104,7 @@ export function LanguageProvider({ children, initialLang }: LanguageProviderProp
     } catch {
       /* ignore */
     }
-  }, [language])
+  }, [language, pathname])
 
   const setLanguage = useCallback((lang: Language) => {
     setLang(lang)
