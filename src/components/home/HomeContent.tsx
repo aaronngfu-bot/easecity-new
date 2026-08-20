@@ -193,8 +193,8 @@ export function HomeContent() {
                     {/* FRONT */}
                     <div className="card absolute inset-0 flex flex-col justify-between p-4 [backface-visibility:hidden]">
                       <div className="flex items-start justify-between">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
-                          <ServiceIcon icon={s.icon} size={24} />
+                        <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
+                          <ServiceIcon icon={s.icon} size={28} />
                         </div>
                         <span className="text-[var(--signal)]">
                           <ArrowUpRight size={15} />
