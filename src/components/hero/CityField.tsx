@@ -132,60 +132,90 @@ export function CityField({ className = '' }: { className?: string }) {
       }
       const bit = () => (rand() > 0.5 ? '1' : '0')
 
-      // ── (mountain ridge removed — reference art has empty sky) ──
+      // ── depth layers: three tiers at distinct tones for legible depth ──
+      const goldDeep: [number, number, number] = [
+        (gold[0] * 0.42) | 0, (gold[1] * 0.42) | 0, (gold[2] * 0.42) | 0,
+      ]
+      const goldMid: [number, number, number] = [
+        (gold[0] * 0.7) | 0, (gold[1] * 0.7) | 0, (gold[2] * 0.7) | 0,
+      ]
 
-      // ── back towers: dim gold silhouettes ──
-      const backCount = small ? 9 : 18
-      for (let i = 0; i < backCount; i++) {
-        const w = 5 + Math.floor(rand() * 6)
-        const c0 = Math.floor(rand() * (COLS - w))
-        const h = Math.min(ROWS - 4, 16 + Math.floor(rand() * 22))
-        const top = ROWS - 1 - h
-        for (let cc = c0; cc < c0 + w; cc++) d(bit(), X(cc), yOf(top), gold, 0.2)
-        for (let rr = top; rr < ROWS; rr += 2) {
-          d('0', X(c0), yOf(rr), gold, 0.16)
-          d('1', X(c0 + w - 1), yOf(rr), gold, 0.16)
+      const tower = (
+        c: number,
+        w: number,
+        top: number,
+        roof: number[],
+        oCol: [number, number, number],
+        oA: number,
+        fCol: [number, number, number],
+        fA: number,
+        fP: number,
+      ) => {
+        for (let i = 0; i < w; i++) d(bit(), X(c + i), yOf(roof[i]), oCol, oA)
+        for (let rr = roof[0]; rr < ROWS; rr++) d('1', X(c), yOf(rr), oCol, oA)
+        for (let rr = roof[w - 1]; rr < ROWS; rr++) d('0', X(c + w - 1), yOf(rr), oCol, oA)
+        for (let i = 1; i < w - 1; i++) {
+          for (let rr = roof[i] + 1; rr < ROWS - 1; rr++) {
+            if (rand() < fP) d(bit(), X(c + i), yOf(rr), fCol, fA + rand() * 0.15)
+          }
         }
       }
 
-      // ── generic towers: bright outline + dense digit window grid ──
-      let c = 1
-      while (c < COLS - 4) {
-        const w = 4 + Math.floor(rand() * 7)
-        if (c + w > COLS - 1) break
-        const leftness = c / COLS
-        const maxH = leftness < 0.42 ? (small ? 14 : 20) : ROWS - 4
-        const h = Math.min(ROWS - 3, 8 + Math.floor(rand() * (maxH - 8)))
-        const top = ROWS - 1 - h
-
-        const roof: number[] = new Array(w).fill(top)
-        const roll = rand()
-        if (roll < 0.2 && w >= 5) {
-          const depth = 2 + Math.floor(rand() * 2)
-          const dir = rand() < 0.5
-          for (let i = 0; i < w; i++) {
-            const u = dir ? i / (w - 1) : 1 - i / (w - 1)
-            roof[i] = top + Math.round(u * depth)
-          }
-        } else if (roll < 0.36 && w >= 5) {
-          const dh = 2
-          for (let i = 0; i < w; i++) {
-            const u = (2 * i) / (w - 1) - 1
-            roof[i] = top + dh - Math.round(dh * Math.sqrt(Math.max(0, 1 - u * u)))
-          }
+      // Layer 1 — distant backdrop (dim, continuous band)
+      {
+        let c = 0
+        while (c < COLS - 1) {
+          const w = 4 + Math.floor(rand() * 6)
+          if (c + w > COLS) break
+          const h = 14 + Math.floor(rand() * 18)
+          const top = ROWS - 1 - h
+          tower(c, w, top, new Array(w).fill(top), goldDeep, 0.22, goldDeep, 0.11, 0.72)
+          c += w
         }
+      }
 
-        for (let i = 0; i < w; i++) d(bit(), X(c + i), yOf(roof[i]), goldLight, 0.75 + rand() * 0.25)
-        for (let rr = roof[0]; rr < ROWS; rr++) d('1', X(c), yOf(rr), goldLight, 0.7)
-        for (let rr = roof[w - 1]; rr < ROWS; rr++) d('0', X(c + w - 1), yOf(rr), goldLight, 0.7)
-
-        // dense window grid inside
-        for (let i = 1; i < w - 1; i++) {
-          for (let rr = roof[i] + 1; rr < ROWS - 1; rr++) {
-            if (rand() < 0.97) d(bit(), X(c + i), yOf(rr), gold, 0.5 + rand() * 0.4)
-          }
+      // Layer 2 — mid-ground (medium tone, slight air gaps)
+      {
+        let c = 0
+        while (c < COLS - 1) {
+          const w = 3 + Math.floor(rand() * 5)
+          if (c + w > COLS) break
+          const h = 8 + Math.floor(rand() * 15)
+          const top = ROWS - 1 - h
+          tower(c, w, top, new Array(w).fill(top), goldMid, 0.45, goldMid, 0.3, 0.8)
+          c += w + 1
         }
-        c += w
+      }
+
+      // Layer 3 — near foreground (bright, varied roofs, clear gaps)
+      {
+        let c = 1
+        while (c < COLS - 3) {
+          const w = 4 + Math.floor(rand() * 6)
+          if (c + w > COLS - 1) break
+          const leftness = c / COLS
+          const maxH = leftness < 0.42 ? (small ? 12 : 18) : ROWS - 4
+          const h = Math.min(ROWS - 3, 7 + Math.floor(rand() * (maxH - 7)))
+          const top = ROWS - 1 - h
+          const roof: number[] = new Array(w).fill(top)
+          const roll = rand()
+          if (roll < 0.2 && w >= 5) {
+            const depth = 2 + Math.floor(rand() * 2)
+            const dir = rand() < 0.5
+            for (let i = 0; i < w; i++) {
+              const u = dir ? i / (w - 1) : 1 - i / (w - 1)
+              roof[i] = top + Math.round(u * depth)
+            }
+          } else if (roll < 0.36 && w >= 5) {
+            const dh = 2
+            for (let i = 0; i < w; i++) {
+              const u = (2 * i) / (w - 1) - 1
+              roof[i] = top + dh - Math.round(dh * Math.sqrt(Math.max(0, 1 - u * u)))
+            }
+          }
+          tower(c, w, top, roof, goldLight, 0.8, gold, 0.62, 0.97)
+          c += w + 1
+        }
       }
 
       // ── landmarks (fixed proportions, drawn over the generic wall) ──
