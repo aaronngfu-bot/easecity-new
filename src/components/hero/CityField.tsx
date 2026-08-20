@@ -26,6 +26,8 @@ type P = {
   white: boolean // white vs teal
 }
 
+type Light = { x: number; y: number; ch: string; phase: number; speed: number; base: number }
+
 /**
  * CityField — a golden Hong Kong harbour skyline drawn entirely in 0/1
  * digits, in the style of the reference artwork:
@@ -78,6 +80,7 @@ export function CityField({ className = '' }: { className?: string }) {
     let radiusPx = 130
     let sky: P[] = []
     let beacons: P[] = []
+    let lights: Light[] = []
 
     function hexToRgb(hex: string): [number, number, number] {
       const h = hex.replace('#', '')
@@ -132,62 +135,7 @@ export function CityField({ className = '' }: { className?: string }) {
       }
       const bit = () => (rand() > 0.5 ? '1' : '0')
 
-      // ── depth layers: three tiers at distinct tones for legible depth ──
-      const goldDeep: [number, number, number] = [
-        (gold[0] * 0.42) | 0, (gold[1] * 0.42) | 0, (gold[2] * 0.42) | 0,
-      ]
-      const goldMid: [number, number, number] = [
-        (gold[0] * 0.7) | 0, (gold[1] * 0.7) | 0, (gold[2] * 0.7) | 0,
-      ]
-
-      const tower = (
-        c: number,
-        w: number,
-        top: number,
-        roof: number[],
-        oCol: [number, number, number],
-        oA: number,
-        fCol: [number, number, number],
-        fA: number,
-        fP: number,
-      ) => {
-        for (let i = 0; i < w; i++) d(bit(), X(c + i), yOf(roof[i]), oCol, oA)
-        for (let rr = roof[0]; rr < ROWS; rr++) d('1', X(c), yOf(rr), oCol, oA)
-        for (let rr = roof[w - 1]; rr < ROWS; rr++) d('0', X(c + w - 1), yOf(rr), oCol, oA)
-        for (let i = 1; i < w - 1; i++) {
-          for (let rr = roof[i] + 1; rr < ROWS - 1; rr++) {
-            if (rand() < fP) d(bit(), X(c + i), yOf(rr), fCol, fA + rand() * 0.15)
-          }
-        }
-      }
-
-      // Layer 1 — distant backdrop (dim, continuous band)
-      {
-        let c = 0
-        while (c < COLS - 1) {
-          const w = 4 + Math.floor(rand() * 6)
-          if (c + w > COLS) break
-          const h = 14 + Math.floor(rand() * 18)
-          const top = ROWS - 1 - h
-          tower(c, w, top, new Array(w).fill(top), goldDeep, 0.22, goldDeep, 0.11, 0.72)
-          c += w
-        }
-      }
-
-      // Layer 2 — mid-ground (medium tone, slight air gaps)
-      {
-        let c = 0
-        while (c < COLS - 1) {
-          const w = 3 + Math.floor(rand() * 5)
-          if (c + w > COLS) break
-          const h = 8 + Math.floor(rand() * 15)
-          const top = ROWS - 1 - h
-          tower(c, w, top, new Array(w).fill(top), goldMid, 0.45, goldMid, 0.3, 0.8)
-          c += w + 1
-        }
-      }
-
-      // Layer 3 — near foreground (bright, varied roofs, clear gaps)
+      // ── single surface plane: solid filled buildings, digit texture ──
       {
         let c = 1
         while (c < COLS - 3) {
@@ -199,21 +147,33 @@ export function CityField({ className = '' }: { className?: string }) {
           const top = ROWS - 1 - h
           const roof: number[] = new Array(w).fill(top)
           const roll = rand()
-          if (roll < 0.2 && w >= 5) {
+          if (roll < 0.18 && w >= 5) {
             const depth = 2 + Math.floor(rand() * 2)
             const dir = rand() < 0.5
             for (let i = 0; i < w; i++) {
               const u = dir ? i / (w - 1) : 1 - i / (w - 1)
               roof[i] = top + Math.round(u * depth)
             }
-          } else if (roll < 0.36 && w >= 5) {
+          } else if (roll < 0.34 && w >= 5) {
             const dh = 2
             for (let i = 0; i < w; i++) {
               const u = (2 * i) / (w - 1) - 1
               roof[i] = top + dh - Math.round(dh * Math.sqrt(Math.max(0, 1 - u * u)))
             }
           }
-          tower(c, w, top, roof, goldLight, 0.8, gold, 0.62, 0.97)
+          // bright outline
+          for (let i = 0; i < w; i++) d(bit(), X(c + i), yOf(roof[i]), goldLight, 0.85)
+          for (let rr = roof[0]; rr < ROWS; rr++) d('1', X(c), yOf(rr), goldLight, 0.8)
+          for (let rr = roof[w - 1]; rr < ROWS; rr++) d('0', X(c + w - 1), yOf(rr), goldLight, 0.8)
+          // solid interior fill + twinkle window lights
+          for (let i = 1; i < w - 1; i++) {
+            for (let rr = roof[i] + 1; rr < ROWS - 1; rr++) {
+              d(bit(), X(c + i), yOf(rr), gold, 0.58)
+              if (rand() < 0.065) {
+                lights.push({ x: X(c + i), y: yOf(rr), ch: '1', phase: rand() * 6, speed: 0.7 + rand() * 2.2, base: 0.55 + rand() * 0.45 })
+              }
+            }
+          }
           c += w + 1
         }
       }
@@ -345,6 +305,7 @@ export function CityField({ className = '' }: { className?: string }) {
     function buildSky() {
       sky = []
       beacons = beacons.filter(() => false)
+      lights = []
       const rand = mulberry32(777)
       const small = W < 640
       const bgCell = small ? 26 : 28
@@ -394,6 +355,7 @@ export function CityField({ className = '' }: { className?: string }) {
       groundY = H * 0.78
       radiusPx = 120
       beacons = []
+      lights = []
       buildSky()
       if (reduceMotion) drawStatic()
     }
@@ -428,6 +390,10 @@ export function CityField({ className = '' }: { className?: string }) {
         ctx.fillText(p.ch, p.x, p.y)
       }
       ctx.drawImage(off, 0, 0, W, H)
+      for (const l of lights) {
+        ctx.fillStyle = rgba(goldLight, 0.8 * l.base)
+        ctx.fillText(l.ch, l.x, l.y)
+      }
       drawReflection()
       for (const b of beacons) {
         ctx.fillStyle = rgba(goldLight, 0.9)
@@ -480,8 +446,29 @@ export function CityField({ className = '' }: { className?: string }) {
       }
       // city
       ctx.drawImage(off, 0, 0, W, H)
+      // twinkle window lights on the city
+      for (const l of lights) {
+        const pulse = 0.5 + 0.5 * Math.sin(t * l.speed + l.phase)
+        ctx.fillStyle = rgba(goldLight, (0.25 + 0.65 * pulse) * l.base)
+        ctx.fillText(l.ch, l.x, l.y)
+      }
       // water
       drawReflection()
+      // reflected twinkle (rippled, depth-faded)
+      for (const l of lights) {
+        const above = groundY - l.y
+        if (above <= 0) continue
+        const ry = 2 * groundY - l.y
+        if (ry >= H) continue
+        const depth = above / Math.max(1, groundY)
+        const fade = 0.5 * (1 - depth * 0.7)
+        const xo = Math.sin(t * 1.2 + l.y * 0.05) * depth * 5
+        const pulse = 0.5 + 0.5 * Math.sin(t * l.speed + l.phase)
+        const a = (0.25 + 0.65 * pulse) * l.base * fade
+        if (a < 0.02) continue
+        ctx.fillStyle = rgba(goldLight, a)
+        ctx.fillText(l.ch, l.x + xo, ry)
+      }
       // pulsing beacons
       for (const b of beacons) {
         const pulse = 0.5 + 0.5 * Math.sin(t * b.speed + b.phase)
@@ -521,6 +508,7 @@ export function CityField({ className = '' }: { className?: string }) {
     const mo = new MutationObserver(() => {
       readTheme()
       beacons = []
+      lights = []
       buildSky()
       if (reduceMotion) drawStatic()
     })

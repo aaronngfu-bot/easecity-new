@@ -90,6 +90,11 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
           <CityField className="h-full w-full" />
         </div>
 
+        {/* Small title-local scrim (~5% area) for headline legibility */}
+        <div
+          aria-hidden
+          className="absolute inset-0 bg-[radial-gradient(ellipse_32%_22%_at_15%_26%,var(--bg-base)_55%,transparent_78%)]"
+        />
         {/* Bottom fade so the hero melts into the next section */}
         <div aria-hidden className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[var(--bg-base)] to-transparent" />
 
