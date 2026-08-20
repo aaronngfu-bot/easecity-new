@@ -10,6 +10,11 @@
   justify-content: center;
   padding: 12px 16px;
   pointer-events: none;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.pill-nav-container.nav-hidden {
+  transform: translateY(-140%);
 }
 
 .pill-nav {
@@ -158,8 +163,8 @@
   padding: 6px 14px;
   border-radius: 9999px;
   border: none;
-  background: var(--signal);
-  color: var(--signal-ink);
+  background: var(--amber);
+  color: var(--amber-ink);
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
@@ -167,7 +172,8 @@
 }
 
 .pill-cta:hover {
-  background: var(--signal-light);
+  background: var(--amber);
+  filter: brightness(1.08);
 }
 
 .pill-auth {

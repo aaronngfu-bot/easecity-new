@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import { LayoutDashboard, LogOut } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -29,6 +29,19 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
   const { data: session, status } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
+  const [navHidden, setNavHidden] = useState(false)
+  const lastScrollY = useRef(0)
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY
+      if (y < 40) { setNavHidden(false); lastScrollY.current = y; return }
+      setNavHidden(y > lastScrollY.current + 8)
+      lastScrollY.current = y
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+
   const authed = status === 'authenticated'
 
   const getItemLabel = (item: NavItem) =>
@@ -37,7 +50,7 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
   const isActive = (href: string) => pathname === href
 
   return (
-    <div className="pill-nav-container">
+    <div className={`pill-nav-container${navHidden ? ' nav-hidden' : ''}`}>
       <nav className={`pill-nav ${className}`} aria-label="Primary">
         <Link className="pill-logo" href="/" aria-label="Home">
           <BrandMark size={28} />
