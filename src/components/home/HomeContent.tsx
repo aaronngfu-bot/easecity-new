@@ -113,13 +113,13 @@ export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
 
             <div className="mt-12 grid gap-6 lg:grid-cols-2">
               {/* EC-Share */}
-              <Link href="/ec-share" className="card group relative flex flex-col overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-9">
+              <Link href="/ec-share" className="card group relative flex flex-col overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-8">
                 <div className="relative">
                   <div className="mb-3 text-left">
                     <p className="label-mono">{c.product01Label}</p>
                     <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.product01Name}</h3>
                   </div>
-                  <p className="max-w-md text-left leading-relaxed text-[var(--text-secondary)]">
+                  <p className="text-left leading-relaxed text-[var(--text-secondary)]">
                     {c.product01Desc}
                   </p>
                   <div className="mt-4 flex gap-2">
@@ -135,13 +135,13 @@ export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
               </Link>
 
               {/* Custom Development */}
-              <Link href="/services" className="card group relative flex flex-col overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-9">
+              <Link href="/services" className="card group relative flex flex-col overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-8">
                 <div className="relative">
                   <div className="mb-3 text-left">
                     <p className="label-mono">{c.servicesLabel}</p>
                     <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.servicesName}</h3>
                   </div>
-                  <p className="max-w-md text-left leading-relaxed text-[var(--text-secondary)]">
+                  <p className="text-left leading-relaxed text-[var(--text-secondary)]">
                     {c.servicesDesc}
                   </p>
                   <div className="mt-4 flex gap-2">
