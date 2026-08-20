@@ -55,19 +55,14 @@ export function ServicesPageClient() {
   return (
     <>
       <PageHero
-        eyebrow={c.heroEyebrow}
         heading={c.heroHeading}
         headingHighlight={c.heroHighlight}
         description={c.heroDescription}
-        meta={[
-          { label: c.metaBasedIn, value: c.metaBasedValue },
-          { label: c.metaTeam, value: c.metaTeamValue },
-        ]}
       />
 
       <section className="section-padding">
         <div className="container-max">
-          <div className="grid gap-6 md:grid-cols-2">
+          <div className="grid gap-x-10 gap-y-12 md:grid-cols-2">
             {services.map((service) => (
               <Link
                 key={service.title}

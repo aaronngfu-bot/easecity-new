@@ -5,7 +5,7 @@ import { cn } from '@/lib/utils'
 interface PageHeroProps {
   serial?: string
   sectionCode?: string
-  eyebrow: string
+  eyebrow?: string
   heading: string
   headingHighlight: string
   description: string
@@ -45,7 +45,7 @@ export function PageHero({
       <div className="container-max relative z-10">
         <div className={cn('max-w-4xl', align === 'center' && 'mx-auto text-center')}>
           <div className={cn('mb-8 flex items-center gap-3 md:mb-10', align === 'center' && 'justify-center')}>
-            <span className="badge">{eyebrow}</span>
+            {eyebrow && <span className="badge">{eyebrow}</span>}
           </div>
 
           <h1 className={cn(
