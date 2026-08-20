@@ -183,8 +183,8 @@
     background: var(--body-bg);
     color: var(--body-text);
     font-family: var(--font-body), system-ui, sans-serif;
-        overflow-x: clip;
-        min-width: 320px;
+        overflow-x: auto;
+                min-width: 768px;
         font-feature-settings: 'ss01', 'cv11';
   }
 
