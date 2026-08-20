@@ -131,11 +131,32 @@ export function HomeContent() {
               subtitle={c.productsSubtitle}
             />
 
-            <div className="mt-12 grid gap-6 lg:grid-cols-2">
-              {/* EC-Share */}
+            <div className="mt-12 grid items-center gap-10 lg:grid-cols-[2fr_3fr]">
+              {/* Narrative */}
+              <div className="text-left">
+                <h3 className="font-display text-2xl font-bold leading-snug text-[var(--text-primary)] md:text-3xl">
+                  {c.productsNarrative}
+                </h3>
+                <p className="mt-4 max-w-md text-[var(--text-secondary)] leading-relaxed">
+                  {c.productsNarrativeDesc}
+                </p>
+                <a href="/ec-share" className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] hover:text-[var(--signal-light)]">
+                  {c.productsExploreCta}
+                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                </a>
+              </div>
+
+              {/* EC-Share product card */}
               <Link href="/ec-share" className="card group relative flex flex-col overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-8">
                 <div className="relative">
-                  <h3 className="mb-3 font-display text-xl font-bold text-[var(--text-primary)]">{c.product01Name}</h3>
+                  <div className="mb-1 flex items-center gap-2">
+                    <span className="label-mono">{c.product01Label}</span>
+                    <span className="text-[var(--signal)]">{c.product01Name}</span>
+                  </div>
+                  <p className="label-mono text-xs text-[var(--text-muted)]">{c.product01Sub}</p>
+                  <h3 className="mb-3 mt-2 font-display text-2xl font-bold text-[var(--text-primary)]">
+                    {c.product01Name}
+                  </h3>
                   <p className="text-left leading-relaxed text-[var(--text-secondary)]">
                     {c.product01Desc}
                   </p>
@@ -144,27 +165,18 @@ export function HomeContent() {
                     <span className="badge">{c.badgeAndroid}</span>
                     <span className="badge">{c.badgeTrial}</span>
                   </div>
-                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
-                    {t.product.pricing.cta}
-                    <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
-                  </span>
-                </div>
-              </Link>
-
-              {/* Custom Development */}
-              <Link href="/services" className="card group relative flex flex-col overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-8">
-                <div className="relative">
-                  <h3 className="mb-3 font-display text-xl font-bold text-[var(--text-primary)]">{c.servicesName}</h3>
-                  <p className="text-left leading-relaxed text-[var(--text-secondary)]">
-                    {c.servicesDesc}
-                  </p>
-                  <div className="mt-4 flex gap-2">
-                    <span className="badge">{c.badgeWeb}</span>
-                    <span className="badge">{c.badgeDesktop}</span>
-                    <span className="badge">{c.badgeDesign}</span>
+                  <div className="mt-6 grid grid-cols-2 gap-4 border-t border-[var(--border-color)] pt-5">
+                    <div>
+                      <p className="font-mono text-lg font-bold text-[var(--signal)]">{c.productLatency}</p>
+                      <p className="label-mono mt-1">{c.product01Sub}</p>
+                    </div>
+                    <div>
+                      <p className="font-mono text-lg font-bold text-[var(--signal)]">{c.productDevices}</p>
+                      <p className="label-mono mt-1">{c.badgeAndroid}</p>
+                    </div>
                   </div>
                   <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
-                    {c.servicesCta}
+                    {t.product.pricing.cta}
                     <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                   </span>
                 </div>
