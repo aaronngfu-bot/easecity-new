@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { BinaryField } from '@/components/hero/BinaryField'
+import { CityField } from '@/components/hero/CityField'
 
 /**
  * ImmersionHero — full-viewport "breathing" first screen.
@@ -74,16 +74,6 @@ export function ImmersionHero() {
   const { t } = useLanguage()
   const c = t.companyPage
 
-  // Desktop anchors the glyph beside the copy; mobile keeps it centered behind.
-  const [isDesktop, setIsDesktop] = useState(false)
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)')
-    const apply = () => setIsDesktop(mq.matches)
-    apply()
-    mq.addEventListener('change', apply)
-    return () => mq.removeEventListener('change', apply)
-  }, [])
-
   const titleChars = (text: string, baseDelay: number) =>
     Array.from(text).map((ch, i) => (
       <span
@@ -98,20 +88,9 @@ export function ImmersionHero() {
 
   return (
     <section className="relative flex min-h-[100svh] flex-col overflow-hidden bg-[var(--bg-base)]">
-        {/* Full-bleed particle field (EC glyph + drifting binary field) */}
+        {/* Full-bleed living city skyline built from binary particles */}
         <div aria-hidden className="absolute inset-0">
-          <BinaryField
-            key={isDesktop ? 'desktop' : 'mobile'}
-            className="h-full w-full"
-            glyphCenterX={isDesktop ? 0.71 : 0.5}
-            glyphCenterY={isDesktop ? 0.5 : 0.26}
-            minCell={12}
-            bgCell={34}
-            bgDensity={0.5}
-            maxBg={420}
-            maxMarkWidth={0.46}
-            float
-          />
+          <CityField className="h-full w-full" />
         </div>
 
         {/* Legibility scrim behind the copy column */}

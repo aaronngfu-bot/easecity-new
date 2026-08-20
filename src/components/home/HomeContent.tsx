@@ -28,15 +28,15 @@ export interface HomeBlogPost {
  * language re-renders immediately; blog posts are injected from the server
  * parent (bilingual) so the rail also renders on first paint without a fetch.
  *
- * Section rhythm (each section uses a distinct composition on purpose):
- *  hero        full-viewport particle immersion
- *  blog        horizontal drag rail
- *  products    narrative + animated device-farm illustration
- *  services    bento grid (one dominant card) with hover-flip small cards
- *  process     connected timeline
- *  cases       asymmetric duo
- *  testimonials staggered trio
- *  cta         glow panel
+ * Section rhythm (distinct compositions, one visual language):
+ *  hero         full-viewport living city skyline (binary particles)
+ *  blog         horizontal drag rail            — reveal: up
+ *  products     narrative + animated device farm — reveal: left
+ *  services     unified bento cards              — reveal: up
+ *  process      connected timeline               — reveal: right
+ *  cases        asymmetric duo                   — reveal: scale
+ *  testimonials breathing wall, 10 quotes        — reveal: up
+ *  cta          glow panel                       — reveal: scale
  */
 export function HomeContent() {
   const { t, language } = useLanguage()
@@ -77,9 +77,24 @@ export function HomeContent() {
   }))
   const [featA, featB, ...restServices] = services
 
+  const testimonials = [
+    { q: c.t1Quote, n: c.t1Name, r: c.t1Role },
+    { q: c.t2Quote, n: c.t2Name, r: c.t2Role },
+    { q: c.t3Quote, n: c.t3Name, r: c.t3Role },
+    { q: c.t4Quote, n: c.t4Name, r: c.t4Role },
+    { q: c.t5Quote, n: c.t5Name, r: c.t5Role },
+    { q: c.t6Quote, n: c.t6Name, r: c.t6Role },
+    { q: c.t7Quote, n: c.t7Name, r: c.t7Role },
+    { q: c.t8Quote, n: c.t8Name, r: c.t8Role },
+    { q: c.t9Quote, n: c.t9Name, r: c.t9Role },
+    { q: c.t10Quote, n: c.t10Name, r: c.t10Role },
+  ]
+  // Three staggered columns: 4 / 3 / 3
+  const tCols = [testimonials.slice(0, 4), testimonials.slice(4, 7), testimonials.slice(7)]
+
   return (
     <main className="relative min-h-screen">
-      {/* Hero — full-viewport immersion with binary particle EC mark */}
+      {/* Hero — full-viewport living city */}
       <ImmersionHero />
 
       {/* Blog rail — active proof, surfaced early */}
@@ -101,7 +116,7 @@ export function HomeContent() {
       </RevealSection>
 
       {/* Products — narrative beside the living device-farm illustration */}
-      <RevealSection>
+      <RevealSection variant="left">
         <section className="section-padding">
           <div className="container-max">
             <div className="grid items-center gap-12 lg:grid-cols-[2fr_3fr]">
@@ -140,7 +155,7 @@ export function HomeContent() {
         </section>
       </RevealSection>
 
-      {/* Services — bento grid: two dominant capabilities, four compact flips */}
+      {/* Services — one card language, bento weights */}
       <RevealSection>
         <section className="section-padding section-bridge bg-[var(--bg-surface)]">
           <div className="container-max">
@@ -157,12 +172,12 @@ export function HomeContent() {
                 href={`/services/${featA.slug}`}
                 className="card group relative flex flex-col justify-between overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-8 lg:col-span-4 lg:row-span-2"
               >
-                <div aria-hidden className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[var(--signal-soft)] blur-2xl transition-opacity opacity-0 group-hover:opacity-100" />
+                <div aria-hidden className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[var(--signal-soft)] opacity-0 blur-2xl transition-opacity group-hover:opacity-100" />
                 <div className="flex items-start justify-between">
                   <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
                     <ServiceIcon icon={featA.icon} size={28} />
                   </div>
-                  <span className="text-[var(--signal)]"><ArrowUpRight size={16} /></span>
+                  <span className="text-[var(--signal)] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"><ArrowUpRight size={16} /></span>
                 </div>
                 <div className="mt-6">
                   <h3 className="font-display text-2xl font-bold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
@@ -194,7 +209,7 @@ export function HomeContent() {
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
                     <ServiceIcon icon={featB.icon} size={24} />
                   </div>
-                  <span className="text-[var(--signal)]"><ArrowUpRight size={15} /></span>
+                  <span className="text-[var(--signal)] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"><ArrowUpRight size={15} /></span>
                 </div>
                 <div className="mt-5">
                   <h3 className="font-display text-lg font-bold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
@@ -209,49 +224,37 @@ export function HomeContent() {
                 </div>
               </Link>
 
-              {/* Compact flip cards */}
+              {/* Same card language, compact weight */}
               {restServices.map((s) => (
                 <Link
                   key={s.slug}
                   href={`/services/${s.slug}`}
-                  className="group block [perspective:1000px] md:col-span-1 lg:col-span-2"
+                  className="card group relative flex flex-col justify-between overflow-hidden p-6 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] lg:col-span-2"
                 >
-                  <div className="relative h-56 w-full transition-transform duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
-                    {/* FRONT */}
-                    <div className="card absolute inset-0 flex flex-col justify-between p-5 [backface-visibility:hidden]">
-                      <div className="flex items-start justify-between">
-                        <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
-                          <ServiceIcon icon={s.icon} size={22} />
-                        </div>
-                        <span className="text-[var(--signal)]"><ArrowUpRight size={15} /></span>
-                      </div>
-                      <div>
-                        <h3 className="font-display text-base font-bold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
-                          {s.title}
-                        </h3>
-                        <p className="mt-2 line-clamp-2 text-xs leading-relaxed text-[var(--text-secondary)]">{s.body}</p>
-                      </div>
+                  <div className="flex items-start justify-between">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
+                      <ServiceIcon icon={s.icon} size={22} />
                     </div>
-                    {/* BACK — bullets */}
-                    <div className="absolute inset-0 flex flex-col justify-between rounded-xl border border-[var(--signal)] bg-[var(--signal-soft)] p-5 [backface-visibility:hidden] [transform:rotateY(180deg)]">
-                      <h3 className="font-display text-base font-bold text-[var(--text-primary)]">{s.title}</h3>
-                      <ul className="space-y-2">
-                        {s.bullets.slice(0, 3).map((b) => (
-                          <li key={b} className="flex items-start gap-1.5 text-xs leading-snug text-[var(--text-secondary)]">
-                            <span className="mt-1 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--signal)]" />
-                            <span className="line-clamp-2">{b}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
+                    <span className="text-[var(--signal)] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"><ArrowUpRight size={15} /></span>
+                  </div>
+                  <div className="mt-5">
+                    <h3 className="font-display text-base font-bold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
+                      {s.title}
+                    </h3>
+                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[var(--text-secondary)]">{s.body}</p>
+                  </div>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {s.tags.slice(0, 3).map((tag) => (
+                      <span key={tag} className="badge">{tag}</span>
+                    ))}
                   </div>
                 </Link>
               ))}
 
-              {/* CTA tile fills the bento's last row */}
+              {/* CTA tile completes the bento's last row */}
               <Link
                 href="/services"
-                className="group flex min-h-[14rem] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-[var(--border-strong)] p-6 text-center transition-colors hover:border-[var(--signal)] hover:bg-[var(--signal-soft)] lg:col-span-4"
+                className="group flex min-h-[12rem] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-[var(--border-strong)] p-6 text-center transition-colors hover:border-[var(--signal)] hover:bg-[var(--signal-soft)] lg:col-span-4"
               >
                 <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border-strong)] text-[var(--text-secondary)] transition-all group-hover:border-[var(--signal)] group-hover:text-[var(--signal)]">
                   <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
@@ -259,7 +262,6 @@ export function HomeContent() {
                 <span className="font-display text-lg font-bold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
                   {c.servicesCta}
                 </span>
-                <span className="label-mono">{c.aboutCta}</span>
               </Link>
             </div>
           </div>
@@ -267,7 +269,7 @@ export function HomeContent() {
       </RevealSection>
 
       {/* Process — connected four-step timeline */}
-      <RevealSection>
+      <RevealSection variant="right">
         <section className="section-padding bg-[var(--bg-surface)]">
           <div className="container-max">
             <SectionHeading
@@ -300,7 +302,7 @@ export function HomeContent() {
       </RevealSection>
 
       {/* Case studies — asymmetric proof duo */}
-      <RevealSection>
+      <RevealSection variant="scale">
         <section className="section-padding section-bridge">
           <div className="container-max">
             <SectionHeading
@@ -339,7 +341,7 @@ export function HomeContent() {
         </section>
       </RevealSection>
 
-      {/* Testimonials — staggered trio, words only */}
+      {/* Testimonials — breathing wall of ten quotes */}
       <RevealSection>
         <section className="section-padding bg-[var(--bg-surface)]">
           <div className="container-max">
@@ -350,30 +352,31 @@ export function HomeContent() {
               subtitle={c.testimSubtitle}
             />
 
-            <div className="mt-12 grid gap-6 md:grid-cols-3">
-              {[
-                { q: c.t1Quote, n: c.t1Name, r: c.t1Role },
-                { q: c.t2Quote, n: c.t2Name, r: c.t2Role },
-                { q: c.t3Quote, n: c.t3Name, r: c.t3Role },
-              ].map((tm, i) => (
-                <figure
-                  key={tm.n}
-                  className={`card relative flex h-full flex-col p-7 transition-transform hover:-translate-y-1 ${i === 1 ? 'card-elevated lg:translate-y-6' : ''}`}
-                >
-                  <span aria-hidden className="font-display text-5xl font-bold leading-none text-[var(--signal)] opacity-30">
-                    &ldquo;
-                  </span>
-                  <div className="mb-3 flex items-center gap-1 text-[var(--amber)]" aria-label="5 stars">
-                    {'★★★★★'.split('').map((s, j) => <span key={j}>{s}</span>)}
-                  </div>
-                  <blockquote className="flex-1 text-[var(--text-secondary)] leading-relaxed">
-                    {tm.q}
-                  </blockquote>
-                  <figcaption className="mt-5 border-t border-[var(--border-color)] pt-4">
-                    <p className="font-semibold text-[var(--text-primary)]">{tm.n}</p>
-                    <p className="label-mono mt-0.5 text-[var(--text-muted)]">{tm.r}</p>
-                  </figcaption>
-                </figure>
+            <div className="t-wall mt-12">
+              {tCols.map((col, ci) => (
+                <div key={ci} className="t-col">
+                  {col.map((tm, i) => (
+                    <figure
+                      key={tm.n}
+                      className={`t-card card relative flex flex-col p-6 transition-colors hover:border-[var(--signal)] ${ci === 1 ? 'card-elevated' : ''}`}
+                      style={{ animationDelay: `${(ci * 3 + i) * 0.55}s`, animationDuration: `${6.5 + ((ci + i) % 3)}s` }}
+                    >
+                      <span aria-hidden className="font-display text-4xl font-bold leading-none text-[var(--signal)] opacity-30">
+                        &ldquo;
+                      </span>
+                      <div className="mb-2 flex items-center gap-1 text-[var(--amber)]" aria-label="5 stars">
+                        {'★★★★★'.split('').map((s, j) => <span key={j}>{s}</span>)}
+                      </div>
+                      <blockquote className="flex-1 text-sm text-[var(--text-secondary)] leading-relaxed">
+                        {tm.q}
+                      </blockquote>
+                      <figcaption className="mt-4 border-t border-[var(--border-color)] pt-3">
+                        <p className="text-sm font-semibold text-[var(--text-primary)]">{tm.n}</p>
+                        <p className="label-mono mt-0.5 text-[var(--text-muted)]">{tm.r}</p>
+                      </figcaption>
+                    </figure>
+                  ))}
+                </div>
               ))}
             </div>
           </div>
@@ -381,7 +384,7 @@ export function HomeContent() {
       </RevealSection>
 
       {/* Frictionless CTA — glow panel */}
-      <RevealSection>
+      <RevealSection variant="scale">
         <section className="section-padding section-bridge">
           <div className="container-max">
             <div className="card group relative mx-auto max-w-3xl overflow-hidden p-10 text-center transition-colors hover:border-[var(--signal)] md:p-14">

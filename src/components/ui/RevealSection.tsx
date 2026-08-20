@@ -5,15 +5,17 @@ import { useEffect, useRef } from 'react'
 interface RevealSectionProps {
   children: React.ReactNode
   className?: string
+  /** Entrance direction: up (default), left, right, or scale. */
+  variant?: 'up' | 'left' | 'right' | 'scale'
 }
 
 /**
- * RevealSection — fade-up on first scroll into view (IntersectionObserver,
- * once). CSS handles the transition + prefers-reduced-motion; JS only flips
- * a class. Content stays fully visible if JS never runs (no opacity in the
- * base markup).
+ * RevealSection — entrance transition on first scroll into view
+ * (IntersectionObserver, once). CSS handles the transition +
+ * prefers-reduced-motion; JS only flips a class. Content stays fully visible
+ * if JS never runs (no opacity in the base markup).
  */
-export function RevealSection({ children, className }: RevealSectionProps) {
+export function RevealSection({ children, className, variant = 'up' }: RevealSectionProps) {
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -35,7 +37,7 @@ export function RevealSection({ children, className }: RevealSectionProps) {
   }, [])
 
   return (
-    <div ref={ref} className={`reveal ${className ?? ''}`}>
+    <div ref={ref} data-reveal={variant} className={`reveal ${className ?? ''}`}>
       {children}
     </div>
   )
