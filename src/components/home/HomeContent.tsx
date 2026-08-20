@@ -6,7 +6,7 @@ import { ArrowRight, ArrowUpRight, Code2 } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { RevealSection } from '@/components/ui/RevealSection'
 import SectionHeading from '@/components/SectionHeading'
-import { CityPulse } from '@/components/hero/CityPulse'
+import { ImmersionHero } from '@/components/home/ImmersionHero'
 import { BlogTimeline } from '@/components/home/BlogTimeline'
 import { ServiceIcon } from '@/components/ui/ServiceIcon'
 import { services as serviceCatalog } from '@/lib/services'
@@ -66,41 +66,8 @@ export function HomeContent() {
 
   return (
     <main className="relative min-h-screen">
-      {/* Hero — City pulse vision hook */}
-      <section className="relative overflow-hidden bg-[var(--bg-base)]">
-        <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_30%_20%,var(--signal-soft),transparent_70%)]" />
-
-        <div className="relative z-10 container-max grid items-center gap-12 pb-20 pt-32 md:pt-40 lg:grid-cols-2 lg:gap-x-16">
-          <div className="text-left">
-            <p className="label-mono mb-6 flex items-center gap-2 text-[var(--signal)]">
-              <span className="h-1.5 w-1.5 rounded-full bg-[var(--amber)] animate-pulse" />
-              {c.heroEyebrowNew}
-            </p>
-
-            <h1 className="font-display text-4xl font-bold leading-[1.05] tracking-tight text-[var(--text-primary)] sm:text-5xl md:text-6xl">
-              {c.heroTitleNew}
-            </h1>
-
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-[var(--text-secondary)]">
-              {c.heroSubtitleNew}
-            </p>
-
-            <div className="mt-10 flex flex-col gap-4 sm:flex-row">
-              <Link href="/about#contact" className="inline-flex items-center gap-2 rounded-lg bg-[var(--amber)] px-7 py-3 text-sm font-semibold text-[var(--amber-ink)] transition-colors hover:brightness-105">
-                {c.heroCtaPrimary}
-                <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
-              </Link>
-              <Link href="/services" className="btn-secondary px-7 py-3 text-sm">
-                {c.heroCtaSecondary}
-              </Link>
-            </div>
-          </div>
-
-          <div className="relative h-[320px] sm:h-[380px] lg:h-full lg:min-h-[420px] lg:pl-4">
-            <CityPulse className="h-full w-full" />
-          </div>
-        </div>
-      </section>
+      {/* Hero — full-viewport immersion with binary particle EC mark */}
+      <ImmersionHero />
 
       {/* Blog rail — active proof, surfaced early */}
       <RevealSection>

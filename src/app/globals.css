@@ -777,3 +777,63 @@
   .ec-row-highlight, .ec-row-highlight-2, .ec-send, .ec-spin, .ec-volume,
   .ec-toggle, .ec-toggle-2 { animation: none !important; }
 }
+
+/* ═══════════════════════════════════════════════════════════════
+   Immersion hero — character stagger, rise-in, scroll cue, ticker
+   ═══════════════════════════════════════════════════════════════ */
+@keyframes hero-char-in {
+  from { opacity: 0; transform: translateY(0.55em); filter: blur(4px); }
+  to   { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+.hero-char {
+  display: inline-block;
+  opacity: 0;
+  animation: hero-char-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes hero-rise {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-rise {
+  opacity: 0;
+  animation: hero-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scroll cue — a dot falling inside a pill, looping */
+.scroll-cue {
+  display: flex;
+  justify-content: center;
+  width: 18px;
+  height: 30px;
+  border: 1px solid var(--border-strong);
+  border-radius: 999px;
+}
+.scroll-cue-dot {
+  width: 3px;
+  height: 6px;
+  margin-top: 5px;
+  border-radius: 999px;
+  background: var(--signal);
+  animation: scroll-cue-drop 1.8s ease-in-out infinite;
+}
+@keyframes scroll-cue-drop {
+  0%   { transform: translateY(0); opacity: 1; }
+  70%  { transform: translateY(12px); opacity: 0.2; }
+  100% { transform: translateY(12px); opacity: 0; }
+}
+
+/* Live signals marquee — two identical tracks, seamless leftward loop */
+.signals-track { animation: signals-loop 28s linear infinite; }
+@keyframes signals-loop {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-100%); }
+}
+.signals-marquee:hover .signals-track { animation-play-state: paused; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-char, .hero-rise { animation: none; opacity: 1; transform: none; filter: none; }
+  .scroll-cue-dot { animation: none; }
+  .signals-track { animation: none; }
+  .signals-marquee { overflow-x: auto; }
+}

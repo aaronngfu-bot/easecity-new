@@ -62,7 +62,32 @@ function buildGlyphGrid(): boolean[][] {
 
 const GLYPH_GRID = buildGlyphGrid()
 
-export function BinaryField({ className = '' }: { className?: string }) {
+export function BinaryField({
+  className = '',
+  glyphCenterX = 0.5,
+  glyphCenterY = 0.5,
+  minCell = 7,
+  bgCell,
+  bgDensity = 1,
+  maxBg = Infinity,
+  maxMarkWidth = 0.78,
+}: {
+  className?: string
+  /** Horizontal anchor of the EC glyph as a fraction of canvas width (0.5 = centered). */
+  glyphCenterX?: number
+  /** Vertical anchor of the EC glyph as a fraction of canvas height (0.5 = centered). */
+  glyphCenterY?: number
+  /** Floor for the glyph cell size (raises stroke weight / spacing at big sizes). */
+  minCell?: number
+  /** Independent grid spacing for background particles (defaults to glyph cell). */
+  bgCell?: number
+  /** Multiplier on background particle density (0..1+). */
+  bgDensity?: number
+  /** Hard cap on background particle count (perf guard for full-bleed canvases). */
+  maxBg?: number
+  /** Max mark width as a fraction of canvas width (0.78 = near-full, hero uses ~0.45). */
+  maxMarkWidth?: number
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   useEffect(() => {
@@ -88,6 +113,8 @@ export function BinaryField({ className = '' }: { className?: string }) {
     let raf = 0
     let t = 0
     let cell = 14
+    let radiusPx = 140
+    let bgSpacingPx = 14
     type P = {
       bx: number; by: number; x: number; y: number
       vx: number; vy: number
@@ -120,14 +147,17 @@ export function BinaryField({ className = '' }: { className?: string }) {
 
     function rebuild() {
       // cell = glyph size in px, fit so the mark is ~66% of the smaller canvas
-      // dimension and never overflows the width; mark stays centered at any size.
-      const scale = Math.min((H * 0.66) / GLYPH_ROWS, (W * 0.78) / GLYPH_COLS)
-      cell = Math.max(7, scale)
+      // dimension and never exceeds maxMarkWidth of the width.
+      const scale = Math.min((H * 0.66) / GLYPH_ROWS, (W * maxMarkWidth) / GLYPH_COLS)
+      cell = Math.max(minCell, scale)
       const markW = GLYPH_COLS * cell
       const markH = GLYPH_ROWS * cell
-      // Mark is geometrically centered on the canvas at any size.
-      const x0 = (W - markW) / 2 + markW * 0.06
-      const y0 = (H - markH) / 2
+      // Glyph horizontal anchor is configurable (0.5 = centered; hero uses a
+      // right bias so the mark sits beside the text column).
+      const x0 = W * glyphCenterX - markW / 2 + markW * 0.06
+      const y0 = H * glyphCenterY - markH / 2
+      radiusPx = Math.max(90, cell * 10)
+      bgSpacingPx = bgCell ?? cell
 
       particles = []
 
@@ -153,14 +183,17 @@ export function BinaryField({ className = '' }: { className?: string }) {
       // background field — density falls off with distance from the glyph center
       const gcx = x0 + glyphCenterCol * cell
       const gcy = y0 + (GLYPH_ROWS / 2) * cell
-      const cols = Math.ceil(W / cell)
-      const rows = Math.ceil(H / cell)
+      const bgCellPx = bgSpacingPx
+      const cols = Math.ceil(W / bgCellPx)
+      const rows = Math.ceil(H / bgCellPx)
       const maxDist = Math.hypot(W, H) / 2
+      let bgCount = 0
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
-          const px = c * cell + cell / 2
-          const py = r * cell + cell / 2
-          // skip if inside the glyph block area (already handled)
+          if (bgCount >= maxBg) break
+          const px = c * bgCellPx + bgCellPx / 2
+          const py = r * bgCellPx + bgCellPx / 2
+          // skip if inside a glyph letter cell (letter particles own that space)
           const gx = (px - x0) / cell
           const gy = (py - y0) / cell
           if (gx >= -0.5 && gx < GLYPH_COLS + 0.5 && gy >= -0.5 && gy < GLYPH_ROWS + 0.5) {
@@ -169,8 +202,9 @@ export function BinaryField({ className = '' }: { className?: string }) {
             }
           }
           const dist = Math.hypot(px - gcx, py - gcy)
-          const density = Math.max(0.28, 0.8 * (1 - dist / maxDist))
+          const density = Math.max(0.28, 0.8 * (1 - dist / maxDist)) * bgDensity
           if (Math.random() > density) continue
+          bgCount++
           particles.push({
             bx: px, by: py, x: px, y: py, vx: 0, vy: 0,
             char: Math.random() > 0.5 ? '1' : '0',
@@ -211,8 +245,6 @@ export function BinaryField({ className = '' }: { className?: string }) {
       if (reduceMotion) drawStatic()
     }
 
-    const RADIUS = Math.max(90, cell * 10)
-
     function step() {
       t += 0.016
       const m = mouse
@@ -220,8 +252,8 @@ export function BinaryField({ className = '' }: { className?: string }) {
         const dx = p.x - m.x
         const dy = p.y - m.y
         const dist = Math.hypot(dx, dy)
-        if (m.active && dist < RADIUS && dist > 0.01) {
-          const force = 1 - dist / RADIUS
+        if (m.active && dist < radiusPx && dist > 0.01) {
+          const force = 1 - dist / radiusPx
           const ang = Math.atan2(dy, dx)
           p.vx += Math.cos(ang) * force * 1.7
           p.vy += Math.sin(ang) * force * 1.7
@@ -246,7 +278,7 @@ export function BinaryField({ className = '' }: { className?: string }) {
         const dx = p.x - mouse.x
         const dy = p.y - mouse.y
         const dist = Math.hypot(dx, dy)
-        const boost = mouse.active && dist < RADIUS ? 1 - dist / RADIUS : 0
+        const boost = mouse.active && dist < radiusPx ? 1 - dist / radiusPx : 0
         // Core glyph particles are drawn at constant full brightness so the logo
         // is always legible; only background particles flicker.
         const a = p.core
