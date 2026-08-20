@@ -47,11 +47,10 @@
         /* Text color to place ON a solid signal background (light: dark teal bg → white text) */
         --signal-ink: #ffffff;
 
-    /* Brand actions — muted ochre-gold so the warm accent blends with the
-       teal brand instead of clashing at full saturation */
-        --amber: #E8A33D;
-            --amber-ink: #1a1200;
-            --amber-soft: rgba(232, 163, 61, 0.14);
+    /* Brand actions — TEMP: light-blue swap (was muted ochre-gold) */
+        --amber: #0EA5E9;
+            --amber-ink: #082F49;
+            --amber-soft: rgba(14, 165, 233, 0.14);
             --bright-cyan: #00D4AA;
 
     /* Backgrounds — layered from deepest (void) to lightest (raised).
@@ -135,10 +134,10 @@
         /* Text color to place ON a solid signal background (dark: bright cyan bg → near-black text) */
         --signal-ink: #031312;
 
-    /* Brand actions — soft honey-gold on dark, gentler than pure amber */
-        --amber: #F2B544;
-            --amber-ink: #1a1200;
-            --amber-soft: rgba(242, 181, 68, 0.16);
+    /* Brand actions — TEMP: light-blue swap (was soft honey-gold) */
+        --amber: #38BDF8;
+            --amber-ink: #082F49;
+            --amber-soft: rgba(56, 189, 248, 0.16);
             --bright-cyan: #00D4AA;
 
     --bg-void: #07090d;
