@@ -4,6 +4,7 @@ import { redirect } from 'next/navigation'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { isAdmin } from '@/lib/permissions'
 import DashboardClient from './DashboardClient'
 
 export default async function DashboardPage() {
@@ -25,6 +26,7 @@ export default async function DashboardPage() {
   return (
     <DashboardClient
       userName={session.user.name ?? null}
+      isAdminUser={session.user.role ? isAdmin(session.user.role) : false}
       subscription={
         subscription
           ? {

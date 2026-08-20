@@ -5,7 +5,7 @@ import { BlogPageHeader } from '@/components/home/BlogPageHeader'
 
 // ISR — the list is static (BlogList + BlogPageHeader are client components
 // that localize on the client), so no per-request server render / DB query.
-export const revalidate = 60
+export const revalidate = 300
 
 export const metadata: Metadata = { title: 'Blog' }
 

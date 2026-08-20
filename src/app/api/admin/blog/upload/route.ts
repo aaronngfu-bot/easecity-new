@@ -4,11 +4,10 @@ import { authOptions } from '@/lib/auth'
 import { withErrorHandler, AuthError, ForbiddenError } from '@/lib/api-handler'
 import { apiSuccess, apiError } from '@/lib/api-response'
 import { isAdmin } from '@/lib/permissions'
-import { put } from '@vercel/blob'
 
 export const dynamic = 'force-dynamic'
 
-const MAX_SIZE = 5 * 1024 * 1024 // 5MB
+const MAX_SIZE = 2 * 1024 * 1024 // 2MB — keep the data URL within function body limits
 const ALLOWED = ['image/png', 'image/jpeg', 'image/webp', 'image/gif', 'image/avif']
 
 const uploadSchema = z.object({
@@ -19,17 +18,14 @@ const uploadSchema = z.object({
 })
 
 /**
- * Admin blog image upload → Vercel Blob. Returns the public URL to store
- * on the VlogPost.image column. Requires BLOB_READ_WRITE_TOKEN in env.
+ * Admin blog image upload — returns a self-contained data URL to store on the
+ * VlogPost.image column. Images live in the DB, so no external Blob token is
+ * needed.
  */
 export const POST = withErrorHandler(async (req) => {
   const session = await getServerSession(authOptions)
   if (!session?.user) throw new AuthError()
   if (!isAdmin(session.user.role)) throw new ForbiddenError()
-
-  if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return apiError('BLOB_NOT_CONFIGURED', 'Vercel Blob storage is not configured (missing BLOB_READ_WRITE_TOKEN)', 503)
-  }
 
   const body = await req.json()
   const { filename, contentType, data } = uploadSchema.parse(body)
@@ -42,13 +38,9 @@ export const POST = withErrorHandler(async (req) => {
   if (buf.length === 0) return apiError('EMPTY', 'Empty file', 400)
   if (buf.length > MAX_SIZE) return apiError('TOO_LARGE', 'Image exceeds 5MB limit', 400)
 
-  // sanitize filename, prefix under blog/
-  const safeName = filename.replace(/[^a-zA-Z0-9._-]/g, '-').toLowerCase()
-  const blob = await put(`blog/${Date.now()}-${safeName}`, buf, {
-    access: 'public',
-    contentType,
-    addRandomSuffix: false,
-  })
+  // Store the image as a self-contained data URL in the DB (VlogPost.image).
+  // No external object storage / token needed — works with the existing Neon DB.
+  const dataUrl = `data:${contentType};base64,${data}`
 
-  return apiSuccess({ url: blob.url }, 201)
+  return apiSuccess({ url: dataUrl }, 201)
 })

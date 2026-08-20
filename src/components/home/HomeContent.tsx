@@ -68,7 +68,6 @@ export function HomeContent() {
     <main className="relative min-h-screen">
       {/* Hero — left copy / right illustration on desktop */}
       <section className="relative overflow-hidden bg-[var(--bg-base)]">
-        <div aria-hidden className="absolute inset-0 bg-grid opacity-50" />
         <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_60%_50%_at_30%_20%,var(--signal-soft),transparent_70%)]" />
 
         <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-12 px-6 pb-20 pt-32 md:pt-40 lg:grid-cols-2 lg:gap-8">

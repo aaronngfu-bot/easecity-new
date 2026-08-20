@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // ISR — pages are pre-rendered from generateStaticParams so visits/prefetches
 // are served from the edge cache instead of a per-request server render.
-export const revalidate = 60
+export const revalidate = 300
 
 export default async function BlogDetailPage({ params }: Props) {
   const { slug } = await params

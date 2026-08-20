@@ -31,6 +31,7 @@ export interface SerializedOrder {
 
 interface Props {
   userName: string | null
+  isAdminUser?: boolean
   subscription: SerializedSubscription | null
   recentOrders: SerializedOrder[]
 }
@@ -415,7 +416,7 @@ function PaymentHistory({ orders, locale }: { orders: SerializedOrder[]; locale:
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
 
-export default function DashboardClient({ userName, subscription, recentOrders }: Props) {
+export default function DashboardClient({ userName, isAdminUser, subscription, recentOrders }: Props) {
   const { t, language } = useLanguage()
 
   const needsAlert = subscription && (
@@ -443,6 +444,15 @@ export default function DashboardClient({ userName, subscription, recentOrders }
             {subscription ? t.dashboard.subtitleActive : t.dashboard.subtitleInactive}
           </p>
         </div>
+        {isAdminUser && (
+          <Link
+            href="/admin"
+            className="inline-flex items-center gap-2 rounded-lg border border-[var(--signal)] bg-[var(--signal)] px-4 py-2.5 text-sm font-semibold text-[var(--signal-ink)] transition-colors hover:bg-[var(--signal-light)]"
+          >
+            {language === 'zh' ? '後台管理' : 'Admin Panel'}
+            <Settings size={15} />
+          </Link>
+        )}
       </div>
 
       {needsAlert && subscription && <AlertBanner subscription={subscription} />}
