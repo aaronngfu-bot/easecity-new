@@ -34,8 +34,8 @@ export const metadata: Metadata = {
     'EaseCity Technologies Limited is a Hong Kong technology firm building web services, system architecture, and AI solutions. We also ship EC-Share, Android device mirroring for teams.',
   icons: {
     icon: [
-      { url: '/images/easecity-favicon-white.png', type: 'image/png', sizes: '48x48', media: '(prefers-color-scheme: light)' },
-      { url: '/images/easecity-favicon-white-32.png', type: 'image/png', sizes: '32x32', media: '(prefers-color-scheme: dark)' },
+      { url: '/images/favicon-clean-48.png', type: 'image/png', sizes: '48x48', media: '(prefers-color-scheme: light)' },
+      { url: '/images/favicon-clean-32.png', type: 'image/png', sizes: '32x32', media: '(prefers-color-scheme: dark)' },
       { url: '/images/easecity-favicon.ico', sizes: 'any' },
     ],
     apple: '/images/easecity-apple-touch-icon.png',

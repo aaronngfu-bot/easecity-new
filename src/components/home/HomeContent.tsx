@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
 import { ArrowRight, ArrowUpRight, Code2, Globe, Palette, Lightbulb, Megaphone, Fingerprint, Cpu } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { RevealSection } from '@/components/ui/RevealSection'
@@ -16,66 +17,6 @@ const SERVICE_ICONS: Record<string, React.ElementType> = {
   consult: Lightbulb,
   ad: Megaphone,
   brand: Fingerprint,
-}
-
-/* Product card art — hand-drawn SVG (no image files). */
-function DeviceGridArt({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 320 220" className={className} fill="none" aria-hidden>
-      {/* backdrop */}
-      <rect x="8" y="8" width="304" height="204" rx="16" fill="var(--signal-soft)" opacity="0.6" />
-      {/* big monitor showing the mirrored phone grid */}
-      <rect x="36" y="36" width="176" height="120" rx="8" fill="var(--bg-surface)" stroke="var(--signal)" strokeWidth="2.5" />
-      <rect x="124" y="156" width="8" height="12" rx="3" fill="var(--signal)" stroke="var(--signal)" strokeWidth="1.5" />
-      <rect x="108" y="168" width="32" height="6" rx="3" fill="var(--signal)" stroke="var(--signal)" strokeWidth="1.5" />
-      {/* monitor screen: 2x2 phone grid being mirrored */}
-      <rect x="48" y="48" width="38" height="52" rx="5" fill="var(--bg-elevated)" stroke="var(--signal)" strokeOpacity="0.6" strokeWidth="1.5" />
-      <rect x="88" y="48" width="38" height="52" rx="5" fill="var(--bg-elevated)" stroke="var(--signal)" strokeOpacity="0.6" strokeWidth="1.5" />
-      <rect x="48" y="112" width="38" height="52" rx="5" fill="var(--bg-elevated)" stroke="var(--signal)" strokeOpacity="0.6" strokeWidth="1.5" />
-      <rect x="88" y="112" width="38" height="52" rx="5" fill="var(--bg-elevated)" stroke="var(--signal)" strokeOpacity="0.6" strokeWidth="1.5" />
-      <circle cx="59" cy="52" r="2" fill="var(--signal)" />
-      <circle cx="99" cy="52" r="2" fill="var(--signal)" />
-      <circle cx="59" cy="116" r="2" fill="var(--signal)" />
-      <circle cx="99" cy="116" r="2" fill="var(--signal)" />
-      <line x1="52" y1="62" x2="80" y2="62" stroke="var(--signal)" strokeOpacity="0.4" strokeWidth="3" strokeLinecap="round" />
-      <line x1="92" y1="62" x2="120" y2="62" stroke="var(--signal)" strokeOpacity="0.4" strokeWidth="3" strokeLinecap="round" />
-      {/* a phone in front, mirroring into the monitor */}
-      <rect x="226" y="60" width="78" height="150" rx="16" fill="var(--bg-surface)" stroke="var(--signal)" strokeWidth="2.5" />
-      <rect x="234" y="104" width="62" height="62" rx="8" fill="var(--bg-elevated)" stroke="var(--signal)" strokeOpacity="0.6" strokeWidth="1.5" />
-      <circle cx="258" cy="132" r="16" stroke="var(--signal)" strokeWidth="2" />
-      <line x1="246" y1="150" x2="270" y2="126" stroke="var(--signal)" strokeWidth="2.5" strokeLinecap="round" />
-      <rect x="252" y="176" width="26" height="4" rx="2" fill="var(--signal)" fillOpacity="0.5" />
-      {/* connection from phone to monitor */}
-      <path d="M226 110 Q 200 84 212 78" stroke="var(--signal)" strokeOpacity="0.5" strokeWidth="2" strokeDasharray="4 4" strokeLinecap="round" />
-    </svg>
-  )
-}
-
-function ConsoleArt({ className = '' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 320 220" className={className} fill="none" aria-hidden>
-      <rect x="8" y="8" width="304" height="204" rx="16" fill="var(--signal-soft)" opacity="0.55" />
-      {/* terminal */}
-      <rect x="52" y="24" width="216" height="172" rx="10" fill="var(--bg-raised)" stroke="var(--signal-soft)" strokeWidth="2.5" />
-      {/* title bar */}
-      <rect x="52" y="24" width="216" height="26" rx="10" fill="var(--signal)" fillOpacity="0.14" />
-      <circle cx="68" cy="37" r="3.5" fill="var(--signal)" />
-      <circle cx="82" cy="37" r="3.5" fill="var(--signal)" fillOpacity="0.5" />
-      <circle cx="96" cy="37" r="3.5" fill="var(--signal)" fillOpacity="0.3" />
-      <rect x="120" y="33" width="52" height="6" rx="3" fill="var(--signal)" fillOpacity="0.7" />
-      {/* prompt + code lines */}
-      <rect x="72" y="70" width="10" height="10" rx="2" fill="var(--signal)" opacity="0.9" />
-      <rect x="90" y="72" width="80" height="6" rx="3" fill="var(--signal)" fillOpacity="0.5" />
-      <rect x="90" y="86" width="120" height="6" rx="3" fill="var(--signal)" fillOpacity="0.25" />
-      <rect x="90" y="100" width="60" height="6" rx="3" fill="var(--signal)" fillOpacity="0.35" />
-      <rect x="72" y="124" width="8" height="8" rx="2" fill="var(--signal)" opacity="0.7" />
-      <rect x="88" y="126" width="96" height="6" rx="3" fill="var(--signal)" fillOpacity="0.4" />
-      <rect x="88" y="140" width="132" height="6" rx="3" fill="var(--signal)" fillOpacity="0.22" />
-      <rect x="88" y="154" width="70" height="6" rx="3" fill="var(--signal)" fillOpacity="0.3" />
-      {/* blinking cursor */}
-      <rect x="226" y="168" width="4" height="14" rx="2" fill="var(--signal)" opacity="0.9" />
-    </svg>
-  )
 }
 
 export interface HomeBlogPost {
@@ -173,20 +114,13 @@ export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
 
             <div className="mt-12 grid gap-6 lg:grid-cols-2">
               {/* EC-Share */}
-              <Link href="/ec-share" className="card group relative flex min-h-[260px] flex-col justify-end overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:min-h-[300px] md:p-10">
-                <DeviceGridArt className="pointer-events-none absolute right-0 top-0 h-full w-full object-cover opacity-25 transition-opacity duration-500 group-hover:opacity-35" />
+              <Link href="/ec-share" className="card group relative flex flex-col justify-end overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-9">
+                <Image src="/images/product-ecshare-clean.png" alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="pointer-events-none absolute right-0 top-0 h-full w-full object-cover object-right opacity-30 transition-opacity duration-500 group-hover:opacity-40" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[var(--bg-surface)] via-[var(--bg-surface)]/90 to-transparent" />
                 <div className="relative z-10">
-                  <div className="mb-3 flex items-center gap-3 text-left">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)]">
-                      <svg className="h-5 w-5 text-[var(--signal)]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2" />
-                      </svg>
-                    </div>
-                    <div className="text-left">
-                      <p className="label-mono">{c.product01Label}</p>
-                      <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.product01Name}</h3>
-                    </div>
+                  <div className="mb-3 text-left">
+                    <p className="label-mono">{c.product01Label}</p>
+                    <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.product01Name}</h3>
                   </div>
                   <p className="max-w-md text-left leading-relaxed text-[var(--text-secondary)]">
                     {c.product01Desc}
@@ -196,7 +130,7 @@ export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
                     <span className="badge">Android</span>
                     <span className="badge">14-day trial</span>
                   </div>
-                  <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
+                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
                     {t.product.pricing.cta}
                     <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                   </span>
@@ -204,18 +138,13 @@ export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
               </Link>
 
               {/* Custom Development */}
-              <Link href="/services" className="card group relative flex min-h-[260px] flex-col justify-end overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:min-h-[300px] md:p-10">
-                <ConsoleArt className="pointer-events-none absolute right-0 top-0 h-full w-full object-cover opacity-25 transition-opacity duration-500 group-hover:opacity-35" />
+              <Link href="/services" className="card group relative flex flex-col justify-end overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-9">
+                <Image src="/images/product-devtool-clean.png" alt="" fill sizes="(max-width: 768px) 100vw, 50vw" className="pointer-events-none absolute right-0 top-0 h-full w-full object-cover object-right opacity-30 transition-opacity duration-500 group-hover:opacity-40" />
                 <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-[var(--bg-surface)] via-[var(--bg-surface)]/90 to-transparent" />
                 <div className="relative z-10">
-                  <div className="mb-3 flex items-center gap-3 text-left">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[var(--signal-soft)]">
-                      <Code2 className="h-5 w-5 text-[var(--signal)]" />
-                    </div>
-                    <div className="text-left">
-                      <p className="label-mono">{c.servicesLabel}</p>
-                      <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.servicesName}</h3>
-                    </div>
+                  <div className="mb-3 text-left">
+                    <p className="label-mono">{c.servicesLabel}</p>
+                    <h3 className="font-display text-xl font-bold text-[var(--text-primary)]">{c.servicesName}</h3>
                   </div>
                   <p className="max-w-md text-left leading-relaxed text-[var(--text-secondary)]">
                     {c.servicesDesc}
@@ -225,7 +154,7 @@ export function HomeContent({ blogPosts }: { blogPosts: HomeBlogPost[] }) {
                     <span className="badge">Desktop</span>
                     <span className="badge">Design</span>
                   </div>
-                  <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
+                  <span className="mt-5 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)]">
                     {c.servicesCta}
                     <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                   </span>

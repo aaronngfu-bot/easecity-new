@@ -40,10 +40,10 @@
     --ring: 173 100% 34%;
 
     /* Brand signal — same teal in both modes */
-        --signal: #008f82;
-        --signal-light: #00a896;
-        --signal-bright: #00e5cc;
-        --signal-soft: rgba(0, 143, 130, 0.08);
+        --signal: #007a6f;
+            --signal-light: #009688;
+            --signal-bright: #00b3a6;
+            --signal-soft: rgba(0, 122, 111, 0.10);
         /* Text color to place ON a solid signal background (light: dark teal bg → white text) */
         --signal-ink: #ffffff;
 
