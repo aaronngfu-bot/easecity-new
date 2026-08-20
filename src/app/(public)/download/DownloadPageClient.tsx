@@ -22,7 +22,6 @@ export function DownloadPageClient({
       <PageHero
         serial="02"
         sectionCode="DOWNLOAD"
-        eyebrow={copy.heroEyebrow}
         heading={copy.heroHeading}
         headingHighlight={copy.heroHighlight}
         description={copy.heroDesc}
@@ -39,7 +38,7 @@ export function DownloadPageClient({
         ]}
       />
 
-      <section className="section-padding">
+      <section className="pt-4 pb-14 md:pb-16">
         <div className="container-max">
           <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
             <div className="glass-prominent overflow-hidden p-6 md:p-8">
