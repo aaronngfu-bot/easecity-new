@@ -241,6 +241,32 @@ export function DownloadPageClient({
           </div>
         </div>
       </section>
+
+      {/* Transparent pricing — shown on the download page */}
+      <section className="section-padding border-t border-border ">
+        <div className="container-max">
+          <div className="glass-panel p-6 md:p-10">
+            <p className="label-mono mb-3 text-[var(--signal)]">
+              {t.pricingPage.badge}
+            </p>
+            <h2 className="font-display text-2xl font-bold text-[var(--text-primary)] md:text-3xl">
+              {t.pricingPage.heading1}{' '}
+              <span className="text-[var(--signal)]">{t.pricingPage.headingHighlight}</span>
+            </h2>
+            <p className="mt-4 max-w-2xl text-[var(--text-secondary)] leading-relaxed">
+              {t.pricingPage.desc}
+            </p>
+            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-2 text-sm text-[var(--text-muted)]">
+              {[t.pricingPage.benefit1, t.pricingPage.benefit2, t.pricingPage.benefit3].map((item) => (
+                <div key={item} className="flex items-center gap-2">
+                  <span className="h-1.5 w-1.5 rounded-full bg-[var(--signal)]" />
+                  <span className="font-mono text-[12px] tracking-wide">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
     </>
   )
 }

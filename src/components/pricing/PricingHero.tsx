@@ -19,13 +19,6 @@ export function PricingHero() {
 
       <div className="container-max relative z-10">
         <div className="mx-auto max-w-3xl text-center">
-          <div className="mb-8 flex items-center justify-center gap-3">
-            <span className="badge">
-              <span className="h-1 w-1 rounded-full bg-[var(--signal)]" />
-              {t.pricingPage.badge}
-            </span>
-          </div>
-
           <h1 className="mb-7 font-display text-4xl font-bold leading-tight tracking-tight md:text-6xl">
             <span className="text-[var(--text-primary)]">{t.pricingPage.heading1}</span>
             <br />
