@@ -145,18 +145,21 @@ export function ImmersionHero() {
           </div>
         </div>
 
-        {/* Scroll cue — points into the first content section */}
+        {/* Scroll cue — points into the first content section.
+            Centering lives on this anchor; the entrance animation lives on the
+            inner span so its transform never clobbers -translate-x-1/2. */}
         <a
           href="#latest"
           aria-label={c.heroScroll}
-          className="hero-rise absolute bottom-7 left-1/2 z-10 flex -translate-x-1/2 flex-col items-center gap-2 text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]"
-          style={{ animationDelay: '1.9s' }}
+          className="hero-scroll-cue-wrap absolute bottom-7 left-1/2 z-10 -translate-x-1/2 px-6 py-2 text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]"
         >
-          <span className="label-mono">{c.heroScroll}</span>
-          <span className="scroll-cue" aria-hidden>
-            <span className="scroll-cue-dot" />
+          <span className="hero-rise flex flex-col items-center gap-2" style={{ animationDelay: '1.9s' }}>
+            <span className="label-mono">{c.heroScroll}</span>
+            <span className="scroll-cue" aria-hidden>
+              <span className="scroll-cue-dot" />
+            </span>
+            <ChevronDown size={13} className="opacity-60" />
           </span>
-          <ChevronDown size={13} className="opacity-60" />
         </a>
     </section>
   )

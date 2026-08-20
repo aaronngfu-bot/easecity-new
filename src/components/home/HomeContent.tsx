@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { RevealSection } from '@/components/ui/RevealSection'
+import { RevealSection, RevealItem } from '@/components/ui/RevealSection'
 import SectionHeading from '@/components/SectionHeading'
 import { ImmersionHero } from '@/components/home/ImmersionHero'
 import { BlogTimeline } from '@/components/home/BlogTimeline'
@@ -116,10 +116,11 @@ export function HomeContent() {
       </RevealSection>
 
       {/* Products — narrative beside the living device-farm illustration */}
-      <RevealSection variant="left">
+      <RevealSection variant="fade">
         <section className="section-padding">
           <div className="container-max">
             <div className="grid items-center gap-12 lg:grid-cols-[2fr_3fr]">
+              <RevealItem>
               <div className="text-left">
                 <span className="label-mono text-[var(--signal)]">{c.productsBadge}</span>
                 <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-4xl">
@@ -145,18 +146,21 @@ export function HomeContent() {
                   <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
                 </a>
               </div>
+              </RevealItem>
 
+              <RevealItem variant="scale" delay={0.15}>
               <div className="relative">
                 <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_60%_at_50%_45%,var(--signal-soft),transparent_75%)]" />
                 <HeroIllustration showFeatures={false} />
               </div>
+              </RevealItem>
             </div>
           </div>
         </section>
       </RevealSection>
 
       {/* Services — one card language, bento weights */}
-      <RevealSection>
+      <RevealSection variant="fade">
         <section className="section-padding section-bridge bg-[var(--bg-surface)]">
           <div className="container-max">
             <SectionHeading
@@ -168,9 +172,10 @@ export function HomeContent() {
 
             <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-6">
               {/* Dominant card — system development */}
+              <RevealItem className="h-full lg:col-span-4 lg:row-span-2">
               <Link
                 href={`/services/${featA.slug}`}
-                className="card group relative flex flex-col justify-between overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-8 lg:col-span-4 lg:row-span-2"
+                className="card group relative flex h-full flex-col justify-between overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-8"
               >
                 <div aria-hidden className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[var(--signal-soft)] opacity-0 blur-2xl transition-opacity group-hover:opacity-100" />
                 <div className="flex items-start justify-between">
@@ -199,11 +204,13 @@ export function HomeContent() {
                   ))}
                 </div>
               </Link>
+              </RevealItem>
 
               {/* Secondary dominant — web platforms */}
+              <RevealItem delay={0.1} className="h-full lg:col-span-2 lg:row-span-2">
               <Link
                 href={`/services/${featB.slug}`}
-                className="card group relative flex flex-col justify-between overflow-hidden p-6 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] lg:col-span-2 lg:row-span-2"
+                className="card group relative flex h-full flex-col justify-between overflow-hidden p-6 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
               >
                 <div className="flex items-start justify-between">
                   <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
@@ -223,13 +230,14 @@ export function HomeContent() {
                   ))}
                 </div>
               </Link>
+              </RevealItem>
 
               {/* Same card language, compact weight */}
-              {restServices.map((s) => (
+              {restServices.map((s, i) => (
+                <RevealItem key={s.slug} delay={0.08 * i} className="h-full lg:col-span-2">
                 <Link
-                  key={s.slug}
                   href={`/services/${s.slug}`}
-                  className="card group relative flex flex-col justify-between overflow-hidden p-6 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] lg:col-span-2"
+                  className="card group relative flex h-full flex-col justify-between overflow-hidden p-6 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
@@ -249,12 +257,14 @@ export function HomeContent() {
                     ))}
                   </div>
                 </Link>
+                </RevealItem>
               ))}
 
               {/* CTA tile completes the bento's last row */}
+              <RevealItem delay={0.2} className="lg:col-span-4">
               <Link
                 href="/services"
-                className="group flex min-h-[12rem] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-[var(--border-strong)] p-6 text-center transition-colors hover:border-[var(--signal)] hover:bg-[var(--signal-soft)] lg:col-span-4"
+                className="group flex h-full min-h-[12rem] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-[var(--border-strong)] p-6 text-center transition-colors hover:border-[var(--signal)] hover:bg-[var(--signal-soft)]"
               >
                 <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border-strong)] text-[var(--text-secondary)] transition-all group-hover:border-[var(--signal)] group-hover:text-[var(--signal)]">
                   <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
@@ -263,13 +273,14 @@ export function HomeContent() {
                   {c.servicesCta}
                 </span>
               </Link>
+              </RevealItem>
             </div>
           </div>
         </section>
       </RevealSection>
 
       {/* Process — connected four-step timeline */}
-      <RevealSection variant="right">
+      <RevealSection variant="fade">
         <section className="section-padding bg-[var(--bg-surface)]">
           <div className="container-max">
             <SectionHeading
@@ -286,8 +297,9 @@ export function HomeContent() {
                 { n: '02', t: c.processS2Title, time: c.processS2Time, d: c.processS2Desc },
                 { n: '03', t: c.processS3Title, time: c.processS3Time, d: c.processS3Desc },
                 { n: '04', t: c.processS4Title, time: c.processS4Time, d: c.processS4Desc },
-              ].map((s) => (
-                <div key={s.n} className="group relative">
+              ].map((s, i) => (
+                <RevealItem key={s.n} delay={0.12 * i} className="h-full">
+                <div className="group relative h-full">
                   <div className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full border border-[var(--signal)] bg-[var(--bg-surface)] font-mono text-sm font-semibold text-[var(--signal)] transition-shadow group-hover:shadow-[0_0_0_6px_var(--signal-soft)]">
                     {s.n}
                   </div>
@@ -295,6 +307,7 @@ export function HomeContent() {
                   <h3 className="mt-1 font-display text-lg font-semibold text-[var(--text-primary)]">{s.t}</h3>
                   <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{s.d}</p>
                 </div>
+                </RevealItem>
               ))}
             </div>
           </div>
@@ -302,7 +315,7 @@ export function HomeContent() {
       </RevealSection>
 
       {/* Case studies — asymmetric proof duo */}
-      <RevealSection variant="scale">
+      <RevealSection variant="fade">
         <section className="section-padding section-bridge">
           <div className="container-max">
             <SectionHeading
@@ -313,7 +326,8 @@ export function HomeContent() {
             />
 
             <div className="mt-12 grid gap-6 lg:grid-cols-5">
-              <div className="card relative flex flex-col overflow-hidden p-8 lg:col-span-3">
+              <RevealItem className="h-full lg:col-span-3">
+              <div className="card relative flex h-full flex-col overflow-hidden p-8">
                 <div aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--signal)] to-transparent" />
                 <span className="label-mono text-[var(--signal)]">{c.caseC1Title}</span>
                 <h3 className="mt-3 font-display text-2xl font-bold leading-snug text-[var(--text-primary)]">
@@ -325,8 +339,10 @@ export function HomeContent() {
                   {c.caseC1Res}
                 </p>
               </div>
+              </RevealItem>
 
-              <div className="card flex flex-col p-8 lg:col-span-2">
+              <RevealItem delay={0.15} className="h-full lg:col-span-2">
+              <div className="card flex h-full flex-col p-8">
                 <span className="label-mono text-[var(--signal)]">{c.caseC2Title}</span>
                 <h3 className="mt-3 font-display text-xl font-bold leading-snug text-[var(--text-primary)]">
                   {c.caseC2Head}
@@ -336,13 +352,14 @@ export function HomeContent() {
                   {c.caseC2Res}
                 </p>
               </div>
+              </RevealItem>
             </div>
           </div>
         </section>
       </RevealSection>
 
       {/* Testimonials — breathing wall of ten quotes */}
-      <RevealSection>
+      <RevealSection variant="fade">
         <section className="section-padding bg-[var(--bg-surface)]">
           <div className="container-max">
             <SectionHeading
@@ -356,8 +373,8 @@ export function HomeContent() {
               {tCols.map((col, ci) => (
                 <div key={ci} className="t-col">
                   {col.map((tm, i) => (
+                    <RevealItem key={tm.n} delay={(ci * 3 + i) * 0.07}>
                     <figure
-                      key={tm.n}
                       className={`t-card card relative flex flex-col p-6 transition-colors hover:border-[var(--signal)] ${ci === 1 ? 'card-elevated' : ''}`}
                       style={{ animationDelay: `${(ci * 3 + i) * 0.55}s`, animationDuration: `${6.5 + ((ci + i) % 3)}s` }}
                     >
@@ -375,6 +392,7 @@ export function HomeContent() {
                         <p className="label-mono mt-0.5 text-[var(--text-muted)]">{tm.r}</p>
                       </figcaption>
                     </figure>
+                    </RevealItem>
                   ))}
                 </div>
               ))}

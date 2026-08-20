@@ -103,9 +103,10 @@ export function CityField({ className = '' }: { className?: string }) {
       parts = []
       const rand = mulberry32(20260820)
       const small = W < 640
-      const COLS = small ? 64 : 110
-      const ROWS = small ? 34 : 44
-      cell = Math.max(4, Math.min((W * 0.94) / COLS, (H * 0.52) / ROWS))
+      // Dense, tall, narrow towers — a Hong Kong skyline, not a suburb.
+      const COLS = small ? 76 : 132
+      const ROWS = small ? 40 : 50
+      cell = Math.max(4, Math.min((W * 0.96) / COLS, (H * 0.55) / ROWS))
       radiusPx = Math.max(90, cell * 12)
       const x0 = (W - COLS * cell) / 2
       const ground = H - Math.max(12, H * 0.045)
@@ -113,11 +114,11 @@ export function CityField({ className = '' }: { className?: string }) {
       const X = (c: number) => x0 + c * cell + cell / 2
 
       // ── back towers: dim silhouettes for depth ──
-      const backCount = small ? 4 : 7
+      const backCount = small ? 5 : 9
       for (let i = 0; i < backCount; i++) {
-        const w = 6 + Math.floor(rand() * 6)
+        const w = 5 + Math.floor(rand() * 6)
         const c0 = Math.floor(rand() * (COLS - w))
-        const h = Math.min(ROWS - 6, 16 + Math.floor(rand() * 20))
+        const h = Math.min(ROWS - 5, 20 + Math.floor(rand() * 24))
         const top = ROWS - 1 - h
         for (let cc = c0; cc < c0 + w; cc++) {
           push({ kind: 'outline', x: X(cc), y: yOf(top), role: 0, bright: 0.26, ch: rand() > 0.5 ? '1' : '0' })
@@ -131,12 +132,12 @@ export function CityField({ className = '' }: { className?: string }) {
       // ── front buildings: bright digit outlines + amber windows ──
       let c = 1
       while (c < COLS - 4) {
-        const w = 5 + Math.floor(rand() * 8)
+        const w = 4 + Math.floor(rand() * 7)
         if (c + w > COLS - 1) break
         const leftness = c / COLS
         // keep the copy column (left ~45%) calmer: shorter towers there
-        const maxH = leftness < 0.45 ? (small ? 16 : 20) : ROWS - 12
-        const h = Math.min(ROWS - 8, 9 + Math.floor(rand() * (maxH - 9)))
+        const maxH = leftness < 0.45 ? (small ? 18 : 26) : ROWS - 8
+        const h = Math.min(ROWS - 6, 10 + Math.floor(rand() * (maxH - 10)))
         const top = ROWS - 1 - h
 
         for (let cc = c; cc < c + w; cc++) {
@@ -165,7 +166,7 @@ export function CityField({ className = '' }: { className?: string }) {
         }
 
         // antenna + blinking beacon
-        if (h > 16 && rand() < 0.5) {
+        if (h > 14 && rand() < 0.6) {
           const ac = c + Math.floor(w / 2)
           const ah = 2 + Math.floor(rand() * 3)
           const at = top - ah
@@ -177,18 +178,17 @@ export function CityField({ className = '' }: { className?: string }) {
           }
         }
 
-        // amber windows — sparse grid inside the tower
+        // amber windows — dense grid inside the tower (HK towers glow)
         for (let rr = top + 2; rr < ROWS - 1; rr += 2) {
           for (let cc = c + 1; cc <= c + w - 2; cc += 2) {
-            if (rand() < 0.5) {
+            if (rand() < 0.58) {
               push({ kind: 'window', x: X(cc), y: yOf(rr), role: 2, bright: 0.45 + rand() * 0.5, speed: 0.35 + rand() * 0.7 })
             }
           }
         }
 
-        const gap = rand() < 0.3 ? 1 + Math.floor(rand() * 2) : 0
-        c += w + gap
-        if (gap === 0) c += rand() < 0.4 ? 1 : 0
+        // tight gaps — towers nearly touch, like a real HK street wall
+        c += w + (rand() < 0.25 ? 1 : 0)
       }
 
       // ── ground line ──
@@ -201,14 +201,14 @@ export function CityField({ className = '' }: { className?: string }) {
       const cols = Math.ceil(W / bgCell)
       const rows = Math.ceil(H / bgCell)
       let bgCount = 0
-      const maxBg = small ? 160 : 320
+      const maxBg = small ? 200 : 420
       for (let r = 0; r < rows; r++) {
         for (let cc = 0; cc < cols; cc++) {
           if (bgCount >= maxBg) break
           const px = cc * bgCell + bgCell / 2
           const py = r * bgCell + bgCell / 2
           const skyBias = 1 - (py / H) * 0.85
-          if (Math.random() > 0.4 * skyBias) continue
+          if (Math.random() > 0.5 * skyBias) continue
           bgCount++
           push({
             kind: 'bg', x: px, y: py,

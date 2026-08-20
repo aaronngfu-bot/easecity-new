@@ -801,7 +801,11 @@
   animation: hero-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Scroll cue — a dot falling inside a pill, looping */
+/* Scroll cue — a dot falling inside a pill, looping. The soft radial bg
+   keeps it legible when the city skyline rises behind it. */
+.hero-scroll-cue-wrap {
+  background: radial-gradient(ellipse 90px 46px at 50% 60%, var(--bg-base) 30%, transparent 75%);
+}
 .scroll-cue {
   display: flex;
   justify-content: center;
@@ -836,6 +840,7 @@
 .reveal[data-reveal='left']  { transform: translateX(-34px); }
 .reveal[data-reveal='right'] { transform: translateX(34px); }
 .reveal[data-reveal='scale'] { transform: scale(0.94); }
+.reveal[data-reveal='fade']  { transform: none; }
 .reveal.is-visible {
   opacity: 1;
   transform: none;
