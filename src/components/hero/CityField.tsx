@@ -23,7 +23,7 @@ type P = {
   bright: number
   phase: number
   speed: number
-  warm: boolean // amber vs teal
+  white: boolean // white vs teal
 }
 
 /**
@@ -64,6 +64,7 @@ export function CityField({ className = '' }: { className?: string }) {
     let goldLight: [number, number, number] = [250, 214, 140]
     let teal: [number, number, number] = [0, 143, 130]
     let tealLight: [number, number, number] = [0, 229, 204]
+    let white: [number, number, number] = [245, 248, 248]
 
     const mouse = { x: -99999, y: -99999, active: false }
 
@@ -89,17 +90,19 @@ export function CityField({ className = '' }: { className?: string }) {
       const am = cs.getPropertyValue('--amber').trim()
       const sl = cs.getPropertyValue('--signal-light').trim()
       const s = cs.getPropertyValue('--signal').trim()
+      const tp = cs.getPropertyValue('--text-primary').trim()
       if (am) {
         gold = hexToRgb(am)
-        // lighter tint of the gold for bright outlines
+        // lighter tint of the accent for bright outlines (blend toward white)
         goldLight = [
-          Math.min(255, gold[0] + 40),
-          Math.min(255, gold[1] + 50),
-          Math.min(255, gold[2] + 70),
+          Math.round(gold[0] + (255 - gold[0]) * 0.35),
+          Math.round(gold[1] + (255 - gold[1]) * 0.35),
+          Math.round(gold[2] + (255 - gold[2]) * 0.35),
         ]
       }
       if (sl) tealLight = hexToRgb(sl)
       if (s) teal = hexToRgb(s)
+      if (tp) white = hexToRgb(tp)
     }
 
     const rgba = (c: [number, number, number], a: number) =>
@@ -179,7 +182,7 @@ export function CityField({ className = '' }: { className?: string }) {
         // dense window grid inside
         for (let i = 1; i < w - 1; i++) {
           for (let rr = roof[i] + 1; rr < ROWS - 1; rr++) {
-            if (rand() < 0.9) d(bit(), X(c + i), yOf(rr), gold, 0.4 + rand() * 0.5)
+            if (rand() < 0.97) d(bit(), X(c + i), yOf(rr), gold, 0.5 + rand() * 0.4)
           }
         }
         c += w
@@ -248,7 +251,7 @@ export function CityField({ className = '' }: { className?: string }) {
         }
         for (let i = 1; i < w - 1; i++) {
           for (let rr = top + 3; rr < ROWS - 1; rr++) {
-            if (rand() < 0.75) d(bit(), X(cI + i), yOf(rr), gold, 0.4 + rand() * 0.5)
+            if (rand() < 0.9) d(bit(), X(cI + i), yOf(rr), gold, 0.5 + rand() * 0.4)
           }
         }
       }
@@ -266,7 +269,7 @@ export function CityField({ className = '' }: { className?: string }) {
         }
         for (let i = 1; i < w - 1; i++) {
           for (let rr = top + 1; rr < ROWS - 1; rr++) {
-            if (rand() < 0.6) d(bit(), X(cP + i), yOf(rr), gold, 0.4 + rand() * 0.4)
+            if (rand() < 0.85) d(bit(), X(cP + i), yOf(rr), gold, 0.5 + rand() * 0.4)
           }
         }
         for (let k = 1; k <= 3; k++) {
@@ -277,7 +280,7 @@ export function CityField({ className = '' }: { className?: string }) {
         beacons.push({
           bx: 0, by: 0, b0x: 0, b0y: 0, fa: 0, fs: 0, fph: 0, vx: 0, vy: 0,
           x: X(cP + 3), y: yOf(top - 7), ch: '1', bright: 0.9,
-          phase: rand() * 6, speed: 1.8, warm: true,
+          phase: rand() * 6, speed: 1.8, white: true,
         })
       }
 
@@ -327,15 +330,16 @@ export function CityField({ className = '' }: { className?: string }) {
           const skyBias = 1 - (py / (H * 0.55)) * 0.8
           if (rand() > 0.55 * skyBias) continue
           count++
+          const isWhite = rand() < 0.45
           sky.push({
             bx: px, by: py, b0x: px, b0y: py,
             fa: 10 + rand() * 22, fs: 0.1 + rand() * 0.25, fph: rand() * Math.PI * 2,
             vx: 0, vy: 0, x: px, y: py,
             ch: rand() > 0.5 ? '1' : '0',
-            bright: 0.2 + rand() * 0.35,
+            bright: isWhite ? 0.62 + rand() * 0.28 : 0.25 + rand() * 0.3,
             phase: rand() * Math.PI * 2,
             speed: 0.5 + rand() * 1.2,
-            warm: rand() < 0.25,
+            white: isWhite,
           })
         }
       }
@@ -389,7 +393,7 @@ export function CityField({ className = '' }: { className?: string }) {
       ctx.textBaseline = 'middle'
       ctx.font = `${cell * 0.92}px "JetBrains Mono", "Courier New", monospace`
       for (const p of sky) {
-        const col = p.warm ? gold : teal
+        const col = p.white ? white : teal
         ctx.fillStyle = rgba(col, p.bright)
         ctx.fillText(p.ch, p.x, p.y)
       }
@@ -433,8 +437,10 @@ export function CityField({ className = '' }: { className?: string }) {
       ctx.font = `${cell * 0.92}px "JetBrains Mono", "Courier New", monospace`
       // sky digits
       for (const p of sky) {
-        const col = p.warm ? gold : teal
-        const a = Math.min(1, p.bright * (0.55 + Math.sin(t * p.speed + p.phase) * 0.4))
+        const col = p.white ? white : teal
+        const a = p.white
+          ? Math.min(1, 0.82 + 0.12 * Math.sin(t * p.speed * 0.7 + p.phase))
+          : Math.min(1, p.bright * (0.55 + Math.sin(t * p.speed + p.phase) * 0.4))
         const dx = p.x - mouse.x
         const dy = p.y - mouse.y
         const dist = Math.hypot(dx, dy)
