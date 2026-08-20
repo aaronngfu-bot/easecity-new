@@ -4,6 +4,7 @@ import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { SkyField } from '@/components/hero/SkyField'
 
 /**
  * ImmersionHero — full-viewport first screen.
@@ -86,8 +87,9 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
     <section className="relative flex min-h-[100svh] flex-col overflow-hidden bg-[var(--bg-base)]">
         {/* Full-bleed binary city (reference art, recolored to brand teal) */}
         <div aria-hidden className="absolute inset-0">
-          <img src="/images/hero-city-light.png" alt="" className="h-full w-full object-cover object-center dark:hidden" />
-          <img src="/images/hero-city-dark.png" alt="" className="hidden h-full w-full object-cover object-center dark:block" />
+          <img src="/images/hero-city-light.png" alt="" className="absolute inset-0 h-full w-full object-cover object-center dark:hidden" />
+          <img src="/images/hero-city-dark.png" alt="" className="absolute inset-0 h-full w-full object-cover object-center hidden dark:block" />
+          <SkyField className="absolute inset-0 h-full w-full" />
         </div>
 
         {/* Legibility scrim behind the copy column */}
@@ -99,8 +101,8 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
         <div aria-hidden className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[var(--bg-base)] to-transparent" />
 
         {/* Copy */}
-        <div className="container-max relative z-10 flex flex-1 items-center pt-28 md:pt-32">
-          <div className="max-w-2xl pb-24 text-left lg:-mt-24">
+        <div className="container-max relative z-10 flex flex-1 items-start pt-32 md:pt-40">
+          <div className="max-w-2xl pb-24 text-left">
             <p className="hero-rise label-mono mb-7 flex items-center gap-2.5 text-[var(--signal)]" style={{ animationDelay: '0.15s' }}>
               <span className="relative flex h-2 w-2">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--amber)] opacity-60" />
