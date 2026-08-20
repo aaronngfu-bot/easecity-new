@@ -830,20 +830,15 @@
 
 /* Live signals marquee removed 2026-08-20 — replaced by section transitions */
 
-/* Scroll reveal (RevealSection) — content is visible without JS; JS only
-   flips .is-visible for the entrance transition. */
-.reveal {
-  opacity: 0;
-  transform: translateY(26px);
-  transition: opacity 1.15s cubic-bezier(0.16, 1, 0.3, 1), transform 1.15s cubic-bezier(0.16, 1, 0.3, 1);
-}
-.reveal[data-reveal='left']  { transform: translateX(-34px); }
-.reveal[data-reveal='right'] { transform: translateX(34px); }
-.reveal[data-reveal='scale'] { transform: scale(0.94); }
-.reveal[data-reveal='fade']  { transform: none; }
-.reveal.is-visible {
-  opacity: 1;
-  transform: none;
+/* Scroll reveal — JS-scrubbed (RevealSection/RevealItem set inline
+   opacity/transform from scroll progress). CSS only guards reduced-motion
+   and no-JS: content must never be stuck hidden. */
+@media (prefers-reduced-motion: reduce) {
+  .reveal, [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }
 
 /* Testimonial wall — three staggered columns; cards breathe gently at
