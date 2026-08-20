@@ -283,6 +283,38 @@ export function HomeContent() {
           </div>
         </section>
       </RevealSection>
+
+      {/* Case studies — proof of work (no people/avatars) */}
+      <RevealSection>
+        <section className="section-padding">
+          <div className="container-max">
+            <SectionHeading
+              badge={c.caseBadge}
+              align="center"
+              title={c.caseTitle}
+              subtitle={c.caseSubtitle}
+            />
+
+            <div className="mt-12 grid gap-8 md:grid-cols-2 lg:grid-cols-[2fr_3fr]">
+              {[
+                { t: c.caseC1Title, head: c.caseC1Head, d: c.caseC1Desc, res: c.caseC1Res },
+                { t: c.caseC2Title, head: c.caseC2Head, d: c.caseC2Desc, res: c.caseC2Res },
+              ].map((cs) => (
+                <div key={cs.t} className="card flex flex-col p-7">
+                  <span className="label-mono text-[var(--signal)]">{cs.t}</span>
+                  <h3 className="mt-2 font-display text-xl font-bold leading-snug text-[var(--text-primary)]">
+                    {cs.head}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{cs.d}</p>
+                  <p className="mt-auto border-t border-[var(--border-color)] pt-4 text-sm font-semibold text-[var(--signal)]">
+                    {cs.res}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </RevealSection>
     </main>
   )
 }
