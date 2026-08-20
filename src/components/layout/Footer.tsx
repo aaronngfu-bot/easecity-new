@@ -6,24 +6,27 @@ import { BrandMark } from '@/components/brand/BrandMark'
 
 export function Footer() {
   const { t } = useLanguage()
+  const f = t.footer
 
+  // Four columns: Brand / Services / Company / Legal. Service links resolve to
+  // their real detail routes; contact routes stay on the shared contact block.
   const footerLinks = {
-    [t.footer.groupCompany]: [
-      { label: t.footer.linkHome, href: '/' },
-      { label: t.footer.linkAbout, href: '/about' },
-      { label: t.footer.linkServices, href: '/services' },
-      { label: t.footer.linkContact, href: '/about#contact' },
+    [f.groupServices]: [
+      { label: f.linkStream, href: '/services/system-development' },
+      { label: f.linkRemote, href: '/services/web-platforms' },
+      { label: f.linkAI, href: '/services/ui-ux-design' },
+      { label: f.linkOnline, href: '/services/advertising' },
     ],
-    [t.footer.groupServices]: [
-      { label: t.footer.linkStream, href: '/services' },
-      { label: t.footer.linkRemote, href: '/services' },
-      { label: t.footer.linkAI, href: '/services' },
-      { label: t.footer.linkOnline, href: '/services' },
+    [f.groupCompany]: [
+      { label: f.linkHome, href: '/' },
+      { label: f.linkAbout, href: '/about' },
+      { label: f.linkBlog, href: '/blog' },
+      { label: f.linkContact, href: '/about#contact' },
     ],
-    [t.footer.groupConnect]: [
-      { label: t.footer.linkTouch, href: '/about#contact' },
-      { label: t.footer.linkPartner, href: '/about#contact' },
-      { label: t.footer.linkEnterprise, href: '/about#contact' },
+    [f.groupLegal]: [
+      { label: f.linkPrivacy, href: '/legal/privacy' },
+      { label: f.linkTerms, href: '/legal/terms' },
+      { label: f.linkTouch, href: '/about#contact' },
     ],
   }
 
@@ -31,8 +34,8 @@ export function Footer() {
     <footer className="relative overflow-hidden border-t border-border bg-bg-void">
       <div className="absolute inset-0 control-grid opacity-20" />
       <div className="container-max relative z-10 pb-8 pt-16">
-        <div className="mb-12 grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-5">
-          <div className="lg:col-span-2">
+        <div className="mb-12 grid grid-cols-2 gap-10 md:grid-cols-5">
+          <div className="col-span-2 md:col-span-2">
             <Link href="/" className="group mb-4 inline-flex items-center gap-2.5">
               <BrandMark size={36} />
               <div className="flex flex-col leading-none">
@@ -41,8 +44,17 @@ export function Footer() {
               </div>
             </Link>
             <p className="max-w-xs text-sm leading-relaxed text-text-secondary">
-              {t.footer.brandDesc}
+              {f.brandDesc}
             </p>
+
+            {/* Live status badge — signals the team is reachable and systems are up */}
+            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-bg-surface px-3 py-1.5">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-status-success opacity-60" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-status-success" />
+              </span>
+              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-text-secondary">{f.statusAll}</span>
+            </div>
           </div>
 
           {Object.entries(footerLinks).map(([group, links]) => (
@@ -66,18 +78,11 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="flex flex-col items-center justify-between gap-4 border-t border-border pt-8 sm:flex-row">
+        <div className="flex flex-col items-center justify-between gap-3 border-t border-border pt-8 sm:flex-row">
           <p className="text-xs text-text-muted">
             © {new Date().getFullYear()} EaseCity Technologies Limited. All rights reserved.
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-5">
-            <Link href="/legal/privacy" className="text-xs text-text-muted transition-colors hover:text-signal">
-              {t.footer.linkPrivacy}
-            </Link>
-            <Link href="/legal/terms" className="text-xs text-text-muted transition-colors hover:text-signal">
-              {t.footer.linkTerms}
-            </Link>
-          </div>
+          <p className="font-mono text-[11px] uppercase tracking-[0.14em] text-text-muted">{f.craftedIn}</p>
         </div>
       </div>
     </footer>

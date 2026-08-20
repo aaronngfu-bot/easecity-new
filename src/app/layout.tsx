@@ -60,12 +60,21 @@ export const metadata: Metadata = {
     title: 'EaseCity — Web services, system architecture & AI',
     description:
       'Hong Kong technology firm building web services, system architecture, and AI solutions — and the makers of EC-Share.',
+    images: [
+      {
+        url: 'https://easecity.hk/images/og-image.png',
+        width: 1200,
+        height: 630,
+        alt: 'EaseCity — Web services, system architecture & AI',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'EaseCity — Web services, system architecture & AI',
     description:
       'Hong Kong technology firm building web services, system architecture, and AI solutions — and the makers of EC-Share.',
+    images: ['https://easecity.hk/images/og-image.png'],
   },
   robots: {
     index: true,

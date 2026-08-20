@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
@@ -9,12 +9,12 @@ import { CityField } from '@/components/hero/CityField'
 /**
  * ImmersionHero — full-viewport "breathing" first screen.
  *
- * Composition (Decide/Learn surface): the BinaryField canvas fills the entire
- * section — the EC glyph particle mark anchors right on desktop (beside the
- * copy) and center-behind on mobile — with copy layered over a soft scrim so
- * it stays legible in both themes. Title characters stagger in (CSS-only, no
+ * Composition: the CityField canvas fills the entire section — a golden Hong
+ * Kong harbour skyline built from binary 0/1 particles, with a strip
+ * reflection under the waterline. Copy layers over a soft scrim so it stays
+ * legible in both themes. Title characters stagger in (CSS-only, no
  * scroll-driven JS), the primary CTA is magnetic, and a scroll cue runs along
- * the bottom edge. Live Signals ticker sits at the hero's base.
+ * the bottom edge.
  *
  * Everything honors prefers-reduced-motion via the CSS classes in globals.css
  * and the canvas' own static path.
@@ -22,16 +22,16 @@ import { CityField } from '@/components/hero/CityField'
 
 /** Primary CTA that leans toward the cursor within a small radius. */
 function MagneticCta({
-  href,
+  onClick,
   children,
   className = '',
 }: {
-  href: string
+  onClick?: () => void
   children: React.ReactNode
   className?: string
 }) {
   const wrapRef = useRef<HTMLSpanElement>(null)
-  const btnRef = useRef<HTMLAnchorElement>(null)
+  const btnRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
     const wrap = wrapRef.current
@@ -59,18 +59,19 @@ function MagneticCta({
 
   return (
     <span ref={wrapRef} className="inline-flex">
-      <Link
+      <button
         ref={btnRef}
-        href={href}
+        type="button"
+        onClick={onClick}
         className={`inline-flex items-center gap-2 transition-transform duration-200 ease-out will-change-transform ${className}`}
       >
         {children}
-      </Link>
+      </button>
     </span>
   )
 }
 
-export function ImmersionHero() {
+export function ImmersionHero({ onStartProject }: { onStartProject?: () => void }) {
   const { t } = useLanguage()
   const c = t.companyPage
 
@@ -128,7 +129,7 @@ export function ImmersionHero() {
 
             <div className="hero-rise mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center" style={{ animationDelay: '1.55s' }}>
               <MagneticCta
-                href="/about#contact"
+                onClick={onStartProject}
                 className="rounded-lg bg-[var(--amber)] px-8 py-3.5 text-sm font-semibold text-[var(--amber-ink)] shadow-[0_0_0_0_rgba(255,184,0,0)] hover:shadow-[0_8px_30px_-6px_rgba(255,184,0,0.55)]"
               >
                 {c.heroCtaPrimary}

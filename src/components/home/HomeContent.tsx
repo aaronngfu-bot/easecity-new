@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import { ArrowRight, ArrowUpRight, LayoutGrid, MousePointer2, ClipboardCopy, Share2 } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { RevealSection, RevealItem } from '@/components/ui/RevealSection'
 import SectionHeading from '@/components/SectionHeading'
 import { ImmersionHero } from '@/components/home/ImmersionHero'
 import { BlogTimeline } from '@/components/home/BlogTimeline'
+import { QuoteModal } from '@/components/contact/QuoteModal'
 import { ServiceIcon } from '@/components/ui/ServiceIcon'
 import { HeroIllustration } from '@/components/illustrations/HeroIllustration'
 import { services as serviceCatalog } from '@/lib/services'
@@ -42,11 +43,13 @@ export function HomeContent() {
   const { t, language } = useLanguage()
   const c = t.companyPage
   const c2 = t.servicesPage
+  const e = t.ecSharePage
 
   // Client-fetch blog posts so the first paint doesn't wait on the DB. While
   // loading, a skeleton occupies the rail; posts arrive shortly after.
   const [blogPosts, setBlogPosts] = useState<HomeBlogPost[]>([])
   const [blogLoading, setBlogLoading] = useState(true)
+  const [quoteOpen, setQuoteOpen] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -77,6 +80,13 @@ export function HomeContent() {
   }))
   const [featA, featB, ...restServices] = services
 
+  const productFeats = [
+    { icon: LayoutGrid, label: e.f1Title },
+    { icon: MousePointer2, label: e.f2Title },
+    { icon: ClipboardCopy, label: e.f3Title },
+    { icon: Share2, label: e.f4Title },
+  ]
+
   const testimonials = [
     { q: c.t1Quote, n: c.t1Name, r: c.t1Role },
     { q: c.t2Quote, n: c.t2Name, r: c.t2Role },
@@ -95,7 +105,7 @@ export function HomeContent() {
   return (
     <main className="relative min-h-screen">
       {/* Hero — full-viewport living city */}
-      <ImmersionHero />
+      <ImmersionHero onStartProject={() => setQuoteOpen(true)} />
 
       {/* Blog rail — active proof, surfaced early */}
       <RevealSection>
@@ -119,7 +129,7 @@ export function HomeContent() {
       <RevealSection variant="fade">
         <section className="section-padding">
           <div className="container-max">
-            <div className="grid items-center gap-12 lg:grid-cols-[2fr_3fr]">
+            <div className="grid items-center gap-12 lg:grid-cols-[6fr_5fr]">
               <RevealItem>
               <div className="text-left">
                 <span className="label-mono text-[var(--signal)]">{c.productsBadge}</span>
@@ -130,20 +140,26 @@ export function HomeContent() {
                   {c.productsNarrativeDesc}
                 </p>
 
-                <div className="mt-8 grid grid-cols-2 gap-4">
-                  <div className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-4">
-                    <p className="font-mono text-xl font-bold text-[var(--signal)]">{c.productLatency}</p>
-                    <p className="label-mono mt-1">{c.product01Sub}</p>
-                  </div>
-                  <div className="rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-4">
-                    <p className="font-mono text-xl font-bold text-[var(--signal)]">{c.productDevices}</p>
-                    <p className="label-mono mt-1">{c.product01Name}</p>
-                  </div>
+                <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                  {productFeats.map((f) => (
+                    <div key={f.label} className="flex items-center gap-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] px-4 py-3">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
+                        <f.icon size={15} strokeWidth={1.8} />
+                      </span>
+                      <span className="text-sm font-medium text-[var(--text-primary)]">{f.label}</span>
+                    </div>
+                  ))}
                 </div>
 
-                <a href="/ec-share" className="group mt-8 inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] hover:text-[var(--signal-light)]">
+                <div className="mt-6 flex flex-wrap items-center gap-2">
+                  <span className="badge font-mono">{c.productLatency}</span>
+                  <span className="badge font-mono">{c.productDevices}</span>
+                  <span className="badge">{c.badgeTrial}</span>
+                </div>
+
+                <a href="/ec-share" className="signal-cta group mt-8">
                   {c.productsExploreCta}
-                  <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
+                  <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
                 </a>
               </div>
               </RevealItem>
@@ -314,7 +330,7 @@ export function HomeContent() {
         </section>
       </RevealSection>
 
-      {/* Case studies — asymmetric proof duo */}
+      {/* Case studies — asymmetric proof stories */}
       <RevealSection variant="fade">
         <section className="section-padding section-bridge">
           <div className="container-max">
@@ -352,6 +368,28 @@ export function HomeContent() {
                   {c.caseC2Res}
                 </p>
               </div>
+              </RevealItem>
+
+              {/* Third story — full-width horizontal, distinct composition */}
+              <RevealItem delay={0.2} className="lg:col-span-5">
+                <div className="card relative flex h-full flex-col gap-6 overflow-hidden p-8 md:flex-row md:items-center md:gap-10">
+                  <div aria-hidden className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[var(--signal)] to-transparent" />
+                  <div className="md:w-1/3">
+                    <span className="label-mono text-[var(--signal)]">{c.caseC3Title}</span>
+                    <h3 className="mt-3 font-display text-2xl font-bold leading-snug text-[var(--text-primary)]">
+                      {c.caseC3Head}
+                    </h3>
+                  </div>
+                  <div className="flex-1">
+                    <p className="max-w-xl leading-relaxed text-[var(--text-secondary)]">{c.caseC3Desc}</p>
+                  </div>
+                  <div className="shrink-0 md:text-right">
+                    <p className="inline-flex items-center gap-2 rounded-lg bg-[var(--signal-soft)] px-4 py-2.5 font-mono text-sm font-semibold text-[var(--signal)]">
+                      <ArrowRight size={14} />
+                      {c.caseC3Res}
+                    </p>
+                  </div>
+                </div>
               </RevealItem>
             </div>
           </div>
@@ -415,11 +453,15 @@ export function HomeContent() {
                   {c.homeCtaSub}
                 </p>
                 <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                  <a href="/about#contact" className="inline-flex items-center gap-2 rounded-lg bg-[var(--amber)] px-8 py-3.5 text-base font-semibold text-[var(--amber-ink)] transition hover:brightness-105 hover:shadow-[0_8px_30px_-6px_var(--amber-soft)]">
+                  <button
+                    type="button"
+                    onClick={() => setQuoteOpen(true)}
+                    className="inline-flex items-center gap-2 rounded-lg bg-[var(--amber)] px-8 py-3.5 text-base font-semibold text-[var(--amber-ink)] transition hover:brightness-105 hover:shadow-[0_8px_30px_-6px_var(--amber-soft)]"
+                  >
                     {c.homeCtaBtn}
                     <ArrowRight size={16} />
-                  </a>
-                  <a href="mailto:admin@easecity.hk" className="text-sm text-[var(--text-muted)] underline-offset-4 transition-colors hover:text-[var(--signal)]">
+                  </button>
+                  <a href="mailto:hello@easecity.hk" className="text-sm text-[var(--text-muted)] underline-offset-4 transition-colors hover:text-[var(--signal)]">
                     {c.homeCtaEmail}
                   </a>
                 </div>
@@ -429,6 +471,9 @@ export function HomeContent() {
           </div>
         </section>
       </RevealSection>
+
+      {/* Frictionless multi-step quote modal (no service → general brief) */}
+      <QuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} />
     </main>
   )
 }
