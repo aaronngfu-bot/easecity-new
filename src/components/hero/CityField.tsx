@@ -23,7 +23,7 @@ type P = {
   bright: number
   phase: number
   speed: number
-  white: boolean // white vs teal
+  yellow: boolean // yellow vs teal
 }
 
 type Light = { x: number; y: number; bld: number; ch: string; phase: number; speed: number; base: number }
@@ -68,7 +68,7 @@ export function CityField({ className = '' }: { className?: string }) {
     let goldLight: [number, number, number] = [250, 214, 140]
     let teal: [number, number, number] = [0, 143, 130]
     let tealLight: [number, number, number] = [0, 229, 204]
-    let white: [number, number, number] = [245, 248, 248]
+    let yellow: [number, number, number] = [255, 215, 0]
 
     const mouse = { x: -99999, y: -99999, active: false }
 
@@ -97,7 +97,6 @@ export function CityField({ className = '' }: { className?: string }) {
       const am = cs.getPropertyValue('--amber').trim()
       const sl = cs.getPropertyValue('--signal-light').trim()
       const s = cs.getPropertyValue('--signal').trim()
-      const tp = cs.getPropertyValue('--text-primary').trim()
       if (am) {
         gold = hexToRgb(am)
         // lighter tint of the accent for bright outlines (blend toward white)
@@ -109,7 +108,6 @@ export function CityField({ className = '' }: { className?: string }) {
       }
       if (sl) tealLight = hexToRgb(sl)
       if (s) teal = hexToRgb(s)
-      if (tp) white = hexToRgb(tp)
     }
 
     const rgba = (c: [number, number, number], a: number) =>
@@ -176,8 +174,8 @@ export function CityField({ className = '' }: { className?: string }) {
           for (let i = 1; i < w - 1; i++) {
             for (let rr = roof[i] + 1; rr < ROWS - 1; rr++) {
               d(bit(), X(c + i), yOf(rr), gold, 0.58)
-              if (rand() < 0.065) {
-                lights.push({ x: X(c + i), y: yOf(rr), bld: bldIdx, ch: '1', phase: rand() * 6, speed: 0.7 + rand() * 2.2, base: 0.55 + rand() * 0.45 })
+              if (rand() < 0.13) {
+                lights.push({ x: X(c + i), y: yOf(rr), bld: bldIdx, ch: '1', phase: rand() * 6, speed: 0.7 + rand() * 2.2, base: 0.6 + rand() * 0.4 })
               }
             }
           }
@@ -337,16 +335,16 @@ export function CityField({ className = '' }: { className?: string }) {
           const skyBias = 1 - (py / (H * 0.55)) * 0.8
           if (rand() > 0.55 * skyBias) continue
           count++
-          const isWhite = rand() < 0.45
+          const isYellow = rand() < 0.45
           sky.push({
             bx: px, by: py, b0x: px, b0y: py,
             fa: 10 + rand() * 22, fs: 0.1 + rand() * 0.25, fph: rand() * Math.PI * 2,
             vx: 0, vy: 0, x: px, y: py,
             ch: rand() > 0.5 ? '1' : '0',
-            bright: isWhite ? 0.62 + rand() * 0.28 : 0.25 + rand() * 0.3,
+            bright: isYellow ? 0.62 + rand() * 0.28 : 0.25 + rand() * 0.3,
             phase: rand() * Math.PI * 2,
             speed: 0.5 + rand() * 1.2,
-            white: isWhite,
+            yellow: isYellow,
           })
         }
       }
@@ -403,7 +401,7 @@ export function CityField({ className = '' }: { className?: string }) {
       ctx.textBaseline = 'middle'
       ctx.font = `${cell * 0.92}px "JetBrains Mono", "Courier New", monospace`
       for (const p of sky) {
-        const col = p.white ? white : teal
+        const col = p.yellow ? yellow : teal
         ctx.fillStyle = rgba(col, p.bright)
         ctx.fillText(p.ch, p.x, p.y)
       }
@@ -442,27 +440,6 @@ export function CityField({ className = '' }: { className?: string }) {
         p.y += p.vy
         if (Math.random() < 0.02) p.ch = p.ch === '1' ? '0' : '1'
       }
-      // buildings spring away from the cursor
-      for (const b of buildings) {
-        const cx = b.x + b.w / 2
-        const cy = b.y + b.h / 2
-        const dx = cx - mouse.x
-        const dy = cy - mouse.y
-        const dist = Math.hypot(dx, dy)
-        if (mouse.active && dist < radiusPx * 2 && dist > 0.01) {
-          const force = (1 - dist / (radiusPx * 2)) * 26
-          b.vx += (dx / dist) * force
-          b.vy += (dy / dist) * force
-        }
-        b.vx += (0 - b.ox) * 0.1
-        b.vy += (0 - b.oy) * 0.1
-        b.vx *= 0.86
-        b.vy *= 0.86
-        b.ox += b.vx
-        b.oy += b.vy
-        const mag = Math.hypot(b.ox, b.oy)
-        if (mag > 28) { b.ox = (b.ox / mag) * 28; b.oy = (b.oy / mag) * 28 }
-      }
     }
 
     function draw() {
@@ -472,8 +449,8 @@ export function CityField({ className = '' }: { className?: string }) {
       ctx.font = `${cell * 0.92}px "JetBrains Mono", "Courier New", monospace`
       // sky digits
       for (const p of sky) {
-        const col = p.white ? white : teal
-        const a = p.white
+        const col = p.yellow ? yellow : teal
+        const a = p.yellow
           ? Math.min(1, 0.82 + 0.12 * Math.sin(t * p.speed * 0.7 + p.phase))
           : Math.min(1, p.bright * (0.55 + Math.sin(t * p.speed + p.phase) * 0.4))
         const dx = p.x - mouse.x
