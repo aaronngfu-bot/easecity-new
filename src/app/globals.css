@@ -47,6 +47,12 @@
         /* Text color to place ON a solid signal background (light: dark teal bg → white text) */
         --signal-ink: #ffffff;
 
+    /* Brand actions — warm amber for primary CTA, electric cyan for accents */
+        --amber: #FFB800;
+            --amber-ink: #1a1200;
+            --amber-soft: rgba(255, 184, 0, 0.14);
+            --bright-cyan: #00D4AA;
+
     /* Backgrounds — layered from deepest (void) to lightest (raised).
        Tinted gray range rather than pure white so sections read as distinct
        surfaces and the page doesn't glare. */
@@ -127,6 +133,12 @@
         --signal-soft: rgba(0, 229, 204, 0.08);
         /* Text color to place ON a solid signal background (dark: bright cyan bg → near-black text) */
         --signal-ink: #031312;
+
+    /* Brand actions — warm amber for primary CTA, electric cyan for accents */
+        --amber: #FFB800;
+            --amber-ink: #1a1200;
+            --amber-soft: rgba(255, 184, 0, 0.16);
+            --bright-cyan: #00D4AA;
 
     --bg-void: #07090d;
     --bg-base: #0b0f14;
