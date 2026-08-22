@@ -7,6 +7,7 @@ interface SectionHeadingProps {
   title: string;         // 主標題,例如「核心功能」
   subtitle?: string;     // 副標題說明
   align?: "center" | "left" | "right";
+  line?: boolean;      // 是否顯示 badge 前的 teal 短線
   /** 保留 prop 以相容舊呼叫點；進場動畫由外層 RevealSection/RevealItem 的 scroll scrub 負責 */
   stepDelay?: number;
 }
@@ -56,6 +57,7 @@ export default function SectionHeading({
   title,
   subtitle,
   align = "center",
+  line = true,
 }: SectionHeadingProps) {
   const tokens = tokenize(title);
 
@@ -69,13 +71,14 @@ export default function SectionHeading({
   return (
     <div className={`flex flex-col ${alignClass} gap-4`}>
       {badge && (
-        <span className="font-mono text-xs uppercase tracking-[0.28em] text-signal">
-          {badge}
+        <span className="scrub-kicker flex items-center gap-3 font-mono text-xs uppercase tracking-[0.28em] text-signal">
+          {line && <span aria-hidden className="scrub-rule h-px w-10 origin-left bg-signal" />}
+          <span className="scrub-kicker-label">{badge}</span>
         </span>
       )}
 
       <h2
-        className={`flex flex-wrap font-display text-3xl font-bold tracking-[-0.035em] text-foreground sm:text-4xl md:text-5xl ${
+        className={`scrub-title flex flex-wrap font-display text-3xl font-bold tracking-[-0.035em] text-foreground sm:text-4xl md:text-5xl ${
           align === "center"
             ? "justify-center"
             : align === "right"
@@ -84,14 +87,18 @@ export default function SectionHeading({
         }`}
       >
         {tokens.map((token, i) => (
-          <span key={i} className="inline-block whitespace-pre">
+          <span
+            key={i}
+            className="scrub-word inline-block whitespace-pre"
+            style={{ ['--i' as string]: i }}
+          >
             {token.text + (token.trailingSpace ? " " : "")}
           </span>
         ))}
       </h2>
 
       {subtitle && (
-        <p className="max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+        <p className="scrub-sub max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
           {subtitle}
         </p>
       )}

@@ -176,7 +176,7 @@ export function BlogTimeline({ posts = [], loading = false }: { posts?: BlogPost
         <div className="mt-8 text-center">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
+            className="scrub-blog-more inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
           >
             {t.companyPage.blogCta}
             <ArrowRight size={14} />

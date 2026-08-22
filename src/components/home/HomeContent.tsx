@@ -1,16 +1,17 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight, ArrowUpRight, LayoutGrid, MousePointer2, ClipboardCopy, Share2 } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { RevealSection, RevealItem } from '@/components/ui/RevealSection'
 import SectionHeading from '@/components/SectionHeading'
+import { Scrub } from '@/components/ui/Scrub'
 import { ImmersionHero } from '@/components/home/ImmersionHero'
 import { BlogTimeline } from '@/components/home/BlogTimeline'
 import { QuoteModal } from '@/components/contact/QuoteModal'
 import { ServiceIcon } from '@/components/ui/ServiceIcon'
 import { HeroIllustration } from '@/components/illustrations/HeroIllustration'
+import { CityField } from '@/components/hero/CityField'
 import { services as serviceCatalog } from '@/lib/services'
 
 export interface HomeBlogPost {
@@ -30,26 +31,48 @@ export interface HomeBlogPost {
  * parent (bilingual) so the rail also renders on first paint without a fetch.
  *
  * Section rhythm (distinct compositions, one visual language):
- *  hero         full-viewport living city skyline (binary particles)
- *  blog         horizontal drag rail            — reveal: up
- *  products     narrative + animated device farm — reveal: left
- *  services     unified bento cards              — reveal: up
- *  process      connected timeline               — reveal: right
- *  cases        asymmetric duo                   — reveal: scale
- *  testimonials breathing wall, 10 quotes        — reveal: up
- *  cta          glow panel                       — reveal: scale
+ *  hero         pinned dissolve (sky lag + copy fade)
+ *  blog         clip-reveal rail from the left
+ *  products     split assemble (copy left, art right)
+ *  services     staggered cascade cards
+ *  testimonials mask-open scale
+ *  cta          punch in
  */
 export function HomeContent() {
   const { t, language } = useLanguage()
   const c = t.companyPage
   const c2 = t.servicesPage
-  const e = t.ecSharePage
 
   // Client-fetch blog posts so the first paint doesn't wait on the DB. While
   // loading, a skeleton occupies the rail; posts arrive shortly after.
   const [blogPosts, setBlogPosts] = useState<HomeBlogPost[]>([])
   const [blogLoading, setBlogLoading] = useState(true)
   const [quoteOpen, setQuoteOpen] = useState(false)
+
+  // Measure each testimonial column's single-iteration height so the marquee
+  // loop point aligns exactly (translateY(-50%) drifts when card heights
+  // differ — sub-pixel rounding makes the seam hitch). Store it as --t-loop.
+  const tMarqueeRef = useRef<HTMLDivElement>(null)
+  const measureTracks = useCallback(() => {
+    const root = tMarqueeRef.current
+    if (!root) return
+    root.querySelectorAll<HTMLElement>('.t-marquee-track').forEach((track) => {
+      const col = track.parentElement
+      if (!col) return
+      const single = track.scrollHeight / 2
+      if (single > 0) col.style.setProperty('--t-loop', `${single}px`)
+    })
+  }, [])
+  useEffect(() => {
+    measureTracks()
+    const ro = new ResizeObserver(measureTracks)
+    if (tMarqueeRef.current) ro.observe(tMarqueeRef.current)
+    window.addEventListener('load', measureTracks)
+    return () => {
+      ro.disconnect()
+      window.removeEventListener('load', measureTracks)
+    }
+  }, [measureTracks])
 
   useEffect(() => {
     let active = true
@@ -80,13 +103,6 @@ export function HomeContent() {
   }))
   const [featA, featB, ...restServices] = services
 
-  const productFeats = [
-    { icon: LayoutGrid, label: e.f1Title },
-    { icon: MousePointer2, label: e.f2Title },
-    { icon: ClipboardCopy, label: e.f3Title },
-    { icon: Share2, label: e.f4Title },
-  ]
-
   const testimonials = [
     { q: c.t1Quote, n: c.t1Name, r: c.t1Role },
     { q: c.t2Quote, n: c.t2Name, r: c.t2Role },
@@ -98,379 +114,230 @@ export function HomeContent() {
     { q: c.t8Quote, n: c.t8Name, r: c.t8Role },
     { q: c.t9Quote, n: c.t9Name, r: c.t9Role },
     { q: c.t10Quote, n: c.t10Name, r: c.t10Role },
+    { q: c.t11Quote, n: c.t11Name, r: c.t11Role },
+    { q: c.t12Quote, n: c.t12Name, r: c.t12Role },
   ]
-  // Three staggered columns: 4 / 3 / 3
-  const tCols = [testimonials.slice(0, 4), testimonials.slice(4, 7), testimonials.slice(7)]
+  // Equal column sizes (4 / 4 / 4) so all three rails keep identical height;
+  // only their start phase differs. Each column loops its own list seamlessly.
+  const tCols = [
+    testimonials.slice(0, 4),
+    testimonials.slice(4, 8),
+    testimonials.slice(8),
+  ].map(col => [...col, ...col])
 
   return (
     <main className="relative min-h-screen">
       {/* Hero — full-viewport living city */}
       <ImmersionHero onStartProject={() => setQuoteOpen(true)} />
 
-      {/* Blog rail — active proof, surfaced early */}
-      <RevealSection>
-        <section id="latest" className="section-padding section-bridge">
+      {/* Blog — clip-reveal from the left */}
+      <Scrub pace="tight">
+        <section id="latest" className="relative z-10 section-padding bg-[var(--bg-base)]">
           <div className="container-max">
-            <SectionHeading
-              badge={c.blogBadge}
-              align="right"
-              title={c.blogTitle}
-              subtitle={c.blogSubtitle}
-            />
+            <div className="scrub-blog-head">
+              <SectionHeading
+                badge={c.blogBadge}
+                align="right"
+                title={c.blogTitle}
+                subtitle={c.blogSubtitle}
+              />
+            </div>
 
-            <div className="mt-10">
+            <div className="scrub-blog-rail mt-10">
               <BlogTimeline posts={blogPosts} loading={blogLoading} />
             </div>
           </div>
         </section>
-      </RevealSection>
+      </Scrub>
 
-      {/* Products — narrative beside the living device-farm illustration */}
-      <RevealSection variant="fade">
-        <section className="section-padding">
-          <div className="container-max">
-            <div className="grid items-center gap-12 lg:grid-cols-[6fr_5fr]">
-              <RevealItem>
-              <div className="text-left">
-                <span className="label-mono text-[var(--signal)]">{c.productsBadge}</span>
-                <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-4xl">
+      {/* Products — split assemble. Tight pace so the scene arrives earlier. */}
+      <Scrub pace="tight">
+        <section className="relative z-10 overflow-hidden section-padding bg-[var(--bg-base)]">
+          <div className="scrub-prod-stars pointer-events-none absolute inset-0" aria-hidden>
+            <div className="scrub-prod-sky absolute inset-x-0 -top-[22%] h-[144%] w-full">
+              <CityField className="h-full w-full" />
+            </div>
+          </div>
+          <div className="container-max relative z-10">
+            <div className="grid items-center gap-8 lg:grid-cols-[5fr_7fr]">
+              <div className="scrub-prod-copy text-left">
+                <span className="scrub-kicker mb-5 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.28em] text-signal">
+                  <span aria-hidden className="scrub-rule h-px w-10 origin-left bg-signal" />
+                  <span className="scrub-kicker-label">{c.productsBadge}</span>
+                </span>
+                <h2 className="scrub-title mt-3 font-display text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-4xl">
                   {c.productsNarrative}
                 </h2>
-                <p className="mt-4 max-w-md leading-relaxed text-[var(--text-secondary)]">
+                <p className="scrub-sub mt-4 max-w-md leading-relaxed text-[var(--text-secondary)]">
                   {c.productsNarrativeDesc}
                 </p>
 
-                <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                  {productFeats.map((f) => (
-                    <div key={f.label} className="flex items-center gap-3 rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] px-4 py-3">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
-                        <f.icon size={15} strokeWidth={1.8} />
-                      </span>
-                      <span className="text-sm font-medium text-[var(--text-primary)]">{f.label}</span>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-6 flex flex-wrap items-center gap-2">
+                <div className="scrub-meta mt-6 flex flex-wrap items-center gap-2">
                   <span className="badge font-mono">{c.productLatency}</span>
                   <span className="badge font-mono">{c.productDevices}</span>
                   <span className="badge">{c.badgeTrial}</span>
                 </div>
 
-                <a href="/ec-share" className="signal-cta group mt-8">
+                <a href="/ec-share" className="scrub-cta-line signal-cta group mt-8">
                   {c.productsExploreCta}
                   <ArrowRight size={15} className="transition-transform group-hover:translate-x-1" />
                 </a>
               </div>
-              </RevealItem>
 
-              <RevealItem variant="scale" delay={0.15}>
-              <div className="relative">
-                <div aria-hidden className="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_60%_at_50%_45%,var(--signal-soft),transparent_75%)]" />
+              <div className="scrub-prod-art relative">
+                <div aria-hidden className="scrub-prod-glow absolute inset-0 -z-10 bg-[radial-gradient(ellipse_60%_60%_at_50%_45%,var(--signal-soft),transparent_75%)]" />
                 <HeroIllustration showFeatures={false} />
               </div>
-              </RevealItem>
             </div>
           </div>
         </section>
-      </RevealSection>
+      </Scrub>
 
-      {/* Services — one card language, bento weights */}
-      <RevealSection variant="fade">
-        <section className="section-padding section-bridge bg-[var(--bg-surface)]">
+      {/* Services — staggered cascade */}
+      <Scrub>
+        <section className="relative z-10 bg-[var(--bg-base)] py-20 md:py-28">
           <div className="container-max">
-            <SectionHeading
-              badge={c.servicesBadge}
-              align="center"
-              title={c.servicesTitle}
-              subtitle={c.servicesSubtitle}
-            />
+            <div className="scrub-svc-head flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
+              <div className="max-w-2xl">
+                <div className="scrub-kicker mb-5 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.28em] text-signal">
+                  <span aria-hidden className="scrub-rule h-px w-10 origin-left bg-signal" />
+                  <span className="scrub-kicker-label">{c.servicesBadge}</span>
+                </div>
+                <h2 className="scrub-title font-display text-3xl font-bold leading-tight tracking-tight text-[var(--text-primary)] md:text-5xl">
+                  {c.servicesTitle}
+                </h2>
+                <p className="scrub-sub mt-4 max-w-xl text-base leading-relaxed text-[var(--text-secondary)]">
+                  {c.servicesSubtitle}
+                </p>
+              </div>
+            </div>
 
-            <div className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-6">
-              {/* Dominant card — system development */}
-              <RevealItem className="h-full lg:col-span-4 lg:row-span-2">
-              <Link
-                href={`/services/${featA.slug}`}
-                className="card group relative flex h-full flex-col justify-between overflow-hidden p-7 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] md:p-8"
-              >
-                <div aria-hidden className="absolute -right-16 -top-16 h-56 w-56 rounded-full bg-[var(--signal-soft)] opacity-0 blur-2xl transition-opacity group-hover:opacity-100" />
-                <div className="flex items-start justify-between">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
-                    <ServiceIcon icon={featA.icon} size={28} />
-                  </div>
-                  <span className="text-[var(--signal)] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"><ArrowUpRight size={16} /></span>
-                </div>
-                <div className="mt-6">
-                  <h3 className="font-display text-2xl font-bold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
-                    {featA.title}
-                  </h3>
-                  <p className="mt-3 max-w-lg leading-relaxed text-[var(--text-secondary)]">{featA.body}</p>
-                  <ul className="mt-5 grid gap-2 sm:grid-cols-2">
-                    {featA.bullets.slice(0, 4).map((b) => (
-                      <li key={b} className="flex items-start gap-2 text-sm text-[var(--text-secondary)]">
-                        <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--signal)]" />
-                        {b}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {featA.tags.map((tag) => (
-                    <span key={tag} className="badge">{tag}</span>
-                  ))}
-                </div>
-              </Link>
-              </RevealItem>
-
-              {/* Secondary dominant — web platforms */}
-              <RevealItem delay={0.1} className="h-full lg:col-span-2 lg:row-span-2">
-              <Link
-                href={`/services/${featB.slug}`}
-                className="card group relative flex h-full flex-col justify-between overflow-hidden p-6 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
-              >
-                <div className="flex items-start justify-between">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
-                    <ServiceIcon icon={featB.icon} size={24} />
-                  </div>
-                  <span className="text-[var(--signal)] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"><ArrowUpRight size={15} /></span>
-                </div>
-                <div className="mt-5">
-                  <h3 className="font-display text-lg font-bold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
-                    {featB.title}
-                  </h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{featB.body}</p>
-                </div>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {featB.tags.map((tag) => (
-                    <span key={tag} className="badge">{tag}</span>
-                  ))}
-                </div>
-              </Link>
-              </RevealItem>
-
-              {/* Same card language, compact weight */}
-              {restServices.map((s, i) => (
-                <RevealItem key={s.slug} delay={0.08 * i} className="h-full lg:col-span-2">
+            <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {[featA, featB, ...restServices].map((s, i) => (
                 <Link
+                  key={s.slug}
                   href={`/services/${s.slug}`}
-                  className="card group relative flex h-full flex-col justify-between overflow-hidden p-6 transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]"
+                  className="scrub-svc-card group flex h-full flex-col rounded-2xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[var(--signal)] hover:shadow-[var(--shadow-lg)]"
+                  style={{ ['--i' as string]: i }}
                 >
-                  <div className="flex items-start justify-between">
-                    <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-[var(--signal-soft)] text-[var(--signal)]">
+                  <div className="flex items-center justify-between">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--signal-soft)] text-[var(--signal)]">
                       <ServiceIcon icon={s.icon} size={22} />
-                    </div>
-                    <span className="text-[var(--signal)] transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"><ArrowUpRight size={15} /></span>
+                    </span>
                   </div>
-                  <div className="mt-5">
-                    <h3 className="font-display text-base font-bold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
-                      {s.title}
-                    </h3>
-                    <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[var(--text-secondary)]">{s.body}</p>
-                  </div>
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    {s.tags.slice(0, 3).map((tag) => (
-                      <span key={tag} className="badge">{tag}</span>
-                    ))}
-                  </div>
+
+                  <h3 className="mt-6 font-display text-xl font-bold text-[var(--text-primary)] transition-colors duration-300 group-hover:text-[var(--signal)]">
+                    {s.title}
+                  </h3>
+                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[var(--text-secondary)]">
+                    {s.body}
+                  </p>
+
+                  <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-medium text-[var(--signal)] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
+                    {c.servicesCta} <ArrowRight size={14} />
+                  </span>
                 </Link>
-                </RevealItem>
-              ))}
-
-              {/* CTA tile completes the bento's last row */}
-              <RevealItem delay={0.2} className="lg:col-span-4">
-              <Link
-                href="/services"
-                className="group flex h-full min-h-[12rem] flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-[var(--border-strong)] p-6 text-center transition-colors hover:border-[var(--signal)] hover:bg-[var(--signal-soft)]"
-              >
-                <span className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--border-strong)] text-[var(--text-secondary)] transition-all group-hover:border-[var(--signal)] group-hover:text-[var(--signal)]">
-                  <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
-                </span>
-                <span className="font-display text-lg font-bold text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
-                  {c.servicesCta}
-                </span>
-              </Link>
-              </RevealItem>
-            </div>
-          </div>
-        </section>
-      </RevealSection>
-
-      {/* Process — connected four-step timeline */}
-      <RevealSection variant="fade">
-        <section className="section-padding bg-[var(--bg-surface)]">
-          <div className="container-max">
-            <SectionHeading
-              badge={c.processBadge}
-              align="center"
-              title={c.processTitle}
-              subtitle={c.processSubtitle}
-            />
-
-            <div className="relative mt-14 grid gap-10 md:grid-cols-2 lg:grid-cols-4 lg:gap-8">
-              <div aria-hidden className="process-line" />
-              {[
-                { n: '01', t: c.processS1Title, time: c.processS1Time, d: c.processS1Desc },
-                { n: '02', t: c.processS2Title, time: c.processS2Time, d: c.processS2Desc },
-                { n: '03', t: c.processS3Title, time: c.processS3Time, d: c.processS3Desc },
-                { n: '04', t: c.processS4Title, time: c.processS4Time, d: c.processS4Desc },
-              ].map((s, i) => (
-                <RevealItem key={s.n} delay={0.12 * i} className="h-full">
-                <div className="group relative h-full">
-                  <div className="relative z-10 flex h-11 w-11 items-center justify-center rounded-full border border-[var(--signal)] bg-[var(--bg-surface)] font-mono text-sm font-semibold text-[var(--signal)] transition-shadow group-hover:shadow-[0_0_0_6px_var(--signal-soft)]">
-                    {s.n}
-                  </div>
-                  <span className="label-mono mt-4 block text-[var(--signal)]">{s.time}</span>
-                  <h3 className="mt-1 font-display text-lg font-semibold text-[var(--text-primary)]">{s.t}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-[var(--text-secondary)]">{s.d}</p>
-                </div>
-                </RevealItem>
               ))}
             </div>
           </div>
         </section>
-      </RevealSection>
+      </Scrub>
 
-      {/* Case studies — asymmetric proof stories */}
-      <RevealSection variant="fade">
-        <section className="section-padding section-bridge">
+      {/* Testimonials — mask-open scale */}
+      <Scrub>
+        <section className="relative z-10 section-padding bg-[var(--bg-surface)]">
           <div className="container-max">
-            <SectionHeading
-              badge={c.caseBadge}
-              align="center"
-              title={c.caseTitle}
-              subtitle={c.caseSubtitle}
-            />
-
-            <div className="mt-12 grid gap-6 lg:grid-cols-5">
-              <RevealItem className="h-full lg:col-span-3">
-              <div className="card relative flex h-full flex-col overflow-hidden p-8">
-                <div aria-hidden className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-[var(--signal)] to-transparent" />
-                <span className="label-mono text-[var(--signal)]">{c.caseC1Title}</span>
-                <h3 className="mt-3 font-display text-2xl font-bold leading-snug text-[var(--text-primary)]">
-                  {c.caseC1Head}
-                </h3>
-                <p className="mt-3 max-w-xl leading-relaxed text-[var(--text-secondary)]">{c.caseC1Desc}</p>
-                <p className="mt-auto inline-flex items-center gap-2 self-start rounded-lg bg-[var(--signal-soft)] px-4 py-2.5 font-mono text-sm font-semibold text-[var(--signal)]">
-                  <ArrowRight size={14} />
-                  {c.caseC1Res}
-                </p>
-              </div>
-              </RevealItem>
-
-              <RevealItem delay={0.15} className="h-full lg:col-span-2">
-              <div className="card flex h-full flex-col p-8">
-                <span className="label-mono text-[var(--signal)]">{c.caseC2Title}</span>
-                <h3 className="mt-3 font-display text-xl font-bold leading-snug text-[var(--text-primary)]">
-                  {c.caseC2Head}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-[var(--text-secondary)]">{c.caseC2Desc}</p>
-                <p className="mt-auto border-t border-[var(--border-color)] pt-4 text-sm font-semibold text-[var(--signal)]">
-                  {c.caseC2Res}
-                </p>
-              </div>
-              </RevealItem>
-
-              {/* Third story — full-width horizontal, distinct composition */}
-              <RevealItem delay={0.2} className="lg:col-span-5">
-                <div className="card relative flex h-full flex-col gap-6 overflow-hidden p-8 md:flex-row md:items-center md:gap-10">
-                  <div aria-hidden className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-[var(--signal)] to-transparent" />
-                  <div className="md:w-1/3">
-                    <span className="label-mono text-[var(--signal)]">{c.caseC3Title}</span>
-                    <h3 className="mt-3 font-display text-2xl font-bold leading-snug text-[var(--text-primary)]">
-                      {c.caseC3Head}
-                    </h3>
-                  </div>
-                  <div className="flex-1">
-                    <p className="max-w-xl leading-relaxed text-[var(--text-secondary)]">{c.caseC3Desc}</p>
-                  </div>
-                  <div className="shrink-0 md:text-right">
-                    <p className="inline-flex items-center gap-2 rounded-lg bg-[var(--signal-soft)] px-4 py-2.5 font-mono text-sm font-semibold text-[var(--signal)]">
-                      <ArrowRight size={14} />
-                      {c.caseC3Res}
-                    </p>
-                  </div>
-                </div>
-              </RevealItem>
+            <div className="scrub-t-head">
+              <SectionHeading
+                badge={c.testimBadge}
+                align="center"
+                line={false}
+                title={c.testimTitle}
+                subtitle={c.testimSubtitle}
+              />
             </div>
-          </div>
-        </section>
-      </RevealSection>
 
-      {/* Testimonials — breathing wall of ten quotes */}
-      <RevealSection variant="fade">
-        <section className="section-padding bg-[var(--bg-surface)]">
-          <div className="container-max">
-            <SectionHeading
-              badge={c.testimBadge}
-              align="center"
-              title={c.testimTitle}
-              subtitle={c.testimSubtitle}
-            />
-
-            <div className="t-wall mt-12">
-              {tCols.map((col, ci) => (
-                <div key={ci} className="t-col">
-                  {col.map((tm, i) => (
-                    <RevealItem key={tm.n} delay={(ci * 3 + i) * 0.07}>
+            <div className="scrub-t-wall t-marquee mt-12" ref={tMarqueeRef} aria-label={c.testimTitle}>
+              {/* Desktop — three parallel masked rails, staggered phases */}
+              <div className="t-marquee-row">
+                {tCols.map((col, ci) => (
+                  <div key={`col-${ci}`} className="t-marquee-col" style={{ ['--ci' as string]: ci }}>
+                    <div className="t-marquee-track" style={{ animationDelay: `${ci * -15}s` }}>
+                      {col.map((tm, i) => (
+                        <figure
+                          key={`${tm.n}-${ci}-${i}`}
+                          className="t-card card relative flex flex-col gap-2 p-6 transition-colors hover:border-[var(--signal)]"
+                        >
+                          <figcaption>
+                            <p className="text-sm font-semibold text-[var(--text-primary)]">{tm.n}</p>
+                            <p className="label-mono mt-0.5 text-[var(--text-muted)]">{tm.r}</p>
+                          </figcaption>
+                          <div className="flex items-center gap-1 text-[var(--amber)]" aria-label="5 stars">
+                            {'★★★★★'.split('').map((s, j) => <span key={j}>{s}</span>)}
+                          </div>
+                          <blockquote className="flex-1 text-sm leading-relaxed text-[var(--text-secondary)]">
+                            &ldquo;{tm.q}&rdquo;
+                          </blockquote>
+                        </figure>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              {/* Mobile — single full-height rail with all 12 cards */}
+              <div className="t-marquee-single">
+                <div className="t-marquee-track">
+                  {[...testimonials, ...testimonials].map((tm, i) => (
                     <figure
-                      className={`t-card card relative flex flex-col p-6 transition-colors hover:border-[var(--signal)] ${ci === 1 ? 'card-elevated' : ''}`}
-                      style={{ animationDelay: `${(ci * 3 + i) * 0.55}s`, animationDuration: `${6.5 + ((ci + i) % 3)}s` }}
+                      key={`s-${tm.n}-${i}`}
+                      className="t-card card relative flex flex-col gap-2 p-6 transition-colors hover:border-[var(--signal)]"
                     >
-                      <span aria-hidden className="font-display text-4xl font-bold leading-none text-[var(--signal)] opacity-30">
-                        &ldquo;
-                      </span>
-                      <div className="mb-2 flex items-center gap-1 text-[var(--amber)]" aria-label="5 stars">
-                        {'★★★★★'.split('').map((s, j) => <span key={j}>{s}</span>)}
-                      </div>
-                      <blockquote className="flex-1 text-sm text-[var(--text-secondary)] leading-relaxed">
-                        {tm.q}
-                      </blockquote>
-                      <figcaption className="mt-4 border-t border-[var(--border-color)] pt-3">
+                      <figcaption>
                         <p className="text-sm font-semibold text-[var(--text-primary)]">{tm.n}</p>
                         <p className="label-mono mt-0.5 text-[var(--text-muted)]">{tm.r}</p>
                       </figcaption>
+                      <div className="flex items-center gap-1 text-[var(--amber)]" aria-label="5 stars">
+                        {'★★★★★'.split('').map((s, j) => <span key={j}>{s}</span>)}
+                      </div>
+                      <blockquote className="flex-1 text-sm leading-relaxed text-[var(--text-secondary)]">
+                        &ldquo;{tm.q}&rdquo;
+                      </blockquote>
                     </figure>
-                    </RevealItem>
                   ))}
                 </div>
-              ))}
-            </div>
-          </div>
-        </section>
-      </RevealSection>
-
-      {/* Frictionless CTA — glow panel */}
-      <RevealSection variant="scale">
-        <section className="section-padding section-bridge">
-          <div className="container-max">
-            <div className="card group relative mx-auto max-w-3xl overflow-hidden p-10 text-center transition-colors hover:border-[var(--signal)] md:p-14">
-              <div aria-hidden className="absolute inset-0 bg-[radial-gradient(ellipse_70%_90%_at_50%_110%,var(--signal-soft),transparent_70%)]" />
-              <div className="relative">
-                <h2 className="font-display text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-4xl">
-                  {c.homeCtaTitle}
-                </h2>
-                <p className="mx-auto mt-4 max-w-xl text-[var(--text-secondary)]">
-                  {c.homeCtaSub}
-                </p>
-                <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                  <button
-                    type="button"
-                    onClick={() => setQuoteOpen(true)}
-                    className="inline-flex items-center gap-2 rounded-lg bg-[var(--amber)] px-8 py-3.5 text-base font-semibold text-[var(--amber-ink)] transition hover:brightness-105 hover:shadow-[0_8px_30px_-6px_var(--amber-soft)]"
-                  >
-                    {c.homeCtaBtn}
-                    <ArrowRight size={16} />
-                  </button>
-                  <a href="mailto:hello@easecity.hk" className="text-sm text-[var(--text-muted)] underline-offset-4 transition-colors hover:text-[var(--signal)]">
-                    {c.homeCtaEmail}
-                  </a>
-                </div>
-                <p className="label-mono mt-6 text-[var(--text-muted)]">{c.homeCtaTrust}</p>
               </div>
             </div>
           </div>
         </section>
-      </RevealSection>
+      </Scrub>
+
+      {/* CTA — punch in. Last section: snap to fully visible as soon as it enters. */}
+      <Scrub pace="last">
+        <section className="relative z-10 section-padding bg-[var(--bg-base)]">
+          <div className="container-max">
+            <div className="scrub-cta mx-auto max-w-2xl text-center">
+              <h2 className="scrub-title font-display text-3xl font-bold leading-tight tracking-tight text-[var(--text-primary)] md:text-5xl">
+                {c.homeCtaTitle}
+              </h2>
+
+              <p className="scrub-sub mx-auto mt-5 max-w-xl text-base leading-relaxed text-[var(--text-secondary)] md:text-lg">
+                {c.homeCtaSub}
+              </p>
+
+              <div className="mt-9 flex justify-center">
+                <button
+                  type="button"
+                  onClick={() => setQuoteOpen(true)}
+                  className="group inline-flex items-center gap-2 rounded-lg bg-[var(--signal)] px-9 py-4 text-base font-semibold text-[var(--signal-ink)] transition hover:bg-[var(--signal-light)]"
+                >
+                  {c.homeCtaBtn}
+                  <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </section>
+      </Scrub>
 
       {/* Frictionless multi-step quote modal (no service → general brief) */}
       <QuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} />

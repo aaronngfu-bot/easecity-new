@@ -692,91 +692,142 @@
 }
 
 
-.ec-cursor-pos { animation: ec-cursor-nudge 3s ease-in-out infinite; }
-.ec-ripple { animation: ec-ripple 3s ease-in-out infinite; }
-.ec-act-scroll { animation: ec-scroll 3.2s ease-in-out infinite; }
-.ec-act-chat { animation: ec-chat-pop 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-.ec-typing { animation: ec-typing 1.4s ease-in-out infinite; }
-.ec-progress { animation: ec-progress 3.2s linear infinite; transform-box: fill-box; transform-origin: left center; }
-.ec-act-gallery { animation: ec-gallery 3.2s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-.ec-toggle { animation: ec-toggle 3.2s ease-in-out infinite; }
+/* ── Chat loop: tap keys → type → send → reply → reset. 0% === 100%. ── */
 
-@keyframes ec-cursor-nudge {
+.ec-key-press {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.ec-key-1 { animation: none; }
+.ec-key-2 { animation: none; }
+.ec-key-3 { animation: none; }
+.ec-key-4 { animation: none; }
+@keyframes ec-key-flash {
+  0%, 8%, 28%, 100% { fill: rgba(0,0,0,0.28); transform: scale(1); }
+  12%, 18% { fill: rgba(255,255,255,0.55); transform: scale(0.9); }
+}
+
+.ec-typed {
+  animation: ec-typed 6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: left center;
+}
+@keyframes ec-typed {
+  0%, 8%, 78%, 100% { transform: scaleX(0.14); opacity: 0.35; }
+  18% { transform: scaleX(0.38); opacity: 0.8; }
+  28% { transform: scaleX(0.68); opacity: 0.95; }
+  38%, 52% { transform: scaleX(1); opacity: 1; }
+  62% { transform: scaleX(1); opacity: 0; }
+}
+
+.ec-send-btn {
+  animation: ec-send-btn 6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ec-send-btn {
+  0%, 48%, 62%, 100% { transform: scale(1); }
+  54% { transform: scale(0.82); }
+}
+
+.ec-chat-stack { animation: none; }
+@keyframes ec-chat-stack {
+  0%, 26% { transform: translateY(0); } /* idle: A B C D — waiting */
+  30%, 42% { transform: translateY(calc(-1 * var(--ec-step, 9.5px))); } /* my send: B C D E — A masked out */
+  46%, 58% { transform: translateY(calc(-2 * var(--ec-step, 9.5px))); } /* their reply: C D E F — B masked out */
+  100% { transform: translateY(calc(-6 * var(--ec-step, 9.5px))); } /* seamless to next pattern start */
+}
+
+.ec-news-feed { animation: none; }
+@keyframes ec-news-feed {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
+}
+
+.ec-game-player { animation: none; }
+@keyframes ec-game-player {
   0%, 100% { transform: translate(0, 0); }
-  50% { transform: translate(2px, 2px); }
+  25% { transform: translate(120%, 0); }
+  50% { transform: translate(120%, 140%); }
+  75% { transform: translate(0, 140%); }
 }
-@keyframes ec-ripple {
-  0%, 20% { opacity: 0; transform: scale(0.4); }
-  40% { opacity: 0.9; transform: scale(1); }
-  60% { opacity: 0.4; transform: scale(1.4); }
-  80%, 100% { opacity: 0; transform: scale(1.8); }
+
+.ec-social-feed { animation: none; }
+@keyframes ec-social-feed {
+  0% { transform: translateY(0); }
+  22% { transform: translateY(0); }         /* hold ~3s — scan post 1 */
+  26% { transform: translateY(-20%); }      /* scroll to post 2 (0.6s) */
+  48% { transform: translateY(-20%); }      /* hold post 2 ~3.1s — read + like */
+  52% { transform: translateY(-40%); }      /* scroll to post 3 (0.6s) */
+  74% { transform: translateY(-40%); }      /* hold post 3 ~3.1s */
+  78% { transform: translateY(-60%); }      /* scroll to post 4 + beyond (0.6s) */
+  100% { transform: translateY(-66.67%); }  /* loop reset — same pixels as 0% */
 }
-@keyframes ec-scroll {
-  0%, 30% { transform: translateY(0); }
-  55%, 85% { transform: translateY(-8px); }
-  100% { transform: translateY(0); }
+/* Key insight: at -66.67% the visible window shows group 2 at exactly
+   the same offset group 0 was at 0%. Every pixel is identical, so the
+   instant reset from -66.67% back to 0% is imperceptibel. */
+
+.ec-like { animation: none; }
+@keyframes ec-like {
+  0%, 25% { opacity: 0; transform: scale(0.3); }
+  26% { opacity: 1; transform: scale(1.35); }   /* LIKE! */
+  28%, 46% { opacity: 1; transform: scale(1); }  /* stays lit while reading */
+  48%, 100% { opacity: 0; transform: scale(0.3); }
 }
-@keyframes ec-chat-pop {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+
+.ec-gallery-photo {
+  animation: ec-gallery-photo 6.8s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
 }
-@keyframes ec-typing {
-  0%, 100% { opacity: 0.3; }
-  50% { opacity: 1; }
+@keyframes ec-gallery-photo {
+  0%, 18%, 88%, 100% { opacity: 0; transform: scale(0.55); }
+  28% { opacity: 1; transform: scale(1.04); }
+  36%, 78% { opacity: 1; transform: scale(1); }
 }
+
+.ec-gallery-album {
+  animation: ec-gallery-album 6.8s ease-in-out infinite;
+}
+@keyframes ec-gallery-album {
+  0%, 18%, 88%, 100% { opacity: 1; }
+  28%, 78% { opacity: 0; }
+}
+
+.ec-ytplay { animation: none; }
+@keyframes ec-ytplay {
+  0%, 12%, 100% { opacity: 1; transform: scale(1); }
+  20% { opacity: 1; transform: scale(0.86); }
+  28%, 86% { opacity: 0; transform: scale(0.7); }
+  94% { opacity: 1; transform: scale(1); }
+}
+
+.ec-progress { animation: none; }
 @keyframes ec-progress {
-  0% { transform: scaleX(0.15); }
-  50% { transform: scaleX(1); }
-  100% { transform: scaleX(0.15); }
+  0%, 22%, 100% { transform: scaleX(0.08); }
+  86% { transform: scaleX(1); }
 }
-@keyframes ec-gallery {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.04); }
+
+.ec-marquee,
+.ec-game-dot,
+.ec-gallery-track {
+  animation: none;
 }
-@keyframes ec-toggle {
-  0%, 100% { transform: translateX(-4px); }
-  50% { transform: translateX(4px); }
-}
+
 @media (prefers-reduced-motion: reduce) {
-  .ec-cursor-pos, .ec-ripple, .ec-act-scroll, .ec-act-chat, .ec-typing,
-  .ec-progress, .ec-act-gallery, .ec-toggle { animation: none !important; }
+  .ec-key-1, .ec-key-2, .ec-key-3, .ec-key-4,
+  .ec-typed, .ec-send-btn, .ec-chat-stack,
+  .ec-news-feed, .ec-game-player, .ec-social-feed, .ec-like,
+  .ec-ytplay, .ec-progress, .ec-gallery-photo, .ec-gallery-album {
+    animation: none !important;
+    transform: none !important;
+  }
 }
-.ec-pulse { filter: drop-shadow(0 0 4px var(--signal)); }
 .ec-device { transition: filter 0.25s ease; }
 .ec-device:hover { filter: drop-shadow(0 0 8px var(--signal)); }
-@media (prefers-reduced-motion: reduce) {
-  .ec-pulse animateMotion { display: none; }
-}
-
-/* EC-Share hero — multi-operation animations (device + mirrored tile sync) */
-.ec-row-highlight { animation: ec-highlight-y 2.8s ease-in-out infinite; }
-.ec-row-highlight-2 { animation: ec-highlight-y 2.8s ease-in-out 1.4s infinite; }
-.ec-send { animation: ec-send 2.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-.ec-spin { animation: ec-spin 3s linear infinite; transform-box: fill-box; transform-origin: center; }
-.ec-volume { animation: ec-volume 2.4s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
-.ec-toggle { animation: ec-toggle 3.2s ease-in-out infinite; }
-.ec-toggle-2 { animation: ec-toggle 3.2s ease-in-out 1.6s infinite; }
-
-@keyframes ec-highlight-y {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(16px); }
-}
-@keyframes ec-send {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.25); }
-}
-@keyframes ec-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-@keyframes ec-volume {
-  0%, 100% { transform: scaleY(1); }
-  50% { transform: scaleY(0.5); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .ec-row-highlight, .ec-row-highlight-2, .ec-send, .ec-spin, .ec-volume,
-  .ec-toggle, .ec-toggle-2 { animation: none !important; }
-}
+.ec-camera { fill: #000; }
+.dark .ec-camera { fill: #000; }
+:root:not(.dark) .ec-camera { fill: #fff; }
 
 /* ═══════════════════════════════════════════════════════════════
    Immersion hero — character stagger, rise-in, scroll cue, ticker
@@ -840,51 +891,47 @@
   }
 }
 
-/* Testimonial wall — three staggered columns; cards breathe gently at
-   different phases so the wall feels alive without being noisy. */
-.t-wall { display: flex; flex-direction: column; gap: 1.25rem; }
-@media (min-width: 768px) {
-  .t-wall { flex-direction: row; align-items: flex-start; }
-  .t-col { flex: 1; display: flex; flex-direction: column; gap: 1.25rem; min-width: 0; }
-  .t-col:nth-child(2) { margin-top: 2.5rem; }
-  .t-col:nth-child(3) { margin-top: 5rem; }
-}
-.t-card { animation: t-breathe 7s ease-in-out infinite; }
-@keyframes t-breathe {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
-}
-
-/* Section transition — a faint signal arc bridging adjacent sections */
-.section-bridge {
+/* Testimonial wall — three columns, each a seamless vertical marquee with its
+   own start phase (negative animation-delay), masked at top and bottom. */
+.t-marquee {
   position: relative;
+  height: clamp(380px, 62vh, 540px);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
+  mask-image: linear-gradient(180deg, transparent, #000 14%, #000 86%, transparent);
 }
-.section-bridge::before {
-  content: '';
-  position: absolute;
-  top: -1px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(720px, 86vw);
-  height: 56px;
-  border-top: 1px solid var(--signal);
-  opacity: 0.22;
-  border-radius: 100% 100% 0 0 / 100% 100% 0 0;
-  pointer-events: none;
+.t-marquee-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  height: 100%;
 }
-.section-bridge::after {
-  content: '';
-  position: absolute;
-  top: -3px;
-  left: 50%;
-  width: 5px;
-  height: 5px;
-  margin-left: -2.5px;
-  border-radius: 999px;
-  background: var(--signal);
-  box-shadow: 0 0 10px var(--signal);
-  opacity: 0.7;
-  pointer-events: none;
+.t-marquee-single {
+  display: none;
+  height: 100%;
+  overflow: hidden;
+}
+.t-marquee-col {
+  min-width: 0;
+  overflow: hidden;
+}
+.t-marquee-track {
+  display: flex;
+  flex-direction: column;
+  will-change: transform;
+  animation: t-scroll 45s linear infinite;
+}
+.t-card {
+  flex-shrink: 0;
+  margin-bottom: 1.25rem;
+}
+@keyframes t-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(calc(-1 * var(--t-loop, 50%))); }
+}
+@media (max-width: 768px) {
+  .t-marquee-row { display: none; }
+  .t-marquee-single { display: block; }
 }
 
 /* Process timeline — horizontal connector on desktop, vertical on mobile */
@@ -901,9 +948,208 @@
     background: linear-gradient(180deg, transparent, var(--signal) 10%, var(--signal) 90%, transparent); }
 }
 
+/* Hero scroll theater — `--p` (0→1) is written by ScrollPin.
+   Sky lags + scales. Copy rises and fades. Cue dies first. */
+.hero-pin-sky {
+  transform: translate3d(0, calc(var(--p, 0) * 28vh), 0) scale(calc(1 + var(--p, 0) * 0.12));
+  transform-origin: 50% 40%;
+  will-change: transform;
+}
+.hero-pin-copy {
+  transform: translate3d(0, calc(var(--p, 0) * -18vh), 0);
+  opacity: calc(1 - var(--p, 0) * 1.15);
+  will-change: transform, opacity;
+}
+.hero-pin-cue {
+  opacity: calc(1 - var(--p, 0) * 2.4);
+}
+
+/* Rest of homepage — `--p` from Scrub. Each section a different motion.
+   Heading parts remap --p with lag so badge / title / sub / body are not one blob. */
+.scrub-kicker {
+  --t: max(0, min(1, calc(var(--p, 0) / 0.4)));
+  opacity: 1;
+  transform: none;
+}
+.scrub-rule {
+  --t: max(0, min(1, calc(var(--p, 0) / 0.32)));
+  transform: scaleX(var(--t));
+  opacity: var(--t);
+  transform-origin: left;
+}
+.scrub-kicker-label {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.08) / 0.34)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 14px), 0);
+}
+.scrub-title {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.08) / 0.48)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 28px), 0);
+}
+.scrub-sub {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.18) / 0.5)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 22px), 0);
+}
+.scrub-meta {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.28) / 0.48)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 16px), 0);
+}
+.scrub-cta-line {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.34) / 0.5)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 14px), 0);
+}
+.scrub-blog-rail {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.12) / 0.72)));
+  opacity: var(--t);
+  clip-path: inset(0 calc((1 - var(--t)) * 100%) 0 0);
+  transform: translate3d(calc((1 - var(--t)) * -56px), 0, 0);
+  will-change: clip-path, transform, opacity;
+}
+/* Blog heading is right-aligned. Do not translate X — public layout
+   overflow-x-clip eats it and only opacity remains. Rise + clip instead. */
+.scrub-blog-head {
+  overflow: visible;
+}
+.scrub-blog-head .scrub-kicker {
+  opacity: 1;
+  transform: none;
+}
+.scrub-blog-head .scrub-rule {
+  --t: max(0, min(1, calc(var(--p, 0) / 0.32)));
+  transform: scaleX(var(--t));
+  opacity: var(--t);
+  transform-origin: right;
+}
+.scrub-blog-head .scrub-kicker-label {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.06) / 0.32)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 18px), 0);
+}
+.scrub-blog-head .scrub-title {
+  opacity: 1;
+  transform: none;
+  clip-path: inset(0 0 calc((1 - max(0, min(1, calc((var(--p, 0) - 0.04) / 0.5)))) * 100%) 0);
+}
+.scrub-blog-head .scrub-word {
+  --lag: calc(var(--i, 0) * 0.07);
+  --t: max(0, min(1, calc((var(--p, 0) - 0.04 - var(--lag)) / 0.42)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 72px), 0);
+  will-change: transform, opacity;
+}
+.scrub-blog-head .scrub-sub {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.2) / 0.4)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 36px), 0);
+}
+.scrub-blog-more {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.38) / 0.4)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 20px), 0);
+}
+.scrub-prod-stars {
+  /* sky drifts down slowly (= up when negative scrollY), lagging the page */
+  opacity: calc(0.35 + var(--p, 0) * 0.65);
+  will-change: opacity;
+}
+.scrub-prod-sky {
+  transform: translate3d(0, calc(-4px + var(--p, 0) * 60px), 0);
+  will-change: transform;
+}
+.scrub-prod-glow {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.04) / 0.38)));
+  opacity: var(--t);
+  transform: scale(calc(0.62 + var(--t) * 0.38));
+  filter: blur(calc((1 - var(--t)) * 12px));
+  transform-origin: 50% 45%;
+}
+.scrub-prod-art {
+  overflow: hidden;
+}
+.scrub-prod-art .prod-hub {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.06) / 0.36)));
+  opacity: var(--t);
+  transform: scale(calc(1.18 - var(--t) * 0.18));
+  filter: blur(calc((1 - var(--t)) * 8px));
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.scrub-prod-art .prod-wing-l {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.38) / 0.42)));
+  opacity: var(--t);
+  transform: translate(calc((1 - var(--t)) * 56px), 0);
+  filter: blur(calc((1 - var(--t)) * 6px));
+}
+.scrub-prod-art .prod-wing-r {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.46) / 0.42)));
+  opacity: var(--t);
+  transform: translate(calc((1 - var(--t)) * -56px), 0);
+  filter: blur(calc((1 - var(--t)) * 6px));
+}
+.scrub-svc-card {
+  --lag: calc(0.14 + var(--i, 0) * 0.06);
+  --t: max(0, min(1, calc((var(--p, 0) - var(--lag)) / 0.55)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 40px), 0) scale(calc(0.94 + var(--t) * 0.06));
+  clip-path: inset(calc((1 - var(--t)) * 100%) 0 0 0);
+  filter: blur(calc((1 - var(--t)) * 8px));
+  will-change: transform, opacity, clip-path, filter;
+}
+.scrub-t-wall {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.12) / 0.58)));
+  opacity: 1;
+  transform: none;
+  clip-path: none;
+  filter: none;
+}
+.scrub-t-wall .t-marquee-col {
+  --lag: calc(var(--ci, 0) * 0.14);
+  --t: max(0, min(1, calc((var(--p, 0) - 0.1 - var(--lag)) / 0.5)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 36px), 0) scale(calc(0.92 + var(--t) * 0.08));
+  clip-path: inset(0 0 calc((1 - var(--t)) * 100%) 0);
+  filter: blur(calc((1 - var(--t)) * 10px));
+}
+.scrub-cta .scrub-title {
+  --t: max(0, min(1, calc(var(--p, 0) / 0.55)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 28px), 0);
+  clip-path: none;
+  filter: none;
+}
+.scrub-cta .scrub-sub {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.08) / 0.5)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 18px), 0);
+  filter: none;
+}
+.scrub-cta button {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.16) / 0.5)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 16px), 0) scale(calc(0.94 + var(--t) * 0.06));
+  filter: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-char, .hero-rise { animation: none; opacity: 1; transform: none; filter: none; }
   .scroll-cue-dot { animation: none; }
   .reveal { transition: none; opacity: 1; transform: none; }
-  .t-card { animation: none; }
+  .t-marquee { mask-image: none; -webkit-mask-image: none; }
+  .t-marquee-track { animation: none; }
+  .hero-pin-sky, .hero-pin-copy { transform: none !important; opacity: 1 !important; }
+  .hero-pin-cue { opacity: 1 !important; }
+  .scrub-kicker, .scrub-kicker-label, .scrub-rule, .scrub-title, .scrub-sub, .scrub-meta, .scrub-cta-line,
+  .scrub-word, .scrub-blog-rail, .scrub-blog-more, .scrub-prod-art, .scrub-prod-stars, .scrub-prod-glow,
+  .scrub-prod-art .prod-hub,
+  .scrub-prod-art .prod-wing-l, .scrub-prod-art .prod-wing-r, .scrub-svc-card, .scrub-t-wall,
+  .scrub-t-wall .t-marquee-col, .scrub-cta button {
+    opacity: 1 !important;
+    transform: none !important;
+    clip-path: none !important;
+    filter: none !important;
+  }
 }
