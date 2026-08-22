@@ -46,15 +46,6 @@ export function Footer() {
             <p className="max-w-xs text-sm leading-relaxed text-text-secondary">
               {f.brandDesc}
             </p>
-
-            {/* Live status badge — signals the team is reachable and systems are up */}
-            <div className="mt-6 inline-flex items-center gap-2 rounded-full border border-border bg-bg-surface px-3 py-1.5">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-status-success opacity-60" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-status-success" />
-              </span>
-              <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-text-secondary">{f.statusAll}</span>
-            </div>
           </div>
 
           {Object.entries(footerLinks).map(([group, links]) => (

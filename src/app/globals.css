@@ -964,6 +964,117 @@
   opacity: calc(1 - var(--p, 0) * 2.4);
 }
 
+/* ═══════════════════════════════════════════════════════════════
+   Victoria Harbour skyline — hero backdrop
+   ═══════════════════════════════════════════════════════════════ */
+
+/* Light mode reads the scene as dusk rather than night: the page sits on a
+   near-white base, so a true night palette would land as a black bar. */
+:root {
+  --hk-sky-far: #d3dfec;
+  --hk-sky-near: #a8bcd8;
+  --hk-cloud: #bccde2;
+  --hk-ridge-far: #97acc9;
+  --hk-ridge-near: #7c93b7;
+  --hk-bldg-1: #6b81a8;
+  --hk-bldg-2: #7c91b6;
+  --hk-bldg-3: #8ca2c5;
+  --hk-bldg-edge: #bacade;
+  --hk-win-warm: #ffc55a;
+  --hk-win-cool: #eef7fc;
+  --hk-win-teal: #12b09c;
+  --hk-accent-pink: #f2789d;
+  --hk-accent-gold: #efa92b;
+  --hk-water: #9fb3ce;
+  --hk-water-deep: #7c94b6;
+  --hk-hull: #46587a;
+  --hk-hull-light: #f3f7f9;
+  --hk-ferry: #2f7d63;
+  --hk-sail: #d75a48;
+  --hk-moon: #edb238;
+}
+
+.dark {
+  --hk-sky-far: #0e1836;
+  --hk-sky-near: #16265c;
+  --hk-cloud: #1b2a55;
+  --hk-ridge-far: #101c42;
+  --hk-ridge-near: #0a1130;
+  --hk-bldg-1: #16265c;
+  --hk-bldg-2: #1e3272;
+  --hk-bldg-3: #274090;
+  --hk-bldg-edge: #3f63c0;
+  --hk-win-warm: #ffd166;
+  --hk-win-cool: #a8ecf7;
+  --hk-win-teal: #00e5cc;
+  --hk-accent-pink: #ff6f9c;
+  --hk-accent-gold: #f7b733;
+  --hk-water: #0a1233;
+  --hk-water-deep: #05091f;
+  --hk-hull: #16203f;
+  --hk-hull-light: #e8eff5;
+  --hk-ferry: #1e6b52;
+  --hk-sail: #d8392b;
+  --hk-moon: #f5c451;
+}
+
+/* Skyline sits nearer the camera than the star field, so it scrubs at roughly
+   half the sky's travel. Scale is baked in here rather than as Tailwind
+   utilities — both would write `transform` and the cascade would drop one. */
+.hero-pin-city {
+  --hk-scale: 1.55;
+  transform: translate3d(0, calc(var(--p, 0) * 16vh), 0) scale(var(--hk-scale));
+  transform-origin: 50% 100%;
+  will-change: transform;
+}
+@media (min-width: 640px) {
+  .hero-pin-city { --hk-scale: 1.22; }
+}
+@media (min-width: 1024px) {
+  .hero-pin-city { --hk-scale: 1; }
+}
+
+@keyframes hk-blink {
+  0%, 100% { opacity: var(--o, 0.7); }
+  50%      { opacity: calc(var(--o, 0.7) * 0.22); }
+}
+.hk-blink {
+  opacity: var(--o, 0.7);
+  animation-name: hk-blink;
+  animation-duration: var(--d, 5s);
+  animation-delay: var(--t, 0s);
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+
+@keyframes hk-bob {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(7px, 3px, 0); }
+}
+.hk-bob   { animation: hk-bob 9s ease-in-out infinite; }
+.hk-bob-b { animation: hk-bob 12s ease-in-out -4s infinite; }
+.hk-bob-c { animation: hk-bob 7s ease-in-out -2.5s infinite; }
+
+@keyframes hk-spin { to { transform: rotate(-360deg); } }
+.hk-wheel {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hk-spin 70s linear infinite;
+}
+
+@keyframes hk-beacon {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.12; }
+}
+.hk-beacon { animation: hk-beacon 2.6s ease-in-out infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  .hk-blink, .hk-bob, .hk-bob-b, .hk-bob-c, .hk-wheel, .hk-beacon {
+    animation: none;
+  }
+  .hero-pin-city { transform: scale(var(--hk-scale)) !important; }
+}
+
 /* Rest of homepage — `--p` from Scrub. Each section a different motion.
    Heading parts remap --p with lag so badge / title / sub / body are not one blob. */
 .scrub-kicker {

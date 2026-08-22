@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { ArrowRight, ChevronDown } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { CityField } from '@/components/hero/CityField'
+import { HarbourSkyline } from '@/components/hero/HarbourSkyline'
 import { ScrollPin } from '@/components/ui/ScrollPin'
 
 /**
@@ -82,17 +83,10 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
   return (
     <ScrollPin className="bg-[var(--bg-base)]" trackClassName="h-[70vh] md:h-[120vh]">
       <CityField className="hero-pin-sky pointer-events-none absolute inset-0 z-0 h-full w-full" />
+      <HarbourSkyline className="hero-pin-city pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-auto w-full" />
 
       <div className="hero-pin-copy container-max relative z-10 flex h-full items-start pt-32 md:pt-40">
         <div className="max-w-2xl pb-24 text-left">
-          <p className="hero-rise label-mono mb-7 flex items-center gap-2.5 text-[var(--signal)]" style={{ animationDelay: '0.15s' }}>
-            <span className="relative flex h-2 w-2">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--amber)] opacity-60" />
-              <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--amber)]" />
-            </span>
-            {c.heroEyebrowNew}
-          </p>
-
           <h1 className="font-display text-[2.75rem] font-bold leading-[1.02] tracking-tight text-[var(--text-primary)] sm:text-6xl lg:text-7xl">
             <span className="sr-only">{c.heroTitleNew}</span>
             <span aria-hidden="true">
