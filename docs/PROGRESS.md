@@ -5,6 +5,242 @@
 
 ---
 
+## Last session: 2026-08-24 (建築後方山脈圖層)
+
+**Summary**: 新增 `hk-mountain.png` 山脊剪影圖層（建築後方），日夜主題切換與 parallax。
+
+**Files changed**: `public/hero/hk-mountain.png`, `harbour-scene.ts`, `HarbourSkyline.tsx`, `globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+---
+
+## Previous session: 2026-08-24 (各船倒影微調)
+
+**Summary**: 恢復日夜天際線切換：日間 `hk-skyline-light.png`、夜間 `hk-skyline-dark.png`；無 sky-key 濾鏡。
+
+**Files changed**: `HarbourSkyline.tsx`, `globals.css`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+---
+
+## Previous session: 2026-08-24 (移除天際線 sky-key 濾鏡)
+
+**Summary**: 移除 `hk-skyline-dark.png` 的 `#hk-dark-sky-key` feColorMatrix 濾鏡。
+
+**Files changed**: `HarbourSkyline.tsx`, `globals.css`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+---
+
+## Previous session: 2026-08-23 (water overlap up, boats lower again)
+
+---
+
+## Previous session: 2026-08-23 (water higher, boats lowered)
+
+**Summary**: Raised waterline `BASE` 470→448; boats dropped ~45px and wakes re-aligned; ferry group offset 22→8.
+
+**Files changed**: `harbour-scene.ts`, `HarbourSkyline.tsx`, `globals.css`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+---
+
+## Previous session: 2026-08-23 (moon higher + close skyline/water gap)
+
+**Summary**: Raised moon (`CELESTIAL_Y` 112→58). Closed building–water gap: `BASE` 488→470, `SKYLINE_FOOT_DROP` 42→110, water canvas lap `-5%`→`-14%`. Re-seated vessels on the new waterline.
+
+**Files changed**: `harbour-scene.ts`, `HarbourSkyline.tsx`, `globals.css`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+---
+
+## Previous session: 2026-08-23 (water extends down + up under buildings)
+
+**Summary**: Water canvas now bleeds 12% below scene edge (`margin-bottom`, `height: 117%`); `BASE` 502→488 for taller water band; `ScrollPin` allows vertical overflow so downward bleed is visible.
+
+**Files changed**: `harbour-scene.ts`, `HarbourSkyline.tsx`, `globals.css`, `ScrollPin.tsx`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+---
+
+## Previous session: 2026-08-23 (cloud height + waterline overlap)
+
+**Summary**: Raised clouds (~80px in viewBox). Waterline `BASE` 532→502, skyline `SKYLINE_FOOT_DROP` 38px, water canvas laps 5% under buildings to close seam.
+
+**Files changed**: `harbour-scene.ts`, `HarbourSkyline.tsx`, `globals.css`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+---
+
+## Previous session: 2026-08-23 (hero enter animation + scroll phase rebalance)
+
+**Summary**: Added staged initial-load animations (sky fade, harbour rise, per-layer stagger for celestial/clouds/buildings/water/vessels). Rebalanced scroll with phased `--p-fade` / `--p-depth` / `--p-exit` vars; gentler parallax offsets; bottom exit veil for smoother handoff to blog section.
+
+**Files changed**: `ScrollPin.tsx`, `ImmersionHero.tsx`, `HarbourSkyline.tsx`, `globals.css`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+**Validation**: `npm run build` → clean.
+
+---
+
+## Previous session: 2026-08-23 (hero parallax + layered motion)
+
+**Summary**: Added scroll-driven parallax to every harbour hero layer (sky, moon/sun, clouds, buildings, water, three vessels) via `--p` CSS offsets. Idle motion: celestial float + halo pulse, skyline breathe, vessel sail + bob (nested SVG groups), slightly faster water canvas swell. Respects `prefers-reduced-motion`.
+
+**Files changed**: `src/components/hero/HarbourSkyline.tsx`, `src/components/hero/HarbourWater.tsx`, `src/app/globals.css`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+**Validation**: `npm run build` → clean.
+
+---
+
+## Previous session: 2026-08-23 (skyline clip + red fringe fix)
+
+**Summary**: Fixed IFC spire clipping: `SKYLINE_VB_H` was inverted (width/height×VB_W), pushing building tops above viewBox; now uses full sky band (`waterline` = BASE). Improved `SkyColumn` red peel (edge flood + pink halo). Re-exported `hk-skyline.png`.
+
+**Files changed**: `HarbourSkyline.tsx`, `scripts/dekey.ps1`, `public/hero/hk-skyline.png`, `globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+---
+
+## Previous session: 2026-08-23 (red-backdrop skyline replaced, SkyColumn dekey)
+
+**Summary**: Replaced hero skyline with user's red-backdrop illustration. `SkyColumn -Floor 28` peels sky red without Matte colour wash; added bottom-edge backdrop flood for pier margin. Output `hk-skyline.png` (1024×419 trim); `SKYLINE_ART.height` → 427.
+
+**Files changed**: `scripts/dekey.ps1`, `public/hero/hk-skyline.png`, `src/components/hero/HarbourSkyline.tsx`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+---
+
+## Previous session: 2026-08-23 (skyline SkyColumn dekey — fix washed Matte)
+
+**Summary**: Matte dekey washed the night skyline because building shadows share the same navy as the sky; distance key punched holes and quantised colours. Added `dekey.ps1 -Mode SkyColumn` (per-column sky peel from top, Floor=5) plus `Threshold` for other dark-backdrop art. Re-exported `hk-skyline.png`; `SKYLINE_ART.height` → 571.
+
+**Files changed**: `scripts/dekey.ps1`, `public/hero/hk-skyline.png`, `src/components/hero/HarbourSkyline.tsx`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+---
+
+## Previous session: 2026-08-23 (hero skyline replaced with user night illustration)
+
+**Summary**: Re-keyed user's Hong Kong night skyline illustration (`1024×571`, navy backdrop rgb(5,20,61)) via `dekey.ps1 -Mode Matte` into `public/hero/hk-skyline.png` (trimmed 1024×406). Updated `SKYLINE_ART.height` to 406; sky, water, vessels unchanged.
+
+**Files changed**: `public/hero/hk-skyline.png`, `src/components/hero/HarbourSkyline.tsx`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+**Validation**: visual check on localhost hero (dark mode); `dekey.ps1` Matte pass.
+
+---
+
+## Previous session: 2026-08-23 (Star Ferry right rigging + deck windows void)
+
+**Summary**: Fixed right mast rigging triangle void: grey anti-aliased stays after yellow matte were not seeding backdrop-black clears. Added `Flood-ClearVoidFromArt` from rigging strand pixels and near-white deck seeds; first-deck rectangular windows now transparent while white lifebuoy circles protected. Re-exported `star-ferry.png` with `-Mode Yellow`.
+
+**Files changed**: `scripts/dekey.ps1`, `public/hero/star-ferry.png`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+**Validation**: probe — rigging black left=0 right=0; deck band black=1.
+
+---
+
+## Previous session: 2026-08-23 (hero buildings swapped to illustration, scene intact)
+
+**Summary**: Replaced only the vector building layer in `HarbourSkyline` with `public/hero/hk-skyline.png` composited as an SVG `<image>` at the waterline. Sky gradient, moon/sun, clouds, animated `HarbourWater` canvas, promenade, and all three vessel artworks remain unchanged.
+
+**Files changed**: **NEW** `public/hero/hk-skyline.png`, `src/components/hero/HarbourSkyline.tsx`, `src/app/globals.css`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+**Validation**: `npm run build` → clean.
+
+---
+
+## Previous session: 2026-08-23 (Star Ferry yellow-key only, no Threshold)
+
+**Summary**: Replaced `Threshold` dekey with `-Mode Yellow` for Star Ferry: matte solve against pure yellow only, forced green palette candidates for saturated hull, border flood-fill for black exports without killing interior blacks (star, tyres). Re-exported `star-ferry.png`; cruiser back to `Matte`.
+
+**Files changed**: `scripts/dekey.ps1`, `public/hero/star-ferry.png`, `public/hero/cruiser.png`, `docs/CHANGELOG.md`, `docs/PROGRESS.md`.
+
+**Validation**: `dekey.ps1 -Mode Yellow` on user reference asset.
+
+---
+
+## Previous session: 2026-08-23 (all three harbour vessels swapped to keyed artwork)
+
+**Summary**: Replaced the traced SVG junk and motor cruiser with the user's three supplied illustrations, alongside an updated Star Ferry keyed asset. `scripts/dekey.ps1` processed `junk.png`, `star-ferry.png`, and `cruiser.png` into `public/hero/`. `HarbourSkyline` now embeds all three as `<image>` elements sized to the existing `VESSELS` footprints so canvas reflections stay aligned. Light/dark theming for the harbour scene was already token-driven (sky, moon/sun swap, water); vessel art shares `.hk-vessel-art` with a dark-theme brightness filter. Follow-up: re-keyed assets with `OpaqueMin` so ship pixels are fully opaque (no ghosting on water); light-mode `--hk-water` / `--hk-water-deep` darkened.
+
+**Files changed**: **NEW** `public/hero/junk.png`, **NEW** `public/hero/cruiser.png`, `public/hero/star-ferry.png`, `scripts/dekey.ps1`, `src/components/hero/HarbourSkyline.tsx`, `src/app/globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+**Validation**: `npm run build` → clean.
+
+---
+
+## Previous session: 2026-08-23 (ferry swapped from a trace to the artwork itself)
+
+**Summary**: After several rounds of correcting the traced Star Ferry, the call was made to drop the redraw and use the supplied illustration directly. **NEW** `scripts/dekey.ps1` keys its backdrop out. A plain colour-distance threshold is not sufficient: the masts and rigging are hairlines, so every one of their pixels is *already* a blend of white and backdrop, and thresholding keeps them fully opaque with the yellow still mixed in — they come out gold. The script instead lifts a palette from the artwork's own interior and, for each edge pixel, solves `C = a·F + (1−a)·BG` for the coverage `a` against every candidate `F`, keeping the smallest residual; pixels solving above 0.98 coverage keep their original colour so interior shading is not flattened onto the palette. Two bugs on the way: PowerShell's `[int]` cast *rounds*, so the top quantiser bucket overflowed to 264 and every write threw on the `[byte]` cast; and passes one and two shared a threshold, so raising it for pass two emptied the palette and dissolved the hull. The result is placed with its sheer (row 310 of 415) on 566 across 293–547 — exactly where the trace sat, so `VESSELS` and the canvas reflection are untouched. Artwork cannot re-tint per theme, so `.dark .hk-ferry-art` knocks the white superstructure back with a brightness filter. The traced geometry, the `--hk-ferry-lit` / `--hk-ferry-deep` / `--hk-ferry-keel` tokens and the `#hk-ferry-hull` clip path are gone; `--hk-ferry` stays because the water still reads it.
+
+**Files changed**: **NEW** `public/hero/star-ferry.png`, **NEW** `scripts/dekey.ps1`, `src/components/hero/HarbourSkyline.tsx`, `src/app/globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+**Validation**: `npx tsc --noEmit` and `npx next lint` → clean. Keyed asset composited over a dark field to check the matte (white-on-white hides it in a normal viewer), then headless Chrome in both themes at scene scale and 2.4×, through a scratch route removed afterwards.
+
+---
+
+## Previous session: 2026-08-23 (ferry given real sheer)
+
+**Summary**: The hull's top edge was `H547` — one horizontal rule spanning the whole vessel, and the line the tyre fenders hang on. It is now a `FERRY_SHEER` curve carrying real sheer: lowest amidships, lifting 6 units into both stems, meeting the bilge arc at each stem so no edge of the hull is straight any more. The lower deck went from a `rect` to a path whose foot follows the same curve, so the deck-to-hull junction reads as an arc rather than a ruled line, and the rubbing strake, tyre fenders and engine casing were re-seated on it. The four tonal bands ride the new bilge unchanged.
+
+**Files changed**: `src/components/hero/HarbourSkyline.tsx`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+**Validation**: `npx tsc --noEmit` → clean, no lint warnings. Headless Chrome in both themes at scene scale, 1.6× and 5×, through a scratch route removed afterwards. A first pass at 4 units of sheer was too shy to read at scene scale and was opened up to 6.
+
+---
+
+## Earlier session: 2026-08-23 (ferry hull given 2.5D tonal banding)
+
+**Summary**: The ferry's hull was two flat tones — a body green and a dark bottom — so it read as a cut-out rather than a volume. It now stacks four tones along the bilge: a lit sheer strake, the topside, the boot-topping and a keel rim, via a `ferryBand(up, edge)` helper that raises the bilge line and closes it off to one side. The offset is deliberately *vertical* rather than truly parallel: near the stems the bilge climbs faster than the offset, so every band pinches out to nothing before the stem, and that taper is what reads as the hull rounding away. New `--hk-ferry-lit` and `--hk-ferry-keel` tokens in both themes, with the dark theme's strake pulled back after it out-shouted the deck above it. The hull also went from 26 to 28 units deep and gained 5 units of overhang past the deck at each end, matching the reference's 0.115 depth-to-length ratio; `VESSELS` was widened to 293–547 so the reflection still tracks it.
+
+**Files changed**: `src/components/hero/HarbourSkyline.tsx`, `src/components/hero/harbour-scene.ts`, `src/app/globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+**Validation**: `npx tsc --noEmit` → clean, no lint warnings. Headless Chrome in both themes at scene scale plus a 5× crop on the hull, through a scratch route removed afterwards.
+
+---
+
+## Earlier session: 2026-08-23 (hull curves and sail camber, from dev-build review)
+
+**Summary**: Three notes off the running dev build. (1) **Ferry bilge**: the hull bottom was a curve-flat-curve — 144 units of dead-horizontal line directly under the tyre fenders — so it read as a barge with rounded corners. It is now one continuous curve stem to stem, still carrying the reference's full bilge rather than collapsing to a lens, and the boot-topping is offset parallel to it. `FERRY_HULL` was hoisted to a constant so the fill and `#hk-ferry-hull` cannot drift apart. (2) **Junk sails**: each leech left the peak on the yard's tangent and only bulged halfway down, which is why they looked slack. They now swell immediately off the peak, keeping the reference's 0.9 width-to-height ratio, and every batten was re-measured against the new leech. (3) **Junk hull**: retraced with the sheer's low point moved aft of midships, the same flat bottom segment removed, and a stronger raised stern; the brown belly panel and bulwark ports were re-seated on the new sheer, and the bow cabin and lamp now reach the deck instead of floating above it. Deckhouse windows moved to `--hk-hull` to match the ferry's.
+
+**Files changed**: `src/components/hero/HarbourSkyline.tsx`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+**Validation**: `npx tsc --noEmit` → clean. Headless Chrome in both themes plus 3.0–4.4× crops on the ferry and the junk, through a scratch route removed afterwards.
+
+---
+
+## Earlier session: 2026-08-23 (junk redrawn, three staggered waterlines, ferry fixes)
+
+**Summary**: Four corrections to the harbour hero. (1) **Funnel centred**: the ferry's funnel sat a unit right of her centreline while the star sat a unit left of the funnel, so neither lined up; funnel, cap, companionway and star all now key off `x=420`, and the star was resized and re-plotted so its bounding box centres in the visible white. (2) **Hull bottom and lower deck**: the boot-topping is now a band that runs *parallel to the bilge* rather than a level rect, so it stays constant right into both stems; the tyre fenders are drawn as rings with the hull showing through the bore so they read as tyres rather than dots; and a first attempt at deck stringers was reverted because it cluttered the glazing the reference keeps clean. (3) **Junk retraced** from a supplied beam-on reference: long raked stem, level sheer, raised stern, a brown belly panel and five bulwark ports clipped inside the hull, a deckhouse under an overhanging roof with eight lit windows, a bow cabin and red-topped lamp, and three lugsails whose battens run out past both the mast and the leech — the detail that makes a junk rig read as one. Hull colour moved from navy to the reference's browns via new `--hk-junk` / `--hk-junk-mid` tokens. (4) **Three waterlines**: the cruiser stays at the shoreline as the far vessel, the ferry is dropped 22 units by a wrapper `<g>` (a wrapper because `.hk-bob` animates `transform` and the CSS property would clobber the attribute), and the junk is authored lowest and largest. `VESSELS` gained a `top` field so each reflection hangs from its own waterline instead of all three from the shore.
+
+**Files changed**: `src/components/hero/HarbourSkyline.tsx`, `src/components/hero/harbour-scene.ts`, `src/components/hero/HarbourWater.tsx`, `src/app/globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+**Validation**: `npm run build` → clean, no lint warnings. Headless Chrome at 1440×900 in both themes, the homepage hero, and 3.0–3.6× crops on each vessel, through a scratch route removed afterwards.
+
+---
+
+## Earlier session: 2026-08-22 (Star Ferry redrawn from a beam-on reference)
+
+**Summary**: Retraced the hero's Star Ferry against a supplied beam-on elevation instead of drawing her from memory. Proportions come straight off the reference: length 244 viewBox units, and the hull, the green lower deck and the white saloon each take almost exactly a third of the 76-unit freeboard, with the masts reaching another 41 above the roof. Because she is double-ended, everything mirrors about `x=420`. New detail: a straight sheer between two sharp raked stems over a full bilge, a boot-topping band clipped to that bilge (`#hk-ferry-hull`), four open railing bays and three saloon panes per side flanking a framed window unit, an engine casing under the funnel that lines up with the striped companionway above it, twenty rounded saloon windows, a row of 24 scuttles along the saloon skirt, four skylights straddling the roofline, the black-topped funnel with its white star, and four tyre fenders on the rubbing strake. Hull green moved off teal toward the reference's forest green, and a matching `--hk-ferry-deep` token was added for the boot-topping. `VESSELS` in `harbour-scene.ts` was widened to `298…542` / depth `48` so the canvas reflection still lands under her.
+
+**Files changed**: `src/components/hero/HarbourSkyline.tsx`, `src/components/hero/harbour-scene.ts`, `src/app/globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+**Validation**: `npm run build` → clean, no lint warnings. Headless Chrome screenshots at 1440×900 in both themes plus a 3.9× and a 15.6× crop on the vessel, taken through a scratch route that was removed afterwards.
+
+---
+
+## Earlier session: 2026-08-22 (harbour hero — sun/moon, star blending, canvas water)
+
+**Summary**: Second pass on the hero harbour scene, addressing three notes. (1) **Sun and moon**: the crescent moon now only renders on the dark theme; light mode gets a sun disc with a layered corona, toggled by `.hk-day` / `.hk-night` off the `.dark` class. New `--hk-sun` and `--hk-glint` tokens; `--hk-glint` names whatever is in the sky so the water's specular path tracks it. (2) **Star blending**: dropped the SVG's static star layer so `CityField` owns all stars, and restyled it to match the scene — warm-white and gold with a little brand teal instead of flat teal, cross sparkles on the brightest, brightness falling off toward the horizon, and no stars at all in light mode (it is daylit). (3) **Water and vessels**: **NEW** `src/components/hero/HarbourWater.tsx` replaces the static SVG ripples with an animated canvas — reflection columns aligned to the skyline's own lit columns, a moon/sun glint path, per-vessel colour smears, and drifting surface streaks, all paused off-screen and static under reduced motion. Scene geometry moved to **NEW** `src/components/hero/harbour-scene.ts`, shared by the SVG and the canvas so reflections land under the lights that cast them. All three vessels were redrawn: the Star Ferry gained raked double ends, a rubbing strake, a funnel, wheelhouses and a shallower hull; the junk gained quadrilateral battened sails with angled yards and scalloped leeches, an upswept gold-capped sheer, a bowsprit, a stern house and a painted oculus; the cruiser gained a raked windshield and radar arch. Each now sits just below the waterline and trails a wake. `HarbourSkyline` returns a `.hk-scene` grid wrapper that splits at the viewBox waterline, welding the canvas to the shore at any width.
+
+**Files changed**: **NEW** `src/components/hero/HarbourWater.tsx`, **NEW** `src/components/hero/harbour-scene.ts`, `src/components/hero/HarbourSkyline.tsx`, `src/components/hero/CityField.tsx`, `src/app/globals.css`, `src/components/home/ImmersionHero.tsx`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+**Validation**: `npm run lint` and `npm run build` → clean. Headless Chrome screenshots at 1440×900 (both themes) and 390×844. Note: `.hk-scene` deliberately declares no `position` — an earlier draft set `position: relative`, which out-cascaded the caller's Tailwind `absolute` (same specificity, later in the sheet) and dropped the whole scene to the top of the hero.
+
+**Known, pre-existing**: on viewports below the `md` breakpoint the hero copy renders transparent in headless captures. Verified against the pre-change build — same behaviour, and `--p` reads `0.0000`, so it is the `hero-char` / `hero-rise` entrance animations, not the ScrollPin. Untouched here.
+
+---
+
+## Earlier session: 2026-08-22 (homepage hero — Victoria Harbour skyline SVG, initial)
+
+**Summary**: Replaced the homepage hero's empty backdrop with a hand-drawn Victoria Harbour skyline. **NEW** `src/components/hero/HarbourSkyline.tsx` renders a flat-vector scene (viewBox 1600×760) — Convention Centre shell roofs, Central Plaza's gold crown, Bank of China's X-braced facets, Two IFC, the Observation Wheel, the Peak ridge and mast, Star Ferry, a red-sailed junk, and lit water. Windows and ripples come from a fixed-seed `mulberry32`, so SSR and client markup match. All colour flows through new `--hk-*` tokens with separate night (dark) and dusk (light) palettes, keeping the dark hero headline legible on the light theme. Layered above `CityField` at `z-1` with its own `--p` parallax at roughly half the star field's travel, plus reduced-motion-guarded window blink, boat bob, wheel rotation, and beacon animations. **Fix**: `ImmersionHero`'s ScrollPin track was `h-[70vh]` on mobile — shorter than the viewport, so ScrollPin resolved `--p` to 1 on load and the hero copy rendered fully transparent; raised to `h-[112vh]`.
+
+**Files changed**: **NEW** `src/components/hero/HarbourSkyline.tsx`, `src/app/globals.css`, `src/components/home/ImmersionHero.tsx`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+**Validation**: `npm run build` → success. Headless Chrome screenshots at 1600×900, 1440×900, 834×1112, and 390×844 in both themes.
+
+---
+
 ## Last session: 2026-05-11 (M2 logout, JWKS, deny-list, download discovery, Stripe verify)
 
 **Summary**: Delivered the five prioritized web/backend items: **`POST /api/v1/auth/logout`** returns `204` and registers the presented JWT in an **Upstash Redis deny-list** (SHA-256 keyed, TTL until JWT `exp`) when `UPSTASH_REDIS_*` is configured; all license/account routes now reject revoked tokens via **`verifyLicenseJwtWithRevocationCheck`** / **`await requireEcShareLicense`**. Added **`GET /api/v1/license/jwks`** for desktop Ed25519/`kid` discovery (standard `{success,data}` envelope). Added **`GET /api/v1/download/latest-manifest`** plus **`/download`** page links for **`dl.easecity.hk`** manifest integration. Added **`npm run ecshare:stripe-verify`** to validate Stripe Price metadata against live Stripe API when `STRIPE_SECRET_KEY` is present. **`docs/API_CONTRACT.md`** is now **v0.4** with §10 decision table (Resend, annual rotation, Redis deny-list, optimistic seats, Upstash rate limits, Vercel). Playwright injects a deterministic dev-only Ed25519 PEM so JWKS e2e stays green without reading `.env.local`.
@@ -328,6 +564,8 @@ See `docs/WEB_TEAM_TASKS.md` for the full list.
 ## Recent changes log
 
 ### Week of 2026-04-21
+- 2026-08-22 — **Harbour hero, pass 2**: theme-swapped sun/moon, star field folded into the scene's palette and hidden by day, and a canvas water layer whose reflections align to the skyline's lit columns. All three vessels redrawn in detail.
+- 2026-08-22 — **Homepage hero skyline**: hand-drawn Victoria Harbour SVG behind the hero, themed via `--hk-*` tokens (night/dusk), with parallax and reduced-motion-guarded animation. Fixed a pre-existing mobile bug where the 70vh ScrollPin track made the hero copy fully transparent on load.
 - 2026-05-08 — **Neon Prisma baseline applied**: resolved existing DB `P3005`, marked foundation migration applied, deployed Stripe webhook event migration, and confirmed DB schema is up to date.
 - 2026-05-06 — **M2 staging deploy readiness check**: added redacted env checker, `npm run check:staging`, migration README notes, and stricter staging checklist flow.
 - 2026-05-06 — **M2 staging readiness / smoke baseline**: expanded `ecshare:smoke` to cover native register/login and license activate/heartbeat/deactivate; added `npm test` as standard API e2e entry; updated staging checklist with repeatable commands and Stripe duplicate-event checks.

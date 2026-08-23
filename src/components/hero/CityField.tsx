@@ -6,7 +6,33 @@ import { useEffect, useRef } from 'react'
  * CityField — 背景星星
  *
  * 星星自然一閃一閃，鼠標經過時產生推動效果。
+ *
+ * The star field shares the hero with the harbour skyline, so it has to read
+ * as the same night sky: colours come from the scene's window palette rather
+ * than the brand teal alone, brightness falls off toward the horizon where the
+ * skyline's sky gradient takes over, and the whole field goes dark in light
+ * mode — that scene is daylit and carries a sun instead.
  */
+
+type Rgb = [number, number, number]
+
+/** Warm starlight with a little brand teal mixed through. */
+const STAR_TONES: { rgb: Rgb; weight: number }[] = [
+  { rgb: [255, 250, 240], weight: 0.56 },
+  { rgb: [255, 214, 138], weight: 0.2 },
+  { rgb: [186, 226, 255], weight: 0.12 },
+  { rgb: [0, 229, 204], weight: 0.12 },
+]
+
+function pickTone(r: number): Rgb {
+  let acc = 0
+  for (const tone of STAR_TONES) {
+    acc += tone.weight
+    if (r <= acc) return tone.rgb
+  }
+  return STAR_TONES[0].rgb
+}
+
 export function CityField({ className = '' }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -19,6 +45,7 @@ export function CityField({ className = '' }: { className?: string }) {
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     const mouse = { x: -9999, y: -9999, active: false }
     let W = 0, H = 0, raf = 0, t = 0, dpr = 1
+    let night = document.documentElement.classList.contains('dark')
 
     interface Star {
       bx: number; by: number  // base (resting) position
@@ -30,15 +57,12 @@ export function CityField({ className = '' }: { className?: string }) {
       freq: number
       phase: number
       phase2: number
+      rgb: Rgb
+      /** 1 near the top of the hero, 0 at the horizon. */
+      alt: number
+      sparkle: boolean
     }
     let stars: Star[] = []
-
-    function getSignal(): [number, number, number] {
-      const s = getComputedStyle(document.documentElement)
-      const hex = s.getPropertyValue('--signal').trim() || '#00D4AA'
-      const n = parseInt(hex.replace('#', ''), 16)
-      return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
-    }
 
     function mulberry32(seed: number) {
       let a = seed
@@ -77,6 +101,9 @@ export function CityField({ className = '' }: { className?: string }) {
                  : sz < 0.35 ? 0.8 + rng() * 0.4
                  : 0.3 + rng() * 0.5
         const px = rng() * W
+        // Thin the field out toward the horizon, where the skyline's sky
+        // gradient thickens and the city glow washes faint stars out.
+        const alt = 1 - Math.min(1, Math.max(0, (y / H - 0.4) / 0.48))
         stars.push({
           bx: px, by: y,
           x: px, y,
@@ -87,26 +114,51 @@ export function CityField({ className = '' }: { className?: string }) {
           freq: 0.6 + rng() * 2.5,
           phase: rng() * Math.PI * 2,
           phase2: rng() * Math.PI * 2,
+          rgb: pickTone(rng()),
+          alt,
+          sparkle: size > 1.5 && rng() > 0.55,
         })
       }
       if (reduce) drawStatic()
     }
 
-    function drawStatic() {
+    function paint(s: Star, alpha: number) {
       const c = ctx!
-      c.clearRect(0, 0, W, H)
-      const sig = getSignal()
-      for (const s of stars) {
-        c.fillStyle = `rgba(${sig[0]},${sig[1]},${sig[2]},${(s.base + s.amp * 0.3).toFixed(2)})`
+      const a = alpha * s.alt
+      if (a < 0.012) return
+      const [r, g, b] = s.rgb
+      c.fillStyle = `rgba(${r},${g},${b},${a.toFixed(3)})`
+      c.beginPath()
+      c.arc(s.x, s.y, s.r, 0, Math.PI * 2)
+      c.fill()
+
+      if (s.sparkle) {
+        const len = s.r * 4.5
+        c.strokeStyle = `rgba(${r},${g},${b},${(a * 0.45).toFixed(3)})`
+        c.lineWidth = 0.7
         c.beginPath()
-        c.arc(s.x, s.y, s.r, 0, Math.PI * 2)
-        c.fill()
+        c.moveTo(s.x - len, s.y)
+        c.lineTo(s.x + len, s.y)
+        c.moveTo(s.x, s.y - len)
+        c.lineTo(s.x, s.y + len)
+        c.stroke()
       }
     }
 
-    function draw() {
-      t += 0.016
+    function drawStatic() {
       const c = ctx!
+      c.clearRect(0, 0, W, H)
+      if (!night) return
+      for (const s of stars) paint(s, s.base + s.amp * 0.3)
+    }
+
+    function draw() {
+      const c = ctx!
+      if (!night) {
+        c.clearRect(0, 0, W, H)
+        return
+      }
+      t += 0.016
 
       // ══ Physics: mouse push + spring back + repel between stars ══
 
@@ -152,17 +204,12 @@ export function CityField({ className = '' }: { className?: string }) {
 
       // ══ Render ══
       c.clearRect(0, 0, W, H)
-      const sig = getSignal()
       for (const s of stars) {
         const wave = Math.sin(t * s.freq + s.phase) * 0.6
                     + Math.sin(t * s.freq * 2.7 + s.phase2) * 0.25
                     + Math.sin(t * s.freq * 0.4 + s.phase * 1.5) * 0.15
         const brightness = s.base + s.amp * (wave * 0.5 + 0.5)
-        const clamped = Math.max(0.01, Math.min(0.9, brightness))
-        c.fillStyle = `rgba(${sig[0]},${sig[1]},${sig[2]},${clamped.toFixed(3)})`
-        c.beginPath()
-        c.arc(s.x, s.y, s.r, 0, Math.PI * 2)
-        c.fill()
+        paint(s, Math.max(0.01, Math.min(0.9, brightness)))
       }
     }
 
@@ -185,7 +232,10 @@ export function CityField({ className = '' }: { className?: string }) {
     canvas.addEventListener('mouseleave', onLeave)
     const ro = new ResizeObserver(() => resize())
     ro.observe(canvas.parentElement!)
-    const mo = new MutationObserver(() => { if (reduce) drawStatic() })
+    const mo = new MutationObserver(() => {
+      night = document.documentElement.classList.contains('dark')
+      if (reduce) drawStatic()
+    })
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
 
     return () => {

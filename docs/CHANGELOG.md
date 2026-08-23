@@ -1,9 +1,266 @@
 # MUPhone / EC-Share — Engineering Changelog
 
 所有從 Cursor 介入到目前狀態的實際改動記錄。
-最後更新：2026-08-19
+最後更新：2026-08-24
 
-## 2026-08-19 — Web polish: dark-mode contrast, transparent favicon, theme-aware logo, services page, Enterprise → Contact us
+## 2026-08-24 — 建築後方山脈圖層
+
+- 新增 `hk-mountain.png` 山脊剪影，置於建築後方；日夜配色切換。
+
+## 2026-08-24 — 倒影下移、移除水面橫線
+
+- 船隻倒影下移 10px（`REFLECTION_DROP`）。
+- 移除水面 `SURFACE_LINES` / `WAVES` 全寬橫線。
+
+## 2026-08-24 — 移除擴散環、修正水面倒影座標
+
+- 移除 SVG 擴散環尾跡。
+- 水面彩色倒影以 `mapSvgY()` runtime 對齊 SVG 船底位置。
+
+## 2026-08-24 — 移除 V 尾跡、快艇漣漪上移
+
+- 移除 Kelvin V 與快艇橫紋，只保留擴散環。
+- 快艇 `wakeSink -10`、`reflectionLift 58` 上移漣漪與水面倒影。
+
+## 2026-08-24 — 漣漪改船體局部座標
+
+- 漣漪錨點改為船體局部座標（`h - draftInset`），隨船體 bob 同步移動。
+
+## 2026-08-24 — 移除建築浮動、漣漪上移
+
+- 移除天際線 `hk-skyline-breathe` 呼吸動畫。
+- 船隻漣漪 `wakeSink` 上調（約高於水線 4–6px）。
+
+## 2026-08-24 — 漣漪水線對齊 + 日夜天際線 foot 對齊
+
+- 船隻漣漪錨點移至 `BASE` 水線（`wakeSink`）；繪製於船體之上。
+- `skylineImageY()` 依各 PNG `footRow` 對齊 light/dark 建築腳位；dark 尺寸更正為 5504×2310。
+
+## 2026-08-24 — 日間 light / 夜間 dark 天際線
+
+- 日間顯示 `hk-skyline-light.png`；夜間顯示 `hk-skyline-dark.png`（無濾鏡）。
+
+## 2026-08-24 — 移除天際線 sky-key 濾鏡
+
+- 移除 `hk-skyline-dark.png` 的 `#hk-dark-sky-key` 濾鏡。
+
+## 2026-08-24 — 改用 hk-skyline-dark.png
+
+- 日夜模式共用 `hk-skyline-light.png`；移除 `hk-skyline-dark.png` 切換與 `#hk-dark-sky-key` 濾鏡。
+
+## 2026-08-24 — SVG 船隻漣漪、移除摩天輪、夜景還原
+
+- 船隻尾跡改在 `HarbourSkyline` SVG 船體群組內繪製，與船底同座標系。
+- 移除 canvas 隨機 `RIPPLES` 與錯位的 `VESSEL_WAKE_SPECS` 繪製。
+- 暫時移除摩天輪（`FerrisWheel`）。
+- 夜景天際線移除 `mix-blend-mode: screen`，還原 `hk-skyline-dark.png` 原色。
+
+## 2026-08-23 — 水位再上重疊、船隻再下移
+
+- 水位線 `BASE` 448→428；水面向上重疊 22%（`height: 132%`）。
+- 三艘船再下移約 37px。
+
+## 2026-08-23 — 水位再抬高、船隻下移
+
+- 水位線 `BASE` 470→448；水面向上重疊 17%。
+- 三艘船 y 下移約 45px，尾跡對齊新水線。
+
+## 2026-08-23 — 月亮上移、消除建築與水面空白
+
+- 月亮／太陽 `CELESTIAL_Y` 112→58。
+- 水位線 `BASE` 488→470；天際線 `SKYLINE_FOOT_DROP` 42→110，蓋住 PNG 底部透明區。
+- 水面 canvas 向上重疊增至 14%；船隻座標對齊新水線。
+
+## 2026-08-23 — 水面向下延伸
+
+- 水面 canvas 向下溢出 12%（`margin-bottom` + `height: 117%`），向上仍重疊建築 5%。
+- 水位線 `BASE` 502→488，水域比例加大；`ScrollPin` 改為 `overflow-y: visible` 避免裁切。
+
+## 2026-08-23 — 雲層上移、水位線與建築重疊
+
+- 雲朵 y 座標上移約 80px。
+- 水位線 `BASE` 532→502；天際線圖下移 38px（`SKYLINE_FOOT_DROP`）浸入水面。
+- 水面 canvas 向上延伸 5%，消除建築與水面的空隙。
+
+## 2026-08-23 — Hero 入場動畫與滾動節奏重調
+
+- 初次載入：星空淡入、維港整體上滑入場，天體→雲→建築→水面→三艘船依序登場。
+- 滾動分三階段：`--p-fade`（文字先淡出）、`--p-depth`（場景視差）、`--p-exit`（底部漸層銜接下一 section）。
+- 視差幅度下調，避免船隻與建築位移過猛。
+
+## 2026-08-23 — Hero 視差滾動與分層動畫
+
+- 天空、月亮/太陽、雲、建築、水面、三艘船各以 `--p` 不同速率位移，滾動時有景深視差。
+- 天體光暈脈動、建築微呼吸、船隻橫移+起伏；水面波紋略加速。
+- `prefers-reduced-motion` 下關閉視差與 idle 動畫。
+
+## 2026-08-23 — 天際線裁切與紅邊修正
+
+- 根因：`SKYLINE_VB_H` 用錯比例（寬/高×VB_W），建築頂超出 viewBox 被裁掉；改為天空帶高度 = `BASE`（578），IFC 等高塔完整顯示。
+- `SkyColumn` 加強四邊 backdrop flood 與粉紅抗鋸齒 halo peel，減少紅色殘留。
+- 重新輸出 `hk-skyline.png`。
+
+## 2026-08-23 — 天際線換紅底插畫（SkyColumn 去紅）
+
+- 使用者提供紅底維港插畫；Matte 會洗色，改用 `-Mode SkyColumn -Floor 28` 自頂剝離紅色天空並保留原色霓虹。
+- `SkyColumn` 新增底邊 backdrop flood，清除碼頭下方紅色出血。
+- 輸出 `public/hero/hk-skyline.png`；`SKYLINE_ART.height` 427。
+
+## 2026-08-23 — 天際線改 SkyColumn 去背（修正 Matte 洗色）
+
+- 夜景插畫建築暗面與天空同色 navy，Matte／距離門檻會打洞並洗成灰藍。
+- `dekey.ps1` 新增 `-Mode SkyColumn`：每欄自頂向下剝離連續天空色（`-Floor 5`），保留原色與霓虹窗光；另恢復 `Threshold`（邊緣 flood）。
+- 重新輸出 `hk-skyline.png`（1024×571）；`SKYLINE_ART.height` 571。
+
+## 2026-08-23 — 天際線建築換成使用者夜景插畫
+
+- 使用者提供維港夜景插畫（深藍底 rgb(5,20,61)），`dekey.ps1` Matte 去背後輸出 `public/hero/hk-skyline.png`（1024×406 trim）。
+- `HarbourSkyline` `SKYLINE_ART.height` 更新為 406；天空、水面、三艘船不變。
+
+## 2026-08-23 — 天星小輪右桅三角形與第一層窗戶去背
+
+- 右桅黑底被深灰抗鋸齒索具包圍，舊 seed（純白鄰居）無法擴散；新增 `Flood-ClearVoidFromArt` 從索具灰線反向 flood 清除 backdrop-black。
+- 第一層白甲板矩形窗以 `Is-WindowVoid` + 甲板白邊 seed 清除；`Protect-WhiteDetail` 保留白色圓形救生圈。
+- 重新輸出 `public/hero/star-ferry.png`（`-Mode Yellow`）。
+
+## 2026-08-23 — 首頁 hero 建築物改為使用者插畫（僅建築層）
+
+- 新增 `public/hero/hk-skyline.png`。
+- `HarbourSkyline` 以 SVG `<image>` 在水線處疊加插畫，取代向量建築／山脊／地標。
+- 保留：天空漸層、月亮／太陽、雲、動畫水面、海濱步道、三艘船。
+
+## 2026-08-23 — 天星小輪黑邊殘留清除
+
+- Mast void 改為 `Is-BackdropBlack`（RGB ≤12，排除深綠與窗玻璃藍），清除桅杆三角形與抗鿾黑邊。
+- 全船 halo peel：貼近透明的 backdrop-black 剝離；煙囪中段白底上的黑星／黑條保留。
+
+## 2026-08-23 — 桅杆三角形內黑底清除
+
+- Yellow 模式新增 mast void fill：船體上緣 28% 內、與白色桅杆相鄰的超級黑，沿超級黑 flood 進三角形封閉區（煙囪黑星／輪胎不受影響）。
+
+## 2026-08-23 — 黃色去背：僅超級黑、不碰深綠
+
+- Flood fill 門檻改為超級黑（RGB 各 ≤4）；深綠不再進邊緣清除。
+- Yellow matte 僅在像素明顯偏黃時執行；綠主導像素跳過解算，保留原色。
+
+## 2026-08-23 — 天星小輪改黃色去背（不用 Threshold）
+
+- 移除 `Threshold` 模式；新增 `-Mode Yellow`：僅對黃色 (255,255,0) 做 palette matte，邊緣白桅解回白色而非金色；強制綠色調色盤候選保留船身飽和度。
+- 黑底匯出檔：邊緣連通純黑 flood fill 清背景，不動船內黑星／輪胎。
+- 天星小輪 `star-ferry.png` 重新輸出；快艇改回 `Matte`。
+
+## 2026-08-23 — 天星小輪飽和度還原（Threshold 去背）
+
+- 根因：黑底圖走 `Matte` 調色盤解算時，綠色船身距黑底不夠遠進不了 palette，邊緣被解成灰白 → 整艘船看起來不飽和。
+- `dekey.ps1` 新增 `-Mode Threshold`：黑底素材保留原像素色；天星小輪與快艇改用此模式，戎克船仍用 `Matte`。
+- 移除 `.dark .hk-vessel-art` 的 `brightness/saturate` filter（會主動洗淡顏色）。
+- 天星小輪改用使用者最新參考圖重新輸出 `public/hero/star-ferry.png`。
+
+## 2026-08-23 — 天星小輪不透明化、淺色海水加深
+
+- `dekey.ps1` 新增 `OpaqueMin`：覆蓋率 > 0.08 的像素強制 alpha=255，避免船身半透明疊在水面上像幽靈船。
+- 三艘船 PNG 重新輸出；移除淺色模式船隻 `brightness` 提亮 filter。
+- 淺色主題 `--hk-water` → `#5a7394`、`--hk-water-deep` → `#3d5674`（海水不再過淺）。
+
+## 2026-08-23 — 維港三艘船全部改用參考圖
+
+- 戎克船與快艇的手繪 SVG 整段刪除，天星小輪 keyed 圖更新；三艘船皆嵌入 `public/hero/{junk,star-ferry,cruiser}.png`。
+- `HarbourSkyline` 用 `<image>` 定位到既有 `VESSELS` 船身跨度，canvas 倒影無需改座標。
+- 深淺色：場景本已有 `--hk-*` token 與日月切換；船隻圖改共用 `.hk-vessel-art`（淺色略提亮、暗色 `brightness(0.86)`），取代僅天星小輪的 `.hk-ferry-art`。
+
+## 2026-08-23 — 天星小輪改用參考圖本身（不再手繪）
+
+- 手繪 SVG 版本整段刪除，改成直接嵌入去背後的參考圖 `public/hero/star-ferry.png`。
+- 新增 `scripts/dekey.ps1` 做去背。純色距門檻不夠用：桅杆與索具是髮絲線，每個像素本來就是白與黃的混色，直接門檻化會保留黃色 → 桅杆變金色。改成用圖檔自身取出的調色盤反解每個邊緣像素的覆蓋率（解 `C = a*F + (1-a)*BG`），覆蓋率 ≥ 0.98 的內部像素保留原色不量化。
+- 定位：圖中舷弧在第 310/415 列，對到 viewBox 的 566；船身橫跨 293–547，與原手繪位置一致，所以 canvas 倒影不用改。
+- 圖檔無法隨主題換色，暗色主題用 `filter: brightness(0.86)` 壓一下白色上層建築。
+- 移除已無用的 `--hk-ferry-lit` / `--hk-ferry-deep` / `--hk-ferry-keel` token 與 `#hk-ferry-hull` clip path；`--hk-ferry` 保留給水面倒影。
+
+## 2026-08-23 — 天星小輪舷弧改成曲線
+
+- 船殼上緣（甲板與船殼交界、輪胎掛的那條線）原本是 `H547` 一條橫貫全船的直線。改成真正的舷弧：中段最低、往艏艉兩端上翹 6 單位。
+- 下層甲板由 `rect` 改成 `path`，底邊跟著同一條舷弧，所以交界線是弧不是尺；防撞條、輪胎、機艙罩一併對齊新曲線。
+- 舷弧與舭部曲線在艏艉兩端交會於同一點，船體上下都沒有直線段了。
+
+## 2026-08-23 — 天星小輪船殼 2.5D 色階
+
+- 船殼原本只有「本體綠 + 底部深綠」兩色，是一塊平的剪影。改成沿舭部曲線疊四層色階：受光舷側板、船側本體、水線漆帶、龍骨暗邊。
+- 每層邊界都是舭部曲線「垂直上移」而非等距平行——靠近艏艉時舭部爬升比位移快，各層會自己收尖消失，這個收尖才是體積感的來源。
+- 新增 `--hk-ferry-lit` / `--hk-ferry-keel` token（明暗各一組）。
+- 船殼吃水由 26 加深到 28 單位、兩端各延長 5 單位超出甲板，比例對齊參考圖的 0.115 深長比；`VESSELS` 的天星小輪 x 範圍同步改成 293–547。
+
+## 2026-08-23 — 船殼曲線與帆面弧度修正（dev build 回饋）
+
+- 天星小輪船底原本是「兩端圓角 + 中段 144 單位水平直線」，輪胎正下方那段完全是直的。改成從艏到艉一條連續曲線，最深點仍保持參考圖的飽滿舭部，水線漆帶跟著平行位移。
+- 戎克帆的後緣原本從帆桁尖端沿切線緩緩張開，弧度不足。改成離開尖端就立刻鼓出，三面帆的最大寬度與高度比維持參考圖的 0.9，帆骨長度重算對齊新後緣。
+- 戎克船殼重畫：舷弧最低點移到中後段、船底同樣去掉水平直線段、艉部起翹加大；棕色腹板與舷側開口依新舷弧重新定位，艏樓與船燈落到甲板上。
+- 戎克艙房窗戶改用 `--hk-hull`，與天星小輪的窗戶同色。
+
+## 2026-08-23 — 戎克船重畫、三艘船分層水平線、天星小輪修正
+
+### 天星小輪
+- 煙囪原本比船身中線右偏 1 單位，星徽又比煙囪左偏 1 單位，兩處都對不齊。煙囪、黑頂、樓梯間、星徽現在一律以 `x=420` 為準；星徽同時放大並重算座標，讓外框正中於露出的白色段。
+- 船底水線漆帶改成「與艉舭曲線平行」的帶狀，而非水平矩形，因此一路延伸到兩端艏艉都維持等寬。
+- 輪胎碰墊改畫成圓環，中間透出船殼綠，才看得出是輪胎而不是黑點。
+- 一度加上的甲板橫向線腳已移除：參考圖的窗戶是乾淨的，加了反而雜亂。
+
+### 戎克船（依新參考圖 1:1 重畫）
+- 長斜艏柱、平直舷弧、上翹船艉；棕色腹板與五個舷側開口以 clip 夾在船殼內；艙房有外伸屋簷與八扇亮窗；艏樓小艙房與紅頂船燈。
+- 三面縱帆的帆骨往桅杆左側與後緣兩邊都伸出去——這是戎克帆最關鍵的辨識特徵，原本沒有。
+- 船殼配色由深藍改為參考圖的棕色系，新增 `--hk-junk` / `--hk-junk-mid` token。
+
+### 三艘船分層
+- 遊艇留在岸線當最遠、天星小輪下移 22 單位、戎克船畫在最低最大，形成前中後三層景深。天星小輪用外層 `<g>` 位移，因為 `.hk-bob` 動的是 `transform`，直接寫在同一個元素上會被 CSS 蓋掉。
+- `VESSELS` 新增 `top` 欄位，讓每艘船的倒影從自己的水平線往下拖，而不是三艘都從岸線開始。
+
+## 2026-08-22 — 天星小輪依正側面參考圖重畫
+
+- 依使用者提供的正側面參考圖重新量比例重畫，取代先前憑印象畫的版本。全長 244 viewBox 單位，船身／綠色下層甲板／白色客艙各約佔 76 單位乾舷的三分之一，桅杆再往上 41 單位；雙頭船故全船以 `x=420` 鏡射對稱。
+- 新增細節：兩端尖削斜艏艉之間的平直舷弧、以 `#hk-ferry-hull` clip 在艉舭曲線內的水線漆帶、每側四格開放欄杆艙與三片客艙玻璃加一組帶框窗、與上方直紋樓梯間對齊的機艙罩、20 扇圓角客艙窗、24 個舷窗、跨在屋頂線上的四座天窗、黑頂白身帶星徽的煙囪、防撞條上四個輪胎碰墊。
+- 船殼綠由偏藍綠改為參考圖的森林綠，另加 `--hk-ferry-deep` token 畫水線漆帶。
+- `harbour-scene.ts` 的 `VESSELS` 天星小輪範圍改為 `298…542`、depth `48`，讓 canvas 倒影仍對得上船身。
+
+## 2026-08-22 — 維港 hero 第二輪：日月切換、星空融合、Canvas 水面
+
+### Sun / moon
+- 月亮改為只在 dark 模式出現；light 模式換成太陽（實心圓 + 多段日暈）。以 `.hk-day` / `.hk-night` 搭配 `.dark` class 切換，未套主題時視同 light。
+- 新增 `--hk-sun` 與 `--hk-glint` token。`--hk-glint` 代表「當下掛在天上的那顆」，水面的鏡面光路直接跟著它換色。
+
+### Stars
+- 移除 SVG 內的靜態星星，改由既有的 `CityField` 單獨負責，避免兩套星空並存。
+- `CityField` 配色改為暖白 + 金 + 少量品牌青，最亮的幾顆加十字星芒；亮度隨高度往地平線衰減，銜接天際線的天空漸層；light 模式完全不畫星星。
+
+### Water（Canvas）
+- 新增 `src/components/hero/HarbourWater.tsx`：以 canvas 取代原本靜態的 SVG 水波。內容包含對齊上方建築燈光的倒影光柱、月/日光漣灑、各船隻的顏色暈染、以及橫向漂移的水面紋理。離開視窗時暫停，`prefers-reduced-motion` 下只畫一張靜態幀。
+- 新增 `src/components/hero/harbour-scene.ts`：SVG 與 canvas 共用的場景幾何與燈光來源，倒影因此會落在真正發光的那一欄下方。
+- `HarbourSkyline` 改為輸出 `.hk-scene` grid 容器，依 viewBox 水平線（578/760）切成兩列，讓 canvas 在任何寬度都貼齊岸邊。
+
+### Vessels
+- 天星小輪：雙頭斜艏艉、防撞條、煙囪、前後駕駛室、兩層甲板窗，吃水改淺。
+- 戎克船：改為正統四邊形硬帆（斜桁 + 竹骨 + 後緣扇形外凸）、上翹船舷加金色舷緣、船首斜桅與船眼、船尾艙房。
+- 遊艇：斜擋風玻璃、雷達架、航行燈。
+- 三艘船改為僅略低於水平線，並在水面留下尾流。
+
+### Theme
+- scroll cue 遮罩改用新的 `--hk-cue-scrim`：dark 壓深、light 提亮。原本固定用 `--hk-water-deep`，在淺色水面上會變成一塊灰斑。
+
+### Note
+- `.hk-scene` 刻意不宣告 `position`：先前草稿寫了 `position: relative`，權重與 Tailwind 的 `absolute` 相同但排在樣式表後面，會把整幅場景推到 hero 頂端。
+
+## 2026-08-22 — 首頁 hero 背景：手繪維港天際線 SVG
+
+### Hero backdrop
+- 新增 `src/components/hero/HarbourSkyline.tsx`：手繪維港夜景 flat-vector SVG（viewBox 1600×760），含會展中心殼形頂、中環廣場金字塔冠、中銀大廈 X 形桁架、國金二期、摩天輪、太平山脊與發射塔、天星小輪、紅帆戎克船、遊艇、水面燈影。窗光與水波以固定 seed 的 mulberry32 產生，確保 SSR/CSR 標記一致。
+- 接進 `ImmersionHero`，置於 `CityField` 星空層之上（z-1）、文案層之下（z-10）。
+
+### Theme
+- `globals.css` 新增 `--hk-*` token 兩套：dark 為夜景、light 為黃昏藍灰，避免深色插畫壓掉淺色主題的深色標題。
+- 新增 `.hero-pin-city` 視差（`--p` 位移約為星空層一半）與 `--hk-scale` 響應式縮放（<640px 1.28 / <1024px 1.22 / 桌機 1）。
+- 新增窗光閃爍、船身搖晃、摩天輪旋轉、塔頂航警燈動畫，全數在 `prefers-reduced-motion` 下停用。
+- scroll cue 遮罩改用 `--hk-water-deep`，並新增 `--hk-cue-ink`；原本的 `--bg-base` 遮罩疊在水面上會變成一塊色斑。
+
+### Fix
+- `ImmersionHero` 的 ScrollPin track 由 `h-[70vh]` 改為 `h-[112vh]`（手機）。原值低於視窗高度，使 ScrollPin 在載入當下就把 `--p` 解為 1，導致手機版 hero 文案完全透明。
 
 ### Theme
 - 新增 `--signal-ink` token（solid signal 背景上的文字色），修正 dark-mode 淺藍底 + 白字對比度不足：light=白字、dark=近黑字。

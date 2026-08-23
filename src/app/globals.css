@@ -654,28 +654,42 @@
 }
 
 /* Theme-switch circular reveal via View Transitions API.
-   The animation itself is driven from ThemeToggle with the Web Animations
-   API on ::view-transition-new(root); here we only reset cross-fade defaults
-   so the wipe is controlled, not a fade. */
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
-  mix-blend-mode: normal;
+   On click ThemeToggle writes the button center into --wc-x/--wc-y on
+   <html>. The old page fades out while the new theme scales up from the
+   button as a growing circle (clip-path), so the color change clearly
+   originates at the toggle and spreads outward. Driven purely by CSS. */
+:root {
+  --wc-x: 50vw;
+  --wc-y: 50vh;
 }
 
 ::view-transition-old(root) {
-  animation: none;
+  animation: theme-old-out 0.35s ease-out forwards;
 }
 
 ::view-transition-new(root) {
-  /* WAAPI sets clip-path each frame; ensure no CSS animation fights it. */
-  animation: none;
+  animation: theme-wipe 1.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  mix-blend-mode: normal;
+}
+
+@keyframes theme-old-out {
+  to { opacity: 0; }
+}
+
+@keyframes theme-wipe {
+  0% {
+    opacity: 1;
+    clip-path: circle(0px at var(--wc-x) var(--wc-y));
+  }
+  100% {
+    clip-path: circle(160vmax at var(--wc-x) var(--wc-y));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-new(root),
-  ::view-transition-old(root) {
-    animation: none !important;
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.01ms !important;
   }
 }
 
@@ -851,11 +865,8 @@
   animation: hero-rise 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
-/* Scroll cue — a dot falling inside a pill, looping. The soft radial bg
-   keeps it legible when the city skyline rises behind it. */
-.hero-scroll-cue-wrap {
-  background: radial-gradient(ellipse 90px 46px at 50% 60%, var(--bg-base) 30%, transparent 75%);
-}
+/* Scroll cue — a dot falling inside a pill, looping. The soft radial scrim
+   backdrop was removed 2026-08-22 — the cue now sits directly on the sky. */
 .scroll-cue {
   display: flex;
   justify-content: center;
@@ -949,19 +960,87 @@
 }
 
 /* Hero scroll theater — `--p` (0→1) is written by ScrollPin.
-   Sky lags + scales. Copy rises and fades. Cue dies first. */
+   Derived: `--p-fade` (copy/cue), `--p-depth` (scene parallax), `--p-exit` (handoff veil). */
+.scroll-pin {
+  /* Tall / wide viewports: nudge the whole hero stage down so the harbour
+     does not float too high with empty sky above. */
+  --hero-drop: clamp(
+    0vh,
+    max((100vh - 48rem) * 0.065, (100vw - 80rem) * 0.018),
+    4vh
+  );
+}
+/* 1080p-class desktop — light nudge only. */
+@media (min-width: 1920px) {
+  .scroll-pin {
+    --hero-drop: clamp(
+      4vh,
+      max((100vh - 50rem) * 0.08, (100vw - 90rem) * 0.022),
+      7vh
+    );
+  }
+}
+/* 1.5K / QHD (2560×1440) and above — push the scene further down. */
+@media (min-width: 2560px) {
+  .scroll-pin {
+    --hero-drop: clamp(
+      9vh,
+      max((100vh - 52rem) * 0.11, (100vw - 100rem) * 0.04),
+      14vh
+    );
+  }
+}
+.hero-stage {
+  position: absolute;
+  inset: 0;
+  transform: translate3d(0, var(--hero-drop), 0);
+  will-change: transform;
+}
 .hero-pin-sky {
-  transform: translate3d(0, calc(var(--p, 0) * 28vh), 0) scale(calc(1 + var(--p, 0) * 0.12));
+  transform: translate3d(0, calc(var(--p-depth, 0) * 12vh), 0) scale(calc(1 + var(--p-depth, 0) * 0.04));
   transform-origin: 50% 40%;
   will-change: transform;
 }
 .hero-pin-copy {
-  transform: translate3d(0, calc(var(--p, 0) * -18vh), 0);
-  opacity: calc(1 - var(--p, 0) * 1.15);
+  transform: translate3d(0, calc(var(--p-fade, 0) * -10vh), 0);
+  opacity: calc(1 - var(--p-fade, 0));
   will-change: transform, opacity;
+  position: relative;
+  z-index: 30;
 }
 .hero-pin-cue {
-  opacity: calc(1 - var(--p, 0) * 2.4);
+  opacity: calc(1 - clamp(0, calc(var(--p-fade, 0) * 1.35), 1));
+  transform: translate3d(0, calc(var(--p-fade, 0) * -5vh), 0);
+  will-change: transform, opacity;
+}
+
+/* Initial load — sky fades, harbour rises from below. */
+@keyframes hero-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes hero-city-rise {
+  from { opacity: 0; transform: translate3d(0, 9vh, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+.hero-enter-sky {
+  animation: hero-fade-in 1.6s ease-out both;
+}
+.hero-enter-mountains {
+  animation: hero-fade-in 1.5s ease-out 0.08s both;
+  overflow: visible;
+}
+.hero-enter-city {
+  animation: hero-city-rise 1.7s cubic-bezier(0.16, 1, 0.3, 1) 0.12s both;
+  overflow: visible;
+}
+
+/* Bottom veil dissolves hero into the next section during the final half of the pin. */
+.hero-exit-veil {
+  height: 58%;
+  background: linear-gradient(to top, var(--bg-base) 6%, transparent 100%);
+  opacity: var(--p-exit, 0);
+  will-change: opacity;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -974,8 +1053,12 @@
   --hk-sky-far: #d3dfec;
   --hk-sky-near: #a8bcd8;
   --hk-cloud: #bccde2;
-  --hk-ridge-far: #97acc9;
-  --hk-ridge-near: #7c93b7;
+  --hk-ridge-far: #b0c5dc;
+  --hk-ridge-near: #98b0cb;
+  --hk-mountain: var(--hk-ridge-far);
+  --hk-mountain-opacity: 0.78;
+  --hk-ridge-block: var(--hk-mountain);
+  --hk-ridge-glint: transparent;
   --hk-bldg-1: #6b81a8;
   --hk-bldg-2: #7c91b6;
   --hk-bldg-3: #8ca2c5;
@@ -985,21 +1068,34 @@
   --hk-win-teal: #12b09c;
   --hk-accent-pink: #f2789d;
   --hk-accent-gold: #efa92b;
-  --hk-water: #9fb3ce;
-  --hk-water-deep: #7c94b6;
+  --hk-water: #7fa7d4;
+  --hk-water-deep: #5b83b8;
   --hk-hull: #46587a;
   --hk-hull-light: #f3f7f9;
   --hk-ferry: #2f7d63;
   --hk-sail: #d75a48;
+  --hk-ferris-rim: var(--hk-bldg-edge);
+  --hk-ferris-core: var(--hk-bldg-1);
+  --hk-ferris-pier: var(--hk-bldg-2);
+  --hk-ferris-cabin: var(--hk-accent-pink);
+  --hk-ferris-cabin-soft: #f4a89a;
   --hk-moon: #edb238;
-}
+  --hk-sun: #f5a623;
+    --hk-sun-ring: #f9b93c;
+    --hk-glint: #f5a623;
+    --hk-cue-ink: #26364e;
+    }
 
 .dark {
   --hk-sky-far: #0e1836;
   --hk-sky-near: #16265c;
   --hk-cloud: #1b2a55;
-  --hk-ridge-far: #101c42;
-  --hk-ridge-near: #0a1130;
+  --hk-ridge-far: #0a142e;
+  --hk-ridge-near: #050a1c;
+  --hk-mountain: var(--hk-ridge-near);
+  --hk-mountain-opacity: 0.96;
+  --hk-ridge-block: var(--hk-mountain);
+  --hk-ridge-glint: rgba(255, 208, 120, 0.95);
   --hk-bldg-1: #16265c;
   --hk-bldg-2: #1e3272;
   --hk-bldg-3: #274090;
@@ -1015,23 +1111,289 @@
   --hk-hull-light: #e8eff5;
   --hk-ferry: #1e6b52;
   --hk-sail: #d8392b;
+  --hk-ferris-rim: #f2f7fc;
+  --hk-ferris-core: var(--hk-bldg-2);
+  --hk-ferris-pier: #0c1638;
+  --hk-ferris-cabin: #ff5e6c;
+  --hk-ferris-cabin-soft: #ff8f82;
   --hk-moon: #f5c451;
+  --hk-sun: #f5a623;
+  --hk-glint: #f5c451;
+  --hk-cue-ink: #93a7bd;
+  }
+
+/* The scene stacks an animated water canvas under an SVG city. A two-row grid
+   split at the viewBox waterline (428 of 760) welds the canvas to the shore at
+   any size: the SVG spans both rows, the canvas takes the lower one, and both
+   share a column so they overlay in source order. Deliberately no `position`
+   here — callers position the wrapper with Tailwind, and a `position` in this
+   rule would out-cascade their `absolute`. */
+.hk-scene {
+  display: grid;
+  grid-template-rows: 428fr 332fr;
+  aspect-ratio: 1600 / 760;
+  overflow-x: clip;
+  overflow-y: visible;
+  position: relative;
 }
+.hk-scene-city,
+.hk-scene-water {
+  display: block;
+  grid-column: 1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+.hk-scene-city {
+  grid-row: 1 / -1;
+  overflow: visible;
+  /* Above the water canvas: the SVG (buildings, skyline, vessels) must always
+     paint over the reflections so the water can never occlude them. */
+  z-index: 1;
+}
+.hk-scene-water {
+  grid-row: 2;
+  align-self: end;
+  z-index: 0;
+  /* Lap well under the skyline footing (closes PNG foot-pad gap) and bleed
+     down past the scene edge. */
+  margin-top: -22%;
+  margin-bottom: -12%;
+  height: 132%;
+}
+
+/* Mountain-only layer — same aspect grid as the harbour scene, no water canvas. */
+.hk-scene-mountains {
+  pointer-events: none;
+  overflow-x: visible;
+}
+.hk-scene-mountains .hk-scene-city {
+  grid-row: 1 / -1;
+}
+
+/* Vessel art — keyed PNG over a light background reads pale, so boost
+   contrast slightly in light mode; drop-shadow gives the hulls some depth. */
+.hk-vessel-art {
+  opacity: 1;
+}
+:root:not(.dark) .hk-vessel-art {
+  filter: contrast(1.12) saturate(1.1) drop-shadow(0 2px 6px rgba(38, 54, 78, 0.25));
+}
+
+/* Keyed skyline — light/dark art toggled with theme. */
+.hk-skyline-art {
+  opacity: 1;
+}
+.hk-skyline-light,
+.hk-skyline-dark {
+  display: none;
+}
+:root:not(.dark) .hk-skyline-light {
+  display: block;
+}
+.dark .hk-skyline-dark {
+  display: block;
+}
+
+/* Mountain + ridge blocks share one opacity stack to avoid light-mode banding. */
+.hk-mountain-stack {
+  opacity: var(--hk-mountain-opacity);
+}
+
+.hk-mountain-art {
+  fill: var(--hk-mountain);
+  opacity: 1;
+  stroke: none;
+}
+
+/* Ridge crowns peek above the path; buried base is covered by the mountain fill. */
+.hk-ridge-block {
+  fill: var(--hk-ridge-block);
+  opacity: 1;
+  stroke: none;
+}
+:root:not(.dark) .hk-ridge-buildings {
+  mask: url(#hk-ridge-window-mask);
+  -webkit-mask: url(#hk-ridge-window-mask);
+}
+.dark .hk-ridge-buildings {
+  mask: none;
+  -webkit-mask: none;
+}
+
+/* Dark mode — warm lit windows on top of the mountain stack. */
+.hk-ridge-glints-night {
+  display: none;
+}
+.dark .hk-ridge-glints-night {
+  display: block;
+}
+.dark .hk-ridge-glint-night {
+  fill: var(--hk-ridge-glint);
+  opacity: 1;
+  filter: drop-shadow(0 0 2px rgba(255, 200, 100, 0.7));
+  animation: hk-ridge-glint-glow 4.6s ease-in-out infinite;
+}
+@keyframes hk-ridge-glint-glow {
+  0%, 100% { opacity: 0.72; }
+  50% { opacity: 1; }
+}
+
+/* Moon by night, sun by day. No theme class yet means light, same as :root. */
+.hk-day { display: none; }
+:root:not(.dark) .hk-day { display: block; }
+:root:not(.dark) .hk-night { display: none; }
 
 /* Skyline sits nearer the camera than the star field, so it scrubs at roughly
    half the sky's travel. Scale is baked in here rather than as Tailwind
    utilities — both would write `transform` and the cascade would drop one. */
 .hero-pin-city {
+  position: relative;
+  width: 100%;
   --hk-scale: 1.55;
-  transform: translate3d(0, calc(var(--p, 0) * 16vh), 0) scale(var(--hk-scale));
+  transform: translate3d(0, calc(var(--p-depth, 0) * 6vh), 0) scale(var(--hk-scale));
   transform-origin: 50% 100%;
-  will-change: transform;
+  opacity: calc(1 - var(--p-exit, 0) * 0.35);
+  will-change: transform, opacity;
 }
 @media (min-width: 640px) {
   .hero-pin-city { --hk-scale: 1.22; }
 }
 @media (min-width: 1024px) {
   .hero-pin-city { --hk-scale: 1; }
+}
+
+/* Layered scroll parallax — subtle depth offsets on `--p-depth` only.
+   Idle motion lives on nested children so scroll transforms never fight keyframes. */
+.hk-parallax-sky,
+.hk-parallax-celestial,
+.hk-parallax-clouds,
+.hk-parallax-mountains,
+.hk-parallax-buildings,
+.hk-parallax-vessel,
+.hk-parallax-water {
+  will-change: transform;
+}
+.hk-parallax-sky {
+  transform: translate3d(0, calc(var(--p-depth, 0) * -3vh), 0);
+  transform-origin: 50% 100%;
+}
+.hk-parallax-celestial {
+  transform: translate3d(0, calc(var(--p-depth, 0) * -5vh), 0);
+  transform-origin: 50% 28%;
+}
+.hk-parallax-clouds {
+  transform: translate3d(0, calc(var(--p-depth, 0) * -3.5vh), 0);
+  transform-origin: 50% 40%;
+}
+.hk-parallax-mountains {
+  transform: translate3d(0, calc(var(--p-depth, 0) * -1vh), 0);
+  transform-origin: 50% 100%;
+}
+.hk-parallax-buildings {
+  transform: translate3d(0, calc(var(--p-depth, 0) * -1vh), 0)
+             scale(calc(1 + var(--p-depth, 0) * 0.012));
+  transform-origin: 50% 100%;
+}
+.hk-parallax-vessel {
+  transform-origin: 50% 100%;
+}
+.hk-parallax-vessel-a {
+  transform: translate3d(0, calc(var(--p-depth, 0) * 2.5vh), 0);
+}
+.hk-parallax-vessel-b {
+  transform: translate3d(0, calc(var(--p-depth, 0) * 2vh), 0);
+}
+.hk-parallax-vessel-c {
+  transform: translate3d(0, calc(var(--p-depth, 0) * 3vh), 0);
+}
+.hk-parallax-water {
+  transform: translate3d(0, calc(var(--p-depth, 0) * 1.5vh), 0);
+  transform-origin: 50% 0%;
+}
+
+/* Staggered harbour layer entrance (plays once on load). */
+@keyframes hk-enter-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+@keyframes hk-enter-rise {
+  from { opacity: 0; transform: translate3d(0, 26px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+.hk-enter-celestial {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hk-enter-fade 1s 0.45s both;
+}
+.hk-enter-clouds {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hk-enter-fade 1.1s 0.65s both;
+}
+.hk-enter-mountains {
+  animation: hk-enter-fade 1.15s 0.5s both;
+}
+.hk-enter-mountains svg {
+  overflow: visible;
+}
+.hk-enter-buildings {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: hk-enter-rise 1.2s 0.55s both;
+}
+.hk-enter-water {
+  animation: hk-enter-fade 1s 0.8s both;
+}
+.hk-enter-vessel {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: hk-enter-rise 1s both;
+}
+.hk-enter-vessel-a { animation-delay: 0.95s; }
+.hk-enter-vessel-b { animation-delay: 1.1s; }
+.hk-enter-vessel-c { animation-delay: 1.25s; }
+
+/* Celestial idle motion */
+@keyframes hk-celestial-float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -7px, 0); }
+}
+.hk-celestial-float {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hk-celestial-float 8s ease-in-out infinite;
+}
+.hk-day.hk-celestial-float { animation-delay: -2.5s; }
+
+@keyframes hk-moon-pulse {
+  0%, 100% { opacity: 0.82; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.1); }
+}
+.hk-moon-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hk-moon-pulse 5.5s ease-in-out infinite;
+}
+
+@keyframes hk-sun-pulse {
+  0%, 100% { opacity: 0.88; transform: scale(1); }
+  50%      { opacity: 1; transform: scale(1.14); }
+}
+.hk-sun-halo {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hk-sun-pulse 4.2s ease-in-out infinite;
+}
+
+@keyframes hk-skyline-breathe {
+  0%, 100% { transform: translate3d(0, 0, 0) scaleY(1); }
+  50%      { transform: translate3d(0, -2px, 0) scaleY(1.006); }
+}
+.hk-skyline-breathe {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: hk-skyline-breathe 7s ease-in-out infinite;
 }
 
 @keyframes hk-blink {
@@ -1049,11 +1411,66 @@
 
 @keyframes hk-bob {
   0%, 100% { transform: translate3d(0, 0, 0); }
-  50%      { transform: translate3d(7px, 3px, 0); }
+  50%      { transform: translate3d(0, 5px, 0); }
 }
-.hk-bob   { animation: hk-bob 9s ease-in-out infinite; }
-.hk-bob-b { animation: hk-bob 12s ease-in-out -4s infinite; }
-.hk-bob-c { animation: hk-bob 7s ease-in-out -2.5s infinite; }
+@keyframes hk-bob-b {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, 6px, 0); }
+}
+@keyframes hk-bob-c {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0, -4px, 0); }
+}
+.hk-bob   { animation: hk-bob 7s ease-in-out infinite; }
+.hk-bob-b { animation: hk-bob-b 10s ease-in-out -3s infinite; }
+.hk-bob-c { animation: hk-bob-c 5.5s ease-in-out -1.8s infinite; }
+
+/* Vessel wakes — SVG rings at hull contact, bob with parent group. */
+.hk-vessel-wake {
+  pointer-events: none;
+}
+@keyframes hk-wake-ring {
+  0% { transform: scale(0.35); opacity: 0.4; }
+  70% { opacity: 0.1; }
+  100% { transform: scale(2.5); opacity: 0; }
+}
+.hk-vessel-wake .hk-wake-ring {
+  transform-box: fill-box;
+  transform-origin: center;
+  opacity: 0;
+  animation: hk-wake-ring 2.8s ease-out infinite;
+}
+.hk-vessel-wake--ferry .hk-wake-ring { animation-duration: 2.8s; }
+.hk-vessel-wake--junk .hk-wake-ring { animation-duration: 3.1s; }
+.hk-vessel-wake--cruiser .hk-wake-ring { animation-duration: 1.85s; }
+.hk-wake-ring--0 { animation-delay: 0s; }
+.hk-wake-ring--1 { animation-delay: 0.92s; }
+.hk-wake-ring--2 { animation-delay: 1.84s; }
+@keyframes hk-wake-streak-pulse {
+  0%, 100% { opacity: 0.16; }
+  50% { opacity: 0.3; }
+}
+.hk-vessel-wake--cruiser .hk-wake-streak {
+  animation: hk-wake-streak-pulse 1.35s ease-in-out infinite;
+}
+.hk-wake-streak--1 { animation-delay: 0.18s; }
+.hk-wake-streak--2 { animation-delay: 0.36s; }
+
+@keyframes hk-vessel-sail {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%      { transform: translate3d(22px, 4px, 0) rotate(0.4deg); }
+}
+@keyframes hk-vessel-sail-b {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50%      { transform: translate3d(-18px, 5px, 0) rotate(-0.35deg); }
+}
+@keyframes hk-vessel-sail-c {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(28px, -3px, 0); }
+}
+.hk-vessel-sail   { animation: hk-vessel-sail 14s ease-in-out infinite; }
+.hk-vessel-sail-b { animation: hk-vessel-sail-b 18s ease-in-out -6s infinite; }
+.hk-vessel-sail-c { animation: hk-vessel-sail-c 9s ease-in-out -2s infinite; }
 
 @keyframes hk-spin { to { transform: rotate(-360deg); } }
 .hk-wheel {
@@ -1062,17 +1479,76 @@
   animation: hk-spin 70s linear infinite;
 }
 
+/* Central pier observation wheel — slow clockwise rotation. */
+@keyframes hk-ferris-spin {
+  to { transform: rotate(360deg); }
+}
+.hk-ferris-rotate {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: hk-ferris-spin 110s linear infinite;
+}
+.hk-enter-ferris {
+  animation: hero-fade-in 1.9s ease-out 0.35s both;
+}
+
 @keyframes hk-beacon {
   0%, 100% { opacity: 1; }
   50%      { opacity: 0.12; }
 }
 .hk-beacon { animation: hk-beacon 2.6s ease-in-out infinite; }
 
+/* Day sun — simple, clean disc. */
+
+/* Clouds — each drifts sideways and bobs gently. */
+.hk-cloud {
+  fill: var(--hk-cloud);
+  transform-box: fill-box;
+  will-change: transform;
+}
+.hk-cloud-a {
+  animation: hk-cloud-drift-a 24s ease-in-out infinite;
+}
+.hk-cloud-b {
+  opacity: 0.7;
+  animation: hk-cloud-drift-b 32s ease-in-out infinite;
+}
+.hk-cloud-c {
+  opacity: 0.75;
+  animation: hk-cloud-drift-c 20s ease-in-out infinite;
+}
+@keyframes hk-cloud-drift-a {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25%      { transform: translate3d(-46px, 6px, 0); }
+  50%      { transform: translate3d(-90px, -4px, 0); }
+  75%      { transform: translate3d(-40px, 8px, 0); }
+}
+@keyframes hk-cloud-drift-b {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(120px, 10px, 0); }
+}
+@keyframes hk-cloud-drift-c {
+  0%, 100% { transform: translate3d(0, -2px, 0); }
+  50%      { transform: translate3d(70px, 8px, 0); }
+}
+
 @media (prefers-reduced-motion: reduce) {
-  .hk-blink, .hk-bob, .hk-bob-b, .hk-bob-c, .hk-wheel, .hk-beacon {
+  .hk-blink, .hk-bob, .hk-bob-b, .hk-bob-c, .hk-wheel, .hk-ferris-rotate, .hk-beacon,
+  .hk-cloud-a, .hk-cloud-b, .hk-cloud-c,
+  .hk-celestial-float, .hk-moon-halo, .hk-sun-halo, .hk-skyline-breathe,
+  .hk-vessel-sail, .hk-vessel-sail-b, .hk-vessel-sail-c,
+  .hk-wake-ring, .hk-wake-streak, .hk-ridge-glint-night,
+  .hero-enter-sky, .hero-enter-mountains, .hero-enter-city, .hk-enter-ferris,
+  .hk-enter-celestial, .hk-enter-clouds, .hk-enter-mountains, .hk-enter-buildings, .hk-enter-water,
+  .hk-enter-vessel {
     animation: none;
   }
-  .hero-pin-city { transform: scale(var(--hk-scale)) !important; }
+  .hk-parallax-sky, .hk-parallax-celestial, .hk-parallax-clouds,
+  .hk-parallax-mountains, .hk-parallax-buildings, .hk-parallax-vessel, .hk-parallax-water {
+    transform: none !important;
+  }
+  .hero-pin-city { transform: scale(var(--hk-scale)) !important; opacity: 1 !important; }
+  .hero-exit-veil { opacity: 0 !important; }
 }
 
 /* Rest of homepage — `--p` from Scrub. Each section a different motion.
@@ -1251,8 +1727,13 @@
   .reveal { transition: none; opacity: 1; transform: none; }
   .t-marquee { mask-image: none; -webkit-mask-image: none; }
   .t-marquee-track { animation: none; }
-  .hero-pin-sky, .hero-pin-copy { transform: none !important; opacity: 1 !important; }
-  .hero-pin-cue { opacity: 1 !important; }
+  .hero-pin-sky, .hero-pin-copy, .hero-pin-city, .hero-pin-cue { transform: none !important; opacity: 1 !important; }
+  .hero-enter-sky, .hero-enter-mountains, .hero-enter-city { animation: none; opacity: 1 !important; }
+  .hero-exit-veil { opacity: 0 !important; }
+  .hk-parallax-sky, .hk-parallax-celestial, .hk-parallax-clouds,
+  .hk-parallax-mountains, .hk-parallax-buildings, .hk-parallax-vessel, .hk-parallax-water {
+    transform: none !important;
+  }
   .scrub-kicker, .scrub-kicker-label, .scrub-rule, .scrub-title, .scrub-sub, .scrub-meta, .scrub-cta-line,
   .scrub-word, .scrub-blog-rail, .scrub-blog-more, .scrub-prod-art, .scrub-prod-stars, .scrub-prod-glow,
   .scrub-prod-art .prod-hub,

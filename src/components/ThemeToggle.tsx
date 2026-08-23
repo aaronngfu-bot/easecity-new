@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useTheme } from 'next-themes'
 import { Moon, Sun } from 'lucide-react'
+import { useLanguage } from '@/context/LanguageContext'
 
 interface ThemeToggleProps {
   className?: string
@@ -10,13 +11,17 @@ interface ThemeToggleProps {
 
 /**
  * Theme toggle with a circular "wipe" reveal using the View Transitions API.
- * On click, a circle grows outward from the toggle button's position, revealing
- * the new theme underneath. Falls back to a plain instant switch in browsers
- * without View Transitions (`document.startViewTransition) support — or when
- * the user prefers reduced motion — so it never blocks the toggle.
+ *
+ * On click we write the button center into `--wc-x` / `--wc-y` CSS variables
+ * on the document element, then start a view transition. The wipe itself is
+ * driven entirely by a CSS @keyframes (see `theme-wipe`) on
+ * `::view-transition-new(root)` — no WAAPI pseudo-element animation, which is
+ * unreliable across browsers. Falls back to an instant switch when View
+ * Transitions or reduced motion isn't available.
  */
 export function ThemeToggle({ className = '' }: ThemeToggleProps) {
   const { resolvedTheme, setTheme } = useTheme()
+  const { t } = useLanguage()
   const [mounted, setMounted] = useState(false)
   const btnRef = useRef<HTMLButtonElement | null>(null)
 
@@ -29,56 +34,33 @@ export function ThemeToggle({ className = '' }: ThemeToggleProps) {
   const toggle = () => {
     const next = isDark ? 'light' : 'dark'
     const el = btnRef.current
+    const root = document.documentElement
+
+    // Remember the wipe origin (button center) in CSS space for the theme-wipe keyframes.
+    if (el) {
+      const r = el.getBoundingClientRect()
+      const cx = r.left + r.width / 2
+      const cy = r.top + r.height / 2
+      root.style.setProperty('--wc-x', `${cx.toFixed(1)}px`)
+      root.style.setProperty('--wc-y', `${cy.toFixed(1)}px`)
+    }
+
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const startVT = (document as Document).startViewTransition
-
-    // Bail to a plain switch when transitions aren't available or reduced motion.
-    if (typeof startVT !== 'function' || reduce) {
-      setTheme(next)
-      return
-    }
-
-    const r = el?.getBoundingClientRect()
-    if (!r) {
-      setTheme(next)
-      return
-    }
-    // Button center in viewport coordinates (== the view-transition root box origin).
-    const cx = r.left + r.width / 2
-    const cy = r.top + r.height / 2
-    // Full-viewport diagonal radius — always covers every corner (incl. the
-    // button's own corner), so the reveal never stops short of the full page.
-    const radius = Math.hypot(window.innerWidth, window.innerHeight)
-
-    const sameSize = () => setTheme(next)
-
-    const transition = (document as Document & {
+    const doc = document as Document & {
       startViewTransition: (cb: () => void) => { ready: Promise<void> }
-    }).startViewTransition(sameSize)
+    }
 
-    // Drive the circle reveal with the Web Animations API directly on the
-    // ::view-transition-new(root) pseudo-element. Anchoring at the button center
-    // (cx, cy) is precise and works reliably across View Transition-aware
-    // browsers — unlike relying on CSS vars read at an indeterminate frame.
-    transition.ready.then(() => {
-      document.documentElement.animate(
-        {
-          clipPath: [
-            `circle(0px at ${cx}px ${cy}px)`,
-            `circle(${radius}px at ${cx}px ${cy}px)`,
-          ],
-        },
-        {
-          duration: 800,
-          easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
-          fill: 'forwards',
-          pseudoElement: '::view-transition-new(root)',
-        }
-      )
-    })
+    if (typeof doc.startViewTransition !== 'function' || reduce) {
+      setTheme(next)
+      return
+    }
+
+    // Call on `document` directly — destructuring startViewTransition off the
+    // object loses `this`, which throws TypeError: Illegal invocation.
+    doc.startViewTransition(() => setTheme(next))
   }
 
-  const label = isDark ? 'Switch to light mode' : 'Switch to dark mode'
+  const label = isDark ? t.footer.themeLight : t.footer.themeDark
 
   return (
     <button

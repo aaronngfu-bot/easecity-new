@@ -81,9 +81,19 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
     ))
 
   return (
-    <ScrollPin className="bg-[var(--bg-base)]" trackClassName="h-[70vh] md:h-[120vh]">
-      <CityField className="hero-pin-sky pointer-events-none absolute inset-0 z-0 h-full w-full" />
-      <HarbourSkyline className="hero-pin-city pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-auto w-full" />
+    // The track must outrun the viewport or ScrollPin resolves `--p` to 1 on
+    // load, which fades the copy out and drags the skyline off its footing.
+    <ScrollPin className="bg-[var(--bg-base)]" trackClassName="h-[155vh] md:h-[175vh]">
+      <div className="hero-stage">
+      <div className="hero-enter-sky pointer-events-none absolute inset-0 z-0">
+        <CityField className="hero-pin-sky h-full w-full" />
+      </div>
+
+      <div className="hero-enter-city pointer-events-none absolute inset-x-0 bottom-0 z-[1] w-full">
+        <HarbourSkyline className="hero-pin-city w-full" />
+      </div>
+
+      <div className="hero-exit-veil pointer-events-none absolute inset-x-0 bottom-0 z-[2]" aria-hidden />
 
       <div className="hero-pin-copy container-max relative z-10 flex h-full items-start pt-32 md:pt-40">
         <div className="max-w-2xl pb-24 text-left">
@@ -106,7 +116,6 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
               className="rounded-lg bg-[var(--amber)] px-8 py-3.5 text-sm font-semibold text-[var(--amber-ink)] shadow-[0_0_0_0_rgba(0,229,204,0)] hover:shadow-[0_8px_30px_-6px_rgba(0,229,204,0.5)]"
             >
               {c.heroCtaPrimary}
-              <ArrowRight size={15} />
             </MagneticCta>
             <Link
               href="/services"
@@ -132,6 +141,7 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
           <ChevronDown size={13} className="opacity-60" />
         </span>
       </a>
+      </div>
     </ScrollPin>
   )
 }

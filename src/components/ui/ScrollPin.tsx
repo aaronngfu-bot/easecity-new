@@ -30,6 +30,9 @@ export function ScrollPin({
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     if (reduce) {
       pin.style.setProperty('--p', '0')
+      pin.style.setProperty('--p-depth', '0')
+      pin.style.setProperty('--p-fade', '0')
+      pin.style.setProperty('--p-exit', '0')
       pin.style.position = 'relative'
       pin.style.height = '100svh'
       track.style.height = 'auto'
@@ -60,6 +63,13 @@ export function ScrollPin({
         pin.style.bottom = 'auto'
       }
       pin.style.setProperty('--p', p.toFixed(4))
+      // Phased progress — copy fades first, depth moves mid-scroll, exit veil last.
+      const pDepth = Math.max(0, Math.min(1, (p - 0.1) / 0.9))
+      const pFade = Math.max(0, Math.min(1, p / 0.75))
+      const pExit = Math.max(0, Math.min(1, (p - 0.5) / 0.5))
+      pin.style.setProperty('--p-depth', pDepth.toFixed(4))
+      pin.style.setProperty('--p-fade', pFade.toFixed(4))
+      pin.style.setProperty('--p-exit', pExit.toFixed(4))
     }
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(update)
@@ -79,7 +89,7 @@ export function ScrollPin({
     <div ref={trackRef} className={`relative ${trackClassName}`}>
       <div
         ref={pinRef}
-        className={`scroll-pin absolute inset-x-0 top-0 z-0 h-[100svh] w-full overflow-hidden ${className ?? ''}`}
+        className={`scroll-pin absolute inset-x-0 top-0 z-0 h-[100svh] w-full overflow-x-clip overflow-y-visible ${className ?? ''}`}
         style={{ ['--p' as string]: 0 }}
       >
         {children}
