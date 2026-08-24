@@ -1085,11 +1085,11 @@
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
 }
-/* Star canvas spans the whole stage, so it settles with the sky gradient it
-   sits behind. Origin is the waterline: scaling from mid-stage pushed stars
-   through the harbour instead of past it. */
+/* Star canvas is the furthest plane, so it barely moves — and it must agree in
+   direction with the SVG sky gradient it sits behind. Origin is the waterline:
+   scaling from mid-stage pushed stars through the harbour instead of past it. */
 .hero-pin-sky {
-  transform: translate3d(0, calc(var(--p-depth, 0) * 5vh + var(--hero-drop, 0px)), 0) scale(calc(1 + var(--p-depth, 0) * 0.025));
+  transform: translate3d(0, calc(var(--p-depth, 0) * -0.8vh + var(--hero-drop, 0px)), 0) scale(calc(1 + var(--p-depth, 0) * 0.02));
   transform-origin: 50% 100%;
 }
 /* Atmosphere the harbour sinks into. Sits over the scene, outside the scene
@@ -1473,46 +1473,52 @@
   .hero-pin-city { --hk-scale: 0.88; --hk-origin-x: 50%; --hk-lift: 0px; }
 }
 
-/* Layered scroll parallax — the scene settles toward the waterline.
-   The waterline is the pivot because vessels and water are pinned, so depth
-   cannot read as "near moves faster" (the nearest layer is the one that never
-   moves). Instead every layer sinks by an amount proportional to how far it
-   sits above the water: one coherent camera settle, not sliding stickers.
-   All layers travel the same direction — mixing signs made the star canvas
-   climb while the SVG sky fell.
-   Idle motion lives on nested children so scroll transforms never fight keyframes. */
+/* Layered scroll parallax — depth exit. Everything travels up as the panel is
+   scrolled, near layers faster, so the skyline pulls away from the mountains
+   and the moon hangs back.
+
+   The harbour is one plate, not three layers. The water band is drawn over the
+   building bases and the vessels float on that band, so any difference in
+   their travel either opens a gap under the skyline or walks the waterline up
+   the buildings like a rising tide. They share `--plate-lift` by construction
+   for that reason — this is the one place in the scene where independent
+   parallax is not available at any magnitude.
+
+   The copy rises on `--p-fade` at roughly the plate's rate, which puts the
+   reader and the near shore on the same plane and leaves the sky behind.
+   Idle motion lives on nested children so scroll transforms never fight
+   keyframes. */
+.hero-scene-mask {
+  --plate-lift: calc(var(--p-depth, 0) * -7vh);
+}
 .hk-parallax-sky {
-  transform: translate3d(0, calc(var(--p-depth, 0) * 4.5vh), 0);
+  transform: translate3d(0, calc(var(--p-depth, 0) * -2vh), 0);
   transform-origin: 50% 100%;
 }
 .hk-parallax-celestial {
-  transform: translate3d(0, calc(var(--p-depth, 0) * 6vh), 0)
-             scale(calc(1 - var(--p-depth, 0) * 0.015));
+  transform: translate3d(0, calc(var(--p-depth, 0) * -1.4vh), 0);
   transform-origin: 50% 100%;
 }
 .hk-parallax-clouds {
-  transform: translate3d(0, calc(var(--p-depth, 0) * 5vh), 0);
+  transform: translate3d(0, calc(var(--p-depth, 0) * -2.8vh), 0);
   transform-origin: 50% 100%;
 }
 .hk-parallax-mountains {
-  transform: translate3d(0, calc(var(--p-depth, 0) * 2.4vh), 0);
+  transform: translate3d(0, calc(var(--p-depth, 0) * -4vh), 0);
   transform-origin: 50% 100%;
 }
-.hk-parallax-buildings {
-  transform: translate3d(0, calc(var(--p-depth, 0) * 1.2vh), 0)
-             scale(calc(1 + var(--p-depth, 0) * 0.006));
-  transform-origin: 50% 100%;
+.hk-parallax-buildings,
+.hk-parallax-vessel-a,
+.hk-parallax-vessel-b,
+.hk-parallax-vessel-c,
+.hk-parallax-water {
+  transform: translate3d(0, var(--plate-lift, 0px), 0);
 }
+.hk-parallax-buildings,
 .hk-parallax-vessel {
   transform-origin: 50% 100%;
 }
-.hk-parallax-vessel-a,
-.hk-parallax-vessel-b,
-.hk-parallax-vessel-c {
-  transform: none;
-}
 .hk-parallax-water {
-  transform: none;
   transform-origin: 50% 0%;
 }
 
@@ -1754,55 +1760,96 @@
   }
 }
 
-/* Rest of homepage — `--p` from Scrub. Each section a different motion.
-   Heading parts remap --p with lag so badge / title / sub / body are not one blob. */
+/* ═══════════════════════════════════════════════════════════════
+   Page motion system — `--p` / `--q` from Scrub
+   ═══════════════════════════════════════════════════════════════
+
+   `--p` drives entrance (plays once, settles). `--q` drives sustained
+   parallax (-1 → 1 across the section, never settles).
+
+   Every scrubbed element resolves the same window, so its identity is one
+   number (`--lag`) plus one distance token — not a bespoke curve. There were
+   twenty different windows and seven lift distances here before, which is how
+   a section title came to travel 28px in one place and 72px in another.
+   Distance signals depth; it should not signal which section you are in. */
+[data-scrub] {
+  --scrub-span: 0.46;
+
+  --lift-sm: 10px;  /* labels, chips, links */
+  --lift-md: 18px;  /* body copy, cards, columns */
+  --lift-lg: 26px;  /* section titles, large art */
+
+  --drift: 22px;    /* sustained parallax amplitude */
+}
+.scrub-rule, .scrub-kicker-label, .scrub-title, .scrub-word, .scrub-sub,
+.scrub-meta, .scrub-cta-line, .scrub-blog-rail, .blog-horizon, .blog-berth,
+.scrub-blog-more, .scrub-prod-glow, .prod-hub, .prod-wing-l, .prod-wing-r,
+.scrub-svc-card, .svc-bullets, .svc-bullet, .t-marquee-col,
+.scrub-cta .scrub-title, .scrub-cta .scrub-sub, .scrub-cta button {
+  --t: max(0, min(1, calc((var(--p, 0) - var(--lag, 0)) / var(--scrub-span))));
+}
+/* Layer promotion only while a section is actually being scrubbed. Left on
+   unconditionally, `will-change` pins a GPU layer for the life of the page. */
+[data-scrub][data-scrubbing] .scrub-rule,
+[data-scrub][data-scrubbing] .scrub-kicker-label,
+[data-scrub][data-scrubbing] .scrub-word,
+[data-scrub][data-scrubbing] .scrub-prod-art,
+[data-scrub][data-scrubbing] .scrub-prod-copy,
+[data-scrub][data-scrubbing] .scrub-svc-card,
+[data-scrub][data-scrubbing] .t-marquee-col {
+  will-change: transform, opacity;
+}
+
+/* Heading ladder — rule, badge, title, sub, meta, CTA in reading order. */
 .scrub-kicker {
-  --t: max(0, min(1, calc(var(--p, 0) / 0.4)));
   opacity: 1;
   transform: none;
 }
 .scrub-rule {
-  --t: max(0, min(1, calc(var(--p, 0) / 0.32)));
+  --lag: 0;
   transform: scaleX(var(--t));
   opacity: var(--t);
   transform-origin: left;
-  will-change: transform, opacity;
 }
 .scrub-kicker-label {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.06) / 0.36)));
+  --lag: 0.04;
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 22px), 0);
-  will-change: transform, opacity;
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-sm)), 0);
 }
 .scrub-title {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.08) / 0.48)));
+  --lag: 0.08;
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 28px), 0);
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-lg)), 0);
 }
 .scrub-sub {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.18) / 0.5)));
+  --lag: 0.16;
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 22px), 0);
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-md)), 0);
 }
 .scrub-meta {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.28) / 0.48)));
+  --lag: 0.22;
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 16px), 0);
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-sm)), 0);
 }
 .scrub-cta-line {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.34) / 0.5)));
+  --lag: 0.28;
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 14px), 0);
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-sm)), 0);
 }
-/* Blog — the hero's horizon continues here as a pier line, with each post
-   berthed beneath it. Cards stagger in per `--i` instead of the whole rail
-   sliding, so dragging the rail never fights an entrance transform. */
+/* Blog — the hero's horizon continues here as a pier line with the posts
+   berthed beneath it. Cards stagger per `--i` rather than the rail sliding as
+   a whole, which would fight the drag gesture.
+
+   The line and the ticks are geometrically coupled — a tick that drifts off
+   its line is just a floating dash — so sustained parallax moves the rail and
+   its line together as one plane, against the heading. */
 .scrub-blog-rail {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.12) / 0.72)));
+  --lag: 0.08;
   opacity: var(--t);
+  transform: translate3d(0, calc(var(--q, 0) * var(--drift) * 0.3), 0);
 }
 .blog-horizon {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.06) / 0.42)));
+  --lag: 0.02;
   position: relative;
   height: 1px;
   transform: scaleX(var(--t));
@@ -1816,10 +1863,9 @@
   opacity: 0.55;
 }
 .blog-berth {
-  --lag: calc(var(--i, 0) * 0.06);
-  --t: max(0, min(1, calc((var(--p, 0) - 0.14 - var(--lag)) / 0.5)));
+  --lag: calc(0.12 + var(--i, 0) * 0.05);
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 22px), 0);
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-md)), 0);
 }
 .blog-tick {
   display: block;
@@ -1838,24 +1884,19 @@
 }
 /* Blog heading is right-aligned. Do not translate X — public layout
    overflow-x-clip eats it and only opacity remains. Rise + clip instead. */
+/* Blog heading is right-aligned, and drifts against the rail below it. Do not
+   translate X — the public layout's overflow-x-clip eats it and only opacity
+   survives. Rise only. */
 .scrub-blog-head {
   overflow: visible;
+  transform: translate3d(0, calc(var(--q, 0) * var(--drift) * -0.22), 0);
 }
 .scrub-blog-head .scrub-kicker {
   opacity: 1;
   transform: none;
 }
 .scrub-blog-head .scrub-rule {
-  --t: max(0, min(1, calc(var(--p, 0) / 0.32)));
-  transform: scaleX(var(--t));
-  opacity: var(--t);
   transform-origin: right;
-}
-.scrub-blog-head .scrub-kicker-label {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.06) / 0.36)));
-  opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 22px), 0);
-  will-change: transform, opacity;
 }
 .scrub-blog-head .scrub-title {
   opacity: 1;
@@ -1863,47 +1904,48 @@
   clip-path: none;
 }
 .scrub-blog-head .scrub-word {
-  --lag: calc(var(--i, 0) * 0.07);
-  --t: max(0, min(1, calc((var(--p, 0) - 0.04 - var(--lag)) / 0.42)));
+  --lag: calc(0.06 + var(--i, 0) * 0.05);
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 72px), 0);
-  will-change: transform, opacity;
-}
-.scrub-blog-head .scrub-sub {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.2) / 0.4)));
-  opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 36px), 0);
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-lg)), 0);
 }
 .scrub-blog-more {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.38) / 0.4)));
+  --lag: 0.3;
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 20px), 0);
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-sm)), 0);
+}
+/* Products — the one section with a genuine foreground/background pair, so it
+   is the one that earns sustained parallax. The art tracks `--q` for the whole
+   section while the copy counter-drifts a third as far; both settle their
+   entrance on `--p` first. */
+.scrub-prod-copy {
+  transform: translate3d(0, calc(var(--q, 0) * var(--drift) * -0.32), 0);
+}
+.scrub-prod-art {
+  overflow: hidden;
+  transform: translate3d(0, calc(var(--q, 0) * var(--drift)), 0);
 }
 .scrub-prod-glow {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.04) / 0.38)));
+  --lag: 0.04;
   opacity: var(--t);
   transform: scale(calc(0.86 + var(--t) * 0.14));
   transform-origin: 50% 45%;
 }
-.scrub-prod-art {
-  overflow: hidden;
-}
 .scrub-prod-art .prod-hub {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.06) / 0.36)));
+  --lag: 0.06;
   opacity: var(--t);
   transform: scale(calc(1.08 - var(--t) * 0.08));
   transform-box: fill-box;
   transform-origin: center;
 }
 .scrub-prod-art .prod-wing-l {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.38) / 0.42)));
+  --lag: 0.26;
   opacity: var(--t);
-  transform: translate(calc((1 - var(--t)) * 28px), 0);
+  transform: translate(calc((1 - var(--t)) * var(--lift-lg)), 0);
 }
 .scrub-prod-art .prod-wing-r {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.46) / 0.42)));
+  --lag: 0.32;
   opacity: var(--t);
-  transform: translate(calc((1 - var(--t)) * -28px), 0);
+  transform: translate(calc((1 - var(--t)) * var(--lift-lg) * -1), 0);
 }
 /* Services — panels hinge up off their own base into a diagonal cascade.
    `--i` is the flat index and `--row` the grid row, so the lag runs across and
@@ -1914,13 +1956,14 @@
   perspective: 1400px;
   perspective-origin: 50% 0%;
 }
+/* No `--q` drift here on purpose: the grid reads as one plane, and drifting
+   rows apart would undo the thing the landing animation just established. */
 .scrub-svc-card {
-  --lag: calc(0.1 + var(--i, 0) * 0.045 + var(--row, 0) * 0.05);
-  --t: max(0, min(1, calc((var(--p, 0) - var(--lag)) / 0.5)));
+  --lag: calc(0.1 + var(--i, 0) * 0.04 + var(--row, 0) * 0.05);
   position: relative;
   overflow: hidden;
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 26px), 0)
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-lg)), 0)
              rotateX(calc((1 - var(--t)) * -8deg))
              scale(calc(0.975 + var(--t) * 0.025));
   transform-origin: 50% 100%;
@@ -1976,45 +2019,44 @@
 /* Feature panel — the lead service carries its deliverables so the grid is not
    six identical boxes. */
 .svc-bullets {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.24) / 0.46)));
+  --lag: 0.2;
   opacity: var(--t);
 }
 .svc-bullet {
-  --blag: calc(var(--bi, 0) * 0.045);
-  --bt: max(0, min(1, calc((var(--p, 0) - 0.26 - var(--blag)) / 0.4)));
-  opacity: var(--bt);
-  transform: translate3d(calc((1 - var(--bt)) * -10px), 0, 0);
+  --lag: calc(0.22 + var(--bi, 0) * 0.04);
+  opacity: var(--t);
+  transform: translate3d(calc((1 - var(--t)) * -10px), 0, 0);
 }
+/* Testimonials already carry continuous motion in the marquee, so adding `--q`
+   drift on top would be two competing constant motions. Entrance only. */
 .scrub-t-wall {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.12) / 0.58)));
   opacity: 1;
   transform: none;
   clip-path: none;
   filter: none;
 }
 .scrub-t-wall .t-marquee-col {
-  --lag: calc(var(--ci, 0) * 0.14);
-  --t: max(0, min(1, calc((var(--p, 0) - 0.1 - var(--lag)) / 0.5)));
+  --lag: calc(0.1 + var(--ci, 0) * 0.06);
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 22px), 0) scale(calc(0.97 + var(--t) * 0.03));
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-md)), 0) scale(calc(0.97 + var(--t) * 0.03));
 }
 .scrub-cta .scrub-title {
-  --t: max(0, min(1, calc(var(--p, 0) / 0.55)));
+  --lag: 0;
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 28px), 0);
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-lg)), 0);
   clip-path: none;
   filter: none;
 }
 .scrub-cta .scrub-sub {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.08) / 0.5)));
+  --lag: 0.06;
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 18px), 0);
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-md)), 0);
   filter: none;
 }
 .scrub-cta button {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.16) / 0.5)));
+  --lag: 0.12;
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 16px), 0) scale(calc(0.94 + var(--t) * 0.06));
+  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-sm)), 0) scale(calc(0.94 + var(--t) * 0.06));
   filter: none;
 }
 
@@ -2073,6 +2115,7 @@
   .scrub-prod-art .prod-hub,
   .scrub-prod-art .prod-wing-l, .scrub-prod-art .prod-wing-r, .scrub-svc-card, .scrub-t-wall,
   .scrub-t-wall .t-marquee-col, .scrub-cta button,
+  .scrub-prod-copy, .scrub-blog-head,
   .blog-horizon, .blog-berth, .svc-bullets, .svc-bullet {
     opacity: 1 !important;
     transform: none !important;

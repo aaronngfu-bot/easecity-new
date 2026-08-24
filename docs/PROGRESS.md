@@ -5,13 +5,15 @@
 
 ---
 
-## Last session: 2026-08-24 (hero parallax model + blog/services composition)
+## Last session: 2026-08-24 (page-wide motion system)
 
-**Summary**: Rebuilt hero scroll parallax around the waterline as pivot (all layers settle downward in proportion to height above the water — previously the star canvas sank while the SVG sky climbed, and far layers moved more than near ones). Added haze + horizon rule over the scene so the harbour dissolves into atmosphere and hands a horizon to the blog rail. Blog rail became a pier line with posts berthing beneath it per-card. Services became a feature panel (bullets + stack tags, 2×2) plus a diagonal plane of panels hinging up, with pointer spotlight and ghost ordinals.
+**Summary**: Replaced the homepage's ad-hoc scroll motion with one system. `Scrub` now emits two variables — `--p` for entrance (settles) and `--q` for sustained parallax (never settles) — so the page has continuous depth instead of entrance-only fades; before this, every `--t` saturated and the whole page below the hero went static. Collapsed twenty bespoke scrub windows and seven lift distances onto one window plus a three-step lift scale, so a section title travels the same distance everywhere. `will-change` is now scoped to sections being scrubbed (was permanent on several elements page-wide); offscreen sections are no longer measured or written. Hero switched to depth exit now that the pin constraint is lifted: the harbour plate (buildings + vessels + water, coupled by `--plate-lift` because the water band overlaps the building bases) leads at -7vh while the moon lags at -1.4vh.
 
-**Files changed**: `ImmersionHero.tsx`, `BlogTimeline.tsx`, `HomeContent.tsx`, `globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+**Verified**: production build clean; measured 29px sustained art/copy differential in products with `--p` already at 1; no scrubbed element stranded below full opacity at rest; only near-viewport sections carry `data-scrubbing`.
 
-**Earlier the same day**: Applied Emil motion bar site-wide except harbour hero art; removed keyboard-overlay animation and scroll blur.
+**Files changed**: `Scrub.tsx`, `globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+**Earlier the same day**: Hero haze + horizon handoff, blog pier line, services feature panel and diagonal landing; Emil motion bar applied site-wide.
 
 ---
 
