@@ -151,40 +151,46 @@ export function BlogTimeline({
         )}
 
         {!loading && items.length > 0 && (
-          <div
-            ref={railRef}
-            className="blog-rail select-none"
-          >
-            {items.map((item) => (
-              <Link
-                key={item.slug}
-                href={`/blog/${item.slug}`}
-                onClick={stopClickOnDrag}
-                draggable={false}
-                className="group block w-[300px] max-w-[78vw] shrink-0 snap-start sm:w-[340px]"
-              >
-                <article className="flex h-full w-full flex-col overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] transition hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)]">
-                  {item.image && (
-                    <div className="relative aspect-[16/9] overflow-hidden border-b border-[var(--border-color)] bg-[var(--bg-elevated)]">
-                      <Image src={item.image} alt={item.title} fill sizes="340px" className="object-cover transition-transform duration-300 group-hover:scale-[1.03]" />
-                    </div>
-                  )}
-                  <div className="flex flex-1 flex-col p-5">
-                    <div className="flex items-center gap-2">
-                      <Calendar size={13} className="text-[var(--signal)]" />
-                      <span className="label-mono">{item.date}</span>
-                    </div>
-                    <h3 className="mt-2 font-display text-lg font-semibold leading-snug text-[var(--text-primary)] transition-colors group-hover:text-[var(--signal)]">
-                      {item.title}
-                    </h3>
-                    {item.body && (
-                      <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[var(--text-secondary)]">{item.body}</p>
+          <>
+            {/* Pier line the hero's horizon hands off to; posts berth beneath it. */}
+            <div className="blog-horizon" aria-hidden />
+            <div
+              ref={railRef}
+              className="blog-rail select-none pt-5"
+            >
+              {items.map((item, i) => (
+                <Link
+                  key={item.slug}
+                  href={`/blog/${item.slug}`}
+                  onClick={stopClickOnDrag}
+                  draggable={false}
+                  className="blog-berth group block w-[300px] max-w-[78vw] shrink-0 snap-start sm:w-[340px]"
+                  style={{ ['--i' as string]: i }}
+                >
+                  <span className="blog-tick" aria-hidden />
+                  <article className="flex h-full w-full flex-col overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--bg-surface)] transition-[border-color,box-shadow,transform] duration-200 ease-out hover:border-[var(--signal)] hover:shadow-[var(--shadow-md)] motion-safe:group-hover:-translate-y-0.5">
+                    {item.image && (
+                      <div className="relative aspect-[16/9] overflow-hidden border-b border-[var(--border-color)] bg-[var(--bg-elevated)]">
+                        <Image src={item.image} alt={item.title} fill sizes="340px" className="object-cover transition-transform duration-200 ease-out motion-safe:group-hover:scale-[1.03]" />
+                      </div>
                     )}
-                  </div>
-                </article>
-              </Link>
-            ))}
-          </div>
+                    <div className="flex flex-1 flex-col p-5">
+                      <div className="flex items-center gap-2">
+                        <Calendar size={13} className="text-[var(--signal)]" />
+                        <span className="label-mono">{item.date}</span>
+                      </div>
+                      <h3 className="mt-2 font-display text-lg font-semibold leading-snug text-[var(--text-primary)] transition-colors duration-200 ease-out group-hover:text-[var(--signal)]">
+                        {item.title}
+                      </h3>
+                      {item.body && (
+                        <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[var(--text-secondary)]">{item.body}</p>
+                      )}
+                    </div>
+                  </article>
+                </Link>
+              ))}
+            </div>
+          </>
         )}
       </div>
 

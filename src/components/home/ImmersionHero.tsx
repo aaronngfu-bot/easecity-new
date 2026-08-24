@@ -10,9 +10,13 @@ import { ScrollPin } from '@/components/ui/ScrollPin'
 
 /**
  * ImmersionHero — first-screen scroll theater.
- * The panel pins for ~2 viewports. `--p` scrubs sky (lag + scale) against
- * copy (rise + mask wipe). Scene layers share one bottom mask so the next
- * section covers a dissolving harbour, not a hard cut.
+ * The panel pins for ~2 viewports. `--p` scrubs the harbour against the copy:
+ * copy lifts and wipes out, while every scene layer settles toward the
+ * waterline in proportion to its height above it. Vessels and water are the
+ * pivot and never move, so the sink reads as one camera settling rather than
+ * layers sliding past each other.
+ * Haze and the horizon rule sit over the scene (outside the wipe mask) so the
+ * harbour dissolves into atmosphere and hands a horizon line to the blog rail.
  */
 
 function MagneticCta({
@@ -95,6 +99,9 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
           <HarbourSkyline className="hero-pin-city w-full" />
         </div>
       </div>
+
+      <div className="hero-scene-haze z-[2]" aria-hidden />
+      <div className="hero-scene-horizon z-[3]" aria-hidden />
 
       <div className="hero-pin-copy container-max relative z-10 flex h-full items-start">
         <div className="hero-copy-inner max-w-2xl text-left">

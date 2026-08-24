@@ -1085,9 +1085,44 @@
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
 }
+/* Star canvas spans the whole stage, so it settles with the sky gradient it
+   sits behind. Origin is the waterline: scaling from mid-stage pushed stars
+   through the harbour instead of past it. */
 .hero-pin-sky {
-  transform: translate3d(0, calc(var(--p-depth, 0) * 12vh + var(--hero-drop, 0px)), 0) scale(calc(1 + var(--p-depth, 0) * 0.04));
-  transform-origin: 50% 40%;
+  transform: translate3d(0, calc(var(--p-depth, 0) * 5vh + var(--hero-drop, 0px)), 0) scale(calc(1 + var(--p-depth, 0) * 0.025));
+  transform-origin: 50% 100%;
+}
+/* Atmosphere the harbour sinks into. Sits over the scene, outside the scene
+   mask, so it fogs the harbour instead of being wiped with it. Invisible at
+   rest (`--p-mask: 0`), so the first screen is unchanged; it only thickens as
+   the scene dissolves, which makes the wipe read as distance rather than a cut
+   in the alpha channel. */
+.hero-scene-haze {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 48%;
+  pointer-events: none;
+  opacity: calc(var(--p-mask, 0) * 0.9);
+  background: linear-gradient(180deg, transparent 0%, var(--bg-base) 82%);
+}
+/* Horizon rule that survives the dissolve and hands the eye to the blog rail. */
+.hero-scene-horizon {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  pointer-events: none;
+  opacity: calc(var(--p-mask, 0) * 0.34);
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    var(--signal) 30%,
+    var(--signal) 70%,
+    transparent 100%
+  );
 }
 .hero-pin-copy {
   transform: translate3d(0, calc(var(--p-fade, 0) * -7vh), 0);
@@ -1438,27 +1473,34 @@
   .hero-pin-city { --hk-scale: 0.88; --hk-origin-x: 50%; --hk-lift: 0px; }
 }
 
-/* Layered scroll parallax — subtle depth offsets on `--p-depth` only.
+/* Layered scroll parallax — the scene settles toward the waterline.
+   The waterline is the pivot because vessels and water are pinned, so depth
+   cannot read as "near moves faster" (the nearest layer is the one that never
+   moves). Instead every layer sinks by an amount proportional to how far it
+   sits above the water: one coherent camera settle, not sliding stickers.
+   All layers travel the same direction — mixing signs made the star canvas
+   climb while the SVG sky fell.
    Idle motion lives on nested children so scroll transforms never fight keyframes. */
 .hk-parallax-sky {
-  transform: translate3d(0, calc(var(--p-depth, 0) * -3vh), 0);
+  transform: translate3d(0, calc(var(--p-depth, 0) * 4.5vh), 0);
   transform-origin: 50% 100%;
 }
 .hk-parallax-celestial {
-  transform: translate3d(0, calc(var(--p-depth, 0) * -5vh), 0);
-  transform-origin: 50% 28%;
+  transform: translate3d(0, calc(var(--p-depth, 0) * 6vh), 0)
+             scale(calc(1 - var(--p-depth, 0) * 0.015));
+  transform-origin: 50% 100%;
 }
 .hk-parallax-clouds {
-  transform: translate3d(0, calc(var(--p-depth, 0) * -3.5vh), 0);
-  transform-origin: 50% 40%;
+  transform: translate3d(0, calc(var(--p-depth, 0) * 5vh), 0);
+  transform-origin: 50% 100%;
 }
 .hk-parallax-mountains {
-  transform: translate3d(0, calc(var(--p-depth, 0) * -1vh), 0);
+  transform: translate3d(0, calc(var(--p-depth, 0) * 2.4vh), 0);
   transform-origin: 50% 100%;
 }
 .hk-parallax-buildings {
-  transform: translate3d(0, calc(var(--p-depth, 0) * -1vh), 0)
-             scale(calc(1 + var(--p-depth, 0) * 0.012));
+  transform: translate3d(0, calc(var(--p-depth, 0) * 1.2vh), 0)
+             scale(calc(1 + var(--p-depth, 0) * 0.006));
   transform-origin: 50% 100%;
 }
 .hk-parallax-vessel {
@@ -1752,10 +1794,47 @@
   opacity: var(--t);
   transform: translate3d(0, calc((1 - var(--t)) * 14px), 0);
 }
+/* Blog — the hero's horizon continues here as a pier line, with each post
+   berthed beneath it. Cards stagger in per `--i` instead of the whole rail
+   sliding, so dragging the rail never fights an entrance transform. */
 .scrub-blog-rail {
   --t: max(0, min(1, calc((var(--p, 0) - 0.12) / 0.72)));
   opacity: var(--t);
-  transform: translate3d(calc((1 - var(--t)) * -28px), 0, 0);
+}
+.blog-horizon {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.06) / 0.42)));
+  position: relative;
+  height: 1px;
+  transform: scaleX(var(--t));
+  transform-origin: left;
+  background: linear-gradient(
+    90deg,
+    var(--signal) 0%,
+    var(--signal) 62%,
+    var(--border-color) 100%
+  );
+  opacity: 0.55;
+}
+.blog-berth {
+  --lag: calc(var(--i, 0) * 0.06);
+  --t: max(0, min(1, calc((var(--p, 0) - 0.14 - var(--lag)) / 0.5)));
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 22px), 0);
+}
+.blog-tick {
+  display: block;
+  width: 1px;
+  height: 14px;
+  margin-bottom: 0.75rem;
+  background: var(--signal);
+  opacity: calc(0.35 + var(--t, 1) * 0.25);
+  transform-origin: top;
+  transition: height 200ms var(--ease-out), opacity 200ms var(--ease-out);
+}
+.blog-berth:hover .blog-tick,
+.blog-berth:focus-visible .blog-tick {
+  height: 22px;
+  opacity: 1;
 }
 /* Blog heading is right-aligned. Do not translate X — public layout
    overflow-x-clip eats it and only opacity remains. Rise + clip instead. */
@@ -1826,11 +1905,85 @@
   opacity: var(--t);
   transform: translate(calc((1 - var(--t)) * -28px), 0);
 }
+/* Services — panels hinge up off their own base into a diagonal cascade.
+   `--i` is the flat index and `--row` the grid row, so the lag runs across and
+   down instead of left-to-right, and the grid lands as a plane rather than a
+   queue. Perspective lives on the grid so every card shares one vanishing
+   point; hinging from `50% 100%` keeps each card's base planted. */
+.svc-grid {
+  perspective: 1400px;
+  perspective-origin: 50% 0%;
+}
 .scrub-svc-card {
-  --lag: calc(0.14 + var(--i, 0) * 0.06);
-  --t: max(0, min(1, calc((var(--p, 0) - var(--lag)) / 0.55)));
+  --lag: calc(0.1 + var(--i, 0) * 0.045 + var(--row, 0) * 0.05);
+  --t: max(0, min(1, calc((var(--p, 0) - var(--lag)) / 0.5)));
+  position: relative;
+  overflow: hidden;
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 24px), 0) scale(calc(0.97 + var(--t) * 0.03));
+  transform: translate3d(0, calc((1 - var(--t)) * 26px), 0)
+             rotateX(calc((1 - var(--t)) * -8deg))
+             scale(calc(0.975 + var(--t) * 0.025));
+  transform-origin: 50% 100%;
+}
+/* Pointer spotlight. `--mx`/`--my` are written by the card's pointer handler;
+   with no pointer they stay at the default and the layer is fully transparent. */
+.svc-spot {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out);
+  background: radial-gradient(
+    18rem 18rem at var(--mx, 50%) var(--my, 0%),
+    var(--signal-soft),
+    transparent 70%
+  );
+}
+/* Ghost ordinal — typographic depth marker, slides as the card is pointed at. */
+.svc-index {
+  position: absolute;
+  right: 1.1rem;
+  top: 0.35rem;
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 3.25rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: var(--text-primary);
+  opacity: 0.05;
+  pointer-events: none;
+  transition: transform 220ms var(--ease-out), opacity 220ms var(--ease-out);
+}
+.svc-icon-tile {
+  transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out),
+              transform 200ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .scrub-svc-card:hover .svc-spot {
+    opacity: 1;
+  }
+  .scrub-svc-card:hover .svc-index {
+    opacity: 0.1;
+    transform: translate3d(0, -4px, 0);
+  }
+  .scrub-svc-card:hover .svc-icon-tile {
+    transform: scale(1.06);
+  }
+}
+.scrub-svc-card:focus-visible .svc-spot {
+  opacity: 1;
+}
+/* Feature panel — the lead service carries its deliverables so the grid is not
+   six identical boxes. */
+.svc-bullets {
+  --t: max(0, min(1, calc((var(--p, 0) - 0.24) / 0.46)));
+  opacity: var(--t);
+}
+.svc-bullet {
+  --blag: calc(var(--bi, 0) * 0.045);
+  --bt: max(0, min(1, calc((var(--p, 0) - 0.26 - var(--blag)) / 0.4)));
+  opacity: var(--bt);
+  transform: translate3d(calc((1 - var(--bt)) * -10px), 0, 0);
 }
 .scrub-t-wall {
   --t: max(0, min(1, calc((var(--p, 0) - 0.12) / 0.58)));
@@ -1919,10 +2072,13 @@
   .scrub-word, .scrub-blog-rail, .scrub-blog-more, .scrub-prod-art, .scrub-prod-glow,
   .scrub-prod-art .prod-hub,
   .scrub-prod-art .prod-wing-l, .scrub-prod-art .prod-wing-r, .scrub-svc-card, .scrub-t-wall,
-  .scrub-t-wall .t-marquee-col, .scrub-cta button {
+  .scrub-t-wall .t-marquee-col, .scrub-cta button,
+  .blog-horizon, .blog-berth, .svc-bullets, .svc-bullet {
     opacity: 1 !important;
     transform: none !important;
     clip-path: none !important;
     filter: none !important;
   }
+  .blog-horizon { opacity: 0.55 !important; }
+  .hero-scene-haze, .hero-scene-horizon { opacity: 0 !important; }
 }

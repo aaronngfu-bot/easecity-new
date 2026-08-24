@@ -5,11 +5,13 @@
 
 ---
 
-## Last session: 2026-08-24 (site motion pass)
+## Last session: 2026-08-24 (hero parallax model + blog/services composition)
 
-**Summary**: Applied Emil motion bar site-wide except harbour hero art; eased hero scroll fade/depth; removed keyboard-overlay animation and scroll blur.
+**Summary**: Rebuilt hero scroll parallax around the waterline as pivot (all layers settle downward in proportion to height above the water — previously the star canvas sank while the SVG sky climbed, and far layers moved more than near ones). Added haze + horizon rule over the scene so the harbour dissolves into atmosphere and hands a horizon to the blog rail. Blog rail became a pier line with posts berthing beneath it per-card. Services became a feature panel (bullets + stack tags, 2×2) plus a diagonal plane of panels hinging up, with pointer spotlight and ghost ordinals.
 
-**Files changed**: `ScrollPin.tsx`, `CommandPalette.tsx`, `KeyboardLayer.tsx`, `ChatWidget.tsx`, `QuoteModal.tsx`, `PillNav.css`, homepage scrub CSS, shared enter timings, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+**Files changed**: `ImmersionHero.tsx`, `BlogTimeline.tsx`, `HomeContent.tsx`, `globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+**Earlier the same day**: Applied Emil motion bar site-wide except harbour hero art; removed keyboard-overlay animation and scroll blur.
 
 ---
 

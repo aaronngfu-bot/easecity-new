@@ -41,6 +41,114 @@ function TestimonialCard({
   )
 }
 
+interface ServiceEntry {
+  slug: string
+  icon: string
+  tags: string[]
+  title: string
+  body: string
+  bullets: string[]
+}
+
+/**
+ * Service panel. Landing motion is scroll-driven from CSS (`--i` / `--row`);
+ * the only JS here is the pointer position for the spotlight, written straight
+ * to the element as custom properties so React never re-renders on move.
+ */
+function ServiceCard({
+  service,
+  index,
+  row,
+  ctaLabel,
+  feature = false,
+}: {
+  service: ServiceEntry
+  index: number
+  row: number
+  ctaLabel: string
+  feature?: boolean
+}) {
+  const trackPointer = (e: React.PointerEvent<HTMLAnchorElement>) => {
+    const el = e.currentTarget
+    const r = el.getBoundingClientRect()
+    el.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`)
+    el.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`)
+  }
+
+  return (
+    <Link
+      href={`/services/${service.slug}`}
+      onPointerMove={trackPointer}
+      className={`scrub-svc-card card group flex h-full flex-col transition-[transform,border-color,box-shadow] duration-200 ease-out hover:border-[var(--signal)] hover:shadow-[var(--shadow-lg)] motion-safe:hover:-translate-y-1 active:scale-[0.98] ${
+        feature ? 'p-8 sm:col-span-2 lg:row-span-2' : 'p-7'
+      }`}
+      style={{ ['--i' as string]: index, ['--row' as string]: row }}
+    >
+      <span className="svc-spot" aria-hidden />
+      <span className="svc-index" aria-hidden>
+        {String(index + 1).padStart(2, '0')}
+      </span>
+
+      <span
+        className={`svc-icon-tile flex items-center justify-center rounded-xl bg-[var(--signal-soft)] text-[var(--signal)] ${
+          feature ? 'h-14 w-14' : 'h-11 w-11'
+        }`}
+      >
+        <ServiceIcon icon={service.icon} size={feature ? 28 : 22} />
+      </span>
+
+      <h3
+        className={`mt-6 font-display font-bold text-[var(--text-primary)] transition-colors duration-200 ease-out group-hover:text-[var(--signal)] ${
+          feature ? 'text-2xl md:text-3xl' : 'text-xl'
+        }`}
+      >
+        {service.title}
+      </h3>
+      <p
+        className={`mt-2 text-sm leading-relaxed text-[var(--text-secondary)] ${
+          feature ? 'max-w-lg' : 'line-clamp-3'
+        }`}
+      >
+        {service.body}
+      </p>
+
+      {feature && service.bullets.length > 0 && (
+        <ul className="svc-bullets mt-7 grid gap-2.5 sm:grid-cols-2">
+          {service.bullets.slice(0, 6).map((b, bi) => (
+            <li
+              key={b}
+              className="svc-bullet flex items-start gap-2.5 text-sm text-[var(--text-secondary)]"
+              style={{ ['--bi' as string]: bi }}
+            >
+              <span aria-hidden className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-[var(--signal)]" />
+              {b}
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {feature && (
+        <div className="svc-bullets mt-auto flex flex-wrap gap-2 pt-8">
+          {service.tags.map((tag, bi) => (
+            <span
+              key={tag}
+              className="svc-bullet badge font-mono"
+              style={{ ['--bi' as string]: bi + 4 }}
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+      )}
+
+      <span className={`inline-flex items-center gap-1.5 pt-6 text-sm font-medium text-[var(--signal)] ${feature ? '' : 'mt-auto'}`}>
+        {ctaLabel}
+        <ArrowRight size={14} className="transition-transform duration-200 ease-out group-hover:translate-x-0.5" />
+      </span>
+    </Link>
+  )
+}
+
 export interface HomeBlogPost {
   id: string
   slug: string
@@ -58,10 +166,10 @@ export interface HomeBlogPost {
  * parent (bilingual) so the rail also renders on first paint without a fetch.
  *
  * Section rhythm (distinct compositions, one visual language):
- *  hero         pinned dissolve (sky lag + copy fade)
- *  blog         clip-reveal rail from the left
+ *  hero         pinned settle onto the waterline, copy wipes out
+ *  blog         pier line continues the hero horizon, posts berth beneath it
  *  products     split assemble (copy left, art right)
- *  services     staggered cascade cards
+ *  services     feature panel + diagonal plane of panels hinging up
  *  testimonials mask-open scale
  *  cta          punch in
  */
@@ -251,31 +359,22 @@ export function HomeContent() {
               </div>
             </div>
 
-            <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {[featA, featB, ...restServices].map((s, i) => (
-                <Link
+            <div className="svc-grid mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <ServiceCard
+                service={featA}
+                index={0}
+                row={0}
+                ctaLabel={c.servicesCta}
+                feature
+              />
+              {[featB, ...restServices].map((s, i) => (
+                <ServiceCard
                   key={s.slug}
-                  href={`/services/${s.slug}`}
-                  className="scrub-svc-card card group flex h-full flex-col p-7 transition-[transform,border-color,box-shadow] duration-200 ease-out hover:border-[var(--signal)] hover:shadow-[var(--shadow-lg)] motion-safe:hover:-translate-y-1 active:scale-[0.97]"
-                  style={{ ['--i' as string]: i }}
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-[var(--signal-soft)] text-[var(--signal)]">
-                      <ServiceIcon icon={s.icon} size={22} />
-                    </span>
-                  </div>
-
-                  <h3 className="mt-6 font-display text-xl font-bold text-[var(--text-primary)] transition-colors duration-300 group-hover:text-[var(--signal)]">
-                    {s.title}
-                  </h3>
-                  <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-[var(--text-secondary)]">
-                    {s.body}
-                  </p>
-
-                  <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-medium text-[var(--signal)]">
-                    {c.servicesCta} <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
-                  </span>
-                </Link>
+                  service={s}
+                  index={i + 1}
+                  row={Math.floor((i + 1) / 3)}
+                  ctaLabel={c.servicesCta}
+                />
               ))}
             </div>
           </div>
