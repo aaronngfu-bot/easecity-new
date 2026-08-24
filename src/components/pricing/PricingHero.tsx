@@ -19,7 +19,7 @@ export function PricingHero() {
 
       <div className="container-max relative z-10">
         <div className="mx-auto max-w-3xl text-center">
-          <h1 className="mb-7 font-display text-4xl font-bold leading-tight tracking-tight md:text-6xl">
+          <h1 className="type-section mb-7 font-display text-4xl font-bold md:text-6xl">
             <span className="text-[var(--text-primary)]">{t.pricingPage.heading1}</span>
             <br />
             <span className="text-[var(--signal)]">{t.pricingPage.headingHighlight}</span>

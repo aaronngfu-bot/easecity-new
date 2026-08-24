@@ -113,7 +113,7 @@ export default function EcSharePage() {
   const c = t.ecSharePage
 
   return (
-    <main className="relative min-h-screen bg-[var(--bg-base)]">
+    <div className="relative min-h-screen bg-[var(--bg-base)]">
       {/* ── Hero ── */}
       <section className="relative overflow-hidden">
         <div aria-hidden className="absolute inset-0 bg-grid opacity-40" />
@@ -307,6 +307,6 @@ export default function EcSharePage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   )
 }

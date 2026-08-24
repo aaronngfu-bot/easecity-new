@@ -3,6 +3,27 @@
 所有從 Cursor 介入到目前狀態的實際改動記錄。
 最後更新：2026-08-24
 
+## 2026-08-24 — 天際線改回原 PNG、補回船體漣漪
+
+- 天際線改回未壓縮 `hk-skyline-light.png` / `hk-skyline-dark.png`，以 CSS 切換日夜。
+- 三艘船底改為隨機短橫條漣漪；畫在船體之下、不跟 bob／漂移，渡輪加長加矮。
+
+## 2026-08-24 — Impeccable optimize（hero LCP / canvas）
+
+- 天際線改載入單一主題 WebP（1280 / 1920），不再同時拉兩張原尺寸 PNG。
+- `CityField` / `HarbourWater`：離開視窗、淺色模式、save-data 時停 RAF；滑鼠未互動時不做 n² 排斥。
+
+## 2026-08-24 — Impeccable harden（a11y / i18n）
+
+- 公開、登入、admin 加上 skip-to-content 與單一 `#main`。
+- 導覽改一般連結（去掉 menubar）；聊天與密碼切換改雙語 aria。
+- Admin 側欄／頂欄走 i18n；聊天支援 Esc、abort、長文換行。
+
+## 2026-08-24 — 安裝 Impeccable 並完成全站 audit
+
+- 以 `npx impeccable install --providers=cursor --scope=project` 安裝 [pbakaus/impeccable](https://github.com/pbakaus/impeccable)（skill、agents、pre-edit hook）。
+- 對 `src/` 跑 detector + 五維 audit；報告見 session canvas。
+
 ## 2026-08-24 — 建築後方山脈圖層
 
 - 新增 `hk-mountain.png` 山脊剪影，置於建築後方；日夜配色切換。

@@ -39,8 +39,8 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
 
   return (
     <div className="pill-nav-container">
-      <nav className={`pill-nav ${className}`} aria-label="Primary">
-        <Link className="pill-logo" href="/" aria-label="Home">
+      <nav className={`pill-nav ${className}`} aria-label={t.a11y.primaryNav}>
+        <Link className="pill-logo" href="/" aria-label={t.nav.home}>
           <BrandMark size={28} />
           <span className="pill-wordmark">
             <span className="pill-wordmark-brand">EaseCity</span>
@@ -48,15 +48,16 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
         </Link>
 
         <div className="pill-nav-items desktop-only">
-          <ul className="pill-list" role="menubar">
+          <ul className="pill-list">
             {items.map((item, i) => {
               const label = getItemLabel(item)
+              const active = isActive(item.href)
               return (
-                <li key={item.href || `item-${i}`} role="none">
+                <li key={item.href || `item-${i}`}>
                   <Link
-                    role="menuitem"
                     href={item.href}
-                    className={`pill ${isActive(item.href) ? 'is-active' : ''}`}
+                    className={`pill ${active ? 'is-active' : ''}`}
+                    aria-current={active ? 'page' : undefined}
                     aria-label={item.ariaLabel || label}
                   >
                     <span className="label-stack">
@@ -69,21 +70,23 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
           </ul>
         </div>
 
-        <div className="pill-language-toggle desktop-only" aria-label="Language switcher">
+        <div className="pill-language-toggle desktop-only" aria-label={t.a11y.language}>
           <button
             type="button"
             onClick={() => setLanguage('en')}
             className={language === 'en' ? 'is-active' : ''}
-            aria-label="Switch to English"
+            aria-label={t.a11y.switchToEnglish}
+            aria-pressed={language === 'en'}
           >
             EN
           </button>
-          <span>/</span>
+          <span aria-hidden="true">/</span>
           <button
             type="button"
             onClick={() => setLanguage('zh')}
             className={language === 'zh' ? 'is-active' : ''}
-            aria-label="切換至中文"
+            aria-label={t.a11y.switchToChinese}
+            aria-pressed={language === 'zh'}
           >
             繁中
           </button>
@@ -135,9 +138,10 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
         )}
 
         <button
+          type="button"
           className={`mobile-menu-button mobile-only ${mobileMenuOpen ? 'is-open' : ''}`}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+          aria-label={mobileMenuOpen ? t.a11y.closeMenu : t.a11y.openMenu}
           aria-expanded={mobileMenuOpen}
         >
           <span className="hamburger-line" />
@@ -150,19 +154,23 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
         <div className="mobile-menu-popover mobile-only">
           <ul className="mobile-menu-list">
             <li>
-              <div className="mobile-language-toggle" aria-label="Language switcher">
+              <div className="mobile-language-toggle" aria-label={t.a11y.language}>
                 <button
                   type="button"
                   onClick={() => setLanguage('en')}
                   className={language === 'en' ? 'is-active' : ''}
+                  aria-label={t.a11y.switchToEnglish}
+                  aria-pressed={language === 'en'}
                 >
                   EN
                 </button>
-                <span>/</span>
+                <span aria-hidden="true">/</span>
                 <button
                   type="button"
                   onClick={() => setLanguage('zh')}
                   className={language === 'zh' ? 'is-active' : ''}
+                  aria-label={t.a11y.switchToChinese}
+                  aria-pressed={language === 'zh'}
                 >
                   繁中
                 </button>
@@ -171,7 +179,7 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
             <li>
               <div className="flex items-center gap-2 py-1">
                 <ThemeToggle />
-                <span className="text-sm text-text-muted">主題切換</span>
+                <span className="text-sm text-text-muted">{t.a11y.theme}</span>
               </div>
             </li>
             {items.map((item, i) => {
@@ -181,6 +189,7 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
                   <Link
                     href={item.href}
                     className={`mobile-menu-link ${isActive(item.href) ? 'is-active' : ''}`}
+                    aria-current={isActive(item.href) ? 'page' : undefined}
                     onClick={() => setMobileMenuOpen(false)}
                   >
                     {label}

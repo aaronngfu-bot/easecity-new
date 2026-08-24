@@ -242,6 +242,8 @@ export type VesselLayout = {
   reflectionDepth: number
   /** Nudge reflection start below hull contact (SVG viewBox px). */
   reflectionDrop: number
+  /** Gap below the PNG box so dashes sit in water, never on the hull. */
+  wakeSink: number
 }
 
 /** Single source of truth — SVG `<image>` boxes and water effects derive from here. */
@@ -267,6 +269,7 @@ export const VESSEL_LAYOUT: VesselLayout[] = [
     maxRx: 54,
     reflectionDepth: 44,
     reflectionDrop: 5,
+    wakeSink: 1.2,
   },
   {
     key: 'junk',
@@ -289,6 +292,7 @@ export const VESSEL_LAYOUT: VesselLayout[] = [
     maxRx: 44,
     reflectionDepth: 50,
     reflectionDrop: 2,
+    wakeSink: 0.5,
   },
   {
     key: 'cruiser',
@@ -311,6 +315,7 @@ export const VESSEL_LAYOUT: VesselLayout[] = [
     maxRx: 14,
     reflectionDepth: 14,
     reflectionDrop: -1,
+    wakeSink: 0.4,
   },
 ]
 
@@ -320,6 +325,15 @@ export function hullWaterY(v: Pick<VesselLayout, 'y' | 'h' | 'draftInset'>) {
 
 export function hullContactY(v: Pick<VesselLayout, 'y' | 'h' | 'draftInset'>) {
   return v.y + v.h - v.draftInset
+}
+
+/** Wake anchor in vessel-local coords — hull bottom meets water. */
+export function wakeLocalY(v: Pick<VesselLayout, 'h' | 'draftInset' | 'wakeSink'>) {
+  return v.h - v.draftInset + v.wakeSink
+}
+
+export function sternXLocal(v: Pick<VesselLayout, 'w' | 'facesLeft'>) {
+  return v.facesLeft ? v.w - 6 : 6
 }
 
 export const VESSELS: {

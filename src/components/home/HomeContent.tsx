@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, Star } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import SectionHeading from '@/components/SectionHeading'
 import { Scrub } from '@/components/ui/Scrub'
@@ -11,8 +11,35 @@ import { BlogTimeline } from '@/components/home/BlogTimeline'
 import { QuoteModal } from '@/components/contact/QuoteModal'
 import { ServiceIcon } from '@/components/ui/ServiceIcon'
 import { HeroIllustration } from '@/components/illustrations/HeroIllustration'
-import { CityField } from '@/components/hero/CityField'
 import { services as serviceCatalog } from '@/lib/services'
+
+function TestimonialCard({
+  tm,
+  duplicate = false,
+}: {
+  tm: { q: string; n: string; r: string }
+  duplicate?: boolean
+}) {
+  return (
+    <figure
+      className={`t-card card relative flex flex-col gap-2 p-6 transition-colors hover:border-[var(--signal)]${duplicate ? ' t-card-dup' : ''}`}
+      aria-hidden={duplicate || undefined}
+    >
+      <div className="flex items-center gap-0.5 text-[var(--amber)]" aria-hidden>
+        {Array.from({ length: 5 }, (_, j) => (
+          <Star key={j} size={12} fill="currentColor" strokeWidth={0} />
+        ))}
+      </div>
+      <blockquote className="flex-1 text-sm leading-relaxed text-[var(--text-secondary)]">
+        &ldquo;{tm.q}&rdquo;
+      </blockquote>
+      <figcaption className="mt-1 border-t border-[var(--border-color)] pt-3">
+        <p className="text-sm font-semibold text-[var(--text-primary)]">{tm.n}</p>
+        <p className="label-mono mt-0.5 text-[var(--text-muted)]">{tm.r}</p>
+      </figcaption>
+    </figure>
+  )
+}
 
 export interface HomeBlogPost {
   id: string
@@ -47,7 +74,9 @@ export function HomeContent() {
   // loading, a skeleton occupies the rail; posts arrive shortly after.
   const [blogPosts, setBlogPosts] = useState<HomeBlogPost[]>([])
   const [blogLoading, setBlogLoading] = useState(true)
+  const [blogError, setBlogError] = useState(false)
   const [quoteOpen, setQuoteOpen] = useState(false)
+  const [compactWall, setCompactWall] = useState<boolean | null>(null)
 
   // Measure each testimonial column's single-iteration height so the marquee
   // loop point aligns exactly (translateY(-50%) drifts when card heights
@@ -75,18 +104,36 @@ export function HomeContent() {
   }, [measureTracks])
 
   useEffect(() => {
+    const mq = window.matchMedia('(max-width: 768px)')
+    const sync = () => setCompactWall(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
+
+  useEffect(() => {
     let active = true
     setBlogLoading(true)
+    setBlogError(false)
     const params = new URLSearchParams({ limit: '10', lang: language })
     fetch(`/api/blog?${params}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
         if (!active) return
-        if (d?.success && Array.isArray(d.data)) setBlogPosts(d.data)
+        if (d?.success && Array.isArray(d.data)) {
+          setBlogPosts(d.data)
+          setBlogError(false)
+        } else {
+          setBlogPosts([])
+          setBlogError(true)
+        }
         setBlogLoading(false)
       })
       .catch(() => {
-        if (active) setBlogLoading(false)
+        if (!active) return
+        setBlogPosts([])
+        setBlogError(true)
+        setBlogLoading(false)
       })
     return () => {
       active = false
@@ -117,16 +164,14 @@ export function HomeContent() {
     { q: c.t11Quote, n: c.t11Name, r: c.t11Role },
     { q: c.t12Quote, n: c.t12Name, r: c.t12Role },
   ]
-  // Equal column sizes (4 / 4 / 4) so all three rails keep identical height;
-  // only their start phase differs. Each column loops its own list seamlessly.
   const tCols = [
     testimonials.slice(0, 4),
     testimonials.slice(4, 8),
     testimonials.slice(8),
-  ].map(col => [...col, ...col])
+  ]
 
   return (
-    <main className="relative min-h-screen">
+    <div className="relative min-h-screen">
       {/* Hero — full-viewport living city */}
       <ImmersionHero onStartProject={() => setQuoteOpen(true)} />
 
@@ -144,7 +189,7 @@ export function HomeContent() {
             </div>
 
             <div className="scrub-blog-rail mt-10">
-              <BlogTimeline posts={blogPosts} loading={blogLoading} />
+              <BlogTimeline posts={blogPosts} loading={blogLoading} error={blogError} />
             </div>
           </div>
         </section>
@@ -153,11 +198,6 @@ export function HomeContent() {
       {/* Products — split assemble. Tight pace so the scene arrives earlier. */}
       <Scrub pace="tight">
         <section className="relative z-10 overflow-hidden section-padding bg-[var(--bg-base)]">
-          <div className="scrub-prod-stars pointer-events-none absolute inset-0" aria-hidden>
-            <div className="scrub-prod-sky absolute inset-x-0 -top-[22%] h-[144%] w-full">
-              <CityField className="h-full w-full" />
-            </div>
-          </div>
           <div className="container-max relative z-10">
             <div className="grid items-center gap-8 lg:grid-cols-[5fr_7fr]">
               <div className="scrub-prod-copy text-left">
@@ -165,7 +205,7 @@ export function HomeContent() {
                   <span aria-hidden className="scrub-rule h-px w-10 origin-left bg-signal" />
                   <span className="scrub-kicker-label">{c.productsBadge}</span>
                 </span>
-                <h2 className="scrub-title mt-3 font-display text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-4xl">
+                <h2 className="type-section scrub-title font-display text-3xl font-bold text-[var(--text-primary)] md:text-4xl">
                   {c.productsNarrative}
                 </h2>
                 <p className="scrub-sub mt-4 max-w-md leading-relaxed text-[var(--text-secondary)]">
@@ -175,7 +215,6 @@ export function HomeContent() {
                 <div className="scrub-meta mt-6 flex flex-wrap items-center gap-2">
                   <span className="badge font-mono">{c.productLatency}</span>
                   <span className="badge font-mono">{c.productDevices}</span>
-                  <span className="badge">{c.badgeTrial}</span>
                 </div>
 
                 <a href="/ec-share" className="scrub-cta-line signal-cta group mt-8">
@@ -195,7 +234,7 @@ export function HomeContent() {
 
       {/* Services — staggered cascade */}
       <Scrub>
-        <section className="relative z-10 bg-[var(--bg-base)] py-20 md:py-28">
+        <section className="relative z-10 section-padding bg-[var(--bg-base)]">
           <div className="container-max">
             <div className="scrub-svc-head flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
               <div className="max-w-2xl">
@@ -203,7 +242,7 @@ export function HomeContent() {
                   <span aria-hidden className="scrub-rule h-px w-10 origin-left bg-signal" />
                   <span className="scrub-kicker-label">{c.servicesBadge}</span>
                 </div>
-                <h2 className="scrub-title font-display text-3xl font-bold leading-tight tracking-tight text-[var(--text-primary)] md:text-5xl">
+                <h2 className="type-section scrub-title font-display text-3xl font-bold text-[var(--text-primary)] md:text-5xl">
                   {c.servicesTitle}
                 </h2>
                 <p className="scrub-sub mt-4 max-w-xl text-base leading-relaxed text-[var(--text-secondary)]">
@@ -217,7 +256,7 @@ export function HomeContent() {
                 <Link
                   key={s.slug}
                   href={`/services/${s.slug}`}
-                  className="scrub-svc-card group flex h-full flex-col rounded-2xl border border-[var(--border-color)] bg-[var(--bg-surface)] p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[var(--signal)] hover:shadow-[var(--shadow-lg)]"
+                  className="scrub-svc-card card group flex h-full flex-col p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[var(--signal)] hover:shadow-[var(--shadow-lg)]"
                   style={{ ['--i' as string]: i }}
                 >
                   <div className="flex items-center justify-between">
@@ -233,8 +272,8 @@ export function HomeContent() {
                     {s.body}
                   </p>
 
-                  <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-medium text-[var(--signal)] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    {c.servicesCta} <ArrowRight size={14} />
+                  <span className="mt-auto inline-flex items-center gap-1.5 pt-6 text-sm font-medium text-[var(--signal)]">
+                    {c.servicesCta} <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" />
                   </span>
                 </Link>
               ))}
@@ -250,8 +289,8 @@ export function HomeContent() {
             <div className="scrub-t-head">
               <SectionHeading
                 badge={c.testimBadge}
-                align="center"
                 line={false}
+                align="center"
                 title={c.testimTitle}
                 subtitle={c.testimSubtitle}
               />
@@ -259,50 +298,27 @@ export function HomeContent() {
 
             <div className="scrub-t-wall t-marquee mt-12" ref={tMarqueeRef} aria-label={c.testimTitle}>
               {/* Desktop — three parallel masked rails, staggered phases */}
-              <div className="t-marquee-row">
+              <div className="t-marquee-row" hidden={compactWall === true} aria-hidden={compactWall === true || undefined}>
                 {tCols.map((col, ci) => (
                   <div key={`col-${ci}`} className="t-marquee-col" style={{ ['--ci' as string]: ci }}>
-                    <div className="t-marquee-track" style={{ animationDelay: `${ci * -15}s` }}>
+                    <div className="t-marquee-track">
                       {col.map((tm, i) => (
-                        <figure
-                          key={`${tm.n}-${ci}-${i}`}
-                          className="t-card card relative flex flex-col gap-2 p-6 transition-colors hover:border-[var(--signal)]"
-                        >
-                          <figcaption>
-                            <p className="text-sm font-semibold text-[var(--text-primary)]">{tm.n}</p>
-                            <p className="label-mono mt-0.5 text-[var(--text-muted)]">{tm.r}</p>
-                          </figcaption>
-                          <div className="flex items-center gap-1 text-[var(--amber)]" aria-label="5 stars">
-                            {'★★★★★'.split('').map((s, j) => <span key={j}>{s}</span>)}
-                          </div>
-                          <blockquote className="flex-1 text-sm leading-relaxed text-[var(--text-secondary)]">
-                            &ldquo;{tm.q}&rdquo;
-                          </blockquote>
-                        </figure>
+                        <TestimonialCard key={`${tm.n}-${ci}-${i}`} tm={tm} />
+                      ))}
+                      {col.map((tm, i) => (
+                        <TestimonialCard key={`${tm.n}-${ci}-dup-${i}`} tm={tm} duplicate />
                       ))}
                     </div>
                   </div>
                 ))}
               </div>
-              {/* Mobile — single full-height rail with all 12 cards */}
-              <div className="t-marquee-single">
+              <div className="t-marquee-single" hidden={compactWall === false} aria-hidden={compactWall === false || undefined}>
                 <div className="t-marquee-track">
-                  {[...testimonials, ...testimonials].map((tm, i) => (
-                    <figure
-                      key={`s-${tm.n}-${i}`}
-                      className="t-card card relative flex flex-col gap-2 p-6 transition-colors hover:border-[var(--signal)]"
-                    >
-                      <figcaption>
-                        <p className="text-sm font-semibold text-[var(--text-primary)]">{tm.n}</p>
-                        <p className="label-mono mt-0.5 text-[var(--text-muted)]">{tm.r}</p>
-                      </figcaption>
-                      <div className="flex items-center gap-1 text-[var(--amber)]" aria-label="5 stars">
-                        {'★★★★★'.split('').map((s, j) => <span key={j}>{s}</span>)}
-                      </div>
-                      <blockquote className="flex-1 text-sm leading-relaxed text-[var(--text-secondary)]">
-                        &ldquo;{tm.q}&rdquo;
-                      </blockquote>
-                    </figure>
+                  {testimonials.map((tm, i) => (
+                    <TestimonialCard key={`s-${tm.n}-${i}`} tm={tm} />
+                  ))}
+                  {testimonials.map((tm, i) => (
+                    <TestimonialCard key={`s-${tm.n}-dup-${i}`} tm={tm} duplicate />
                   ))}
                 </div>
               </div>
@@ -316,7 +332,7 @@ export function HomeContent() {
         <section className="relative z-10 section-padding bg-[var(--bg-base)]">
           <div className="container-max">
             <div className="scrub-cta mx-auto max-w-2xl text-center">
-              <h2 className="scrub-title font-display text-3xl font-bold leading-tight tracking-tight text-[var(--text-primary)] md:text-5xl">
+              <h2 className="type-section scrub-title font-display text-3xl font-bold text-[var(--text-primary)] md:text-5xl">
                 {c.homeCtaTitle}
               </h2>
 
@@ -328,12 +344,17 @@ export function HomeContent() {
                 <button
                   type="button"
                   onClick={() => setQuoteOpen(true)}
-                  className="group inline-flex items-center gap-2 rounded-lg bg-[var(--signal)] px-9 py-4 text-base font-semibold text-[var(--signal-ink)] transition hover:bg-[var(--signal-light)]"
+                  className="group inline-flex min-h-11 items-center gap-2 rounded-lg bg-[var(--signal)] px-9 py-4 text-base font-semibold text-[var(--signal-ink)] transition hover:bg-[var(--signal-light)]"
                 >
                   {c.homeCtaBtn}
                   <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />
                 </button>
               </div>
+              <p className="scrub-sub mt-5 text-sm text-[var(--text-muted)]">
+                <a href="mailto:hello@easecity.hk" className="underline decoration-[var(--border-color)] underline-offset-4 transition-colors hover:text-[var(--signal)] hover:decoration-[var(--signal)]">
+                  {c.homeCtaEmail}
+                </a>
+              </p>
             </div>
           </div>
         </section>
@@ -341,6 +362,6 @@ export function HomeContent() {
 
       {/* Frictionless multi-step quote modal (no service → general brief) */}
       <QuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} />
-    </main>
+    </div>
   )
 }

@@ -2,19 +2,15 @@
 
 import { useEffect, useRef } from 'react'
 import {
-  CELESTIAL_X,
   LIGHT_SOURCES,
-  TONE_VAR,
   VB_H,
   VB_W,
   VESSELS,
   WATER_H,
   mulberry32,
-  type Tone,
 } from './harbour-scene'
 
-/** Reflections and teal spill hug the shore (water canvas sits beneath the SVG
- *  skyline, so they may slide under building footings without occluding them). */
+/** Surface chops hug the shore (water canvas sits beneath the SVG skyline). */
 const CLIP_TOP = 2
 
 /**
@@ -23,7 +19,7 @@ const CLIP_TOP = 2
  * Sits behind the skyline SVG and shows through its transparent water region,
  * so the vessels drawn in SVG still float on top. Authored in the scene's
  * viewBox units (x 0…1600, y 0…182 below the waterline) and scaled to fit,
- * which keeps every reflection under the light that casts it at any size.
+ * which keeps surface chops denser under the skyline at any size.
  */
 
 type Rgb = [number, number, number]
@@ -31,17 +27,16 @@ type Rgb = [number, number, number]
 const FALLBACK: Record<string, Rgb> = {
   '--hk-water': [10, 18, 51],
   '--hk-water-deep': [5, 9, 31],
-  '--hk-win-warm': [255, 209, 102],
   '--hk-win-cool': [168, 236, 247],
-  '--hk-win-teal': [0, 229, 204],
-  '--hk-accent-pink': [255, 111, 156],
-  '--hk-accent-gold': [247, 183, 51],
-  '--hk-glint': [245, 196, 81],
-  '--hk-ferry': [42, 107, 69],
-  '--hk-junk': [30, 21, 18],
-  '--hk-hull': [22, 32, 63],
   '--hk-hull-light': [232, 239, 245],
-  '--hk-sail': [216, 57, 43],
+}
+
+function mixRgb(a: Rgb, b: Rgb, t: number): Rgb {
+  return [
+    Math.round(a[0] + (b[0] - a[0]) * t),
+    Math.round(a[1] + (b[1] - a[1]) * t),
+    Math.round(a[2] + (b[2] - a[2]) * t),
+  ]
 }
 
 function hexToRgb(raw: string, fallback: Rgb): Rgb {
@@ -68,20 +63,54 @@ function readPalette(): Record<string, Rgb> {
   return out
 }
 
-/** Per-source wobble constants, fixed up front so the surface stays coherent. */
-const COLUMNS = (() => {
-  const rand = mulberry32(60219)
-  return LIGHT_SOURCES.map((s) => ({
-    x: s.x,
-    tone: s.tone as Tone,
-    weight: s.weight,
-    phase: rand() * Math.PI * 2,
-    phase2: rand() * Math.PI * 2,
-    speed: 0.55 + rand() * 0.6,
-    spread: 0.7 + rand() * 0.7,
-    segs: 5 + Math.round(s.weight * 10),
-    depth: 28 + s.weight * 140,
-  }))
+function chopLife(life: number) {
+  if (life < 0.08) return life / 0.08
+  if (life < 0.14) return 1
+  if (life < 0.32) return 1 - (life - 0.14) / 0.18
+  return 0
+}
+
+/** Short surface chops — denser under the skyline, born / stretch / vanish. */
+const RIPPLES = (() => {
+  const rand = mulberry32(904411)
+  const out: Array<{
+    x: number
+    y: number
+    w: number
+    phase: number
+    period: number
+    spread: number
+    amp: number
+  }> = []
+
+  for (let i = 0; i < 72; i++) {
+    out.push({
+      x: rand() * VB_W,
+      y: CLIP_TOP + 10 + Math.pow(rand(), 0.72) * WATER_H * 0.68,
+      w: 9 + rand() * 20,
+      phase: rand(),
+      period: 8.2 + rand() * 5.4,
+      spread: 1.12 + rand() * 0.38,
+      amp: 0.52 + rand() * 0.3,
+    })
+  }
+
+  for (const s of LIGHT_SOURCES) {
+    const n = 3 + Math.round(s.weight * 7)
+    for (let i = 0; i < n; i++) {
+      const f = Math.pow(rand(), 0.8)
+      out.push({
+        x: s.x + (rand() - 0.5) * 26,
+        y: CLIP_TOP + 8 + f * (42 + s.weight * 86),
+        w: 7 + rand() * 18 + s.weight * 6,
+        phase: rand(),
+        period: 7.6 + rand() * 5.8,
+        spread: 1.14 + rand() * 0.4,
+        amp: 0.56 + s.weight * 0.26,
+      })
+    }
+  }
+  return out
 })()
 
 const VESSEL_DASHES = (() => {
@@ -91,20 +120,10 @@ const VESSEL_DASHES = (() => {
       vi,
       fx: rand(),
       fy: Math.pow(rand(), 1.3),
-      w: 0.12 + rand() * 0.3,
+      w: 0.14 + rand() * 0.22,
       phase: rand() * Math.PI * 2,
-      accent: rand() > 0.62,
     })),
   )
-})()
-
-const GLINT = (() => {
-  const rand = mulberry32(707101)
-  return Array.from({ length: 30 }, (_, i) => ({
-    f: (i + 0.5) / 30,
-    phase: rand() * Math.PI * 2,
-    w: 0.45 + rand() * 0.9,
-  }))
 })()
 
 export function HarbourWater({ className = '' }: { className?: string }) {
@@ -121,7 +140,8 @@ export function HarbourWater({ className = '' }: { className?: string }) {
     let raf = 0
     let last = 0
     let t = 0
-    let visible = true
+    let visible = false
+    let pageVisible = document.visibilityState === 'visible'
     const DT = 0.048
     let mapSvgY = (svgY: number) => svgY - WATER_H
 
@@ -146,7 +166,8 @@ export function HarbourWater({ className = '' }: { className?: string }) {
       if (!cvs || !ctx) return
       const rect = cvs.getBoundingClientRect()
       if (rect.width < 1) return
-      const dpr = Math.min(window.devicePixelRatio || 1, 1.75)
+      const mobile = rect.width < 720
+      const dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1 : 1.5)
       const w = Math.round(rect.width * dpr)
       const h = Math.round(rect.height * dpr)
       // Reassigning width/height clears the canvas and re-lays it out, so skip
@@ -163,7 +184,6 @@ export function HarbourWater({ className = '' }: { className?: string }) {
 
     function draw() {
       if (!ctx) return
-      updateWaterMapping()
       const deep = pal['--hk-water-deep']
       const surf = pal['--hk-water']
 
@@ -183,74 +203,73 @@ export function HarbourWater({ className = '' }: { className?: string }) {
       ctx.fillStyle = shore
       ctx.fillRect(0, CLIP_TOP, VB_W, 28)
 
-      // Reflection columns — softened with a ghost offset for shimmer.
-      ctx.globalCompositeOperation = 'lighter'
-      for (const c of COLUMNS) {
-        const col = pal[TONE_VAR[c.tone]]
-        for (let i = 0; i < c.segs; i++) {
-          const f = (i + 0.5) / c.segs
-          const y = CLIP_TOP + f * c.depth
-          const sway =
-            Math.sin(t * c.speed + f * 7 + c.phase) * (1.2 + f * 7) * c.spread +
-            Math.sin(t * c.speed * 1.7 + f * 11 + c.phase2) * (0.5 + f * 3.5)
-          const w = (4 + f * 20) * c.spread
-          const flicker = 0.55 + 0.45 * Math.sin(t * 1.6 + c.phase2 + f * 5)
-          const a = c.weight * Math.pow(1 - f, 1.55) * flicker * 0.72
-          if (a < 0.01) continue
-          ctx.fillStyle = rgba(col, a)
-          ctx.fillRect(c.x + sway - w / 2, y, w, 1.6 + f * 1.2)
-          ctx.fillStyle = rgba(col, a * 0.35)
-          ctx.fillRect(c.x + sway * 0.6 + 3 - w * 0.35, y + 1.2, w * 0.55, 1)
-        }
-      }
-      ctx.globalCompositeOperation = 'source-over'
-
-      // Moon or sun glint — tapered path with softer falloff.
-      const glint = pal['--hk-glint']
-      for (const g of GLINT) {
-        const y = Math.max(CLIP_TOP, g.f * WATER_H * 0.92)
-        const sway = Math.sin(t * 0.65 + g.f * 6 + g.phase) * (2 + g.f * 22)
-        const w = (8 + g.f * 46) * g.w
-        const pulse = 0.42 + 0.58 * Math.sin(t * 1.2 + g.phase)
-        const a = Math.pow(1 - g.f, 1.35) * pulse * 0.44
-        ctx.fillStyle = rgba(glint, a)
-        ctx.fillRect(CELESTIAL_X + sway - w / 2, y, w, 1.8 + g.f * 2)
+      // Harbour chops — cream ticks that appear, stretch, and vanish in place.
+      const lightWater = (surf[0] + surf[1] + surf[2]) / 3 > 90
+      const foam = mixRgb(surf, pal['--hk-hull-light'], lightWater ? 0.78 : 0.64)
+      const chopGain = lightWater ? 0.48 : 0.36
+      for (const r of RIPPLES) {
+        const life = ((t / r.period + r.phase) % 1 + 1) % 1
+        const env = chopLife(life)
+        if (env <= 0) continue
+        const fade = Math.pow(1 - Math.min(1, (r.y - CLIP_TOP) / (WATER_H * 0.85)), 1.15)
+        const a = fade * env * r.amp * chopGain
+        if (a < 0.028) continue
+        const stretch = 0.82 + life * r.spread
+        const w = r.w * stretch
+        ctx.fillStyle = rgba(foam, a)
+        ctx.fillRect(r.x - w / 2, r.y, w, lightWater ? 1.35 : 1.2)
       }
 
-      // Vessel reflections — broken dashes with lateral drift.
+      // Vessel foam — same hull-light on every boat, no accent flicker.
+      const vesselFoam = pal['--hk-hull-light']
       for (const d of VESSEL_DASHES) {
         const v = VESSELS[d.vi]
-        const col = pal[d.accent ? v.accent : v.hull]
         const span = v.x1 - v.x0
         const y = mapSvgY(v.contactY + v.reflectionDrop + d.fy * v.depth)
         const sway =
-          Math.sin(t * 0.95 + d.fy * 7 + d.phase) * (1.5 + d.fy * 5) +
-          Math.sin(t * 1.4 + d.phase) * 0.8
+          Math.sin(t * 0.85 + d.fy * 6 + d.phase) * (1.1 + d.fy * 3.4) +
+          Math.sin(t * 1.15 + d.phase) * 0.45
         const w = span * d.w
-        const a = Math.pow(1 - d.fy, 1.5) * (0.4 + 0.4 * Math.sin(t * 1.4 + d.phase)) * 0.42
-        ctx.fillStyle = rgba(col, a)
-        ctx.fillRect(v.x0 + d.fx * (span - w) + sway, y, w, 1.6 + d.fy * 1.6)
+        const a = Math.pow(1 - d.fy, 1.55) * (0.62 + 0.2 * Math.sin(t * 1.05 + d.phase)) * 0.34
+        ctx.fillStyle = rgba(vesselFoam, a)
+        ctx.fillRect(v.x0 + d.fx * (span - w) + sway, y, w, 1.2 + d.fy * 1.1)
       }
     }
 
+    const shouldRun = () => visible && pageVisible && !reduce
+
     const loop = (now: number) => {
+      raf = 0
+      if (!shouldRun()) return
+      if (now - last >= 36) {
+        last = now
+        t += DT
+        draw()
+      }
       raf = requestAnimationFrame(loop)
-      if (!visible) return
-      if (now - last < 36) return // ~28fps — smooth enough for slow water
-      last = now
-      t += DT
-      draw()
+    }
+
+    const kick = () => {
+      if (shouldRun()) {
+        if (!raf) raf = requestAnimationFrame(loop)
+        return
+      }
+      if (raf) {
+        cancelAnimationFrame(raf)
+        raf = 0
+      }
     }
 
     resize()
-    if (!reduce) raf = requestAnimationFrame(loop)
+    if (reduce) draw()
 
     const ro = new ResizeObserver(resize)
     ro.observe(canvas)
 
     const io = new IntersectionObserver(([e]) => {
       visible = e.isIntersecting
-    })
+      kick()
+    }, { rootMargin: '80px' })
     io.observe(canvas)
 
     const mo = new MutationObserver(() => {
@@ -259,8 +278,20 @@ export function HarbourWater({ className = '' }: { className?: string }) {
     })
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
 
+    const onPageVis = () => {
+      pageVisible = document.visibilityState === 'visible'
+      kick()
+    }
+    const onScroll = () => {
+      if (visible) updateWaterMapping()
+    }
+    document.addEventListener('visibilitychange', onPageVis)
+    window.addEventListener('scroll', onScroll, { passive: true })
+
     return () => {
       cancelAnimationFrame(raf)
+      document.removeEventListener('visibilitychange', onPageVis)
+      window.removeEventListener('scroll', onScroll)
       ro.disconnect()
       io.disconnect()
       mo.disconnect()

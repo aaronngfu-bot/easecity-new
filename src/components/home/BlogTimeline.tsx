@@ -38,7 +38,15 @@ interface UpdateCard {
  * Mouseup/mousemove are tracked on `window` so releasing outside the rail
  * always ends the gesture.
  */
-export function BlogTimeline({ posts = [], loading = false }: { posts?: BlogPost[]; loading?: boolean }) {
+export function BlogTimeline({
+  posts = [],
+  loading = false,
+  error = false,
+}: {
+  posts?: BlogPost[]
+  loading?: boolean
+  error?: boolean
+}) {
   const { language, t } = useLanguage()
   const railRef = useRef<HTMLDivElement | null>(null)
   const dragState = useRef<{ startX: number; startTop: number; scrollLeft: number; active: boolean } | null>(null)
@@ -134,10 +142,18 @@ export function BlogTimeline({ posts = [], loading = false }: { posts?: BlogPost
           </div>
         )}
 
+        {!loading && items.length === 0 && (
+          <div className="card px-6 py-10 text-center">
+            <p className="text-sm leading-relaxed text-[var(--text-secondary)]">
+              {error ? t.companyPage.blogError : t.companyPage.blogEmpty}
+            </p>
+          </div>
+        )}
+
         {!loading && items.length > 0 && (
           <div
             ref={railRef}
-            className="flex snap-x snap-mandatory cursor-grab gap-8 overflow-x-auto pb-4 pr-4 select-none [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            className="blog-rail select-none"
           >
             {items.map((item) => (
               <Link
@@ -172,11 +188,11 @@ export function BlogTimeline({ posts = [], loading = false }: { posts?: BlogPost
         )}
       </div>
 
-      {items.length > 0 && (
+      {!loading && (
         <div className="mt-8 text-center">
           <Link
             href="/blog"
-            className="scrub-blog-more inline-flex items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
+            className="scrub-blog-more inline-flex min-h-11 items-center gap-1.5 text-sm font-semibold text-[var(--signal)] transition-colors hover:text-[var(--signal-light)]"
           >
             {t.companyPage.blogCta}
             <ArrowRight size={14} />

@@ -7,7 +7,7 @@ import { useLayoutEffect, useRef } from 'react'
  * pinned (JS fixed — CSS sticky dies under overflow-x-clip on the public
  * layout) and `--p` (0→1) scrubs child CSS.
  *
- * Do not wrap this in RevealSection: a transformed ancestor breaks pinning.
+ * Do not wrap this in a transformed ancestor: that breaks pinning.
  */
 
 export function ScrollPin({
@@ -33,6 +33,7 @@ export function ScrollPin({
       pin.style.setProperty('--p-depth', '0')
       pin.style.setProperty('--p-fade', '0')
       pin.style.setProperty('--p-exit', '0')
+      pin.style.setProperty('--p-mask', '0')
       pin.style.position = 'relative'
       pin.style.height = '100svh'
       track.style.height = 'auto'
@@ -40,36 +41,57 @@ export function ScrollPin({
     }
 
     let raf = 0
+    let lastP = -1
+    let lastMode = ''
+    let lastScrub = false
     const update = () => {
       raf = 0
       const r = track.getBoundingClientRect()
       const vh = window.innerHeight
       const travel = Math.max(1, r.height - vh)
       let p = 0
+      let mode = 'top'
       if (r.top <= 0 && r.bottom > vh) {
         p = Math.min(1, -r.top / travel)
-        pin.style.position = 'fixed'
-        pin.style.top = '0'
-        pin.style.bottom = 'auto'
+        mode = 'fixed'
       } else if (r.bottom <= vh) {
         p = 1
-        pin.style.position = 'absolute'
-        pin.style.top = 'auto'
-        pin.style.bottom = '0'
-      } else {
-        p = 0
-        pin.style.position = 'absolute'
-        pin.style.top = '0'
-        pin.style.bottom = 'auto'
+        mode = 'bottom'
       }
-      pin.style.setProperty('--p', p.toFixed(4))
-      // Phased progress — copy fades first, depth moves mid-scroll, exit veil last.
+      if (mode !== lastMode) {
+        lastMode = mode
+        if (mode === 'fixed') {
+          pin.style.position = 'fixed'
+          pin.style.top = '0'
+          pin.style.bottom = 'auto'
+        } else if (mode === 'bottom') {
+          pin.style.position = 'absolute'
+          pin.style.top = 'auto'
+          pin.style.bottom = '0'
+        } else {
+          pin.style.position = 'absolute'
+          pin.style.top = '0'
+          pin.style.bottom = 'auto'
+        }
+      }
+      const p4 = Number(p.toFixed(4))
+      if (p4 === lastP) return
+      lastP = p4
+      // Copy wipes first, depth mid-scroll, scene mask starts as lag is visible.
       const pDepth = Math.max(0, Math.min(1, (p - 0.1) / 0.9))
       const pFade = Math.max(0, Math.min(1, p / 0.75))
       const pExit = Math.max(0, Math.min(1, (p - 0.5) / 0.5))
+      const pMask = Math.max(0, Math.min(1, (p - 0.48) / 0.52))
+      pin.style.setProperty('--p', p4.toFixed(4))
       pin.style.setProperty('--p-depth', pDepth.toFixed(4))
       pin.style.setProperty('--p-fade', pFade.toFixed(4))
       pin.style.setProperty('--p-exit', pExit.toFixed(4))
+      pin.style.setProperty('--p-mask', pMask.toFixed(4))
+      const scrub = p4 > 0.01 && p4 < 0.99
+      if (scrub !== lastScrub) {
+        lastScrub = scrub
+        pin.classList.toggle('is-scrubbing', scrub)
+      }
     }
     const schedule = () => {
       if (!raf) raf = requestAnimationFrame(update)
@@ -90,7 +112,7 @@ export function ScrollPin({
       <div
         ref={pinRef}
         className={`scroll-pin absolute inset-x-0 top-0 z-0 h-[100svh] w-full overflow-x-clip overflow-y-visible ${className ?? ''}`}
-        style={{ ['--p' as string]: 0 }}
+        style={{ ['--p' as string]: 0, ['--p-mask' as string]: 0 }}
       >
         {children}
       </div>

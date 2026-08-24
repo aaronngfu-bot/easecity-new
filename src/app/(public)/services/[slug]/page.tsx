@@ -43,7 +43,7 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
   const subject = language === 'zh' ? service.subject.zh : service.subject.en
 
   return (
-    <main className="relative min-h-screen bg-[var(--bg-base)]">
+    <div className="relative min-h-screen bg-[var(--bg-base)]">
       <div aria-hidden className="absolute inset-0 bg-grid opacity-30" />
       <div className="container-max relative z-10 max-w-4xl pt-2 pb-24 md:pb-32">
         <div className="mt-8">
@@ -157,6 +157,6 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
       </div>
 
       <QuoteModal open={quoteOpen} onClose={() => setQuoteOpen(false)} serviceSlug={service.slug} serviceTitle={title} />
-    </main>
+    </div>
   )
 }

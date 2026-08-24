@@ -45,7 +45,7 @@ export function SectionTitle({
           <span className="h-px w-8 bg-gradient-to-r from-signal/40 to-transparent" />
         </div>
       )}
-      <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary leading-[1.05] tracking-tight">
+      <h2 className="type-section font-display text-3xl md:text-4xl lg:text-5xl font-bold text-text-primary">
         {title}
         {titleHighlight && (
           <>

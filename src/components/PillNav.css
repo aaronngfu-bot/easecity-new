@@ -8,7 +8,7 @@
   z-index: 100;
   display: flex;
   justify-content: center;
-  padding: 12px 16px;
+  padding: max(12px, env(safe-area-inset-top, 0px)) 16px 12px;
   pointer-events: none;
 }
 
@@ -46,7 +46,7 @@
 }
 
 .pill-wordmark-brand {
-  font-family: var(--font-display), system-ui, sans-serif;
+  font-family: var(--font-display), "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
   font-size: 15px;
   font-weight: 700;
   letter-spacing: -0.02em;
@@ -196,8 +196,8 @@
   align-items: center;
   justify-content: center;
   gap: 4px;
-  width: 38px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   padding: 8px;
   background: var(--bg-elevated);
   border: 1px solid var(--border-color);
@@ -232,9 +232,9 @@
 
 .mobile-menu-popover {
   position: fixed;
-  top: 64px;
-  left: 16px;
-  right: 16px;
+  top: calc(64px + env(safe-area-inset-top, 0px));
+  left: max(16px, env(safe-area-inset-left, 0px));
+  right: max(16px, env(safe-area-inset-right, 0px));
   background: var(--bg-surface);
   border: 1px solid var(--border-color);
   border-radius: 16px;
@@ -312,8 +312,8 @@
   color: var(--signal);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
+/* Width-only 768px treats landscape phones as desktop. */
+@media (max-width: 900px), (max-height: 540px) {
   .desktop-only {
     display: none !important;
   }
@@ -322,7 +322,7 @@
   }
 }
 
-@media (min-width: 769px) {
+@media (min-width: 901px) and (min-height: 541px) {
   .mobile-only {
     display: none !important;
   }

@@ -26,7 +26,7 @@ export function Philosophy() {
               <span className="w-1.5 h-1.5 rounded-full bg-signal shadow-glow-signal-sm" />
               <p className="label-mono text-signal/80">{t.philosophy.eyebrow}</p>
             </div>
-            <h2 className="font-display text-4xl md:text-5xl font-bold text-text-primary leading-[1.05] tracking-tight mb-6">
+            <h2 className="type-section font-display text-4xl md:text-5xl font-bold text-text-primary mb-6">
               {t.philosophy.heading}{' '}
               <span className="text-gradient-signal">{t.philosophy.headingHighlight}</span>
             </h2>

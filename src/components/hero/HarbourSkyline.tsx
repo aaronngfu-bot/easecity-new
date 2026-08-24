@@ -8,6 +8,8 @@ import {
   SKY_LIFT,
   VESSEL_HREFS,
   VESSEL_LAYOUT,
+  mulberry32,
+  type VesselLayout,
   MOUNTAIN_ART,
   MOUNTAIN_PATH_D,
   mountainLayout,
@@ -72,6 +74,99 @@ const SKYLINE_BOX_H = Math.ceil(
 const MOUNTAIN_BOX = mountainLayout()
 const RIDGE_VISIBLE = visibleRidgeStructures()
 
+const MOON_BITE_X = CELESTIAL_X + 14
+const MOON_BITE_Y = CELESTIAL_Y - 12
+const MOON_BITE_R = CELESTIAL_R - 4
+
+function MoonCrescent() {
+  return (
+    <circle
+      cx={CELESTIAL_X}
+      cy={CELESTIAL_Y}
+      r={CELESTIAL_R}
+      fill="var(--hk-moon)"
+      mask="url(#hk-moon-mask)"
+    />
+  )
+}
+
+const RIPPLE_SEED: Record<VesselLayout['key'], number> = {
+  ferry: 90101,
+  junk: 77213,
+  cruiser: 44019,
+}
+
+type HullWave = {
+  x1: number
+  x2: number
+  y: number
+  sw: number
+  o: number
+  delay: number
+  spread: number
+}
+
+/** Straight slosh lines under the hull — born on the bob, spread sideways, vanish. */
+function buildHullWaves(v: VesselLayout): HullWave[] {
+  const rand = mulberry32(RIPPLE_SEED[v.key])
+  const inset = v.key === 'cruiser' ? 5 : 8
+  const nudgeX = v.key === 'cruiser' ? 11 : 0
+  const nudgeY = v.key === 'ferry' ? 6 : v.key === 'cruiser' ? -3.5 : 0
+  const x0 = v.x + inset + nudgeX
+  const span = Math.max(12, v.w - inset * 2)
+  const floor = v.y + v.h + v.wakeSink + nudgeY
+  const scale = v.key === 'cruiser' ? 0.42 : v.key === 'junk' ? 0.78 : 1
+  const dyScale = v.key === 'cruiser' ? 0.62 : v.key === 'junk' ? 0.82 : 1
+  const count = v.key === 'ferry' ? 36 : v.key === 'junk' ? 28 : 14
+  const depthMax = 12.6 * dyScale
+  const out: HullWave[] = []
+  for (let i = 0; i < count; i++) {
+    const t = rand() ** 0.68
+    const w = (11 + rand() * 28) * scale
+    const x1 = x0 + rand() * Math.max(4, span - w)
+    out.push({
+      x1,
+      x2: x1 + w,
+      y: floor + t * depthMax + (rand() - 0.5) * 1.8,
+      sw: (1.52 - t * 0.86 + rand() * 0.18) * (v.key === 'cruiser' ? 0.72 : 1),
+      o: 0.38 - t * 0.2,
+      delay: rand() * (v.bobPeriod * 0.22),
+      spread: 1.28 + t * 0.82 + rand() * 0.14,
+    })
+  }
+  return out
+}
+
+const VESSEL_WAVES = Object.fromEntries(
+  VESSEL_LAYOUT.map((v) => [v.key, buildHullWaves(v)]),
+) as Record<VesselLayout['key'], HullWave[]>
+
+function VesselWaves({ v }: { v: VesselLayout }) {
+  return (
+    <g className={`hk-vessel-waves hk-vessel-waves--${v.key}`} aria-hidden="true">
+      {VESSEL_WAVES[v.key].map((w, i) => (
+        <line
+          key={i}
+          className="hk-hull-wave"
+          x1={w.x1}
+          x2={w.x2}
+          y1={w.y}
+          y2={w.y}
+          stroke="var(--hk-hull-light)"
+          strokeWidth={w.sw}
+          strokeLinecap="round"
+          opacity={w.o}
+          style={{
+            ['--wave-o' as string]: w.o,
+            ['--wave-spread' as string]: w.spread,
+            animationDelay: `${v.bobOffset - w.delay + (v.bobSign < 0 ? v.bobPeriod / 2 : 0)}s`,
+          }}
+        />
+      ))}
+    </g>
+  )
+}
+
 function ridgeBlockLayout(footX: number, dx: number, w: number, h: number) {
   const cx = footX + dx
   const bedY = ridgeYAt(cx) + RIDGE_BED_DEPTH
@@ -112,18 +207,36 @@ function RidgeBlockGlints({ footX, dx, w, h, glints }: RidgeBlockSpec & { footX:
 
   return (
     <>
-      {glints.map((g, i) => (
-        <rect
-          key={i}
-          x={x + g.x}
-          y={y + g.y}
-          width={g.w}
-          height={g.h}
-          className="hk-ridge-glint-night"
-          style={{ animationDelay: `${-(i % 4) * 0.9}s` }}
-          rx="0.3"
-        />
-      ))}
+      {glints.map((g, i) => {
+        const n = mulberry32(
+          (Math.round(footX * 13 + dx * 17 + g.x * 31 + g.y * 19 + i * 97) >>> 0),
+        )()
+        const timing = {
+          animationDelay: `${(-n * 4.6).toFixed(2)}s`,
+          animationDuration: `${(4.1 + n * 1.5).toFixed(2)}s`,
+        }
+        return (
+          <g key={i}>
+            <ellipse
+              className="hk-ridge-glint-halo"
+              cx={x + g.x + g.w / 2}
+              cy={y + g.y + g.h / 2}
+              rx={g.w * 1.4}
+              ry={g.h * 1.2}
+              style={timing}
+            />
+            <rect
+              x={x + g.x}
+              y={y + g.y}
+              width={g.w}
+              height={g.h}
+              className="hk-ridge-glint-night"
+              style={timing}
+              rx="0.3"
+            />
+          </g>
+        )
+      })}
     </>
   )
 }
@@ -164,6 +277,7 @@ export function HarbourSkyline({ className = '' }: { className?: string }) {
         className="hk-scene-city"
         viewBox={`0 0 ${VB_W} ${VB_H}`}
         preserveAspectRatio="xMidYMax meet"
+        overflow="visible"
         aria-hidden="true"
         focusable="false"
       >
@@ -183,11 +297,6 @@ export function HarbourSkyline({ className = '' }: { className?: string }) {
             <stop offset="100%" stopColor="var(--hk-sky-near)" />
           </linearGradient>
 
-          <radialGradient id="hk-moon-glow">
-            <stop offset="0%" stopColor="var(--hk-moon)" stopOpacity="0.4" />
-            <stop offset="100%" stopColor="var(--hk-moon)" stopOpacity="0" />
-          </radialGradient>
-
           <radialGradient id="hk-sun-corona">
             <stop offset="0%" stopColor="var(--hk-sun)" stopOpacity="0.45" />
             <stop offset="40%" stopColor="var(--hk-sun)" stopOpacity="0.18" />
@@ -196,7 +305,7 @@ export function HarbourSkyline({ className = '' }: { className?: string }) {
 
           <mask id="hk-moon-mask">
             <circle cx={CELESTIAL_X} cy={CELESTIAL_Y} r={CELESTIAL_R} fill="#fff" />
-            <circle cx={CELESTIAL_X + 14} cy={CELESTIAL_Y - 12} r={CELESTIAL_R - 4} fill="#000" />
+            <circle cx={MOON_BITE_X} cy={MOON_BITE_Y} r={MOON_BITE_R} fill="#000" />
           </mask>
         </defs>
 
@@ -273,14 +382,9 @@ export function HarbourSkyline({ className = '' }: { className?: string }) {
         <g className="hk-parallax-celestial">
           <g className="hk-enter-celestial">
             <g className="hk-night hk-celestial-float">
-              <circle className="hk-moon-halo" cx={CELESTIAL_X} cy={CELESTIAL_Y} r="76" fill="url(#hk-moon-glow)" />
-              <circle
-                cx={CELESTIAL_X}
-                cy={CELESTIAL_Y}
-                r={CELESTIAL_R}
-                fill="var(--hk-moon)"
-                mask="url(#hk-moon-mask)"
-              />
+              <g className="hk-moon">
+                <MoonCrescent />
+              </g>
             </g>
 
             <g className="hk-day hk-celestial-float">
@@ -328,6 +432,7 @@ export function HarbourSkyline({ className = '' }: { className?: string }) {
         {/* == Vessels == */}
         <g className="hk-parallax-vessel hk-parallax-vessel-a">
           <g className="hk-enter-vessel hk-enter-vessel-a">
+            <VesselWaves v={VESSEL_LAYOUT[0]} />
             <g className="hk-vessel-sail">
             <g className="hk-bob">
             <g transform={`translate(${VESSEL_LAYOUT[0].x} ${VESSEL_LAYOUT[0].y})`}>
@@ -347,6 +452,7 @@ export function HarbourSkyline({ className = '' }: { className?: string }) {
 
         <g className="hk-parallax-vessel hk-parallax-vessel-b">
           <g className="hk-enter-vessel hk-enter-vessel-b">
+            <VesselWaves v={VESSEL_LAYOUT[1]} />
             <g className="hk-vessel-sail-b">
             <g className="hk-bob-b">
             <g transform={`translate(${VESSEL_LAYOUT[1].x} ${VESSEL_LAYOUT[1].y})`}>
@@ -366,6 +472,7 @@ export function HarbourSkyline({ className = '' }: { className?: string }) {
 
         <g className="hk-parallax-vessel hk-parallax-vessel-c">
           <g className="hk-enter-vessel hk-enter-vessel-c">
+            <VesselWaves v={VESSEL_LAYOUT[2]} />
             <g className="hk-vessel-sail-c">
             <g className="hk-bob-c">
             <g transform={`translate(${VESSEL_LAYOUT[2].x} ${VESSEL_LAYOUT[2].y})`}>

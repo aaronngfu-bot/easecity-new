@@ -194,9 +194,13 @@
   body {
     background: var(--body-bg);
     color: var(--body-text);
-    font-family: var(--font-body), system-ui, sans-serif;
+    font-family: var(--font-body), "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
     overflow-x: clip;
+    line-height: 1.6;
     font-feature-settings: 'ss01', 'cv11';
+  }
+  :lang(zh-HK) body {
+    line-height: 1.65;
   }
 
   /* Scrollbar — theme-aware */
@@ -339,9 +343,32 @@
   a:focus-visible,
   button:focus-visible,
   [tabindex]:focus-visible {
+    outline: 2px solid var(--signal);
+    outline-offset: 3px;
+    box-shadow: none;
+    border-radius: inherit;
+  }
+
+  /* Keyboard skip — off-screen until focused */
+  .skip-link {
+    position: fixed;
+    left: 0.75rem;
+    top: 0.75rem;
+    z-index: 200;
+    transform: translateY(-160%);
+    padding: 0.625rem 1rem;
+    background: var(--signal);
+    color: var(--signal-ink);
+    font-size: 0.875rem;
+    font-weight: 600;
+    border-radius: 0.375rem;
+    text-decoration: none;
+  }
+  .skip-link:focus,
+  .skip-link:focus-visible {
+    transform: translateY(0);
     outline: none;
     box-shadow: var(--focus-ring);
-    border-radius: 0.25rem;
   }
 
   /* Animated underline */
@@ -452,10 +479,18 @@
 }
 .prose-async h1, .prose-async h2, .prose-async h3, .prose-async h4 {
   color: var(--text-primary);
-  font-family: var(--font-display), system-ui, sans-serif;
+  font-family: var(--font-display), "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
   font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1.3;
   margin-top: 1.6em;
+}
+:lang(zh-HK) .prose-async h1,
+:lang(zh-HK) .prose-async h2,
+:lang(zh-HK) .prose-async h3,
+:lang(zh-HK) .prose-async h4 {
+  letter-spacing: 0.01em;
+  line-height: 1.45;
 }
 .prose-async h1 { font-size: 1.5rem; }
 .prose-async h2 { font-size: 1.3rem; }
@@ -891,8 +926,8 @@
 
 /* Live signals marquee removed 2026-08-20 — replaced by section transitions */
 
-/* Scroll reveal — JS-scrubbed (RevealSection/RevealItem set inline
-   opacity/transform from scroll progress). CSS only guards reduced-motion
+/* Scroll reveal — JS-scrubbed (Scrub sets inline opacity/transform
+   from scroll progress). CSS only guards reduced-motion
    and no-JS: content must never be stuck hidden. */
 @media (prefers-reduced-motion: reduce) {
   .reveal, [data-reveal] {
@@ -922,6 +957,10 @@
   height: 100%;
   overflow: hidden;
 }
+.t-marquee-row[hidden],
+.t-marquee-single[hidden] {
+  display: none !important;
+}
 .t-marquee-col {
   min-width: 0;
   overflow: hidden;
@@ -930,8 +969,12 @@
   display: flex;
   flex-direction: column;
   will-change: transform;
-  animation: t-scroll 45s linear infinite;
+  animation: t-scroll var(--t-speed, 38s) linear infinite;
 }
+.t-marquee-col:nth-child(1) { --t-speed: 36s; }
+.t-marquee-col:nth-child(2) { --t-speed: 46s; }
+.t-marquee-col:nth-child(2) .t-marquee-track { animation-direction: reverse; }
+.t-marquee-col:nth-child(3) { --t-speed: 40s; }
 .t-card {
   flex-shrink: 0;
   margin-bottom: 1.25rem;
@@ -960,58 +1003,153 @@
 }
 
 /* Hero scroll theater — `--p` (0→1) is written by ScrollPin.
-   Derived: `--p-fade` (copy/cue), `--p-depth` (scene parallax), `--p-exit` (handoff veil). */
+   Derived: `--p-fade` (copy/cue), `--p-depth` (scene parallax),
+   `--p-mask` (shared scene wipe), `--p-exit` (legacy alias). */
 .scroll-pin {
-  /* Tall / wide viewports: nudge the whole hero stage down so the harbour
-     does not float too high with empty sky above. */
-  --hero-drop: clamp(
-    0vh,
-    max((100vh - 48rem) * 0.065, (100vw - 80rem) * 0.018),
-    4vh
-  );
+  /* Scene-only drop: harbour, stars, cue. Copy (title / lede / CTAs) stays. */
+  --hero-drop: 0px;
 }
-/* 1080p-class desktop — light nudge only. */
 @media (min-width: 1920px) {
   .scroll-pin {
     --hero-drop: clamp(
-      4vh,
-      max((100vh - 50rem) * 0.08, (100vw - 90rem) * 0.022),
-      7vh
+      6vh,
+      max((100vh - 50rem) * 0.1, (100vw - 90rem) * 0.03),
+      10vh
     );
   }
 }
-/* 1.5K / QHD (2560×1440) and above — push the scene further down. */
+/* 2K / QHD (2560×1440) and above — peaks sit below the CTAs, not beside them. */
 @media (min-width: 2560px) {
   .scroll-pin {
     --hero-drop: clamp(
-      9vh,
-      max((100vh - 52rem) * 0.11, (100vw - 100rem) * 0.04),
-      14vh
+      12vh,
+      max((100vh - 52rem) * 0.12, (100vw - 100rem) * 0.035),
+      16vh
     );
   }
 }
 .hero-stage {
   position: absolute;
   inset: 0;
-  transform: translate3d(0, var(--hero-drop), 0);
-  will-change: transform;
+}
+/* One mask for sky + harbour: wipe from the waterline up as `--p-mask` grows.
+   Box hangs above the viewport so mobile harbour scale is not clipped at rest. */
+.hero-scene-mask {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  top: -22vh;
+  isolation: isolate;
+  pointer-events: none;
+  transform: translate3d(0, 0, 0);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 calc(100% - var(--p-mask, 0) * 20%),
+    transparent calc(100% - var(--p-mask, 0) * 4%)
+  );
+  mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 calc(100% - var(--p-mask, 0) * 20%),
+    transparent calc(100% - var(--p-mask, 0) * 4%)
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
 }
 .hero-pin-sky {
-  transform: translate3d(0, calc(var(--p-depth, 0) * 12vh), 0) scale(calc(1 + var(--p-depth, 0) * 0.04));
+  transform: translate3d(0, calc(var(--p-depth, 0) * 12vh + var(--hero-drop, 0px)), 0) scale(calc(1 + var(--p-depth, 0) * 0.04));
   transform-origin: 50% 40%;
-  will-change: transform;
 }
 .hero-pin-copy {
-  transform: translate3d(0, calc(var(--p-fade, 0) * -10vh), 0);
-  opacity: calc(1 - var(--p-fade, 0));
-  will-change: transform, opacity;
+  transform: translate3d(0, calc(var(--p-fade, 0) * -7vh), 0);
+  opacity: calc(1 - var(--p-fade, 0) * 0.42);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 calc(112% - var(--p-fade, 0) * 130%),
+    transparent calc(112% - var(--p-fade, 0) * 68%)
+  );
+  mask-image: linear-gradient(
+    180deg,
+    #000 0%,
+    #000 calc(112% - var(--p-fade, 0) * 130%),
+    transparent calc(112% - var(--p-fade, 0) * 68%)
+  );
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
   position: relative;
   z-index: 30;
+  padding-top: max(7.5rem, calc(env(safe-area-inset-top, 0px) + 6.25rem));
+}
+.hero-copy-inner {
+  padding-bottom: 3.5rem;
+}
+.hero-title {
+  font-size: clamp(2.15rem, 8.4vw, 2.75rem);
+  letter-spacing: -0.04em;
+  line-height: 0.98;
+}
+:lang(zh-HK) .hero-title {
+  letter-spacing: 0;
+  line-height: 1.18;
+  font-size: clamp(2.15rem, 8vw, 2.55rem);
+}
+.hero-lede {
+  margin-top: 1.5rem;
+  font-size: 1rem;
+  line-height: 1.65;
+  letter-spacing: 0.01em;
+}
+:lang(zh-HK) .hero-lede {
+  letter-spacing: 0;
+  line-height: 1.7;
+}
+.type-section {
+  letter-spacing: -0.035em;
+  line-height: 1.05;
+}
+:lang(zh-HK) .type-section {
+  letter-spacing: 0;
+  line-height: 1.28;
+  font-size: clamp(1.5rem, 2.2vw, 1.875rem);
+}
+.hero-actions {
+  margin-top: 2rem;
 }
 .hero-pin-cue {
+  position: absolute;
+  left: 50%;
+  bottom: max(1.25rem, env(safe-area-inset-bottom, 0px));
+  z-index: 10;
   opacity: calc(1 - clamp(0, calc(var(--p-fade, 0) * 1.35), 1));
-  transform: translate3d(0, calc(var(--p-fade, 0) * -5vh), 0);
-  will-change: transform, opacity;
+  transform: translate3d(-50%, calc(var(--p-fade, 0) * -5vh), 0);
+}
+@media (min-width: 768px) and (min-height: 720px) {
+  .hero-pin-copy {
+    padding-top: max(10rem, calc(env(safe-area-inset-top, 0px) + 8.5rem));
+  }
+  .hero-title { font-size: 3.75rem; }
+  :lang(zh-HK) .hero-title { font-size: 3.25rem; }
+  .hero-lede { font-size: 1.125rem; }
+}
+@media (min-width: 1024px) and (min-height: 720px) {
+  .hero-title { font-size: 4.5rem; }
+  :lang(zh-HK) .hero-title { font-size: 3.5rem; }
+}
+@media (max-height: 540px) {
+  .hero-pin-copy {
+    padding-top: max(4.25rem, calc(env(safe-area-inset-top, 0px) + 3.5rem));
+  }
+  .hero-copy-inner { padding-bottom: 3rem; }
+  .hero-title { font-size: clamp(1.7rem, 5.2vw, 2.15rem); }
+  :lang(zh-HK) .hero-title { font-size: clamp(1.85rem, 5.6vw, 2.25rem); }
+  .hero-lede { margin-top: 0.7rem; font-size: 0.9375rem; }
+  .hero-actions { margin-top: 0.9rem; gap: 0.55rem; }
+  .hero-pin-cue { display: none; }
 }
 
 /* Initial load — sky fades, harbour rises from below. */
@@ -1035,12 +1173,13 @@
   overflow: visible;
 }
 
-/* Bottom veil dissolves hero into the next section during the final half of the pin. */
-.hero-exit-veil {
-  height: 58%;
-  background: linear-gradient(to top, var(--bg-base) 6%, transparent 100%);
-  opacity: var(--p-exit, 0);
-  will-change: opacity;
+.scroll-pin.is-scrubbing .hero-pin-sky,
+.scroll-pin.is-scrubbing .hero-pin-city {
+  will-change: transform;
+}
+.scroll-pin.is-scrubbing .hero-pin-copy,
+.scroll-pin.is-scrubbing .hero-pin-cue {
+  will-change: transform, opacity;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1230,13 +1369,21 @@
 }
 .dark .hk-ridge-glint-night {
   fill: var(--hk-ridge-glint);
-  opacity: 1;
-  filter: drop-shadow(0 0 2px rgba(255, 200, 100, 0.7));
+  --glint-lo: 0.7;
+  --glint-hi: 1;
+  filter: drop-shadow(0 0 1.4px rgba(255, 200, 110, 0.5));
+  animation: hk-ridge-glint-glow 4.6s ease-in-out infinite;
+}
+.dark .hk-ridge-glint-halo {
+  fill: rgba(255, 196, 90, 0.2);
+  --glint-lo: 0.3;
+  --glint-hi: 0.58;
+  filter: blur(1.5px);
   animation: hk-ridge-glint-glow 4.6s ease-in-out infinite;
 }
 @keyframes hk-ridge-glint-glow {
-  0%, 100% { opacity: 0.72; }
-  50% { opacity: 1; }
+  0%, 100% { opacity: var(--glint-lo, 0.55); }
+  50% { opacity: var(--glint-hi, 0.8); }
 }
 
 /* Moon by night, sun by day. No theme class yet means light, same as :root. */
@@ -1250,30 +1397,24 @@
 .hero-pin-city {
   position: relative;
   width: 100%;
-  --hk-scale: 1.55;
-  transform: translate3d(0, calc(var(--p-depth, 0) * 6vh), 0) scale(var(--hk-scale));
-  transform-origin: 50% 100%;
-  opacity: calc(1 - var(--p-exit, 0) * 0.35);
-  will-change: transform, opacity;
+  --hk-scale: 2.18;
+  --hk-origin-x: 34%;
+  --hk-lift: 0px;
+  transform: translate3d(0, calc(0px - var(--hk-lift, 0px) + var(--hero-drop, 0px)), 0) scale(var(--hk-scale));
+  transform-origin: var(--hk-origin-x) 100%;
 }
-@media (min-width: 640px) {
-  .hero-pin-city { --hk-scale: 1.22; }
+@media (min-width: 640px) and (min-height: 700px) {
+  .hero-pin-city { --hk-scale: 1.12; --hk-origin-x: 46%; --hk-lift: 0px; }
 }
-@media (min-width: 1024px) {
-  .hero-pin-city { --hk-scale: 1; }
+@media (min-width: 1024px) and (min-height: 700px) {
+  .hero-pin-city { --hk-scale: 1; --hk-origin-x: 50%; --hk-lift: 0px; }
+}
+@media (max-height: 540px) {
+  .hero-pin-city { --hk-scale: 0.88; --hk-origin-x: 50%; --hk-lift: 0px; }
 }
 
 /* Layered scroll parallax — subtle depth offsets on `--p-depth` only.
    Idle motion lives on nested children so scroll transforms never fight keyframes. */
-.hk-parallax-sky,
-.hk-parallax-celestial,
-.hk-parallax-clouds,
-.hk-parallax-mountains,
-.hk-parallax-buildings,
-.hk-parallax-vessel,
-.hk-parallax-water {
-  will-change: transform;
-}
 .hk-parallax-sky {
   transform: translate3d(0, calc(var(--p-depth, 0) * -3vh), 0);
   transform-origin: 50% 100%;
@@ -1298,17 +1439,13 @@
 .hk-parallax-vessel {
   transform-origin: 50% 100%;
 }
-.hk-parallax-vessel-a {
-  transform: translate3d(0, calc(var(--p-depth, 0) * 2.5vh), 0);
-}
-.hk-parallax-vessel-b {
-  transform: translate3d(0, calc(var(--p-depth, 0) * 2vh), 0);
-}
+.hk-parallax-vessel-a,
+.hk-parallax-vessel-b,
 .hk-parallax-vessel-c {
-  transform: translate3d(0, calc(var(--p-depth, 0) * 3vh), 0);
+  transform: none;
 }
 .hk-parallax-water {
-  transform: translate3d(0, calc(var(--p-depth, 0) * 1.5vh), 0);
+  transform: none;
   transform-origin: 50% 0%;
 }
 
@@ -1366,14 +1503,8 @@
 }
 .hk-day.hk-celestial-float { animation-delay: -2.5s; }
 
-@keyframes hk-moon-pulse {
-  0%, 100% { opacity: 0.82; transform: scale(1); }
-  50%      { opacity: 1; transform: scale(1.1); }
-}
-.hk-moon-halo {
-  transform-box: fill-box;
-  transform-origin: center;
-  animation: hk-moon-pulse 5.5s ease-in-out infinite;
+.hk-moon {
+  filter: drop-shadow(0 0 4px var(--hk-moon));
 }
 
 @keyframes hk-sun-pulse {
@@ -1425,36 +1556,37 @@
 .hk-bob-b { animation: hk-bob-b 10s ease-in-out -3s infinite; }
 .hk-bob-c { animation: hk-bob-c 5.5s ease-in-out -1.8s infinite; }
 
-/* Vessel wakes — SVG rings at hull contact, bob with parent group. */
-.hk-vessel-wake {
+/* Hull slosh — straight lines born on the bob, spread sideways, vanish. */
+.hk-vessel-waves {
   pointer-events: none;
 }
-@keyframes hk-wake-ring {
-  0% { transform: scale(0.35); opacity: 0.4; }
-  70% { opacity: 0.1; }
-  100% { transform: scale(2.5); opacity: 0; }
+@keyframes hk-hull-wave {
+  0%, 14% {
+    opacity: 0;
+    transform: scaleX(0.86);
+  }
+  20% {
+    opacity: var(--wave-o, 0.4);
+    transform: scaleX(1);
+  }
+  30% {
+    opacity: calc(var(--wave-o, 0.4) * 0.5);
+    transform: scaleX(var(--wave-spread, 1.6));
+  }
+  40%, 100% {
+    opacity: 0;
+    transform: scaleX(calc(var(--wave-spread, 1.6) * 1.08));
+  }
 }
-.hk-vessel-wake .hk-wake-ring {
+.hk-hull-wave {
+  stroke: var(--hk-hull-light);
   transform-box: fill-box;
-  transform-origin: center;
-  opacity: 0;
-  animation: hk-wake-ring 2.8s ease-out infinite;
+  transform-origin: 50% 50%;
+  animation: hk-hull-wave 7s ease-out infinite;
 }
-.hk-vessel-wake--ferry .hk-wake-ring { animation-duration: 2.8s; }
-.hk-vessel-wake--junk .hk-wake-ring { animation-duration: 3.1s; }
-.hk-vessel-wake--cruiser .hk-wake-ring { animation-duration: 1.85s; }
-.hk-wake-ring--0 { animation-delay: 0s; }
-.hk-wake-ring--1 { animation-delay: 0.92s; }
-.hk-wake-ring--2 { animation-delay: 1.84s; }
-@keyframes hk-wake-streak-pulse {
-  0%, 100% { opacity: 0.16; }
-  50% { opacity: 0.3; }
-}
-.hk-vessel-wake--cruiser .hk-wake-streak {
-  animation: hk-wake-streak-pulse 1.35s ease-in-out infinite;
-}
-.hk-wake-streak--1 { animation-delay: 0.18s; }
-.hk-wake-streak--2 { animation-delay: 0.36s; }
+.hk-vessel-waves--ferry .hk-hull-wave { animation-duration: 7s; }
+.hk-vessel-waves--junk .hk-hull-wave { animation-duration: 10s; }
+.hk-vessel-waves--cruiser .hk-hull-wave { animation-duration: 5.5s; }
 
 @keyframes hk-vessel-sail {
   0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
@@ -1535,9 +1667,9 @@
 @media (prefers-reduced-motion: reduce) {
   .hk-blink, .hk-bob, .hk-bob-b, .hk-bob-c, .hk-wheel, .hk-ferris-rotate, .hk-beacon,
   .hk-cloud-a, .hk-cloud-b, .hk-cloud-c,
-  .hk-celestial-float, .hk-moon-halo, .hk-sun-halo, .hk-skyline-breathe,
+  .hk-celestial-float, .hk-moon, .hk-sun-halo, .hk-skyline-breathe,
   .hk-vessel-sail, .hk-vessel-sail-b, .hk-vessel-sail-c,
-  .hk-wake-ring, .hk-wake-streak, .hk-ridge-glint-night,
+  .hk-hull-wave, .hk-ridge-glint-night, .hk-ridge-glint-halo,
   .hero-enter-sky, .hero-enter-mountains, .hero-enter-city, .hk-enter-ferris,
   .hk-enter-celestial, .hk-enter-clouds, .hk-enter-mountains, .hk-enter-buildings, .hk-enter-water,
   .hk-enter-vessel {
@@ -1547,8 +1679,12 @@
   .hk-parallax-mountains, .hk-parallax-buildings, .hk-parallax-vessel, .hk-parallax-water {
     transform: none !important;
   }
-  .hero-pin-city { transform: scale(var(--hk-scale)) !important; opacity: 1 !important; }
-  .hero-exit-veil { opacity: 0 !important; }
+  .hero-pin-city { transform: translate3d(0, var(--hero-drop, 0px), 0) scale(var(--hk-scale)) !important; opacity: 1 !important; }
+  .hero-scene-mask,
+  .hero-pin-copy {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
 }
 
 /* Rest of homepage — `--p` from Scrub. Each section a different motion.
@@ -1563,11 +1699,13 @@
   transform: scaleX(var(--t));
   opacity: var(--t);
   transform-origin: left;
+  will-change: transform, opacity;
 }
 .scrub-kicker-label {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.08) / 0.34)));
+  --t: max(0, min(1, calc((var(--p, 0) - 0.06) / 0.36)));
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 14px), 0);
+  transform: translate3d(0, calc((1 - var(--t)) * 22px), 0);
+  will-change: transform, opacity;
 }
 .scrub-title {
   --t: max(0, min(1, calc((var(--p, 0) - 0.08) / 0.48)));
@@ -1612,14 +1750,15 @@
   transform-origin: right;
 }
 .scrub-blog-head .scrub-kicker-label {
-  --t: max(0, min(1, calc((var(--p, 0) - 0.06) / 0.32)));
+  --t: max(0, min(1, calc((var(--p, 0) - 0.06) / 0.36)));
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * 18px), 0);
+  transform: translate3d(0, calc((1 - var(--t)) * 22px), 0);
+  will-change: transform, opacity;
 }
 .scrub-blog-head .scrub-title {
   opacity: 1;
   transform: none;
-  clip-path: inset(0 0 calc((1 - max(0, min(1, calc((var(--p, 0) - 0.04) / 0.5)))) * 100%) 0);
+  clip-path: none;
 }
 .scrub-blog-head .scrub-word {
   --lag: calc(var(--i, 0) * 0.07);
@@ -1637,15 +1776,6 @@
   --t: max(0, min(1, calc((var(--p, 0) - 0.38) / 0.4)));
   opacity: var(--t);
   transform: translate3d(0, calc((1 - var(--t)) * 20px), 0);
-}
-.scrub-prod-stars {
-  /* sky drifts down slowly (= up when negative scrollY), lagging the page */
-  opacity: calc(0.35 + var(--p, 0) * 0.65);
-  will-change: opacity;
-}
-.scrub-prod-sky {
-  transform: translate3d(0, calc(-4px + var(--p, 0) * 60px), 0);
-  will-change: transform;
 }
 .scrub-prod-glow {
   --t: max(0, min(1, calc((var(--p, 0) - 0.04) / 0.38)));
@@ -1721,21 +1851,58 @@
   filter: none;
 }
 
+.blog-rail {
+  display: flex;
+  cursor: grab;
+  gap: 2rem;
+  overflow-x: auto;
+  padding-bottom: 1rem;
+  padding-right: 1rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+  scrollbar-width: thin;
+}
+.blog-rail:active { cursor: grabbing; }
+.blog-rail::-webkit-scrollbar { height: 6px; }
+.blog-rail::-webkit-scrollbar-track { background: transparent; }
+.blog-rail::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .hero-char, .hero-rise { animation: none; opacity: 1; transform: none; filter: none; }
   .scroll-cue-dot { animation: none; }
   .reveal { transition: none; opacity: 1; transform: none; }
-  .t-marquee { mask-image: none; -webkit-mask-image: none; }
+  .t-marquee {
+    height: auto;
+    overflow: visible;
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
   .t-marquee-track { animation: none; }
-  .hero-pin-sky, .hero-pin-copy, .hero-pin-city, .hero-pin-cue { transform: none !important; opacity: 1 !important; }
+  .t-card-dup { display: none; }
+  .hero-pin-copy {
+    transform: none !important;
+    opacity: 1 !important;
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
+  .hero-pin-sky { transform: translate3d(0, var(--hero-drop, 0px), 0) !important; opacity: 1 !important; }
+  .hero-pin-city { transform: translate3d(0, var(--hero-drop, 0px), 0) scale(var(--hk-scale)) !important; opacity: 1 !important; }
+  .hero-pin-cue { transform: translate3d(-50%, 0, 0) !important; opacity: 1 !important; }
   .hero-enter-sky, .hero-enter-mountains, .hero-enter-city { animation: none; opacity: 1 !important; }
-  .hero-exit-veil { opacity: 0 !important; }
+  .hero-scene-mask {
+    -webkit-mask-image: none !important;
+    mask-image: none !important;
+  }
   .hk-parallax-sky, .hk-parallax-celestial, .hk-parallax-clouds,
   .hk-parallax-mountains, .hk-parallax-buildings, .hk-parallax-vessel, .hk-parallax-water {
     transform: none !important;
   }
-  .scrub-kicker, .scrub-kicker-label, .scrub-rule, .scrub-title, .scrub-sub, .scrub-meta, .scrub-cta-line,
-  .scrub-word, .scrub-blog-rail, .scrub-blog-more, .scrub-prod-art, .scrub-prod-stars, .scrub-prod-glow,
+  .scrub-kicker, .scrub-kicker-label, .scrub-rule,
+  .scrub-title, .scrub-sub, .scrub-meta, .scrub-cta-line,
+  .scrub-word, .scrub-blog-rail, .scrub-blog-more, .scrub-prod-art, .scrub-prod-glow,
   .scrub-prod-art .prod-hub,
   .scrub-prod-art .prod-wing-l, .scrub-prod-art .prod-wing-r, .scrub-svc-card, .scrub-t-wall,
   .scrub-t-wall .t-marquee-col, .scrub-cta button {

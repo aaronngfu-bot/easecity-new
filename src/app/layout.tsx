@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Instrument_Sans, JetBrains_Mono, Syne } from 'next/font/google'
 import { cookies } from 'next/headers'
 import './globals.css'
@@ -24,6 +24,12 @@ const syne = Syne({
   variable: '--font-display',
   display: 'swap',
 })
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
+}
 
 export const metadata: Metadata = {
   title: {

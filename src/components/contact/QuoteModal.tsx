@@ -148,7 +148,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
   }
 
   return (
-    <div className="fixed inset-0 z-[120] flex items-end justify-center sm:items-center">
+    <div className="fixed inset-0 z-[120] flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-label={c.quoteTitle}>
       {/* backdrop */}
       <motion.div
         initial={{ opacity: 0 }}
@@ -174,7 +174,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
               <p className="mt-0.5 text-xs font-medium text-[var(--text-muted)]">{serviceTitle}</p>
             )}
           </div>
-          <button onClick={onClose} className="rounded-md p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]" aria-label="Close">
+          <button type="button" onClick={onClose} className="rounded-md p-1.5 text-[var(--text-muted)] transition-colors hover:bg-[var(--bg-elevated)] hover:text-[var(--text-primary)]" aria-label={c.closeModal}>
             <X size={18} />
           </button>
         </div>

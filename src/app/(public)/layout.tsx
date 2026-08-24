@@ -4,6 +4,7 @@ import { ChatWidget } from '@/components/chat/ChatWidget'
 import { CommandPalette } from '@/components/ui/CommandPalette'
 import { KeyboardLayer } from '@/components/ui/KeyboardLayer'
 import { BackButton } from '@/components/ui/BackButton'
+import { SkipLink } from '@/components/a11y/SkipLink'
 
 const navItems = [
   { href: '/ec-share',  labelKey: 'product' },
@@ -19,12 +20,13 @@ export default function PublicLayout({
 }) {
   return (
     <div className="control-canvas relative min-h-screen overflow-x-clip">
+      <SkipLink />
       <div className="pointer-events-none fixed inset-0 z-[1] control-grid opacity-20" />
 
       <PillNav
         items={navItems}
       />
-      <main className="relative z-[2] min-h-screen">
+      <main id="main" tabIndex={-1} className="relative z-[2] min-h-screen">
         <BackButton />
         {children}
       </main>

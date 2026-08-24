@@ -11,7 +11,8 @@ import { ScrollPin } from '@/components/ui/ScrollPin'
 /**
  * ImmersionHero — first-screen scroll theater.
  * The panel pins for ~2 viewports. `--p` scrubs sky (lag + scale) against
- * copy (rise + fade) so the next section covers a dissolving first screen.
+ * copy (rise + mask wipe). Scene layers share one bottom mask so the next
+ * section covers a dissolving harbour, not a hard cut.
  */
 
 function MagneticCta({
@@ -31,6 +32,7 @@ function MagneticCta({
     const btn = btnRef.current
     if (!wrap || !btn) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return
 
     const STRENGTH = 0.22
     const onMove = (e: MouseEvent) => {
@@ -51,12 +53,12 @@ function MagneticCta({
   }, [])
 
   return (
-    <span ref={wrapRef} className="inline-flex">
+    <span ref={wrapRef} className="inline-flex w-auto">
       <button
         ref={btnRef}
         type="button"
         onClick={onClick}
-        className={`inline-flex items-center gap-2 transition-transform duration-200 ease-out will-change-transform ${className}`}
+        className={`inline-flex w-auto items-center justify-center gap-2 transition-transform duration-200 ease-out will-change-transform ${className}`}
       >
         {children}
       </button>
@@ -85,19 +87,18 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
     // load, which fades the copy out and drags the skyline off its footing.
     <ScrollPin className="bg-[var(--bg-base)]" trackClassName="h-[155vh] md:h-[175vh]">
       <div className="hero-stage">
-      <div className="hero-enter-sky pointer-events-none absolute inset-0 z-0">
-        <CityField className="hero-pin-sky h-full w-full" />
+      <div className="hero-scene-mask" aria-hidden>
+        <div className="hero-enter-sky pointer-events-none absolute inset-0 z-0">
+          <CityField className="hero-pin-sky h-full w-full" />
+        </div>
+        <div className="hero-enter-city pointer-events-none absolute inset-x-0 bottom-0 z-[1] w-full">
+          <HarbourSkyline className="hero-pin-city w-full" />
+        </div>
       </div>
 
-      <div className="hero-enter-city pointer-events-none absolute inset-x-0 bottom-0 z-[1] w-full">
-        <HarbourSkyline className="hero-pin-city w-full" />
-      </div>
-
-      <div className="hero-exit-veil pointer-events-none absolute inset-x-0 bottom-0 z-[2]" aria-hidden />
-
-      <div className="hero-pin-copy container-max relative z-10 flex h-full items-start pt-32 md:pt-40">
-        <div className="max-w-2xl pb-24 text-left">
-          <h1 className="font-display text-[2.75rem] font-bold leading-[1.02] tracking-tight text-[var(--text-primary)] sm:text-6xl lg:text-7xl">
+      <div className="hero-pin-copy container-max relative z-10 flex h-full items-start">
+        <div className="hero-copy-inner max-w-2xl text-left">
+          <h1 className="hero-title font-display font-bold text-[var(--text-primary)]">
             <span className="sr-only">{c.heroTitleNew}</span>
             <span aria-hidden="true">
               {titleChars(c.heroTitleA, 0.3)}
@@ -106,20 +107,20 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
             </span>
           </h1>
 
-          <p className="hero-rise mt-7 max-w-xl text-base leading-relaxed text-[var(--text-secondary)] sm:text-lg" style={{ animationDelay: '1.35s' }}>
+          <p className="hero-rise hero-lede max-w-xl text-[var(--text-secondary)]" style={{ animationDelay: '1.35s' }}>
             {c.heroSubtitleNew}
           </p>
 
-          <div className="hero-rise mt-10 flex flex-col items-start gap-4 sm:flex-row sm:items-center" style={{ animationDelay: '1.55s' }}>
+          <div className="hero-rise hero-actions flex flex-col items-start gap-3 sm:flex-row sm:items-center" style={{ animationDelay: '1.55s' }}>
             <MagneticCta
               onClick={onStartProject}
-              className="rounded-lg bg-[var(--amber)] px-8 py-3.5 text-sm font-semibold text-[var(--amber-ink)] shadow-[0_0_0_0_rgba(0,229,204,0)] hover:shadow-[0_8px_30px_-6px_rgba(0,229,204,0.5)]"
+              className="inline-flex min-h-11 items-center justify-center rounded-lg bg-[var(--amber)] px-8 py-3.5 text-sm font-semibold text-[var(--amber-ink)] shadow-[0_0_0_0_rgba(0,229,204,0)] hover:shadow-[0_8px_30px_-6px_rgba(0,229,204,0.5)]"
             >
               {c.heroCtaPrimary}
             </MagneticCta>
             <Link
               href="/services"
-              className="btn-secondary group px-7 py-3.5 text-sm"
+              className="btn-secondary group inline-flex min-h-11 items-center justify-center px-7 py-3.5 text-sm"
             >
               {c.heroCtaSecondary}
               <ArrowRight size={14} className="transition-transform group-hover:translate-x-1" />
@@ -131,14 +132,14 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
       <a
         href="#latest"
         aria-label={c.heroScroll}
-        className="hero-pin-cue hero-scroll-cue-wrap absolute bottom-7 left-1/2 z-10 -translate-x-1/2 px-6 py-2 text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]"
+        className="hero-pin-cue hero-scroll-cue-wrap px-6 py-2 text-[var(--text-secondary)] transition-colors hover:text-[var(--signal)]"
       >
-        <span className="hero-rise flex flex-col items-center gap-2" style={{ animationDelay: '1.9s' }}>
-          <span className="label-mono">{c.heroScroll}</span>
+        <span className="hero-rise flex flex-col items-center gap-1.5" style={{ animationDelay: '1.9s' }}>
+          <span className="label-mono text-[10px] uppercase tracking-[0.2em]">{c.heroScroll}</span>
           <span className="scroll-cue" aria-hidden>
             <span className="scroll-cue-dot" />
           </span>
-          <ChevronDown size={13} className="opacity-60" />
+          <ChevronDown size={13} className="opacity-60" aria-hidden />
         </span>
       </a>
       </div>

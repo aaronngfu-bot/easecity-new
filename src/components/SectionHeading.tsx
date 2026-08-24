@@ -3,13 +3,11 @@
 import React from "react";
 
 interface SectionHeadingProps {
-  badge?: string;        // 上方小標籤,例如「FEATURES」
-  title: string;         // 主標題,例如「核心功能」
-  subtitle?: string;     // 副標題說明
+  badge?: string;
+  title: string;
+  subtitle?: string;
   align?: "center" | "left" | "right";
-  line?: boolean;      // 是否顯示 badge 前的 teal 短線
-  /** 保留 prop 以相容舊呼叫點；進場動畫由外層 RevealSection/RevealItem 的 scroll scrub 負責 */
-  stepDelay?: number;
+  line?: boolean;
 }
 
 interface Token {
@@ -50,8 +48,7 @@ function tokenize(title: string): Token[] {
 }
 
 /** Static heading. Entrance motion is owned by the surrounding
- *  RevealSection/RevealItem scroll-scrub so every element on the page
- *  emerges in proportion to scroll, from one system. */
+ *  Scrub so the title emerges in proportion to scroll. */
 export default function SectionHeading({
   badge,
   title,
@@ -78,7 +75,7 @@ export default function SectionHeading({
       )}
 
       <h2
-        className={`scrub-title flex flex-wrap font-display text-3xl font-bold tracking-[-0.035em] text-foreground sm:text-4xl md:text-5xl ${
+        className={`type-section scrub-title flex flex-wrap font-display text-3xl font-bold text-foreground sm:text-4xl md:text-5xl ${
           align === "center"
             ? "justify-center"
             : align === "right"

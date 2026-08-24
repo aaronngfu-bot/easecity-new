@@ -25,7 +25,7 @@ export default async function BlogPage() {
   })
 
   return (
-    <main className="relative min-h-screen bg-[var(--bg-base)]">
+    <div className="relative min-h-screen bg-[var(--bg-base)]">
       <div aria-hidden className="absolute inset-0 bg-grid opacity-30" />
       <div className="container-max relative z-10 max-w-3xl pt-2 pb-24 md:pb-32">
         <BlogPageHeader />
@@ -34,6 +34,6 @@ export default async function BlogPage() {
           <BlogList posts={posts} />
         </div>
       </div>
-    </main>
+    </div>
   )
 }

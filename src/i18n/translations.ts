@@ -255,9 +255,9 @@ const en = {
       heroCtaProduct: "Explore EC-Share",
             heroCtaServices: "Our Services",
           heroEyebrowNew: "Available for new projects",
-          heroTitleNew: "We architect digital cities.",
+          heroTitleNew: "We architect digital cities",
           heroTitleA: "We architect",
-          heroTitleB: "digital cities.",
+          heroTitleB: "digital cities",
           heroScroll: "Scroll",
           heroSubtitleNew: "From real-time streaming infrastructure to AI-powered platforms — we design systems that teams actually want to use.",
           heroCtaPrimary: "Start a Project",
@@ -290,7 +290,7 @@ const en = {
         servicesBadge: "WHAT WE DO",
         servicesTitle: "Custom development, end to end",
         servicesSubtitle: "From low-latency infrastructure to polished web products — one team, full ownership.",
-        servicesCta: "Explore all services",
+        servicesCta: "View this service",
     processBadge: "HOW WE WORK",
     processTitle: "From first message to shipped product — no black boxes.",
     processSubtitle: "A transparent four-step process with clear deliverables and time commitments at every stage.",
@@ -369,6 +369,8 @@ const en = {
             blogTitle: "What we've been building",
             blogSubtitle: "A running log of recent work, releases, and product notes.",
             blogCta: "View all posts",
+            blogEmpty: "New notes will appear here. You can still open the full log.",
+            blogError: "Couldn't load the latest notes. You can still open the full log.",
         blogItems: [
           { date: '2026-08', title: 'Brand refresh & transparent mark', body: 'Shipped a new interlocking brand mark, transparent favicon set, and a unified dark/light theme token system across the site.' },
           { date: '2026-08', title: 'Pricing clarity', body: 'Enterprise tier moved to a contact-driven model; transparent self-serve pricing for solo and team plans.' },
@@ -871,6 +873,8 @@ const en = {
       next: 'Continue',
       back: 'Back',
       done: 'Submit enquiry',
+      closeModal: 'Close',
+      quoteTitle: 'Project enquiry',
     },
 
   companyInfo: {
@@ -1078,6 +1082,8 @@ const en = {
     unexpectedError: 'An unexpected error occurred',
     dashboard: 'Dashboard',
     signOut: 'Sign out',
+    showPassword: 'Show password',
+    hidePassword: 'Hide password',
   },
 
   chat: {
@@ -1086,6 +1092,36 @@ const en = {
     welcome: "Hi! I'm easecity's AI assistant. How can I help you today?",
     placeholder: 'Ask anything about easecity...',
     error: 'Something went wrong. Please try again.',
+    open: 'Open chat',
+    close: 'Close chat',
+    send: 'Send message',
+    typing: 'Assistant is typing',
+  },
+
+  a11y: {
+    skipToContent: 'Skip to content',
+    primaryNav: 'Primary',
+    language: 'Language',
+    switchToEnglish: 'Switch to English',
+    switchToChinese: 'Switch to Chinese',
+    openMenu: 'Open menu',
+    closeMenu: 'Close menu',
+    theme: 'Theme',
+  },
+
+  admin: {
+    brand: 'Admin',
+    eyebrow: 'Operator surface',
+    title: 'Admin dashboard',
+    online: 'System online',
+    backToSite: 'Back to site',
+    dashboard: 'Dashboard',
+    users: 'Users',
+    orders: 'Orders',
+    contacts: 'Contacts',
+    blog: 'Blog',
+    settings: 'Settings',
+    logs: 'Audit logs',
   },
 
   payment: {
@@ -1402,9 +1438,9 @@ const zh: typeof en = {
       heroCtaProduct: "探索 EC-Share",
       heroCtaServices: "我們的服務",
     heroEyebrowNew: "接受新專案中",
-    heroTitleNew: "我們打造數位城市。",
+    heroTitleNew: "我們打造數位城市",
     heroTitleA: "我們打造",
-    heroTitleB: "數位城市。",
+    heroTitleB: "數位城市",
     heroScroll: "向下瀏覽",
     heroSubtitleNew: "從即時串流基礎設施到 AI 平台——我們設計真正能被團隊愛用的系統。",
     heroCtaPrimary: "開始一個專案",
@@ -1437,7 +1473,7 @@ const zh: typeof en = {
         servicesBadge: "我們做什麼",
         servicesTitle: "客製化開發，一條龍",
         servicesSubtitle: "從低延遲基礎設施到精緻網頁產品——一個團隊，全程負責。",
-        servicesCta: "探索全部服務",
+        servicesCta: "查看此服務",
     processBadge: "我們如何工作",
     processTitle: "從第一則訊息到上線產品——沒有黑箱。",
     processSubtitle: "透明的四步流程，每個階段都有明確交付物與時間承諾。",
@@ -1516,6 +1552,8 @@ const zh: typeof en = {
             blogTitle: "我們最近在做什麼",
             blogSubtitle: "近期工作、發佈與產品紀錄的持續日誌。",
             blogCta: "查看全部貼文",
+            blogEmpty: "新紀錄會出現在這裡。仍可開啟完整日誌。",
+            blogError: "最新紀錄暫時載不進來。仍可開啟完整日誌。",
         blogItems: [
           { date: '2026-08', title: '品牌重塑與透明標記', body: '推出全新交疊品牌標記、透明 favicon 組，以及全站統一的深淺色 theme token 系統。' },
           { date: '2026-08', title: '定價更清晰', body: '企業版改為聯絡制；個人與團隊方案維持透明的自助訂閱。' },
@@ -2015,6 +2053,8 @@ const zh: typeof en = {
       next: '繼續',
       back: '返回',
       done: '提交查詢',
+      closeModal: '關閉',
+      quoteTitle: '專案查詢',
     },
 
   companyInfo: {
@@ -2222,6 +2262,8 @@ const zh: typeof en = {
     unexpectedError: '發生意外錯誤',
     dashboard: '控制台',
     signOut: '登出',
+    showPassword: '顯示密碼',
+    hidePassword: '隱藏密碼',
   },
 
   chat: {
@@ -2230,6 +2272,36 @@ const zh: typeof en = {
     welcome: '你好！我是 easecity 的 AI 助手。有什麼可以幫助您的嗎？',
     placeholder: '詢問任何關於 easecity 的問題…',
     error: '出現錯誤，請重試。',
+    open: '開啟對話',
+    close: '關閉對話',
+    send: '傳送訊息',
+    typing: '助理正在輸入',
+  },
+
+  a11y: {
+    skipToContent: '跳至主要內容',
+    primaryNav: '主要導覽',
+    language: '語言',
+    switchToEnglish: 'Switch to English',
+    switchToChinese: '切換至中文',
+    openMenu: '開啟選單',
+    closeMenu: '關閉選單',
+    theme: '主題',
+  },
+
+  admin: {
+    brand: '管理',
+    eyebrow: '操作介面',
+    title: '管理後台',
+    online: '系統在線',
+    backToSite: '返回網站',
+    dashboard: '總覽',
+    users: '使用者',
+    orders: '訂單',
+    contacts: '聯絡',
+    blog: '網誌',
+    settings: '設定',
+    logs: '稽核紀錄',
   },
 
   payment: {

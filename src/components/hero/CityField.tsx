@@ -43,9 +43,15 @@ export function CityField({ className = '' }: { className?: string }) {
     if (!ctx) return
 
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }).connection
+    const saveData = Boolean(conn?.saveData || conn?.effectiveType === '2g' || conn?.effectiveType === 'slow-2g')
     const mouse = { x: -9999, y: -9999, active: false }
     let W = 0, H = 0, raf = 0, t = 0, dpr = 1
     let night = document.documentElement.classList.contains('dark')
+    let visible = false
+    let pageVisible = document.visibilityState === 'visible'
+    let settling = false
+    let listening = false
 
     interface Star {
       bx: number; by: number  // base (resting) position
@@ -84,7 +90,8 @@ export function CityField({ className = '' }: { className?: string }) {
       const rect = parent.getBoundingClientRect()
       W = Math.max(1, rect.width)
       H = Math.max(1, rect.height)
-      dpr = Math.min(window.devicePixelRatio || 1, 2)
+      const mobile = W < 720
+      dpr = Math.min(window.devicePixelRatio || 1, mobile ? 1.25 : 1.5)
       cvs.width = Math.round(W * dpr)
       cvs.height = Math.round(H * dpr)
       cvs.style.width = `${W}px`
@@ -92,7 +99,11 @@ export function CityField({ className = '' }: { className?: string }) {
       c.setTransform(dpr, 0, 0, dpr, 0, 0)
 
       const rng = mulberry32(Math.round(W * 1000 + H))
-      const starCount = Math.min(200, Math.round(W * 0.12))
+      const starCount = saveData || reduce
+        ? Math.min(56, Math.round(W * 0.05))
+        : mobile
+          ? Math.min(90, Math.round(W * 0.07))
+          : Math.min(140, Math.round(W * 0.1))
       stars = []
       for (let i = 0; i < starCount; i++) {
         const y = rng() * H
@@ -160,46 +171,49 @@ export function CityField({ className = '' }: { className?: string }) {
       }
       t += 0.016
 
-      // ══ Physics: mouse push + spring back + repel between stars ══
-
-      // Inter-star repulsion prevents clumping
-      for (let i = 0; i < stars.length; i++) {
-        for (let j = i + 1; j < stars.length; j++) {
-          const a = stars[i], b = stars[j]
-          const dx = a.x - b.x, dy = a.y - b.y
-          const d = Math.hypot(dx, dy)
-          if (d < 20 && d > 0.01) {
-            const force = (1 - d / 20) * 0.03
-            const nx = (dx / d) * force
-            const ny = (dy / d) * force
-            a.vx += nx; a.vy += ny
-            b.vx -= nx; b.vy -= ny
+      // Physics only while the pointer is in the field — the n² repulsion
+      // is a mouse-interaction aid, not a resting-state cost.
+      if (mouse.active) {
+        for (let i = 0; i < stars.length; i++) {
+          for (let j = i + 1; j < stars.length; j++) {
+            const a = stars[i], b = stars[j]
+            const dx = a.x - b.x, dy = a.y - b.y
+            const d = Math.hypot(dx, dy)
+            if (d < 20 && d > 0.01) {
+              const force = (1 - d / 20) * 0.03
+              const nx = (dx / d) * force
+              const ny = (dy / d) * force
+              a.vx += nx; a.vy += ny
+              b.vx -= nx; b.vy -= ny
+            }
           }
         }
       }
 
-      for (const s of stars) {
-        // Mouse push (repel)
-        if (mouse.active) {
-          const dx = s.x - mouse.x, dy = s.y - mouse.y
-          const d = Math.hypot(dx, dy)
-          if (d < 180 && d > 0.01) {
-            const force = (1 - d / 180) * 0.6
-            s.vx += (dx / d) * force
-            s.vy += (dy / d) * force
+      const interact = mouse.active
+      if (interact) settling = true
+      if (interact || settling) {
+        let energy = 0
+        for (const s of stars) {
+          if (interact) {
+            const dx = s.x - mouse.x, dy = s.y - mouse.y
+            const d = Math.hypot(dx, dy)
+            if (d < 180 && d > 0.01) {
+              const force = (1 - d / 180) * 0.6
+              s.vx += (dx / d) * force
+              s.vy += (dy / d) * force
+            }
           }
+
+          s.vx += (s.bx - s.x) * 0.04
+          s.vy += (s.by - s.y) * 0.04
+          s.vx *= 0.82
+          s.vy *= 0.82
+          s.x += s.vx
+          s.y += s.vy
+          energy += Math.abs(s.vx) + Math.abs(s.vy)
         }
-
-        // Spring back to base position
-        s.vx += (s.bx - s.x) * 0.04
-        s.vy += (s.by - s.y) * 0.04
-
-        // Damping
-        s.vx *= 0.82
-        s.vy *= 0.82
-
-        s.x += s.vx
-        s.y += s.vy
+        if (!interact && energy < 0.02) settling = false
       }
 
       // ══ Render ══
@@ -215,35 +229,81 @@ export function CityField({ className = '' }: { className?: string }) {
 
     const onMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect()
-      mouse.x = e.clientX - rect.left
-      mouse.y = e.clientY - rect.top
+      const x = e.clientX - rect.left
+      const y = e.clientY - rect.top
+      if (x < 0 || y < 0 || x > rect.width || y > rect.height) {
+        mouse.active = false
+        mouse.x = -9999
+        mouse.y = -9999
+        return
+      }
+      mouse.x = x
+      mouse.y = y
       mouse.active = true
     }
-    const onLeave = () => { mouse.active = false; mouse.x = -9999; mouse.y = -9999 }
+
+    const shouldRun = () => visible && pageVisible && night && !reduce && !saveData
+
+    const setListening = (on: boolean) => {
+      if (on === listening) return
+      listening = on
+      if (on) window.addEventListener('mousemove', onMove, { passive: true })
+      else {
+        window.removeEventListener('mousemove', onMove)
+        mouse.active = false
+        mouse.x = -9999
+        mouse.y = -9999
+      }
+    }
 
     const loop = () => {
-      if (!reduce) draw()
+      raf = 0
+      if (!shouldRun()) return
+      draw()
       raf = requestAnimationFrame(loop)
     }
 
+    const kick = () => {
+      if (shouldRun()) {
+        setListening(true)
+        if (!raf) raf = requestAnimationFrame(loop)
+        return
+      }
+      setListening(false)
+      if (raf) {
+        cancelAnimationFrame(raf)
+        raf = 0
+      }
+      if (!night) ctx.clearRect(0, 0, W, H)
+      else if (reduce || saveData) drawStatic()
+    }
+
     resize()
-    raf = requestAnimationFrame(loop)
-    window.addEventListener('mousemove', onMove)
-    canvas.addEventListener('mouseleave', onLeave)
     const ro = new ResizeObserver(() => resize())
     ro.observe(canvas.parentElement!)
     const mo = new MutationObserver(() => {
       night = document.documentElement.classList.contains('dark')
-      if (reduce) drawStatic()
+      kick()
     })
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] })
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting
+      kick()
+    }, { rootMargin: '80px' })
+    io.observe(canvas)
+    const onPageVis = () => {
+      pageVisible = document.visibilityState === 'visible'
+      kick()
+    }
+    document.addEventListener('visibilitychange', onPageVis)
 
     return () => {
       cancelAnimationFrame(raf)
-      window.removeEventListener('mousemove', onMove)
-      canvas.removeEventListener('mouseleave', onLeave)
+      setListening(false)
+      document.removeEventListener('visibilitychange', onPageVis)
       ro.disconnect()
       mo.disconnect()
+      io.disconnect()
     }
   }, [])
 

@@ -45,7 +45,7 @@ export function BlogPostContent({ post }: { post: BlogPost }) {
         </span>
       </div>
 
-      <h1 className="mt-3 font-display text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-4xl">
+      <h1 className="type-section mt-3 font-display text-3xl font-bold text-[var(--text-primary)] md:text-4xl">
         {title}
       </h1>
       {excerpt && <p className="mt-3 text-base text-[var(--text-muted)]">{excerpt}</p>}

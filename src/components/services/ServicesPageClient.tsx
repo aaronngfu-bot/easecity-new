@@ -134,7 +134,7 @@ export function ServicesPageClient() {
             className="mx-auto mb-14 max-w-2xl text-center"
           >
             <p className="label-mono mb-4 text-[var(--signal)]">{c.casesBadge}</p>
-            <h2 className="font-display text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-4xl">
+            <h2 className="type-section font-display text-3xl font-bold text-[var(--text-primary)] md:text-4xl">
               {c.casesTitle}
             </h2>
             <p className="mt-4 text-[var(--text-secondary)]">{c.casesSubtitle}</p>
@@ -194,7 +194,7 @@ export function ServicesPageClient() {
             className="mx-auto mb-14 max-w-2xl text-center"
           >
             <p className="label-mono mb-4 text-[var(--signal)]">{c.quoteBadge}</p>
-            <h2 className="font-display text-3xl font-bold tracking-tight text-[var(--text-primary)] md:text-4xl">
+            <h2 className="type-section font-display text-3xl font-bold text-[var(--text-primary)] md:text-4xl">
               {c.quoteTitle}
             </h2>
             <p className="mt-4 text-[var(--text-secondary)]">{c.quoteSubtitle}</p>
