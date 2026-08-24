@@ -1394,14 +1394,17 @@
 .hero-pin-city {
   position: relative;
   width: 100%;
-  --hk-scale: 1.28;
-  --hk-origin-x: 36%;
+  --hk-scale: 1;
+  --hk-origin-x: 50%;
   --hk-lift: 0px;
   transform: translate3d(0, calc(0px - var(--hk-lift, 0px) + var(--hero-drop, 0px)), 0) scale(var(--hk-scale));
   transform-origin: var(--hk-origin-x) 100%;
 }
+@media (max-width: 639.98px) {
+  .hk-scene { overflow-x: visible; }
+}
 @media (min-width: 640px) and (min-height: 700px) {
-  .hero-pin-city { --hk-scale: 1.12; --hk-origin-x: 46%; --hk-lift: 0px; }
+  .hero-pin-city { --hk-scale: 1.12; --hk-origin-x: 50%; --hk-lift: 0px; }
 }
 @media (min-width: 1024px) and (min-height: 700px) {
   .hero-pin-city { --hk-scale: 1; --hk-origin-x: 50%; --hk-lift: 0px; }

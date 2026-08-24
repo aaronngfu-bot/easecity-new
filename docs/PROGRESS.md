@@ -5,9 +5,9 @@
 
 ---
 
-## Last session: 2026-08-24 (hero mask on mobile too)
+## Last session: 2026-08-24 (mobile harbour uncropped)
 
-**Summary**: Restored the small bottom wipe mask on mobile; desktop keeps the same light gradient.
+**Summary**: Mobile harbour scale is 1 so the full skyline and sun stay in frame.
 
 **Files changed**: `globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
 
