@@ -1060,13 +1060,6 @@
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
 }
-@media (max-width: 639.98px) {
-  .hero-scene-mask {
-    top: 0;
-    -webkit-mask-image: none;
-    mask-image: none;
-  }
-}
 .hero-pin-sky {
   transform: translate3d(0, calc(var(--p-depth, 0) * 12vh + var(--hero-drop, 0px)), 0) scale(calc(1 + var(--p-depth, 0) * 0.04));
   transform-origin: 50% 40%;

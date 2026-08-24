@@ -5,9 +5,9 @@
 
 ---
 
-## Last session: 2026-08-24 (mobile sky restore + boats)
+## Last session: 2026-08-24 (hero mask on mobile too)
 
-**Summary**: Mobile harbour scale back to 1.28 so the star field is the original size; removed vessel CSS filter (Safari + mask was hiding the boats).
+**Summary**: Restored the small bottom wipe mask on mobile; desktop keeps the same light gradient.
 
 **Files changed**: `globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
 
