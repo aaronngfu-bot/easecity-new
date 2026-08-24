@@ -5,11 +5,11 @@
 
 ---
 
-## Last session: 2026-08-24 (mobile harbour uncropped)
+## Last session: 2026-08-24 (site motion pass)
 
-**Summary**: Mobile harbour scale is 1 so the full skyline and sun stay in frame.
+**Summary**: Applied Emil motion bar site-wide except harbour hero art; eased hero scroll fade/depth; removed keyboard-overlay animation and scroll blur.
 
-**Files changed**: `globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+**Files changed**: `ScrollPin.tsx`, `CommandPalette.tsx`, `KeyboardLayer.tsx`, `ChatWidget.tsx`, `QuoteModal.tsx`, `PillNav.css`, homepage scrub CSS, shared enter timings, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
 
 ---
 
@@ -48,6 +48,7 @@ See `docs/WEB_TEAM_TASKS.md`.
 
 ## Recent changes log
 
+- 2026-08-24 — Site motion pass: command palette instant; hero fade/depth ease-out; homepage scrub GPU-only.
 - 2026-08-24 — Restored uncompressed skyline PNGs and random hull-chop ripple dashes.
 - 2026-08-24 — Restored uncompressed skyline PNGs and vessel hull wake rings.
 - 2026-08-24 — `/impeccable optimize`: themed WebP skyline + paused/capped `CityField` / `HarbourWater` RAF.

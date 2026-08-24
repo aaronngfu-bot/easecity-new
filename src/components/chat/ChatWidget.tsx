@@ -1,10 +1,11 @@
 'use client'
 
 import { useState, useRef, useEffect, useCallback } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import { MessageCircle, X, Send, Bot, User } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
+import { EASE_OUT } from '@/lib/motion'
 
 interface ChatMessage {
   id: string
@@ -14,6 +15,7 @@ interface ChatMessage {
 
 export function ChatWidget() {
   const { t } = useLanguage()
+  const reduce = useReducedMotion()
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState('')
   const [messages, setMessages] = useState<ChatMessage[]>([])
@@ -104,10 +106,11 @@ export function ChatWidget() {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
+            initial={reduce ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.96 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
+            exit={reduce ? { opacity: 0 } : { opacity: 0, y: 12, scale: 0.96 }}
+            transition={{ duration: 0.2, ease: EASE_OUT }}
+            style={{ transformOrigin: 'bottom right' }}
             className="glass-panel !rounded-2xl fixed bottom-24 left-4 right-4 z-50 max-h-[min(520px,calc(100dvh-7rem))] flex flex-col shadow-2xl overflow-hidden sm:left-auto sm:right-6 sm:w-[380px]"
             role="dialog"
             aria-modal="false"
@@ -191,21 +194,20 @@ export function ChatWidget() {
         )}
       </AnimatePresence>
 
-      <motion.button
+      <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
         className={cn(
           'fixed bottom-6 right-6 z-50 w-14 h-14 rounded-full flex items-center justify-center',
-          'transition-colors shadow-none',
+          'transition-[transform,background-color,color,border-color] duration-150 ease-out shadow-none',
+          'motion-safe:active:scale-[0.97]',
           isOpen ? 'glass-panel !rounded-full text-text-secondary' : 'bg-signal text-bg-base border border-signal/40'
         )}
         aria-label={isOpen ? t.chat.close : t.chat.open}
         aria-expanded={isOpen}
       >
         {isOpen ? <X size={22} aria-hidden="true" /> : <MessageCircle size={22} aria-hidden="true" />}
-      </motion.button>
+      </button>
     </>
   )
 }

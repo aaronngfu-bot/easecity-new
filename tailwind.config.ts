@@ -257,7 +257,12 @@ const config: Config = {
   				}
   			}
   		},
-  		boxShadow: {
+  		transitionTimingFunction: {
+			out: 'var(--ease-out)',
+			'in-out': 'var(--ease-in-out)',
+			drawer: 'var(--ease-drawer)',
+		},
+		boxShadow: {
   			'glow-cyan': '0 0 20px #00e5cc30, 0 0 60px #00e5cc10',
   			'glow-cyan-sm': '0 0 10px var(--signal)',
   			'glow-purple': '0 0 20px #a855f730, 0 0 60px #a855f710',

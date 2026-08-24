@@ -47,7 +47,7 @@ export function TechVision() {
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
           className="max-w-4xl mx-auto mb-14 glass-prominent p-8 md:p-10"
         >
           <div className="flex items-center justify-center gap-2 mb-5">
@@ -68,10 +68,10 @@ export function TechVision() {
           {capabilities.map((cap, i) => (
             <motion.div
               key={cap.domain}
-              initial={{ opacity: 0, y: 24 }}
+              initial={{ opacity: 0, y: 12 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.12 }}
+              transition={{ duration: 0.25, delay: i * 0.05, ease: [0.23, 1, 0.32, 1] }}
               className="glass-panel glass-panel-interactive p-6 group"
             >
               <div className="flex items-center gap-2 mb-5">
@@ -100,7 +100,7 @@ export function TechVision() {
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.8, delay: 0.4 }}
+          transition={{ duration: 0.25, delay: 0.08, ease: [0.23, 1, 0.32, 1] }}
           className="glass-panel p-6 md:p-7 overflow-x-auto"
         >
           <div className="flex items-center gap-2 mb-6">

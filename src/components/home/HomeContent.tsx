@@ -256,7 +256,7 @@ export function HomeContent() {
                 <Link
                   key={s.slug}
                   href={`/services/${s.slug}`}
-                  className="scrub-svc-card card group flex h-full flex-col p-7 transition-all duration-300 hover:-translate-y-1 hover:border-[var(--signal)] hover:shadow-[var(--shadow-lg)]"
+                  className="scrub-svc-card card group flex h-full flex-col p-7 transition-[transform,border-color,box-shadow] duration-200 ease-out hover:border-[var(--signal)] hover:shadow-[var(--shadow-lg)] motion-safe:hover:-translate-y-1 active:scale-[0.97]"
                   style={{ ['--i' as string]: i }}
                 >
                   <div className="flex items-center justify-between">
@@ -344,7 +344,7 @@ export function HomeContent() {
                 <button
                   type="button"
                   onClick={() => setQuoteOpen(true)}
-                  className="group inline-flex min-h-11 items-center gap-2 rounded-lg bg-[var(--signal)] px-9 py-4 text-base font-semibold text-[var(--signal-ink)] transition hover:bg-[var(--signal-light)]"
+                  className="group inline-flex min-h-11 items-center gap-2 rounded-lg bg-[var(--signal)] px-9 py-4 text-base font-semibold text-[var(--signal-ink)] transition-colors duration-200 ease-out hover:bg-[var(--signal-light)] active:scale-[0.97]"
                 >
                   {c.homeCtaBtn}
                   <ArrowRight size={18} className="transition-transform group-hover:translate-x-0.5" />

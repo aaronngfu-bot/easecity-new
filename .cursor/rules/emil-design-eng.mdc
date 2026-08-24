@@ -1,0 +1,19 @@
+---
+description: Emil Kowalski design-eng — motion and press feedback for the whole EaseCity site
+globs: src/**/*.{tsx,css}
+---
+
+# Emil design-eng（全站）
+
+改任何公開頁、admin、auth 的 UI 前，先讀 `.cursor/skills/emil-design-eng/SKILL.md`。動畫從零做用 `animate`；審查用 `review-animations`。
+
+## 必須遵守
+
+- 只動 `transform` / `opacity`（必要時 color）。禁止 `transition: all`、`transition-all`。
+- UI 進場用 **ease-out**（`--ease-out`），不要 `ease-in`。自訂曲線：`--ease-out` / `--ease-in-out` / `--ease-drawer`。
+- UI 時長通常 **150–250ms**，按壓 **100–160ms**。鍵盤捷徑不要動畫。
+- 進場不要 `scale(0)`，用 `scale(0.95)` + `opacity: 0`。
+- 可點元素加 `:active { transform: scale(0.97) }`。
+- Hover 位移／放大必須包在 `@media (hover: hover) and (pointer: fine)`。
+- 遵守 `prefers-reduced-motion`：留 opacity／顏色，拿掉位移。
+- 與現有海港／hero 規則衝突時，先守 repo 的海港／月亮／船體約束。

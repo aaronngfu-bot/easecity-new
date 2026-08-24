@@ -3,6 +3,18 @@
 所有從 Cursor 介入到目前狀態的實際改動記錄。
 最後更新：2026-08-24
 
+## 2026-08-24 — 全站動效掃描（不動海港場景）
+
+- 命令盤／快捷鍵表即開即關；聊天室從 FAB 原點進場，按壓縮小。
+- Hero 滾差：`--p-fade` / `--p-depth` 用 ease-out，遮罩維持線性晚溶。
+- 首頁 scrub 拿掉 blur／clip-path；區塊進場壓到 200–280ms。
+
+## 2026-08-24 — 安裝 emilkowalski/skills 並套用全站
+
+- 以 `npx skills add emilkowalski/skills` 安裝 12 項技能；網頁相關 10 項複製到 `.cursor/skills/`。
+- Skill router + `emil-design-eng` rule 約束全站 UI。
+- 加入 `--ease-out`／`--ease-in-out`／`--ease-drawer`；按鈕／CTA 按壓 `scale(0.97)`，hover 限精細指標。
+
 ## 2026-08-24 — 手機海港完整入鏡
 
 - 手機不再 1.28／偏左裁切；建築與太陽完整顯示。

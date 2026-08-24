@@ -10,13 +10,14 @@ import { PageHero } from '@/components/ui/PageHero'
 import { QuoteModal } from '@/components/contact/QuoteModal'
 import { ServiceIcon } from '@/components/ui/ServiceIcon'
 import { services as serviceCatalog } from '@/lib/services'
+import { EASE_OUT } from '@/lib/motion'
 
 const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
+  hidden: { opacity: 0, y: 12 },
   visible: (i = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.5, delay: i * 0.08, ease: 'easeOut' as const },
+    transition: { duration: 0.25, delay: i * 0.05, ease: EASE_OUT },
   }),
 }
 

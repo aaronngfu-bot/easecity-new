@@ -51,7 +51,7 @@ export function UserRoleForm({
   const selectClass = cn(
     'w-full rounded-md border bg-bg-void px-3 py-2 text-sm text-text-primary',
     'border-border focus:border-signal/50 focus:outline-none focus:ring-1 focus:ring-signal/30',
-    'transition-all'
+    'transition-[border-color,box-shadow] duration-200 ease-out'
   )
 
   return (
@@ -118,7 +118,7 @@ export function UserRoleForm({
           (role === currentRole && status === currentStatus)
         }
         className={cn(
-          'w-full rounded-md px-4 py-2.5 text-sm font-semibold transition-all',
+          'w-full rounded-md px-4 py-2.5 text-sm font-semibold transition-[background-color,transform] duration-150 ease-out active:scale-[0.97]',
           'bg-signal text-[#03100f] hover:bg-signal-light',
           'disabled:opacity-40 disabled:cursor-not-allowed'
         )}

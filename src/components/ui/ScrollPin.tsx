@@ -2,6 +2,18 @@
 
 import { useLayoutEffect, useRef } from 'react'
 
+function clamp01(n: number) {
+  return Math.max(0, Math.min(1, n))
+}
+
+function easeOutCubic(t: number) {
+  return 1 - (1 - t) ** 3
+}
+
+function easeOutQuad(t: number) {
+  return t * (2 - t)
+}
+
 /**
  * Scroll theater. Track is taller than the viewport; the inner panel stays
  * pinned (JS fixed — CSS sticky dies under overflow-x-clip on the public
@@ -77,11 +89,12 @@ export function ScrollPin({
       const p4 = Number(p.toFixed(4))
       if (p4 === lastP) return
       lastP = p4
-      // Copy wipes first, depth mid-scroll, scene mask starts as lag is visible.
-      const pDepth = Math.max(0, Math.min(1, (p - 0.1) / 0.9))
-      const pFade = Math.max(0, Math.min(1, p / 0.75))
-      const pExit = Math.max(0, Math.min(1, (p - 0.5) / 0.5))
-      const pMask = Math.max(0, Math.min(1, (p - 0.48) / 0.52))
+      // ease-out on fade/depth so the first scroll reads immediately;
+      // mask stays linear so the harbour dissolve stays late and light.
+      const pDepth = easeOutQuad(clamp01((p - 0.1) / 0.9))
+      const pFade = easeOutCubic(clamp01(p / 0.75))
+      const pExit = clamp01((p - 0.5) / 0.5)
+      const pMask = clamp01((p - 0.48) / 0.52)
       pin.style.setProperty('--p', p4.toFixed(4))
       pin.style.setProperty('--p-depth', pDepth.toFixed(4))
       pin.style.setProperty('--p-fade', pFade.toFixed(4))

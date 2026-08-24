@@ -19,9 +19,9 @@ export function AnimatedSection({
   const shouldReduceMotion = useReducedMotion()
 
   const directionMap = {
-    up: { y: 30, x: 0 },
-    left: { y: 0, x: -30 },
-    right: { y: 0, x: 30 },
+    up: { y: 12, x: 0 },
+    left: { y: 0, x: -12 },
+    right: { y: 0, x: 12 },
     none: { y: 0, x: 0 },
   }
 
@@ -38,9 +38,9 @@ export function AnimatedSection({
       whileInView={{ opacity: 1, y: 0, x: 0 }}
       viewport={{ once: true, margin: '-80px' }}
       transition={{
-        duration: 0.65,
+        duration: 0.28,
         delay,
-        ease: [0.21, 0.47, 0.32, 0.98],
+        ease: [0.23, 1, 0.32, 1],
       }}
       className={cn(className)}
     >
@@ -102,11 +102,11 @@ export function StaggerItem({
   return (
     <motion.div
       variants={{
-        hidden: { opacity: 0, y: 20 },
+        hidden: { opacity: 0, y: 10 },
         visible: {
           opacity: 1,
           y: 0,
-          transition: { duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] },
+          transition: { duration: 0.22, ease: [0.23, 1, 0.32, 1] },
         },
       }}
       className={cn(className)}

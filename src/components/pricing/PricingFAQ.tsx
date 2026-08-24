@@ -39,12 +39,12 @@ export function PricingFAQ() {
             return (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 15 }}
+                initial={{ opacity: 0, y: 8 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.4, delay: i * 0.06 }}
+                transition={{ duration: 0.22, delay: i * 0.04, ease: [0.23, 1, 0.32, 1] }}
                 className={cn(
-                  'glass-panel overflow-hidden !rounded-xl transition-all duration-300',
+                  'glass-panel overflow-hidden !rounded-xl transition-[border-color] duration-200 ease-out',
                   isOpen && 'border-signal/25'
                 )}
               >
@@ -65,7 +65,7 @@ export function PricingFAQ() {
                     size={16}
                     aria-hidden="true"
                     className={cn(
-                      'shrink-0 text-text-muted transition-all duration-200',
+                      'shrink-0 text-text-muted transition-[transform,color] duration-200 ease-out',
                       isOpen && 'rotate-180 text-signal'
                     )}
                   />
@@ -79,7 +79,7 @@ export function PricingFAQ() {
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.25, ease: 'easeInOut' }}
+                      transition={{ duration: 0.22, ease: [0.77, 0, 0.175, 1] }}
                       className="overflow-hidden"
                     >
                       <div className="px-5 md:px-6 pb-5 pt-0 pl-[3.25rem]">

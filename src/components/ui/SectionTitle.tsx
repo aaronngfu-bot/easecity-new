@@ -1,7 +1,8 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { EASE_OUT } from '@/lib/motion'
 
 interface SectionTitleProps {
   eyebrow?: string
@@ -20,12 +21,13 @@ export function SectionTitle({
   align = 'center',
   className,
 }: SectionTitleProps) {
+  const reduce = useReducedMotion()
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      initial={reduce ? false : { opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
-      transition={{ duration: 0.6, ease: [0.21, 0.47, 0.32, 0.98] }}
+      transition={{ duration: 0.28, ease: EASE_OUT }}
       className={cn(
         'mb-12 md:mb-16',
         align === 'center' && 'text-center mx-auto',

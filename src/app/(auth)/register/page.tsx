@@ -78,9 +78,9 @@ export default function RegisterPage() {
     <>
       <LoginBackground />
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
         className="relative z-10 space-y-6"
       >
       <AnimatePresence>
@@ -98,7 +98,7 @@ export default function RegisterPage() {
               initial={{ opacity: 0, scale: 0.96, y: 12 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 8 }}
-              transition={{ duration: 0.25 }}
+              transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
               className="signal-panel-highlight w-full max-w-sm p-7 text-center"
             >
               <div className="relative mx-auto mb-6 flex h-16 w-16 items-center justify-center">

@@ -203,7 +203,7 @@ export function KeyboardLayer() {
             initial={{ y: 24, opacity: 0, scale: 0.98 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
             exit={{ y: 12, opacity: 0 }}
-            transition={{ duration: 0.18 }}
+            transition={{ duration: 0.16, ease: [0.23, 1, 0.32, 1] }}
             className="fixed left-1/2 -translate-x-1/2 bottom-20 z-[110] glass-panel px-4 py-2.5 text-sm text-signal flex items-center gap-2 !rounded-full"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-signal animate-signal-pulse" />
@@ -269,14 +269,10 @@ function ShortcutCheatsheet({ open, onClose }: { open: boolean; onClose: () => v
     },
   ]
 
+  if (!open) return null
+
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
+        <div
           className="fixed inset-0 z-[105] flex items-center justify-center px-4"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) onClose()
@@ -284,11 +280,7 @@ function ShortcutCheatsheet({ open, onClose }: { open: boolean; onClose: () => v
         >
           <div className="absolute inset-0 bg-bg-base/60 backdrop-blur-sm" />
 
-          <motion.div
-            initial={{ scale: 0.95, opacity: 0, y: 8 }}
-            animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.96, opacity: 0 }}
-            transition={{ duration: 0.22, ease: [0.2, 0.8, 0.25, 1] }}
+          <div
             className="relative w-full max-w-lg glass-panel p-6 md:p-7"
           >
             <div className="flex items-center justify-between mb-5">
@@ -335,10 +327,8 @@ function ShortcutCheatsheet({ open, onClose }: { open: boolean; onClose: () => v
               <span>DISCOVERED SURFACE: 4 / 5</span>
               <span>v1.0.0</span>
             </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </div>
+        </div>
   )
 }
 
@@ -373,7 +363,7 @@ function PrivilegeOverlay({ open, onClose }: { open: boolean; onClose: () => voi
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
           className="fixed inset-0 z-[115] flex items-center justify-center px-4"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) onClose()
@@ -387,7 +377,7 @@ function PrivilegeOverlay({ open, onClose }: { open: boolean; onClose: () => voi
             initial={{ scale: 0.96, opacity: 0, y: 8 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
             exit={{ scale: 0.98, opacity: 0 }}
-            transition={{ duration: 0.28, ease: [0.2, 0.8, 0.25, 1] }}
+            transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
             className="relative w-full max-w-md glass-prominent p-6 md:p-7 overflow-hidden"
           >
             <div className="privilege-scan" />

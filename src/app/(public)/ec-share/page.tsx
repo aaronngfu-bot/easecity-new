@@ -245,7 +245,7 @@ export default function EcSharePage() {
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.25, ease: [0.23, 1, 0.32, 1] }}
             className="mx-auto mb-14 max-w-2xl text-center"
           >
             <p className="label-mono mb-4 text-[var(--signal)]">{c.galleryBadge}</p>
@@ -266,7 +266,7 @@ export default function EcSharePage() {
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
+                transition={{ duration: 0.25, delay: i * 0.05, ease: [0.23, 1, 0.32, 1] }}
                 className="group relative overflow-hidden rounded-xl border border-[var(--border-color)] bg-[var(--bg-elevated)]"
               >
                 <div className="relative aspect-[4/3] overflow-hidden">
@@ -275,7 +275,7 @@ export default function EcSharePage() {
                     alt={g.label}
                     fill
                     sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="object-cover transition-transform duration-200 ease-out motion-safe:group-hover:scale-[1.03]"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent" />
                 </div>

@@ -74,10 +74,10 @@ export function Expansion() {
             return (
               <motion.div
                 key={pillar.title}
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 12 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.12 }}
+                transition={{ duration: 0.25, delay: i * 0.05, ease: [0.23, 1, 0.32, 1] }}
                 className="group glass-panel glass-panel-interactive p-6 md:p-7"
               >
                 <div className="flex items-center justify-between mb-5">
@@ -91,7 +91,7 @@ export function Expansion() {
                     EXP.{String(i + 1).padStart(2, '0')}
                   </span>
                 </div>
-                <div className="mb-5 w-11 h-11 rounded-xl bg-bg-base/40 group-hover:bg-signal/10 border border-border group-hover:border-signal/25 flex items-center justify-center text-text-muted group-hover:text-signal transition-all duration-300">
+                <div className="mb-5 w-11 h-11 rounded-xl bg-bg-base/40 group-hover:bg-signal/10 border border-border group-hover:border-signal/25 flex items-center justify-center text-text-muted group-hover:text-signal transition-[background-color,border-color,color] duration-200 ease-out">
                   <pillar.icon size={20} />
                 </div>
                 <h3 className="font-display text-lg font-bold text-text-primary mb-3 group-hover:text-white transition-colors">
@@ -104,10 +104,10 @@ export function Expansion() {
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+          transition={{ duration: 0.22, delay: 0.08, ease: [0.23, 1, 0.32, 1] }}
           className="text-center"
         >
           <p className="text-text-secondary text-base mb-6 max-w-2xl mx-auto">{t.expansion.closing}</p>

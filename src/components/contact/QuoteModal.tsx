@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
+import { EASE_OUT } from '@/lib/motion'
 import { X, ArrowLeft, ArrowRight, Send, CheckCircle2, AlertCircle, Phone } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
@@ -154,16 +155,17 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
+        transition={{ duration: 0.15, ease: EASE_OUT }}
         onClick={onClose}
         className="absolute inset-0 bg-black/50 backdrop-blur-sm"
       />
 
       {/* panel */}
       <motion.div
-        initial={{ opacity: 0, y: 24, scale: 0.98 }}
+        initial={{ opacity: 0, y: 16, scale: 0.98 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        exit={{ opacity: 0, y: 24, scale: 0.98 }}
-        transition={{ duration: 0.22 }}
+        exit={{ opacity: 0, y: 16, scale: 0.98 }}
+        transition={{ duration: 0.22, ease: EASE_OUT }}
         className="relative z-10 flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-t-2xl border border-[var(--border-color)] bg-[var(--bg-surface)] shadow-2xl sm:rounded-2xl"
       >
         {/* header */}
@@ -198,7 +200,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
         <div className="flex-1 overflow-y-auto px-5 py-5">
           <AnimatePresence mode="wait">
             {state === 'success' ? (
-              <motion.div key="done" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center py-10 text-center">
+              <motion.div key="done" initial={{ opacity: 0, scale: 0.97 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.2, ease: EASE_OUT }} className="flex flex-col items-center justify-center py-10 text-center">
                 <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-md border border-[var(--signal)]/30 bg-[var(--signal)]/10">
                   <CheckCircle2 size={30} className="text-[var(--signal)]" />
                 </div>
@@ -208,7 +210,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
                 <button onClick={onClose} className="signal-cta mt-6">{t.footer.linkTouch}</button>
               </motion.div>
             ) : isQuestionStep && curQ ? (
-              <motion.div key={`q-${step}`} initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+              <motion.div key={`q-${step}`} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.18, ease: EASE_OUT }}>
                 {step === 0 && <p className="mb-4 text-sm text-[var(--text-secondary)]">{questionnaire.intro[language]}</p>}
                 <h3 className="font-display text-xl font-semibold text-[var(--text-primary)]">{curQ.label[language]}</h3>
 
@@ -280,7 +282,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
                 )}
               </motion.div>
             ) : isContactStep ? (
-              <motion.div key="contact" initial={{ opacity: 0, x: 16 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -16 }} transition={{ duration: 0.18 }}>
+              <motion.div key="contact" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.18, ease: EASE_OUT }}>
                 <h3 className="font-display text-xl font-semibold text-[var(--text-primary)]">{c.step3Title}</h3>
                 <p className="mt-1 text-sm text-[var(--text-secondary)]">{c.step3Desc}</p>
 

@@ -32,11 +32,11 @@
   gap: 8px;
   padding: 4px 10px 4px 8px;
   border-radius: 9999px;
-  transition: background-color 150ms ease;
+  transition: background-color 150ms var(--ease-out), transform 120ms var(--ease-out);
 }
 
-.pill-logo:hover {
-  background: var(--signal-soft);
+.pill-logo:active {
+  transform: scale(0.97);
 }
 
 .pill-wordmark {
@@ -76,13 +76,12 @@
   font-weight: 500;
   color: var(--text-secondary);
   text-decoration: none;
-  transition: color 150ms ease, background-color 150ms ease;
+  transition: color 150ms var(--ease-out), background-color 150ms var(--ease-out), transform 120ms var(--ease-out);
   white-space: nowrap;
 }
 
-.pill:hover {
-  color: var(--text-primary);
-  background: var(--signal-soft);
+.pill:active {
+  transform: scale(0.97);
 }
 
 .pill.is-active {
@@ -121,15 +120,11 @@
   font-weight: 600;
   padding: 4px 6px;
   border-radius: 4px;
-  transition: color 150ms ease, background-color 150ms ease;
+  transition: color 150ms var(--ease-out), background-color 150ms var(--ease-out);
 }
 
 .pill-language-toggle button.is-active {
   color: var(--signal);
-}
-
-.pill-language-toggle button:hover {
-  color: var(--text-primary);
 }
 
 .pill-sign-in {
@@ -144,12 +139,11 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 150ms ease, color 150ms ease;
+  transition: border-color 150ms var(--ease-out), color 150ms var(--ease-out), transform 120ms var(--ease-out);
 }
 
-.pill-sign-in:hover {
-  border-color: var(--signal);
-  color: var(--signal);
+.pill-sign-in:active {
+  transform: scale(0.97);
 }
 
 .pill-cta {
@@ -163,12 +157,11 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 150ms ease;
+  transition: background-color 150ms var(--ease-out), transform 120ms var(--ease-out);
 }
 
-.pill-cta:hover {
-  background: var(--amber);
-  filter: brightness(1.08);
+.pill-cta:active {
+  transform: scale(0.97);
 }
 
 .pill-auth {
@@ -182,11 +175,11 @@
   font-size: 12px;
   font-weight: 600;
   cursor: pointer;
-  transition: background-color 150ms ease;
+  transition: background-color 150ms var(--ease-out), transform 120ms var(--ease-out);
 }
 
-.pill-auth:hover {
-  background: var(--signal-light);
+.pill-auth:active {
+  transform: scale(0.97);
 }
 
 /* Mobile */
@@ -203,11 +196,11 @@
   border: 1px solid var(--border-color);
   border-radius: 9999px;
   cursor: pointer;
-  transition: border-color 150ms ease, background-color 150ms ease;
+  transition: border-color 150ms var(--ease-out), background-color 150ms var(--ease-out), transform 120ms var(--ease-out);
 }
 
-.mobile-menu-button:hover {
-  border-color: var(--signal);
+.mobile-menu-button:active {
+  transform: scale(0.97);
 }
 
 .hamburger-line {
@@ -216,7 +209,7 @@
   height: 2px;
   background: var(--text-primary);
   border-radius: 2px;
-  transition: transform 220ms cubic-bezier(0.4, 0, 0.2, 1), opacity 180ms ease;
+  transition: transform 180ms var(--ease-out), opacity 150ms var(--ease-out);
 }
 
 /* Animate to an X when open */
@@ -243,13 +236,13 @@
   z-index: 99;
   pointer-events: auto;
   transform-origin: top right;
-  animation: mobile-menu-in 220ms cubic-bezier(0.4, 0, 0.2, 1);
+  animation: mobile-menu-in 200ms var(--ease-out);
 }
 
 @keyframes mobile-menu-in {
   from {
     opacity: 0;
-    transform: translateY(-8px) scale(0.98);
+    transform: translateY(-6px) scale(0.96);
   }
   to {
     opacity: 1;
@@ -260,6 +253,14 @@
 @media (prefers-reduced-motion: reduce) {
   .mobile-menu-popover {
     animation: none;
+  }
+  .pill-logo:active,
+  .pill:active,
+  .pill-sign-in:active,
+  .pill-cta:active,
+  .pill-auth:active,
+  .mobile-menu-button:active {
+    transform: none;
   }
 }
 
@@ -281,10 +282,9 @@
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
-  transition: background-color 150ms ease;
+  transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out);
 }
 
-.mobile-menu-link:hover,
 .mobile-menu-link.is-active {
   background: var(--signal-soft);
   color: var(--signal);
@@ -313,6 +313,37 @@
 }
 
 /* Width-only 768px treats landscape phones as desktop. */
+@media (hover: hover) and (pointer: fine) {
+  .pill-logo:hover {
+    background: var(--signal-soft);
+  }
+  .pill:hover {
+    color: var(--text-primary);
+    background: var(--signal-soft);
+  }
+  .pill-language-toggle button:hover {
+    color: var(--text-primary);
+  }
+  .pill-sign-in:hover {
+    border-color: var(--signal);
+    color: var(--signal);
+  }
+  .pill-cta:hover {
+    background: var(--amber);
+    filter: brightness(1.08);
+  }
+  .pill-auth:hover {
+    background: var(--signal-light);
+  }
+  .mobile-menu-button:hover {
+    border-color: var(--signal);
+  }
+  .mobile-menu-link:hover {
+    background: var(--signal-soft);
+    color: var(--signal);
+  }
+}
+
 @media (max-width: 900px), (max-height: 540px) {
   .desktop-only {
     display: none !important;

@@ -112,10 +112,10 @@ function PrincipleCard({ index, principle, noteLabel, isOpen, onOpen, onClose }:
 
   return (
     <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      whileInView={{ opacity: 1, x: 0 }}
+      initial={{ opacity: 0, y: 10 }}
+      whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
+      transition={{ duration: 0.22, delay: index * 0.05, ease: [0.23, 1, 0.32, 1] }}
       onMouseEnter={handleEnter}
       onMouseLeave={handleLeave}
       onClick={handleClick}
@@ -141,7 +141,7 @@ function PrincipleCard({ index, principle, noteLabel, isOpen, onOpen, onClose }:
                 initial={{ opacity: 0, height: 0, marginTop: 0 }}
                 animate={{ opacity: 1, height: 'auto', marginTop: 14 }}
                 exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                transition={{ duration: 0.28, ease: [0.2, 0.8, 0.25, 1] }}
+                transition={{ duration: 0.2, ease: [0.77, 0, 0.175, 1] }}
                 className="overflow-hidden"
               >
                 <div className="pt-3 border-t border-signal/20 relative">

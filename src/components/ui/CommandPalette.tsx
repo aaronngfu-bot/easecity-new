@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion, AnimatePresence } from 'framer-motion'
 import {
   Home, LayoutGrid, Tag, Info, Mail, Zap, ShieldCheck, Cpu, Building2,
   Languages, Mail as MailIcon, Keyboard, Signal, CornerDownLeft, Search,
@@ -212,14 +211,10 @@ export function CommandPalette() {
     el?.scrollIntoView({ block: 'nearest' })
   }, [activeIdx])
 
+  if (!open) return null
+
   return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.15 }}
+        <div
           className="fixed inset-0 z-[100] flex items-start justify-center pt-[12vh] md:pt-[18vh] px-4"
           onMouseDown={(e) => {
             if (e.target === e.currentTarget) setOpen(false)
@@ -228,11 +223,7 @@ export function CommandPalette() {
           {/* Backdrop */}
           <div className="absolute inset-0 bg-bg-base/60 backdrop-blur-sm" aria-hidden="true" />
 
-          <motion.div
-            initial={{ y: -12, opacity: 0, scale: 0.98 }}
-            animate={{ y: 0, opacity: 1, scale: 1 }}
-            exit={{ y: -8, opacity: 0, scale: 0.98 }}
-            transition={{ duration: 0.22, ease: [0.2, 0.8, 0.25, 1] }}
+          <div
             className="relative w-full max-w-xl glass-panel !rounded-2xl overflow-hidden"
             role="dialog"
             aria-modal="true"
@@ -344,10 +335,8 @@ export function CommandPalette() {
                 <span className="text-signal">LIVE</span>
               </span>
             </div>
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
+          </div>
+        </div>
   )
 }
 

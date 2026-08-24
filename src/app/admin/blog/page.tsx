@@ -197,6 +197,7 @@ export default function AdminBlogPage() {
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
           className="rounded-lg border border-border bg-bg-surface p-5"
         >
           <div className="mb-4 flex items-center justify-between">

@@ -75,6 +75,7 @@ export function ContactForm() {
       <motion.div
         initial={{ opacity: 0, scale: 0.97 }}
         animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
         className="signal-panel-highlight flex h-full min-h-[480px] flex-col items-center justify-center p-10 text-center"
         role="status"
       >
@@ -100,9 +101,9 @@ export function ContactForm() {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5 }}
+      transition={{ duration: 0.22, ease: [0.23, 1, 0.32, 1] }}
       className="signal-panel p-6 md:p-8"
     >
       {/* progress header */}
@@ -135,7 +136,7 @@ export function ContactForm() {
               initial={{ opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -12 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
             >
               <h3 className="font-display text-xl font-semibold text-text-primary">{c.step1Title}</h3>
               <p className="mt-1 text-sm text-text-secondary">{c.step1Desc}</p>
@@ -167,7 +168,7 @@ export function ContactForm() {
               initial={{ opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -12 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
             >
               <h3 className="font-display text-xl font-semibold text-text-primary">{c.step2Title}</h3>
               <p className="mt-1 text-sm text-text-secondary">{c.step2Desc}</p>
@@ -204,7 +205,7 @@ export function ContactForm() {
               initial={{ opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -12 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.18, ease: [0.23, 1, 0.32, 1] }}
             >
               <h3 className="font-display text-xl font-semibold text-text-primary">{c.step3Title}</h3>
               <p className="mt-1 text-sm text-text-secondary">{c.step3Desc}</p>

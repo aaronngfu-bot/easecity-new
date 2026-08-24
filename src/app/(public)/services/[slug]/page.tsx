@@ -68,7 +68,7 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
                   key={b}
                   initial={{ opacity: 0, x: -12 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.4 }}
+                  transition={{ duration: 0.2, ease: [0.23, 1, 0.32, 1] }}
                   className="flex items-start gap-2.5"
                 >
                   <Check size={16} className="mt-1 shrink-0 text-[var(--signal)]" />
@@ -136,7 +136,7 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
                 initial={{ opacity: 0, x: -16 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: '-40px' }}
-                transition={{ duration: 0.45, delay: i * 0.08 }}
+                transition={{ duration: 0.22, delay: i * 0.04, ease: [0.23, 1, 0.32, 1] }}
                 className="relative flex gap-5 pb-8 last:pb-0"
               >
                 {/* vertical connector */}

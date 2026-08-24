@@ -327,7 +327,7 @@ function QuickActions() {
             <p className="text-sm font-medium text-text-primary">{a.label}</p>
             <p className="text-xs text-text-muted truncate">{a.desc}</p>
           </div>
-          <ChevronRight size={14} className="text-text-muted group-hover:text-signal group-hover:translate-x-0.5 transition-all shrink-0" />
+          <ChevronRight size={14} className="text-text-muted group-hover:text-signal motion-safe:group-hover:translate-x-0.5 transition-[color,transform] duration-200 ease-out shrink-0" />
         </Link>
       ))}
     </div>
