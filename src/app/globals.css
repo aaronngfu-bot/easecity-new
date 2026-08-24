@@ -1060,6 +1060,13 @@
   -webkit-mask-size: 100% 100%;
   mask-size: 100% 100%;
 }
+@media (max-width: 639.98px) {
+  .hero-scene-mask {
+    top: 0;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+}
 .hero-pin-sky {
   transform: translate3d(0, calc(var(--p-depth, 0) * 12vh + var(--hero-drop, 0px)), 0) scale(calc(1 + var(--p-depth, 0) * 0.04));
   transform-origin: 50% 40%;
@@ -1310,13 +1317,10 @@
   grid-row: 1 / -1;
 }
 
-/* Vessel art — keyed PNG over a light background reads pale, so boost
-   contrast slightly in light mode; drop-shadow gives the hulls some depth. */
+/* Vessel art — no CSS filter. Filter + ancestor mask drops SVG <image>
+   on iOS Safari, which is why the boats vanished on mobile. */
 .hk-vessel-art {
   opacity: 1;
-}
-:root:not(.dark) .hk-vessel-art {
-  filter: contrast(1.12) saturate(1.1) drop-shadow(0 2px 6px rgba(38, 54, 78, 0.25));
 }
 
 /* Keyed skyline — light/dark art toggled with theme. */
@@ -1397,8 +1401,8 @@
 .hero-pin-city {
   position: relative;
   width: 100%;
-  --hk-scale: 2.18;
-  --hk-origin-x: 34%;
+  --hk-scale: 1.28;
+  --hk-origin-x: 36%;
   --hk-lift: 0px;
   transform: translate3d(0, calc(0px - var(--hk-lift, 0px) + var(--hero-drop, 0px)), 0) scale(var(--hk-scale));
   transform-origin: var(--hk-origin-x) 100%;

@@ -5,11 +5,11 @@
 
 ---
 
-## Last session: 2026-08-24 (skyline PNG + hull-chop ripples)
+## Last session: 2026-08-24 (mobile sky restore + boats)
 
-**Summary**: Restored uncompressed skyline PNGs; hull-chop dashes stay on the water, span the bob/sail sweep, and sit behind the hull.
+**Summary**: Mobile harbour scale back to 1.28 so the star field is the original size; removed vessel CSS filter (Safari + mask was hiding the boats).
 
-**Files changed**: `HarbourSkyline.tsx`, `harbour-scene.ts`, `globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+**Files changed**: `globals.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
 
 ---
 
