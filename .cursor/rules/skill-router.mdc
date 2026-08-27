@@ -9,7 +9,8 @@ alwaysApply: true
 
 ## 本專案常用 DAILY Skills
 
-- Next.js / React / UI：改 `src/**/*.tsx`、頁面、元件、狀態、Tailwind 時，用 `frontend-patterns` + **`emil-design-eng`**（全站動效／按壓／easing／hover 品味；動畫專案再加 `animate`、`review-animations`、`improve-animations`）。需要高質感 UI/UX 時加 `frontend-ui-ux`。前端設計審查、a11y/效能/RWD 技術檢查、反模式偵測、polish / critique 時，先讀並套用 `impeccable`（`/impeccable audit`、`/impeccable critique`、`/impeccable polish` 等）；涉及 WCAG、鍵盤操作、ARIA 時再加 `accessibility`。不要用 `write-swift`／`animate-expo`。
+- Next.js / React / UI：改 `src/**/*.tsx`、頁面、元件、狀態、Tailwind 時，用 `frontend-patterns` + **`emil-design-eng`**（全站動效／按壓／easing／hover 品味；動畫專案再加 `animate`、`review-animations`、`improve-animations`）。需要高質感 UI/UX 時加 `frontend-ui-ux`。
+- 版面／構圖／視覺方向（landing、行銷 section、卡片格、hero 重構）：加 **`design-taste-frontend`**（反 AI 樣板：禁三等分卡片、禁裝飾性序號與 scroll cue、feature grid 必須有真實表面變化、eyebrow 配額、em-dash 禁令）。它管「長怎樣」，`emil-design-eng` 管「怎麼動、按下去甚麼感覺」；兩者衝突時以 `design-taste-frontend` 定構圖、`emil-design-eng` 定動效參數。改既有頁面時走它的 Redesign Protocol（preserve 模式：不動 IA、slug、品牌色）。前端設計審查、a11y/效能/RWD 技術檢查、反模式偵測、polish / critique 時，先讀並套用 `impeccable`（`/impeccable audit`、`/impeccable critique`、`/impeccable polish` 等）；涉及 WCAG、鍵盤操作、ARIA 時再加 `accessibility`。不要用 `write-swift`／`animate-expo`。
 - Backend / API：新增或修改 route handler、server action、validation、錯誤回應時，用 `backend-patterns` + `api-design`；涉及 auth、user input、secrets、payments、admin 權限時加 `security-review`。
 - Database：改 Prisma schema、migration、資料模型、索引、SQL/Postgres 行為時，用 `database-migrations` + `postgres-patterns`；仍遵守現有 `database-prisma` rule。
 - Stripe / Payments：新增付款、webhook、checkout、subscription、refund、Stripe API 升級時，用 `stripe-best-practices`；升級 SDK/API version 時用 `upgrade-stripe`。

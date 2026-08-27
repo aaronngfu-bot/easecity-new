@@ -44,108 +44,72 @@ function TestimonialCard({
 interface ServiceEntry {
   slug: string
   icon: string
-  tags: string[]
   title: string
   body: string
-  bullets: string[]
 }
 
 /**
- * Service panel. Landing motion is scroll-driven from CSS (`--i` / `--row`);
- * the only JS here is the pointer position for the spotlight, written straight
- * to the element as custom properties so React never re-renders on move.
+ * One capability in the services flow.
+ *
+ * The panel is a chevron: its tip points into the next panel's notch, so the
+ * six capabilities read as the single pipeline the copy claims rather than six
+ * interchangeable boxes. The shape is a clip-path in CSS, which clips pointer
+ * events too, so the hit area is the chevron and not its bounding box.
+ *
+ * `tone` is not decoration. The catalog's build capabilities come first and the
+ * advisory ones after, so the build side sits on the raised surface and carries
+ * a per-discipline hue on its icon while advisory stays flat and neutral. No
+ * panel is singled out at rest — hover and focus are the only accent states, so
+ * the row reads as a chain of equals rather than one pick and four also-rans.
+ *
+ * Motion is scroll-driven from CSS off `--i`, so there is no JS per panel.
  */
-function ServiceCard({
+function ServiceStep({
   service,
   index,
-  row,
-  ctaLabel,
-  feature = false,
+  tone,
 }: {
   service: ServiceEntry
   index: number
-  row: number
-  ctaLabel: string
-  feature?: boolean
+  tone: 'raised' | 'flat'
 }) {
-  const trackPointer = (e: React.PointerEvent<HTMLAnchorElement>) => {
-    const el = e.currentTarget
-    const r = el.getBoundingClientRect()
-    el.style.setProperty('--mx', `${((e.clientX - r.left) / r.width) * 100}%`)
-    el.style.setProperty('--my', `${((e.clientY - r.top) / r.height) * 100}%`)
-  }
+  const discipline = tone === 'flat' ? '' : ` svc-step-disc-${index + 1}`
 
   return (
-    <Link
-      href={`/services/${service.slug}`}
-      onPointerMove={trackPointer}
-      className={`scrub-svc-card card group flex h-full flex-col transition-[transform,border-color,box-shadow] duration-200 ease-out hover:border-[var(--signal)] hover:shadow-[var(--shadow-lg)] motion-safe:hover:-translate-y-1 active:scale-[0.98] ${
-        feature ? 'p-8 sm:col-span-2 lg:row-span-2' : 'p-7'
-      }`}
-      style={{ ['--i' as string]: index, ['--row' as string]: row }}
+    <li
+      className="scrub-svc-step flex w-[14.5rem] shrink-0 snap-start xl:w-auto xl:min-w-0 xl:flex-1"
+      style={{ ['--i' as string]: index }}
     >
-      <span className="svc-spot" aria-hidden />
-      <span className="svc-index" aria-hidden>
-        {String(index + 1).padStart(2, '0')}
-      </span>
-
-      <span
-        className={`svc-icon-tile flex items-center justify-center rounded-xl bg-[var(--signal-soft)] text-[var(--signal)] ${
-          feature ? 'h-14 w-14' : 'h-11 w-11'
-        }`}
+      <Link
+        href={`/services/${service.slug}`}
+        className={`svc-step group svc-step-${tone}${discipline}${index === 0 ? ' svc-step-origin' : ''}`}
       >
-        <ServiceIcon icon={service.icon} size={feature ? 28 : 22} />
-      </span>
-
-      <h3
-        className={`mt-6 font-display font-bold text-[var(--text-primary)] transition-colors duration-200 ease-out group-hover:text-[var(--signal)] ${
-          feature ? 'text-2xl md:text-3xl' : 'text-xl'
-        }`}
-      >
-        {service.title}
-      </h3>
-      <p
-        className={`mt-2 text-sm leading-relaxed text-[var(--text-secondary)] ${
-          feature ? 'max-w-lg' : 'line-clamp-3'
-        }`}
-      >
-        {service.body}
-      </p>
-
-      {feature && service.bullets.length > 0 && (
-        <ul className="svc-bullets mt-7 grid gap-2.5 sm:grid-cols-2">
-          {service.bullets.slice(0, 6).map((b, bi) => (
-            <li
-              key={b}
-              className="svc-bullet flex items-start gap-2.5 text-sm text-[var(--text-secondary)]"
-              style={{ ['--bi' as string]: bi }}
-            >
-              <span aria-hidden className="mt-[0.45rem] h-1 w-1 shrink-0 rounded-full bg-[var(--signal)]" />
-              {b}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      {feature && (
-        <div className="svc-bullets mt-auto flex flex-wrap gap-2 pt-8">
-          {service.tags.map((tag, bi) => (
-            <span
-              key={tag}
-              className="svc-bullet badge font-mono"
-              style={{ ['--bi' as string]: bi + 4 }}
-            >
-              {tag}
+        <span className="svc-step-face">
+          {/* Index, conduit, outlet — read left to right, the same direction the
+              panel points. */}
+          <span className="flex items-center gap-2.5" aria-hidden>
+            <span className="font-mono text-[1.75rem] font-bold leading-none tracking-[-0.04em] text-[var(--text-primary)]">
+              {String(index + 1).padStart(2, '0')}
             </span>
-          ))}
-        </div>
-      )}
+            <span className="svc-step-rule" />
+            <ArrowRight size={14} className="svc-step-arrow shrink-0 text-[var(--text-muted)]" />
+          </span>
 
-      <span className={`inline-flex items-center gap-1.5 pt-6 text-sm font-medium text-[var(--signal)] ${feature ? '' : 'mt-auto'}`}>
-        {ctaLabel}
-        <ArrowRight size={14} className="transition-transform duration-200 ease-out group-hover:translate-x-0.5" />
-      </span>
-    </Link>
+          <span className="mt-5 flex items-center gap-2">
+            <span className="svc-step-icon">
+              <ServiceIcon icon={service.icon} size={15} />
+            </span>
+            <span className="font-display text-sm font-bold leading-snug text-[var(--text-primary)] transition-colors duration-200 ease-out group-hover:text-[var(--signal)]">
+              {service.title}
+            </span>
+          </span>
+
+          <span className="mt-2.5 line-clamp-6 text-xs leading-[1.7] text-[var(--text-secondary)]">
+            {service.body}
+          </span>
+        </span>
+      </Link>
+    </li>
   )
 }
 
@@ -169,7 +133,7 @@ export interface HomeBlogPost {
  *  hero         pinned settle onto the waterline, copy wipes out
  *  blog         pier line continues the hero horizon, posts berth beneath it
  *  products     split assemble (copy left, art right)
- *  services     feature panel + diagonal plane of panels hinging up
+ *  services     chevron flow, panels arriving in the direction they point
  *  testimonials mask-open scale
  *  cta          punch in
  */
@@ -248,15 +212,16 @@ export function HomeContent() {
     }
   }, [language])
 
-  const services = serviceCatalog.map((s) => ({
-    slug: s.slug,
-    icon: s.icon,
-    tags: s.tags,
-    title: c2[s.titleKey as keyof typeof c2] as string,
-    body: c2[s.bodyKey as keyof typeof c2] as string,
-    bullets: language === 'zh' ? s.bullets.zh : s.bullets.en,
-  }))
-  const [featA, featB, ...restServices] = services
+  // Brand design keeps its own page and its place in /services; it is left out
+  // of the home flow so the chain reads as the build-and-run pipeline.
+  const services = serviceCatalog
+    .filter((s) => s.slug !== 'brand-design')
+    .map((s) => ({
+      slug: s.slug,
+      icon: s.icon,
+      title: c2[s.titleKey as keyof typeof c2] as string,
+      body: c2[s.bodyKey as keyof typeof c2] as string,
+    }))
 
   const testimonials = [
     { q: c.t1Quote, n: c.t1Name, r: c.t1Role },
@@ -313,9 +278,11 @@ export function HomeContent() {
                   <span aria-hidden className="scrub-rule h-px w-10 origin-left bg-signal" />
                   <span className="scrub-kicker-label">{c.productsBadge}</span>
                 </span>
-                <h2 className="type-section scrub-title font-display text-3xl font-bold text-[var(--text-primary)] md:text-4xl">
-                  {c.productsNarrative}
-                </h2>
+                <div className="scrub-reveal">
+                  <h2 className="type-section scrub-title font-display text-3xl font-bold text-[var(--text-primary)] md:text-4xl">
+                    {c.productsNarrative}
+                  </h2>
+                </div>
                 <p className="scrub-sub mt-4 max-w-md leading-relaxed text-[var(--text-secondary)]">
                   {c.productsNarrativeDesc}
                 </p>
@@ -340,49 +307,55 @@ export function HomeContent() {
         </section>
       </Scrub>
 
-      {/* Services — staggered cascade */}
+      {/* Services — arrow flow */}
       <Scrub>
         <section className="relative z-10 section-padding bg-[var(--bg-base)]">
           <div className="container-max">
-            <div className="scrub-svc-head flex flex-col items-start justify-between gap-6 md:flex-row md:items-end">
-              <div className="max-w-2xl">
-                <div className="scrub-kicker mb-5 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.28em] text-signal">
-                  <span aria-hidden className="scrub-rule h-px w-10 origin-left bg-signal" />
-                  <span className="scrub-kicker-label">{c.servicesBadge}</span>
-                </div>
+            <div className="max-w-2xl">
+              <div className="scrub-kicker mb-5 flex items-center gap-3 font-mono text-xs uppercase tracking-[0.28em] text-signal">
+                <span aria-hidden className="scrub-rule h-px w-10 origin-left bg-signal" />
+                <span className="scrub-kicker-label">{c.servicesBadge}</span>
+              </div>
+              <div className="scrub-reveal">
                 <h2 className="type-section scrub-title font-display text-3xl font-bold text-[var(--text-primary)] md:text-5xl">
                   {c.servicesTitle}
                 </h2>
-                <p className="scrub-sub mt-4 max-w-xl text-base leading-relaxed text-[var(--text-secondary)]">
-                  {c.servicesSubtitle}
-                </p>
               </div>
+              <p className="scrub-sub mt-4 max-w-xl text-base leading-relaxed text-[var(--text-secondary)]">
+                {c.servicesSubtitle}
+              </p>
             </div>
 
-            <div className="svc-grid mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <ServiceCard
-                service={featA}
-                index={0}
-                row={0}
-                ctaLabel={c.servicesCta}
-                feature
-              />
-              {[featB, ...restServices].map((s, i) => (
-                <ServiceCard
+            {/* An ordered list because the numerals are the section's argument:
+                one team carries a project from infrastructure through to the
+                brand around it. One row, always — the chain is the point, so
+                below xl it scrolls rather than wrapping and breaking mid-chain. */}
+            <ol className="svc-flow mt-12 flex snap-x snap-proximity overflow-x-auto pb-2 xl:overflow-x-visible xl:pb-0">
+              {services.map((s, i) => (
+                <ServiceStep
                   key={s.slug}
                   service={s}
-                  index={i + 1}
-                  row={Math.floor((i + 1) / 3)}
-                  ctaLabel={c.servicesCta}
+                  index={i}
+                  tone={i < 3 ? 'raised' : 'flat'}
                 />
               ))}
-            </div>
+            </ol>
+
+            <Link
+              href="/services"
+              className="scrub-cta-line group mt-8 inline-flex min-h-11 items-center gap-2 rounded-lg border border-[var(--signal)] bg-[var(--signal-soft)] px-5 text-sm font-semibold text-[var(--signal)] transition-[background-color,color,transform] duration-200 ease-out hover:bg-[var(--signal)] hover:text-[var(--signal-ink)] active:scale-[0.97]"
+            >
+              {c.servicesAllCta}
+              <ArrowRight size={16} className="transition-transform duration-200 ease-out group-hover:translate-x-0.5" />
+            </Link>
           </div>
         </section>
       </Scrub>
 
-      {/* Testimonials — mask-open scale */}
-      <Scrub>
+      {/* Testimonials — mask-open scale. Early pace: the wall is by far the
+          tallest section, so anything slower left its columns still fading in
+          after the reader had scrolled past them. */}
+      <Scrub pace="early">
         <section className="relative z-10 section-padding bg-[var(--bg-surface)]">
           <div className="container-max">
             <div className="scrub-t-head">

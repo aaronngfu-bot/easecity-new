@@ -56,6 +56,7 @@ export function ScrollPin({
     let lastP = -1
     let lastMode = ''
     let lastScrub = false
+    let lastCopyGone = false
     const update = () => {
       raf = 0
       const r = track.getBoundingClientRect()
@@ -89,12 +90,14 @@ export function ScrollPin({
       const p4 = Number(p.toFixed(4))
       if (p4 === lastP) return
       lastP = p4
-      // ease-out on fade/depth so the first scroll reads immediately;
-      // mask stays linear so the harbour dissolve stays late and light.
+      // ease-out on fade/depth so the first scroll reads immediately. The mask
+      // stays linear and starts a third of the way in: it drives the water
+      // closing over the harbour, and a descent has to be gradual to read as
+      // one. Starting it at half meant nothing happened, then everything did.
       const pDepth = easeOutQuad(clamp01((p - 0.1) / 0.9))
       const pFade = easeOutCubic(clamp01(p / 0.75))
       const pExit = clamp01((p - 0.5) / 0.5)
-      const pMask = clamp01((p - 0.48) / 0.52)
+      const pMask = clamp01((p - 0.22) / 0.78)
       pin.style.setProperty('--p', p4.toFixed(4))
       pin.style.setProperty('--p-depth', pDepth.toFixed(4))
       pin.style.setProperty('--p-fade', pFade.toFixed(4))
@@ -104,6 +107,11 @@ export function ScrollPin({
       if (scrub !== lastScrub) {
         lastScrub = scrub
         pin.classList.toggle('is-scrubbing', scrub)
+      }
+      const copyGone = pFade >= 0.99
+      if (copyGone !== lastCopyGone) {
+        lastCopyGone = copyGone
+        pin.classList.toggle('is-copy-gone', copyGone)
       }
     }
     const schedule = () => {

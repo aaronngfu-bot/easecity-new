@@ -53,6 +53,17 @@
             --amber-soft: rgba(0, 122, 111, 0.10);
             --bright-cyan: #00D4AA;
 
+    /* Build-discipline hues. Used only to tint the three build capabilities in
+       the services flow, so the disciplines are distinguishable at a glance in
+       a row of narrow panels. Kept adjacent to the brand teal on the wheel so
+       the palette still reads as one system. */
+        --disc-1: #007a6f;
+            --disc-1-soft: rgba(0, 122, 111, 0.10);
+        --disc-2: #1d6fd0;
+            --disc-2-soft: rgba(29, 111, 208, 0.10);
+        --disc-3: #6d4bd6;
+            --disc-3-soft: rgba(109, 75, 214, 0.10);
+
     /* Backgrounds — layered from deepest (void) to lightest (raised).
        Tinted gray range rather than pure white so sections read as distinct
        surfaces and the page doesn't glare. */
@@ -144,6 +155,13 @@
             --amber-ink: #031312;
             --amber-soft: rgba(0, 229, 204, 0.08);
             --bright-cyan: #00D4AA;
+
+    --disc-1: #00e5cc;
+        --disc-1-soft: rgba(0, 229, 204, 0.10);
+    --disc-2: #4da3ff;
+        --disc-2-soft: rgba(77, 163, 255, 0.12);
+    --disc-3: #a98bff;
+        --disc-3-soft: rgba(169, 139, 255, 0.12);
 
     --bg-void: #07090d;
     --bg-base: #0b0f14;
@@ -772,10 +790,13 @@
   transform-box: fill-box;
   transform-origin: center;
 }
-.ec-key-1 { animation: none; }
-.ec-key-2 { animation: none; }
-.ec-key-3 { animation: none; }
-.ec-key-4 { animation: none; }
+.ec-key-1, .ec-key-2, .ec-key-3, .ec-key-4 {
+  animation: ec-key-flash 6s ease-in-out infinite;
+}
+.ec-key-1 { animation-delay: 0.4s; }
+.ec-key-2 { animation-delay: 1.0s; }
+.ec-key-3 { animation-delay: 1.6s; }
+.ec-key-4 { animation-delay: 2.2s; }
 @keyframes ec-key-flash {
   0%, 8%, 28%, 100% { fill: rgba(0,0,0,0.28); transform: scale(1); }
   12%, 18% { fill: rgba(255,255,255,0.55); transform: scale(0.9); }
@@ -804,7 +825,9 @@
   54% { transform: scale(0.82); }
 }
 
-.ec-chat-stack { animation: none; }
+.ec-chat-stack {
+  animation: ec-chat-stack 6s ease-in-out infinite;
+}
 @keyframes ec-chat-stack {
   0%, 26% { transform: translateY(0); } /* idle: A B C D — waiting */
   30%, 42% { transform: translateY(calc(-1 * var(--ec-step, 9.5px))); } /* my send: B C D E — A masked out */
@@ -812,41 +835,79 @@
   100% { transform: translateY(calc(-6 * var(--ec-step, 9.5px))); } /* seamless to next pattern start */
 }
 
-.ec-news-feed { animation: none; }
-@keyframes ec-news-feed {
-  from { transform: translateY(0); }
-  to { transform: translateY(-50%); }
+/* `transform-box: fill-box` matters here: without it, a `%` translate on an
+   SVG element resolves against the whole 900×500 illustration viewport, not
+   this element's own content — turning "-50%" into a jump clean off-canvas
+   instead of "shift by exactly one repeated copy's height". */
+/* Redesign note: the previous news/game/social scenes leaned on several thin
+   rows of near-invisible detail (list rows, a dashed patrol path, scrolling
+   avatars+captions) that only read once the illustration was scaled up 2x —
+   at the size these devices actually render on the page they looked static.
+   These three are rebuilt around one bold, unmistakable motif each instead. */
+
+/* News: one big tag swatch cycling through three colours (a new story each
+   time) next to two plain headline bars that never move — the colour swap
+   alone reads as "feed updating" without needing scrolling text. */
+.ec-news-thumb {
+  animation: ec-news-thumb-fade 9s ease-in-out infinite;
+}
+.ec-news-thumb-1 { animation-delay: -3s; }
+.ec-news-thumb-2 { animation-delay: -6s; }
+@keyframes ec-news-thumb-fade {
+  0%, 4% { opacity: 0; }
+  10%, 26% { opacity: 1; }
+  32%, 100% { opacity: 0; }
 }
 
-.ec-game-player { animation: none; }
-@keyframes ec-game-player {
-  0%, 100% { transform: translate(0, 0); }
-  25% { transform: translate(120%, 0); }
-  50% { transform: translate(120%, 140%); }
-  75% { transform: translate(0, 140%); }
+/* Game: three score stars fill in sequence, then a bounce and reset — the
+   universal "combo counter" — while a single gem idles with its own bounce
+   underneath, so there is always something obviously alive on the screen. */
+.ec-game-star {
+  fill: rgba(255, 255, 255, 0.22);
+  animation: ec-game-star-fill 6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+.ec-game-star-1 { animation-delay: 0.35s; }
+.ec-game-star-2 { animation-delay: 0.7s; }
+@keyframes ec-game-star-fill {
+  0%, 6% { fill: rgba(255, 255, 255, 0.22); transform: scale(1); }
+  14% { transform: scale(1.4); }
+  20%, 78% { fill: #fbbf24; transform: scale(1); }
+  86%, 100% { fill: rgba(255, 255, 255, 0.22); transform: scale(1); }
+}
+.ec-game-gem {
+  animation: ec-game-gem-bounce 1.6s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ec-game-gem-bounce {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-3px) scale(1.08); }
 }
 
-.ec-social-feed { animation: none; }
-@keyframes ec-social-feed {
-  0% { transform: translateY(0); }
-  22% { transform: translateY(0); }         /* hold ~3s — scan post 1 */
-  26% { transform: translateY(-20%); }      /* scroll to post 2 (0.6s) */
-  48% { transform: translateY(-20%); }      /* hold post 2 ~3.1s — read + like */
-  52% { transform: translateY(-40%); }      /* scroll to post 3 (0.6s) */
-  74% { transform: translateY(-40%); }      /* hold post 3 ~3.1s */
-  78% { transform: translateY(-60%); }      /* scroll to post 4 + beyond (0.6s) */
-  100% { transform: translateY(-66.67%); }  /* loop reset — same pixels as 0% */
+/* Social: one still photo, no scrolling feed — the double-tap "like" burst
+   (heart pop + an expanding ring) is the whole motif, on repeat. */
+.ec-like {
+  animation: ec-like-pop 4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
 }
-/* Key insight: at -66.67% the visible window shows group 2 at exactly
-   the same offset group 0 was at 0%. Every pixel is identical, so the
-   instant reset from -66.67% back to 0% is imperceptibel. */
-
-.ec-like { animation: none; }
-@keyframes ec-like {
-  0%, 25% { opacity: 0; transform: scale(0.3); }
-  26% { opacity: 1; transform: scale(1.35); }   /* LIKE! */
-  28%, 46% { opacity: 1; transform: scale(1); }  /* stays lit while reading */
-  48%, 100% { opacity: 0; transform: scale(0.3); }
+@keyframes ec-like-pop {
+  0%, 40% { opacity: 0; transform: scale(0.4); }
+  46% { opacity: 1; transform: scale(1.3); }
+  54%, 66% { opacity: 1; transform: scale(1); }
+  80%, 100% { opacity: 0; transform: scale(1); }
+}
+.ec-like-ring {
+  animation: ec-like-ring 4s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ec-like-ring {
+  0%, 42% { opacity: 0; transform: scale(0.5); }
+  50% { opacity: 0.8; transform: scale(1); }
+  70%, 100% { opacity: 0; transform: scale(1.6); }
 }
 
 .ec-gallery-photo {
@@ -868,7 +929,11 @@
   28%, 78% { opacity: 0; }
 }
 
-.ec-ytplay { animation: none; }
+.ec-ytplay {
+  animation: ec-ytplay 8s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
 @keyframes ec-ytplay {
   0%, 12%, 100% { opacity: 1; transform: scale(1); }
   20% { opacity: 1; transform: scale(0.86); }
@@ -876,7 +941,11 @@
   94% { opacity: 1; transform: scale(1); }
 }
 
-.ec-progress { animation: none; }
+.ec-progress {
+  animation: ec-progress 8s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: left center;
+}
 @keyframes ec-progress {
   0%, 22%, 100% { transform: scaleX(0.08); }
   86% { transform: scaleX(1); }
@@ -891,14 +960,36 @@
 @media (prefers-reduced-motion: reduce) {
   .ec-key-1, .ec-key-2, .ec-key-3, .ec-key-4,
   .ec-typed, .ec-send-btn, .ec-chat-stack,
-  .ec-news-feed, .ec-game-player, .ec-social-feed, .ec-like,
+  .ec-news-thumb, .ec-game-star, .ec-game-gem, .ec-like, .ec-like-ring,
   .ec-ytplay, .ec-progress, .ec-gallery-photo, .ec-gallery-album {
     animation: none !important;
     transform: none !important;
   }
+  .ec-mon-cell, .ec-mon-cell > rect, .ec-mon-cell > g, .ec-cable, .ec-device {
+    transition: none !important;
+  }
 }
-.ec-device { transition: filter 0.25s ease; }
+.ec-device { transition: filter 0.25s ease; cursor: pointer; }
 .ec-device:hover { filter: drop-shadow(0 0 8px var(--signal)); }
+/* Clicked to disconnect: the device itself keeps showing its own screen —
+   nothing about it changes. Only the monitor's mirrored tile is affected
+   (removed from the grid, see `.ec-mon-cell`) and the cable to it (`.ec-cable`,
+   simply unmounted with the device no longer in `visibleDevices`). */
+/* Reconnecting a device shifts every remaining tile to close the gap it left.
+   All three pieces of a monitor cell — the bezel rect, the wall-colour rect,
+   and the `<g>` that actually holds the mirrored screen — must transition
+   together, or the screen (moved via its `transform` attribute) reaches the
+   new slot on a different clock than the rects around it (moved via `x`/`y`)
+   and is visibly detached from its own bezel mid-animation. */
+.ec-mon-cell,
+.ec-mon-cell > rect,
+.ec-mon-cell > g,
+.ec-cable {
+  transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1), x 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+    y 0.4s cubic-bezier(0.23, 1, 0.32, 1), width 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+    height 0.4s cubic-bezier(0.23, 1, 0.32, 1), d 0.4s cubic-bezier(0.23, 1, 0.32, 1),
+    opacity 0.3s ease;
+}
 .ec-camera { fill: #000; }
 .dark .ec-camera { fill: #000; }
 :root:not(.dark) .ec-camera { fill: #fff; }
@@ -1031,26 +1122,14 @@
    Derived: `--p-fade` (copy/cue), `--p-depth` (scene parallax),
    `--p-mask` (shared scene wipe), `--p-exit` (legacy alias). */
 .scroll-pin {
-  /* Scene-only drop: harbour, stars, cue. Copy (title / lede / CTAs) stays. */
+  /* Scene-only drop: harbour, stars, cue. Copy stays. The 1920 / 2560 CSS
+     gates from origin/main never opened on a scaled 2K maximize, so this
+     starts at 1600×850 so the skyline actually moves. Scale stays 1. */
   --hero-drop: 0px;
 }
-@media (min-width: 1920px) {
+@media (min-width: 1600px) and (min-height: 850px) {
   .scroll-pin {
-    --hero-drop: clamp(
-      6vh,
-      max((100vh - 50rem) * 0.1, (100vw - 90rem) * 0.03),
-      10vh
-    );
-  }
-}
-/* 2K / QHD (2560×1440) and above — peaks sit below the CTAs, not beside them. */
-@media (min-width: 2560px) {
-  .scroll-pin {
-    --hero-drop: clamp(
-      12vh,
-      max((100vh - 52rem) * 0.12, (100vw - 100rem) * 0.035),
-      16vh
-    );
+    --hero-drop: clamp(10vh, 12vh, 14vh);
   }
 }
 .hero-stage {
@@ -1097,50 +1176,49 @@
    rest (`--p-mask: 0`), so the first screen is unchanged; it only thickens as
    the scene dissolves, which makes the wipe read as distance rather than a cut
    in the alpha channel. */
-.hero-scene-haze {
+/* The harbour's water, continued below the scene.
+
+   The scene's mask wipes the bottom of the stage, and what used to show through
+   was the page: the canvas water is navy (`--hk-water`) and `--bg-base` is
+   neutral, so the join carried a hue change and read as a cut. This sits behind
+   the scene and carries the water's own two tones downward, draining to the
+   page tone at the very bottom, which is what depth does to water anyway. So
+   the buildings stay planted on the surface and the waterline just keeps going.
+
+   The 30vh travel is not parallax — this is a smooth tonal field with no
+   feature in it to read a rate off, so the travel exists only to sweep the
+   depth gradient up through the frame. That sweep is the descent: a point near
+   the bottom of the stage reads surface navy at rest and near-black by the end,
+   so the water goes on extending downward and getting deeper the whole way,
+   instead of holding one tone while the harbour lifts off it. The harbour
+   plate (buildings, canvas, vessels) moves as one HTML transform (depth lift
+   20vh); only this empty column below it travels on its own.
+
+   Box hangs 30vh below the stage so the sweep lands its `--bg-base` end exactly
+   on the stage bottom, where the next section starts. The long transparent
+   lead-in keeps the layer clear of anything above the wipe, on any viewport. */
+.hero-deep-water {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 0;
-  height: 48%;
+  top: 56vh;
+  bottom: -30vh;
   pointer-events: none;
-  opacity: calc(var(--p-mask, 0) * 0.9);
-  background: linear-gradient(180deg, transparent 0%, var(--bg-base) 82%);
-}
-/* Horizon rule that survives the dissolve and hands the eye to the blog rail. */
-.hero-scene-horizon {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  pointer-events: none;
-  opacity: calc(var(--p-mask, 0) * 0.34);
+  transform: translate3d(0, calc(var(--p-depth, 0) * -30vh), 0);
   background: linear-gradient(
-    90deg,
+    180deg,
     transparent 0%,
-    var(--signal) 30%,
-    var(--signal) 70%,
-    transparent 100%
+    transparent 44%,
+    var(--hk-water) 58%,
+    var(--hk-water-deep) 80%,
+    var(--bg-base) 100%
   );
 }
 .hero-pin-copy {
-  transform: translate3d(0, calc(var(--p-fade, 0) * -7vh), 0);
-  opacity: calc(1 - var(--p-fade, 0) * 0.42);
-  -webkit-mask-image: linear-gradient(
-    180deg,
-    #000 0%,
-    #000 calc(112% - var(--p-fade, 0) * 130%),
-    transparent calc(112% - var(--p-fade, 0) * 68%)
-  );
-  mask-image: linear-gradient(
-    180deg,
-    #000 0%,
-    #000 calc(112% - var(--p-fade, 0) * 130%),
-    transparent calc(112% - var(--p-fade, 0) * 68%)
-  );
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+  /* Full fade. `* 0.42` left the title at 58% and the mask wiped from the
+     bottom, so the heading block never actually left. */
+  transform: translate3d(0, calc(var(--p-fade, 0) * -8vh), 0);
+  opacity: calc(1 - var(--p-fade, 0));
   position: relative;
   z-index: 30;
   padding-top: max(7.5rem, calc(env(safe-area-inset-top, 0px) + 6.25rem));
@@ -1240,6 +1318,9 @@
 .scroll-pin.is-scrubbing .hero-pin-copy,
 .scroll-pin.is-scrubbing .hero-pin-cue {
   will-change: transform, opacity;
+}
+.scroll-pin.is-copy-gone .hero-pin-copy {
+  pointer-events: none;
 }
 
 /* ═══════════════════════════════════════════════════════════════
@@ -1457,7 +1538,11 @@
   --hk-scale: 1;
   --hk-origin-x: 50%;
   --hk-lift: 0px;
-  transform: translate3d(0, calc(0px - var(--hk-lift, 0px) + var(--hero-drop, 0px)), 0) scale(var(--hk-scale));
+  transform: translate3d(
+    0,
+    calc(var(--p-depth, 0) * -20vh - var(--hk-lift, 0px) + var(--hero-drop, 0px)),
+    0
+  ) scale(var(--hk-scale));
   transform-origin: var(--hk-origin-x) 100%;
 }
 @media (max-width: 639.98px) {
@@ -1473,53 +1558,32 @@
   .hero-pin-city { --hk-scale: 0.88; --hk-origin-x: 50%; --hk-lift: 0px; }
 }
 
-/* Layered scroll parallax — depth exit. Everything travels up as the panel is
-   scrolled, near layers faster, so the skyline pulls away from the mountains
-   and the moon hangs back.
+/* Layered scroll parallax — depth exit.
 
-   The harbour is one plate, not three layers. The water band is drawn over the
-   building bases and the vessels float on that band, so any difference in
-   their travel either opens a gap under the skyline or walks the waterline up
-   the buildings like a rising tide. They share `--plate-lift` by construction
-   for that reason — this is the one place in the scene where independent
-   parallax is not available at any magnitude.
+   Buildings, water, vessels and the sky gradient ride one transform on
+   `.hero-pin-city`. That wrapper is an HTML box, so the travel is real CSS
+   pixels and the viewBox scale cannot multiply one member and not the other.
+   Independent lifts on the SVG groups and the canvas were the rising-tide
+   bug: same `px` declaration, two coordinate spaces.
 
-   The copy rises on `--p-fade` at roughly the plate's rate, which puts the
-   reader and the near shore on the same plane and leaves the sky behind.
-   Idle motion lives on nested children so scroll transforms never fight
-   keyframes. */
-.hero-scene-mask {
-  --plate-lift: calc(var(--p-depth, 0) * -7vh);
-}
-.hk-parallax-sky {
-  transform: translate3d(0, calc(var(--p-depth, 0) * -2vh), 0);
-  transform-origin: 50% 100%;
-}
+   The sky gradient stays on the plate too. It bleeds below the waterline to
+   hide the PNG foot pad; if it lagged the buildings, that bleed walked and
+   read as the waterline coming apart.
+
+   Celestial / clouds / mountains hang back in viewBox units (they sit above
+   the waterline, so a lag cannot open a gap at the shore). Idle bob and sail
+   live on nested children so they never fight the plate. */
 .hk-parallax-celestial {
-  transform: translate3d(0, calc(var(--p-depth, 0) * -1.4vh), 0);
+  transform: translate3d(0, calc(var(--p-depth, 0) * 36px), 0);
   transform-origin: 50% 100%;
 }
 .hk-parallax-clouds {
-  transform: translate3d(0, calc(var(--p-depth, 0) * -2.8vh), 0);
+  transform: translate3d(0, calc(var(--p-depth, 0) * 28px), 0);
   transform-origin: 50% 100%;
 }
 .hk-parallax-mountains {
-  transform: translate3d(0, calc(var(--p-depth, 0) * -4vh), 0);
+  transform: translate3d(0, calc(var(--p-depth, 0) * 18px), 0);
   transform-origin: 50% 100%;
-}
-.hk-parallax-buildings,
-.hk-parallax-vessel-a,
-.hk-parallax-vessel-b,
-.hk-parallax-vessel-c,
-.hk-parallax-water {
-  transform: translate3d(0, var(--plate-lift, 0px), 0);
-}
-.hk-parallax-buildings,
-.hk-parallax-vessel {
-  transform-origin: 50% 100%;
-}
-.hk-parallax-water {
-  transform-origin: 50% 0%;
 }
 
 /* Staggered harbour layer entrance (plays once on load). */
@@ -1748,8 +1812,8 @@
   .hk-enter-vessel {
     animation: none;
   }
-  .hk-parallax-sky, .hk-parallax-celestial, .hk-parallax-clouds,
-  .hk-parallax-mountains, .hk-parallax-buildings, .hk-parallax-vessel, .hk-parallax-water {
+  .hk-parallax-celestial, .hk-parallax-clouds, .hk-parallax-mountains,
+  .hero-deep-water {
     transform: none !important;
   }
   .hero-pin-city { transform: translate3d(0, var(--hero-drop, 0px), 0) scale(var(--hk-scale)) !important; opacity: 1 !important; }
@@ -1782,9 +1846,9 @@
   --drift: 22px;    /* sustained parallax amplitude */
 }
 .scrub-rule, .scrub-kicker-label, .scrub-title, .scrub-word, .scrub-sub,
-.scrub-meta, .scrub-cta-line, .scrub-blog-rail, .blog-horizon, .blog-berth,
+.scrub-meta, .scrub-cta-line, .scrub-blog-rail, .blog-berth,
 .scrub-blog-more, .scrub-prod-glow, .prod-hub, .prod-wing-l, .prod-wing-r,
-.scrub-svc-card, .svc-bullets, .svc-bullet, .t-marquee-col,
+.scrub-svc-step, .t-marquee-col,
 .scrub-cta .scrub-title, .scrub-cta .scrub-sub, .scrub-cta button {
   --t: max(0, min(1, calc((var(--p, 0) - var(--lag, 0)) / var(--scrub-span))));
 }
@@ -1795,7 +1859,7 @@
 [data-scrub][data-scrubbing] .scrub-word,
 [data-scrub][data-scrubbing] .scrub-prod-art,
 [data-scrub][data-scrubbing] .scrub-prod-copy,
-[data-scrub][data-scrubbing] .scrub-svc-card,
+[data-scrub][data-scrubbing] .scrub-svc-step,
 [data-scrub][data-scrubbing] .t-marquee-col {
   will-change: transform, opacity;
 }
@@ -1816,10 +1880,23 @@
   opacity: var(--t);
   transform: translate3d(0, calc((1 - var(--t)) * var(--lift-sm)), 0);
 }
+/* Titles are uncovered, not faded. A block that fades in is the same gesture
+   in every section; a line of type climbing out from behind its own edge has
+   a direction and a weight. The mask reserves descender room and pulls it back
+   with a negative margin so the reveal costs no layout space. */
+.scrub-reveal,
+.scrub-word-mask {
+  overflow: hidden;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
 .scrub-title {
   --lag: 0.08;
-  opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-lg)), 0);
+  transform: translate3d(0, calc((1 - var(--t)) * 112%), 0);
+}
+.scrub-word {
+  --lag: calc(0.06 + var(--i, 0) * 0.045);
+  transform: translate3d(0, calc((1 - var(--t)) * 112%), 0);
 }
 .scrub-sub {
   --lag: 0.16;
@@ -1836,51 +1913,24 @@
   opacity: var(--t);
   transform: translate3d(0, calc((1 - var(--t)) * var(--lift-sm)), 0);
 }
-/* Blog — the hero's horizon continues here as a pier line with the posts
-   berthed beneath it. Cards stagger per `--i` rather than the rail sliding as
-   a whole, which would fight the drag gesture.
-
-   The line and the ticks are geometrically coupled — a tick that drifts off
-   its line is just a floating dash — so sustained parallax moves the rail and
-   its line together as one plane, against the heading. */
+/* Blog — cards stagger per `--i` rather than the rail sliding as a whole,
+   which would fight the drag gesture. Sustained parallax drifts the rail
+   against the heading above it so the two read as separate planes. */
 .scrub-blog-rail {
   --lag: 0.08;
   opacity: var(--t);
   transform: translate3d(0, calc(var(--q, 0) * var(--drift) * 0.3), 0);
 }
-.blog-horizon {
-  --lag: 0.02;
-  position: relative;
-  height: 1px;
-  transform: scaleX(var(--t));
-  transform-origin: left;
-  background: linear-gradient(
-    90deg,
-    var(--signal) 0%,
-    var(--signal) 62%,
-    var(--border-color) 100%
-  );
-  opacity: 0.55;
-}
+/* Posts fade in place — no positional entrance at all. This used to slide
+   each card in from an X offset ("along the rail's own axis"), but at
+   `--drift`'s 22px, staggered per card by `--i`, a fast scroll landed
+   several cards mid-slide at once and it read as the whole rail lurching
+   left before snapping to rest, not as a deliberate entrance. A card that is
+   simply always where it belongs, just fading up, can't glitch that way. */
 .blog-berth {
   --lag: calc(0.12 + var(--i, 0) * 0.05);
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-md)), 0);
-}
-.blog-tick {
-  display: block;
-  width: 1px;
-  height: 14px;
-  margin-bottom: 0.75rem;
-  background: var(--signal);
-  opacity: calc(0.35 + var(--t, 1) * 0.25);
-  transform-origin: top;
-  transition: height 200ms var(--ease-out), opacity 200ms var(--ease-out);
-}
-.blog-berth:hover .blog-tick,
-.blog-berth:focus-visible .blog-tick {
-  height: 22px;
-  opacity: 1;
+  transform: none;
 }
 /* Blog heading is right-aligned. Do not translate X — public layout
    overflow-x-clip eats it and only opacity remains. Rise + clip instead. */
@@ -1902,11 +1952,6 @@
   opacity: 1;
   transform: none;
   clip-path: none;
-}
-.scrub-blog-head .scrub-word {
-  --lag: calc(0.06 + var(--i, 0) * 0.05);
-  opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-lg)), 0);
 }
 .scrub-blog-more {
   --lag: 0.3;
@@ -1947,85 +1992,166 @@
   opacity: var(--t);
   transform: translate(calc((1 - var(--t)) * var(--lift-lg) * -1), 0);
 }
-/* Services — panels hinge up off their own base into a diagonal cascade.
-   `--i` is the flat index and `--row` the grid row, so the lag runs across and
-   down instead of left-to-right, and the grid lands as a plane rather than a
-   queue. Perspective lives on the grid so every card shares one vanishing
-   point; hinging from `50% 100%` keeps each card's base planted. */
-.svc-grid {
-  perspective: 1400px;
-  perspective-origin: 50% 0%;
-}
-/* No `--q` drift here on purpose: the grid reads as one plane, and drifting
-   rows apart would undo the thing the landing animation just established. */
-.scrub-svc-card {
-  --lag: calc(0.1 + var(--i, 0) * 0.04 + var(--row, 0) * 0.05);
-  position: relative;
-  overflow: hidden;
+/* Services — an arrow flow. Each panel is a chevron whose tip points into the
+   next panel's notch, so the six capabilities read as the one pipeline the copy
+   claims rather than as six interchangeable boxes.
+
+   Panels arrive in the direction they point, so the entrance reads as the chain
+   filling in rather than a grid appearing. No `--q` drift: the chain is one
+   object, and drifting its links apart would undo that. */
+.scrub-svc-step {
+  --lag: calc(0.08 + var(--i, 0) * 0.05);
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-lg)), 0)
-             rotateX(calc((1 - var(--t)) * -8deg))
-             scale(calc(0.975 + var(--t) * 0.025));
-  transform-origin: 50% 100%;
+  transform: translate3d(calc((1 - var(--t)) * -18px), 0, 0);
 }
-/* Pointer spotlight. `--mx`/`--my` are written by the card's pointer handler;
-   with no pointer they stay at the default and the layer is fully transparent. */
-.svc-spot {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 200ms var(--ease-out);
-  background: radial-gradient(
-    18rem 18rem at var(--mx, 50%) var(--my, 0%),
-    var(--signal-soft),
-    transparent 70%
+/* The panels seat into each other rather than sitting near each other: each one
+   is pulled back by the tip depth, so a tip lands inside the next notch and the
+   row is one continuous band instead of six arrows pointing at gaps. `--seam` is
+   the clearance left between the two coinciding diagonals — the hairline that
+   reads as a machined joint. Overlapping also hands the measure back: the boxes
+   sum to more than the container, so each panel is wider than a gapped row. */
+.svc-flow {
+  --tip: 20px;
+  --seam: 3px;
+}
+.svc-flow > li + li {
+  margin-left: calc((var(--tip) - var(--seam)) * -1);
+}
+/* The 1px outline is two layers: the anchor paints the frame and holds 1px of
+   padding, and the face sits inside it clipped to the same polygon. A `border`
+   cannot follow a clip-path and an `outline` would be clipped away with it.
+   The tip and notch are in px rather than percent so both polygons resolve to
+   the same arrow geometry and the frame keeps an even width. clip-path also
+   clips pointer events, so the hit area is the chevron, not its bounding box. */
+.svc-step {
+  --nudge: 0px;
+  position: relative;
+  --chev: polygon(
+    0 0,
+    calc(100% - var(--tip)) 0,
+    100% 50%,
+    calc(100% - var(--tip)) 100%,
+    0 100%,
+    var(--tip) 50%
+  );
+  display: flex;
+  flex: 1;
+  padding: 1px;
+  border-radius: 0.375rem;
+  background: var(--border-color);
+  clip-path: var(--chev);
+  transform: translate3d(var(--nudge), 0, 0);
+  transition: background-color 200ms var(--ease-out), transform 200ms var(--ease-out);
+}
+/* The flow has to start somewhere, so the first panel carries no inbound notch. */
+.svc-step-origin {
+  --chev: polygon(
+    0 0,
+    calc(100% - var(--tip)) 0,
+    100% 50%,
+    calc(100% - var(--tip)) 100%,
+    0 100%
   );
 }
-/* Ghost ordinal — typographic depth marker, slides as the card is pointed at. */
-.svc-index {
+.svc-step-face {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  border-radius: 0.25rem;
+  padding: 0.8125rem calc(var(--tip) + 0.625rem) 1rem calc(var(--tip) + 0.5rem);
+  clip-path: var(--chev);
+  background: var(--face-bg, var(--bg-surface));
+}
+/* No notch to clear, so the lead panel's copy lines up with the heading above. */
+.svc-step-origin .svc-step-face {
+  padding-left: 0.9375rem;
+}
+/* Surface tones. The catalog's build capabilities come first and the advisory
+   ones after, so the build side sits on the raised surface and advisory stays
+   on the base one — surface variation drawn from a difference the content
+   already has. Nothing is accented at rest; that is left to hover and focus. */
+.svc-step-raised {
+  --face-bg: var(--bg-elevated);
+}
+/* The three build disciplines each carry their own hue so a row of narrow
+   panels stays scannable; the advisory ones share a neutral tile, which keeps
+   the colour meaning "this is something we build" rather than decorating every
+   panel in turn. */
+.svc-step-disc-1 { --disc: var(--disc-1); --disc-soft: var(--disc-1-soft); }
+.svc-step-disc-2 { --disc: var(--disc-2); --disc-soft: var(--disc-2-soft); }
+.svc-step-disc-3 { --disc: var(--disc-3); --disc-soft: var(--disc-3-soft); }
+
+/* Masthead: index, conduit, outlet. The rule is not a divider — it is the run
+   the signal travels, so on hover it fills from the index toward the arrow and
+   the arrow leaves at the same moment. scaleX on a 1px line stays on the GPU. */
+.svc-step-rule {
+  position: relative;
+  height: 1px;
+  flex: 1;
+  overflow: hidden;
+  background: var(--border-color);
+}
+.svc-step-rule::after {
+  content: '';
   position: absolute;
-  right: 1.1rem;
-  top: 0.35rem;
-  font-family: var(--font-mono), ui-monospace, monospace;
-  font-size: 3.25rem;
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: -0.04em;
-  color: var(--text-primary);
-  opacity: 0.05;
-  pointer-events: none;
-  transition: transform 220ms var(--ease-out), opacity 220ms var(--ease-out);
+  inset: 0;
+  background: var(--disc, var(--signal));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 260ms var(--ease-out);
 }
-.svc-icon-tile {
-  transition: background-color 200ms var(--ease-out), color 200ms var(--ease-out),
-              transform 200ms var(--ease-out);
+.svc-step-icon {
+  display: inline-flex;
+  height: 1.75rem;
+  width: 1.75rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background: var(--disc-soft, transparent);
+  color: var(--disc, var(--text-secondary));
+  transition: transform 200ms var(--ease-out);
 }
+.svc-step-flat .svc-step-icon {
+  border: 1px solid var(--border-color);
+}
+.svc-step-arrow {
+  transition: transform 200ms var(--ease-out), color 200ms var(--ease-out);
+}
+/* Hover advances the panel along the flow instead of lifting it off the page: a
+   vertical lift would break the line the chevrons draw. */
 @media (hover: hover) and (pointer: fine) {
-  .scrub-svc-card:hover .svc-spot {
-    opacity: 1;
+  .svc-step:hover {
+    --nudge: 3px;
+    background: var(--signal);
+    /* The next panel overlaps this one's tip, so a lit outline has to come
+       forward or the arrow point loses its highlight under the neighbour. */
+    z-index: 1;
   }
-  .scrub-svc-card:hover .svc-index {
-    opacity: 0.1;
-    transform: translate3d(0, -4px, 0);
+  .svc-step:hover .svc-step-rule::after {
+    transform: scaleX(1);
   }
-  .scrub-svc-card:hover .svc-icon-tile {
+  .svc-step:hover .svc-step-icon {
     transform: scale(1.06);
   }
+  .svc-step:hover .svc-step-arrow {
+    transform: translateX(3px);
+    color: var(--disc, var(--signal));
+  }
 }
-.scrub-svc-card:focus-visible .svc-spot {
-  opacity: 1;
+.svc-step:active {
+  transform: translate3d(var(--nudge), 0, 0) scale(0.985);
 }
-/* Feature panel — the lead service carries its deliverables so the grid is not
-   six identical boxes. */
-.svc-bullets {
-  --lag: 0.2;
-  opacity: var(--t);
+/* The clip-path would eat a focus ring, so focus thickens and lights the frame
+   itself — a change in width as well as colour, not colour alone. */
+.svc-step:focus-visible {
+  outline: none;
+  padding: 2px;
+  background: var(--signal);
+  z-index: 1;
 }
-.svc-bullet {
-  --lag: calc(0.22 + var(--bi, 0) * 0.04);
-  opacity: var(--t);
-  transform: translate3d(calc((1 - var(--t)) * -10px), 0, 0);
+.svc-step:focus-visible .svc-step-rule::after {
+  transform: scaleX(1);
 }
 /* Testimonials already carry continuous motion in the marquee, so adding `--q`
    drift on top would be two competing constant motions. Entrance only. */
@@ -2036,14 +2162,16 @@
   filter: none;
 }
 .scrub-t-wall .t-marquee-col {
-  --lag: calc(0.1 + var(--ci, 0) * 0.06);
+  --lag: calc(0.04 + var(--ci, 0) * 0.05);
   opacity: var(--t);
   transform: translate3d(0, calc((1 - var(--t)) * var(--lift-md)), 0) scale(calc(0.97 + var(--t) * 0.03));
 }
+/* The last section is an arrival, not another entrance, so it settles inward
+   instead of climbing like every heading above it. */
 .scrub-cta .scrub-title {
   --lag: 0;
   opacity: var(--t);
-  transform: translate3d(0, calc((1 - var(--t)) * var(--lift-lg)), 0);
+  transform: scale(calc(0.955 + var(--t) * 0.045));
   clip-path: none;
   filter: none;
 }
@@ -2072,6 +2200,7 @@
   scrollbar-width: thin;
 }
 .blog-rail:active { cursor: grabbing; }
+
 .blog-rail::-webkit-scrollbar { height: 6px; }
 .blog-rail::-webkit-scrollbar-track { background: transparent; }
 .blog-rail::-webkit-scrollbar-thumb {
@@ -2105,23 +2234,26 @@
     -webkit-mask-image: none !important;
     mask-image: none !important;
   }
-  .hk-parallax-sky, .hk-parallax-celestial, .hk-parallax-clouds,
-  .hk-parallax-mountains, .hk-parallax-buildings, .hk-parallax-vessel, .hk-parallax-water {
+  .hk-parallax-celestial, .hk-parallax-clouds, .hk-parallax-mountains,
+  .hero-deep-water {
     transform: none !important;
   }
   .scrub-kicker, .scrub-kicker-label, .scrub-rule,
   .scrub-title, .scrub-sub, .scrub-meta, .scrub-cta-line,
-  .scrub-word, .scrub-blog-rail, .scrub-blog-more, .scrub-prod-art, .scrub-prod-glow,
+  .scrub-word, .scrub-reveal, .scrub-word-mask,
+  .scrub-blog-rail, .scrub-blog-more, .scrub-prod-art, .scrub-prod-glow,
   .scrub-prod-art .prod-hub,
-  .scrub-prod-art .prod-wing-l, .scrub-prod-art .prod-wing-r, .scrub-svc-card, .scrub-t-wall,
+  .scrub-prod-art .prod-wing-l, .scrub-prod-art .prod-wing-r, .scrub-svc-step, .scrub-t-wall,
   .scrub-t-wall .t-marquee-col, .scrub-cta button,
-  .scrub-prod-copy, .scrub-blog-head,
-  .blog-horizon, .blog-berth, .svc-bullets, .svc-bullet {
+  .scrub-prod-copy, .scrub-blog-head, .blog-berth {
     opacity: 1 !important;
     transform: none !important;
     clip-path: none !important;
     filter: none !important;
   }
-  .blog-horizon { opacity: 0.55 !important; }
-  .hero-scene-haze, .hero-scene-horizon { opacity: 0 !important; }
+  /* The chevron is the panel's shape, not motion, so it stays — only the hover
+     nudge goes. `.svc-step` is deliberately absent from the reset above. */
+  .svc-step {
+    --nudge: 0px !important;
+  }
 }

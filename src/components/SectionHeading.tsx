@@ -74,8 +74,11 @@ export default function SectionHeading({
         </span>
       )}
 
+      {/* Words rise out from behind their own mask rather than fading in. The
+          h2 carries no scrub class of its own; stacking a block-level rise on
+          top of the per-word rise made both read as one soft fade. */}
       <h2
-        className={`type-section scrub-title flex flex-wrap font-display text-3xl font-bold text-foreground sm:text-4xl md:text-5xl ${
+        className={`type-section flex flex-wrap font-display text-3xl font-bold text-foreground sm:text-4xl md:text-5xl ${
           align === "center"
             ? "justify-center"
             : align === "right"
@@ -84,12 +87,13 @@ export default function SectionHeading({
         }`}
       >
         {tokens.map((token, i) => (
-          <span
-            key={i}
-            className="scrub-word inline-block whitespace-pre"
-            style={{ ['--i' as string]: i }}
-          >
-            {token.text + (token.trailingSpace ? " " : "")}
+          <span key={i} className="scrub-word-mask inline-flex">
+            <span
+              className="scrub-word inline-block whitespace-pre"
+              style={{ ['--i' as string]: i }}
+            >
+              {token.text + (token.trailingSpace ? " " : "")}
+            </span>
           </span>
         ))}
       </h2>

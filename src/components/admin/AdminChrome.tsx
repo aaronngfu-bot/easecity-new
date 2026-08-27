@@ -10,6 +10,7 @@ const NAV = [
   { href: '/admin/orders', key: 'orders' as const, icon: '◈' },
   { href: '/admin/contacts', key: 'contacts' as const, icon: '◇' },
   { href: '/admin/blog', key: 'blog' as const, icon: '▤' },
+  { href: '/admin/media', key: 'media' as const, icon: '▣' },
   { href: '/admin/settings', key: 'settings' as const, icon: '⚙' },
   { href: '/admin/logs', key: 'logs' as const, icon: '◆' },
 ]

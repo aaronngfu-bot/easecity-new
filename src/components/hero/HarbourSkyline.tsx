@@ -111,17 +111,17 @@ function buildHullWaves(v: VesselLayout): HullWave[] {
   const rand = mulberry32(RIPPLE_SEED[v.key])
   const inset = v.key === 'cruiser' ? 5 : 8
   const nudgeX = v.key === 'cruiser' ? 11 : 0
-  const nudgeY = v.key === 'ferry' ? 6 : v.key === 'cruiser' ? -3.5 : 0
+  const nudgeY = v.key === 'ferry' ? -8 : v.key === 'cruiser' ? 1 : 0
   const x0 = v.x + inset + nudgeX
   const span = Math.max(12, v.w - inset * 2)
-  const floor = v.y + v.h + v.wakeSink + nudgeY
+  const floor = v.y + v.h + v.wakeSink + nudgeY - 2
   const scale = v.key === 'cruiser' ? 0.42 : v.key === 'junk' ? 0.78 : 1
   const dyScale = v.key === 'cruiser' ? 0.62 : v.key === 'junk' ? 0.82 : 1
-  const count = v.key === 'ferry' ? 36 : v.key === 'junk' ? 28 : 14
-  const depthMax = 12.6 * dyScale
+  const count = v.key === 'ferry' ? 64 : v.key === 'junk' ? 28 : 20
+  const depthMax = (v.key === 'ferry' ? 19 : 12.6) * dyScale
   const out: HullWave[] = []
   for (let i = 0; i < count; i++) {
-    const t = rand() ** 0.68
+    const t = rand() ** (v.key === 'ferry' ? 0.5 : 0.68)
     const w = (11 + rand() * 28) * scale
     const x1 = x0 + rand() * Math.max(4, span - w)
     out.push({
@@ -432,9 +432,9 @@ export function HarbourSkyline({ className = '' }: { className?: string }) {
         {/* == Vessels == */}
         <g className="hk-parallax-vessel hk-parallax-vessel-a">
           <g className="hk-enter-vessel hk-enter-vessel-a">
-            <VesselWaves v={VESSEL_LAYOUT[0]} />
             <g className="hk-vessel-sail">
             <g className="hk-bob">
+            <VesselWaves v={VESSEL_LAYOUT[0]} />
             <g transform={`translate(${VESSEL_LAYOUT[0].x} ${VESSEL_LAYOUT[0].y})`}>
             <image
               href={VESSEL_ART.ferry.href}
@@ -452,9 +452,9 @@ export function HarbourSkyline({ className = '' }: { className?: string }) {
 
         <g className="hk-parallax-vessel hk-parallax-vessel-b">
           <g className="hk-enter-vessel hk-enter-vessel-b">
-            <VesselWaves v={VESSEL_LAYOUT[1]} />
             <g className="hk-vessel-sail-b">
             <g className="hk-bob-b">
+            <VesselWaves v={VESSEL_LAYOUT[1]} />
             <g transform={`translate(${VESSEL_LAYOUT[1].x} ${VESSEL_LAYOUT[1].y})`}>
             <image
               href={VESSEL_ART.junk.href}
@@ -472,9 +472,9 @@ export function HarbourSkyline({ className = '' }: { className?: string }) {
 
         <g className="hk-parallax-vessel hk-parallax-vessel-c">
           <g className="hk-enter-vessel hk-enter-vessel-c">
-            <VesselWaves v={VESSEL_LAYOUT[2]} />
             <g className="hk-vessel-sail-c">
             <g className="hk-bob-c">
+            <VesselWaves v={VESSEL_LAYOUT[2]} />
             <g transform={`translate(${VESSEL_LAYOUT[2].x} ${VESSEL_LAYOUT[2].y})`}>
             <image
               href={VESSEL_ART.cruiser.href}

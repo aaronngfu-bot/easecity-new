@@ -3,9 +3,7 @@
 import { useEffect, useRef } from 'react'
 import {
   LIGHT_SOURCES,
-  VB_H,
   VB_W,
-  VESSELS,
   WATER_H,
   mulberry32,
 } from './harbour-scene'
@@ -113,19 +111,6 @@ const RIPPLES = (() => {
   return out
 })()
 
-const VESSEL_DASHES = (() => {
-  const rand = mulberry32(133707)
-  return VESSELS.flatMap((v, vi) =>
-    Array.from({ length: 18 }, () => ({
-      vi,
-      fx: rand(),
-      fy: Math.pow(rand(), 1.3),
-      w: 0.14 + rand() * 0.22,
-      phase: rand() * Math.PI * 2,
-    })),
-  )
-})()
-
 export function HarbourWater({ className = '' }: { className?: string }) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
@@ -143,23 +128,8 @@ export function HarbourWater({ className = '' }: { className?: string }) {
     let visible = false
     let pageVisible = document.visibilityState === 'visible'
     const DT = 0.048
-    let mapSvgY = (svgY: number) => svgY - WATER_H
 
     const rgba = (c: Rgb, a: number) => `rgba(${c[0]},${c[1]},${c[2]},${a})`
-
-    function updateWaterMapping() {
-      const cvs = canvasRef.current
-      if (!cvs) return
-      const scene = cvs.closest('.hk-scene')
-      if (!scene) return
-      const sceneRect = scene.getBoundingClientRect()
-      const canvasRect = cvs.getBoundingClientRect()
-      if (sceneRect.height < 1 || canvasRect.height < 1) return
-      mapSvgY = (svgY) => {
-        const screenY = sceneRect.top + (svgY / VB_H) * sceneRect.height
-        return ((screenY - canvasRect.top) / canvasRect.height) * WATER_H
-      }
-    }
 
     function resize() {
       const cvs = canvasRef.current
@@ -178,7 +148,6 @@ export function HarbourWater({ className = '' }: { className?: string }) {
       const sx = (rect.width / VB_W) * dpr
       const sy = (rect.height / WATER_H) * dpr
       ctx.setTransform(sx, 0, 0, sy, 0, 0)
-      updateWaterMapping()
       draw()
     }
 
@@ -218,21 +187,6 @@ export function HarbourWater({ className = '' }: { className?: string }) {
         const w = r.w * stretch
         ctx.fillStyle = rgba(foam, a)
         ctx.fillRect(r.x - w / 2, r.y, w, lightWater ? 1.35 : 1.2)
-      }
-
-      // Vessel foam — same hull-light on every boat, no accent flicker.
-      const vesselFoam = pal['--hk-hull-light']
-      for (const d of VESSEL_DASHES) {
-        const v = VESSELS[d.vi]
-        const span = v.x1 - v.x0
-        const y = mapSvgY(v.contactY + v.reflectionDrop + d.fy * v.depth)
-        const sway =
-          Math.sin(t * 0.85 + d.fy * 6 + d.phase) * (1.1 + d.fy * 3.4) +
-          Math.sin(t * 1.15 + d.phase) * 0.45
-        const w = span * d.w
-        const a = Math.pow(1 - d.fy, 1.55) * (0.62 + 0.2 * Math.sin(t * 1.05 + d.phase)) * 0.34
-        ctx.fillStyle = rgba(vesselFoam, a)
-        ctx.fillRect(v.x0 + d.fx * (span - w) + sway, y, w, 1.2 + d.fy * 1.1)
       }
     }
 
@@ -282,16 +236,11 @@ export function HarbourWater({ className = '' }: { className?: string }) {
       pageVisible = document.visibilityState === 'visible'
       kick()
     }
-    const onScroll = () => {
-      if (visible) updateWaterMapping()
-    }
     document.addEventListener('visibilitychange', onPageVis)
-    window.addEventListener('scroll', onScroll, { passive: true })
 
     return () => {
       cancelAnimationFrame(raf)
       document.removeEventListener('visibilitychange', onPageVis)
-      window.removeEventListener('scroll', onScroll)
       ro.disconnect()
       io.disconnect()
       mo.disconnect()

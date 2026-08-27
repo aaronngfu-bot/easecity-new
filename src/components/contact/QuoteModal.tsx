@@ -28,8 +28,16 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
     ...questionnaire.questions.filter((x) => x.id === 'budget' || x.id === 'timeline'),
   ]
 
-  // final two steps: contact details + submit
+  /**
+   * Questions, then contact details, then the confirmation. The confirmation
+   * counts: it is the step the progress bar has to be able to fill. Before, it
+   * was counted but never reached, because submitting went straight to the
+   * success state without advancing the step. So the bar topped out one segment
+   * short and the label read "step 6 of 7" on a screen that said the request had
+   * been sent.
+   */
   const TOTAL = questions.length + 2
+  const DONE_STEP = questions.length + 1
 
   const [step, setStep] = useState(0) // 0..questions.length-1 = questions, then contact, then done
   const [answers, setAnswers] = useState<Answers>({})
@@ -73,7 +81,9 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
 
   const isQuestionStep = step < questions.length
   const isContactStep = step === questions.length
-  const isDoneStep = step === questions.length + 1
+
+  /** Steps the visitor has reached, counting the one they are on. */
+  const reached = Math.min(step + 1, TOTAL)
 
   const curQ = isQuestionStep ? questions[step] : null
 
@@ -97,6 +107,17 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
     return list
       .map((v) => opts.find((o) => o.en === v || o.zh === v)?.[language] ?? v)
       .join(', ')
+  }
+
+  /**
+   * An empty array counts as unanswered. Checking the value for truthiness is
+   * not enough: tick an option on a multi-select and untick it again and you are
+   * left with `[]`, which would let a required question through unanswered.
+   */
+  const answered = (qid: string): boolean => {
+    const val = answers[qid]
+    if (Array.isArray(val)) return val.length > 0
+    return typeof val === 'string' ? val.trim().length > 0 : false
   }
 
   const curValid = () => {
@@ -142,6 +163,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
       const result = await res.json()
       if (!res.ok || !result.success) throw new Error(result.error?.message || 'Something went wrong')
       setState('success')
+      setStep(DONE_STEP)
     } catch (err) {
       setErrorMsg(err instanceof Error ? err.message : 'Unexpected error')
       setState('error')
@@ -171,7 +193,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
         {/* header */}
         <div className="flex items-center justify-between border-b border-[var(--border-color)] px-5 py-4">
           <div>
-            <span className="label-mono text-[var(--signal)]">QUOTE.REQUEST</span>
+            <span className="label-mono text-[var(--signal)]">{c.quoteEyebrow}</span>
             {serviceTitle && (
               <p className="mt-0.5 text-xs font-medium text-[var(--text-muted)]">{serviceTitle}</p>
             )}
@@ -184,14 +206,18 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
         {/* progress */}
         <div className="px-5 pt-4">
           <div className="flex items-center justify-between">
-            <span className="label-mono text-[var(--text-muted)]">
-              {c.stepOf.replace('{n}', String(Math.min(step + 1, TOTAL))).replace('{total}', String(TOTAL))}
+            <span className={cn('label-mono', state === 'success' ? 'text-[var(--signal)]' : 'text-[var(--text-muted)]')}>
+              {state === 'success'
+                ? c.stepAllDone
+                : c.stepOf.replace('{n}', String(reached)).replace('{total}', String(TOTAL))}
             </span>
-            <span className="text-xs font-medium text-[var(--text-muted)]">{Math.round(((step + 1) / TOTAL) * 100)}%</span>
+            <span className={cn('text-xs font-medium', state === 'success' ? 'text-[var(--signal)]' : 'text-[var(--text-muted)]')}>
+              {Math.round((reached / TOTAL) * 100)}%
+            </span>
           </div>
           <div className="mt-2 flex gap-1.5">
             {Array.from({ length: TOTAL }).map((_, i) => (
-              <div key={i} className={cn('h-1 flex-1 rounded-full transition-colors', i <= step ? 'bg-[var(--signal)]' : 'bg-[var(--border-color)]')} />
+              <div key={i} className={cn('h-1 flex-1 rounded-full transition-colors', i < reached ? 'bg-[var(--signal)]' : 'bg-[var(--border-color)]')} />
             ))}
           </div>
         </div>
@@ -340,7 +366,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
               <button
                 type="button"
                 onClick={next}
-                disabled={curQ?.required && !answers[curQ.id]}
+                disabled={curQ?.required && !answered(curQ.id)}
                 className="signal-cta disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {c.next}

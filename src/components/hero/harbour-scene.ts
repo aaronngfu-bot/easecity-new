@@ -297,7 +297,7 @@ export const VESSEL_LAYOUT: VesselLayout[] = [
   {
     key: 'cruiser',
     x: 1303,
-    y: 542,
+    y: 544,
     w: 74,
     h: 24,
     hull: '--hk-hull-light',

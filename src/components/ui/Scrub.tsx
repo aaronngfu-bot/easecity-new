@@ -17,6 +17,9 @@ import { useLayoutEffect, useRef } from 'react'
  * the testimonial wall (48 cards). `data-scrubbing` marks the visible ones so
  * CSS can scope `will-change` to them instead of pinning layers page-wide.
  *
+ * Sections already on screen at mount have no scroll distance left to animate
+ * over, so their entrance is driven by a short clock instead of by scroll.
+ *
  * Shared rAF. Reduced-motion locks `--p` at 1 and `--q` at 0 so CSS falls
  * through to the rested layout with no movement.
  */
@@ -26,7 +29,15 @@ interface Entry {
   visible: boolean
   p: number
   q: number
+  /** Lower bound on `--p`, raised by the load ramp. Only ever climbs. */
+  floor: number
+  /** Timestamp the load ramp starts at, 0 once it has finished. */
+  rampStart: number
 }
+
+/** Load ramp: how long the entrance takes, and how long it waits first. */
+const RAMP_MS = 1100
+const RAMP_LEAD_MS = 160
 
 const entries = new Map<HTMLElement, Entry>()
 let raf = 0
@@ -51,18 +62,37 @@ function apply(entry: Entry) {
   const vh = window.innerHeight
   const pace = el.dataset.pace
   const tight = pace === 'tight'
+  const early = pace === 'early'
   const last = pace === 'last'
 
-  const start = last ? vh * 0.92 : vh * 0.52
+  // `start` is where the section's top has to reach before `--p` moves at all,
+  // and `travel` is how far it then climbs. Tall sections saturate the clamp, so
+  // a section much higher than the viewport needs `early` or it is still fading
+  // in long after the reader has passed it.
+  const start = last ? vh * 0.92 : early ? vh * 0.8 : vh * 0.52
   const travel = last
     ? clamp(r.height * 0.28, vh * 0.18, vh * 0.28)
-    : tight
-      ? clamp(r.height * 0.55, vh * 0.38, vh * 0.55)
-      : clamp(r.height * 0.5, vh * 0.48, vh * 0.72)
+    : early
+      ? clamp(r.height * 0.45, vh * 0.34, vh * 0.5)
+      : tight
+        ? clamp(r.height * 0.55, vh * 0.38, vh * 0.55)
+        : clamp(r.height * 0.5, vh * 0.48, vh * 0.72)
 
   let p = clamp((start - r.top) / travel, 0, 1)
   if (last && r.bottom <= vh + 8) p = 1
   if (!last && r.top < 0) p = 1
+
+  // A section already on screen when it mounts has no scroll distance left to
+  // travel, so `--p` would sit at 0 and leave a blank band where the reader can
+  // already see the section is. Those run their entrance on a clock instead.
+  // The floor only climbs, so the scroll value takes over without a step back.
+  if (entry.rampStart) {
+    const k = clamp((performance.now() - entry.rampStart) / RAMP_MS, 0, 1)
+    entry.floor = 1 - (1 - k) ** 3
+    if (k >= 1) entry.rampStart = 0
+    schedule()
+  }
+  if (entry.floor > p) p = entry.floor
 
   // Signed distance of the section's centre from the viewport centre. Divided
   // by the full span either can travel, so a tall section drifts no faster
@@ -129,18 +159,22 @@ export function Scrub({
 }: {
   children: React.ReactNode
   className?: string
-  pace?: 'normal' | 'tight' | 'last'
+  pace?: 'normal' | 'tight' | 'early' | 'last'
 }) {
   const ref = useRef<HTMLDivElement>(null)
 
   useLayoutEffect(() => {
     const el = ref.current
     if (!el) return
-    const entry: Entry = { el, visible: true, p: -1, q: -2 }
+    const entry: Entry = { el, visible: true, p: -1, q: -2, floor: 0, rampStart: 0 }
     entries.set(el, entry)
     ensureListening()
     const io = ensureObserver()
     io.observe(el)
+    const r = el.getBoundingClientRect()
+    if (!reduced() && r.top < window.innerHeight && r.bottom > 0) {
+      entry.rampStart = performance.now() + RAMP_LEAD_MS
+    }
     apply(entry)
     return () => {
       io.unobserve(el)

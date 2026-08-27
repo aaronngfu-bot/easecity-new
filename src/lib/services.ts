@@ -9,7 +9,11 @@ export interface ServiceDetail {
   icon: string
   titleKey: string // key into t.servicesPage
   bodyKey: string
-  tags: string[]
+  /** Mostly proper nouns (frameworks, tools), which is why en and zh are
+   *  often identical — but a few tags are plain English words ("Architecture",
+   *  "Process") that do need a translation, so this stays bilingual rather
+   *  than a flat string[]. */
+  tags: { en: string[]; zh: string[] }
   bullets: { en: string[]; zh: string[] }
   subject: { en: string; zh: string } // prefilled contact subject
 }
@@ -20,7 +24,7 @@ export const services: ServiceDetail[] = [
     icon: 'code',
     titleKey: 's1Title',
     bodyKey: 's1Body',
-    tags: ['C++', 'Flutter', 'Next.js', 'Node.js'],
+    tags: { en: ['C++', 'Flutter', 'Next.js', 'Node.js'], zh: ['C++', 'Flutter', 'Next.js', 'Node.js'] },
     bullets: {
       en: [
         'Real-time, low-latency systems and control infrastructure',
@@ -42,7 +46,7 @@ export const services: ServiceDetail[] = [
     icon: 'web',
     titleKey: 's2Title',
     bodyKey: 's2Body',
-    tags: ['Next.js', 'Prisma', 'Stripe', 'Vercel'],
+    tags: { en: ['Next.js', 'Prisma', 'Stripe', 'Vercel'], zh: ['Next.js', 'Prisma', 'Stripe', 'Vercel'] },
     bullets: {
       en: [
         'Full-stack platforms: dashboards, admin, and portals',
@@ -64,7 +68,7 @@ export const services: ServiceDetail[] = [
     icon: 'design',
     titleKey: 's3Title',
     bodyKey: 's3Body',
-    tags: ['Figma', 'Tailwind', 'Design Systems'],
+    tags: { en: ['Figma', 'Tailwind', 'Design Systems'], zh: ['Figma', 'Tailwind', '設計系統'] },
     bullets: {
       en: [
         'Dark/light theme systems with a single source of truth',
@@ -86,7 +90,7 @@ export const services: ServiceDetail[] = [
     icon: 'consult',
     titleKey: 's4Title',
     bodyKey: 's4Body',
-    tags: ['Architecture', 'Performance', 'Process'],
+    tags: { en: ['Architecture', 'Performance', 'Process'], zh: ['架構', '效能', '流程'] },
     bullets: {
       en: [
         'Architecture review and technical due diligence',
@@ -108,7 +112,7 @@ export const services: ServiceDetail[] = [
     icon: 'ad',
     titleKey: 's5Title',
     bodyKey: 's5Body',
-    tags: ['Google Ads', 'Meta', 'SEO'],
+    tags: { en: ['Google Ads', 'Meta', 'SEO'], zh: ['Google Ads', 'Meta', 'SEO'] },
     bullets: {
       en: [
         'Performance marketing across search and social',
@@ -130,7 +134,7 @@ export const services: ServiceDetail[] = [
     icon: 'brand',
     titleKey: 's6Title',
     bodyKey: 's6Body',
-    tags: ['Logo', 'Brand Identity', 'Visual System'],
+    tags: { en: ['Logo', 'Brand Identity', 'Visual System'], zh: ['Logo', '品牌識別', '視覺系統'] },
     bullets: {
       en: [
         'Logo and wordmark systems that hold up at any size',

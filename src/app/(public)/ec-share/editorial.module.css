@@ -1,0 +1,877 @@
+/* V3 — Editorial.
+   Asymmetric 12-column measure, wide margins, photography carrying the
+   argument. No boxes anywhere: separation comes from hairlines and space. */
+
+.page {
+  position: relative;
+  background: var(--bg-base);
+}
+
+/* ---------- page furniture ----------
+   A fine grain so the flat fill has some tooth. No column rules: the drawn
+   grid competed with the layout instead of supporting it. */
+
+.field {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+.page > :not(.field) {
+  position: relative;
+  z-index: 1;
+}
+.field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23g)'/%3E%3C/svg%3E");
+}
+
+@keyframes slide {
+  from { opacity: 0; transform: translate3d(0, 22px, 0); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes reveal {
+  from { opacity: 0; clip-path: inset(0 0 0 100%); }
+  to { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+.enter { opacity: 0; animation: slide 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.d1 { animation-delay: 40ms; }
+.d2 { animation-delay: 110ms; }
+.d3 { animation-delay: 200ms; }
+.d4 { animation-delay: 270ms; }
+.plateEnter { opacity: 0; animation: reveal 1s cubic-bezier(0.16, 1, 0.3, 1) 320ms forwards; }
+
+.scrubbed {
+  --t: max(0, min(1, calc((var(--p, 0) - var(--lag, 0)) / 0.46)));
+}
+
+/* ---------- hero ---------- */
+
+/* Holds the viewport at minimum, so the section below always starts at or under
+   the fold. Without it the fold lands wherever the headline happens to stop,
+   which differs by language, and the next heading peeks in on one and not the
+   other. Centred rather than top-aligned so the slack on a tall screen reads as
+   air around the hero instead of a gap under it. */
+.hero {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100svh;
+  /* The icon is a solid block where a line of small type used to sit, so it
+     needs more clearance under the floating header than the eyebrow did. */
+  padding: 6.5rem 0 3rem;
+}
+@media (min-width: 768px) {
+  .hero { padding: 6.5rem 0 4rem; }
+}
+/* Light pooled off-centre, over the headline rather than the middle, so it
+   reinforces the asymmetry instead of fighting it. */
+.spill {
+  position: absolute;
+  inset: -35% -10% auto -15%;
+  height: 90%;
+  pointer-events: none;
+  background: radial-gradient(42% 55% at 32% 26%, var(--signal-soft), transparent 70%);
+}
+.top {
+  display: grid;
+  gap: 2rem;
+}
+@media (min-width: 1024px) {
+  .top {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: end;
+    gap: 2.5rem;
+  }
+  /* Eight columns, not seven: the icon standing beside the headline takes its
+     width out of the measure, and at seven the title broke mid-word. */
+  .topLeft { grid-column: 1 / span 8; }
+  .topRight { grid-column: 9 / span 4; padding-bottom: 0.6rem; }
+}
+/* Carries a platform name, so it is not uppercased: these are spelled the way
+   their vendor spells them. Its line-height is fixed rather than inherited
+   because the icon's height is computed from it. */
+.eyebrow {
+  font-size: var(--eyebrow-size, 0.72rem);
+  line-height: var(--eyebrow-lh, 1.4);
+  letter-spacing: 0.16em;
+  color: var(--text-muted);
+}
+/* Icon left, platforms and headline stacked to its right. The icon squares off
+   against that whole stack — top edge on the platform line, bottom edge on the
+   headline's last line — so the three share two horizontals rather than one.
+   Its size is the sum of what it spans, which keeps that exact as the type
+   scales. Below 640 the icon would eat the measure, so it moves above instead. */
+.lead {
+  --title-size: clamp(2.3rem, 4.4vw, 4.1rem);
+  --eyebrow-size: 0.72rem;
+  --eyebrow-lh: 1.4;
+  --lead-row-gap: 0.85rem;
+  --icon-size: calc(
+    var(--title-size) * 2.04 + var(--eyebrow-size) * var(--eyebrow-lh) + var(--lead-row-gap)
+  );
+  display: grid;
+  justify-items: start;
+  gap: 1.1rem;
+}
+@media (min-width: 640px) {
+  .lead {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: clamp(1rem, 2vw, 1.75rem);
+    row-gap: var(--lead-row-gap);
+  }
+  .lead .eyebrow { grid-area: 1 / 2; }
+  .appIcon { grid-area: 1 / 1 / 3 / 2; align-self: start; }
+  .title { grid-area: 2 / 2; }
+}
+.appIcon {
+  position: relative;
+  height: var(--icon-size);
+  width: var(--icon-size);
+  overflow: hidden;
+  border-radius: 22.5%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-elevated);
+}
+.appIcon img { object-fit: cover; }
+/* Interim only. The company mark bleeds to its own edges and its darker half
+   disappears on a dark surface, so it is inset and given a ground of its own.
+   Drop this class once real app artwork sits in the slot. */
+.appIconPlaceholder {
+  background: #fff;
+  padding: 11%;
+}
+.appIconPlaceholder img { object-fit: contain; }
+.title {
+  font-size: var(--title-size);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: -0.032em;
+  color: var(--text-primary);
+}
+.accent {
+  display: block;
+  color: var(--signal);
+  /* Optical indent: the second line starts where the eye expects a turn. */
+  text-indent: 0.06em;
+}
+.sub {
+  font-size: 1.02rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+.ctas {
+  margin-top: 1.6rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.4rem;
+}
+.primary {
+  display: inline-flex;
+  min-height: 2.75rem;
+  align-items: center;
+  border-radius: 999px;
+  background: var(--text-primary);
+  padding: 0 1.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--bg-base);
+  transition: background-color 180ms var(--ease-out), transform 180ms var(--ease-out);
+}
+.primary:hover { background: var(--signal); color: var(--signal-ink); }
+.primary:active { transform: scale(0.97); }
+.textLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  border-bottom: 1px solid var(--border-strong);
+  padding-bottom: 2px;
+  transition: color 180ms var(--ease-out), border-color 180ms var(--ease-out);
+}
+.textLink:hover { color: var(--signal); border-color: var(--signal); }
+.textLink svg { transition: transform 180ms var(--ease-out); }
+.textLink:hover svg { transform: translateX(3px); }
+
+.heroPlate {
+  position: relative;
+  margin-top: 3rem;
+  aspect-ratio: 21 / 9;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: var(--bg-elevated);
+}
+.heroPlate img { object-fit: cover; }
+@media (max-width: 767.98px) {
+  .heroPlate { aspect-ratio: 4 / 3; }
+}
+.figures {
+  display: grid;
+  gap: 0.5rem 2.5rem;
+  border-top: 1px solid var(--border-color);
+  margin-top: 1rem;
+  padding-top: 1rem;
+}
+@media (min-width: 640px) {
+  .figures { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+.figure {
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+}
+.figureVal {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.figureKey {
+  font-size: 0.68rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+/* ---------- section heads ---------- */
+
+/* The subtitle sits under the headline it belongs to. It spent two passes
+   across the gutter — top-aligned, then bottom-aligned and on the index's own
+   tracks — and neither read right: at this container width there is 500px of
+   nothing between a headline and one small line of type, and no amount of
+   aligning the far edge makes those two look like one thought. Stacked and
+   held to a reading measure, it is a subtitle. This also matches the section
+   heads on /services, which were stacked all along. */
+.head {
+  display: grid;
+  gap: 0.85rem;
+  max-width: 42rem;
+}
+.headTitle {
+  --lag: 0.05;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.026em;
+  color: var(--text-primary);
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 18px), 0);
+}
+.headSub {
+  --lag: 0.13;
+  font-size: 0.95rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 14px), 0);
+}
+
+/* ---------- capability entries ---------- */
+
+/* Two up, not six down. As full-width rows the six ran 780px of section on a
+   1080 screen, and each row spent most of its measure empty — the argument
+   column only ever holds two lines. Paired, the index is a third shorter and
+   the measure is actually used.
+   No rules between them either. Each entry opens with its own diagram and a
+   name in display type, which is already more separation than a hairline
+   provides; the lines were drawing a grid the content did not need, and once
+   they are gone the only thing hover had to say was which line it had
+   recoloured. Six items, told apart by the space around them. */
+.entries {
+  margin-top: 3rem;
+  display: grid;
+  gap: 2.9rem;
+}
+@media (min-width: 900px) {
+  .entries {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 3.2rem 4rem;
+  }
+}
+.entry {
+  --lag: calc(0.1 + var(--i, 0) * 0.05);
+  /* Negative, so every row starts its loop already part-way through: six
+     diagrams beating in step would read as one blinking element. */
+  --rd: calc(var(--i, 0) * -0.62s);
+  display: grid;
+  gap: 0.5rem 2.5rem;
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 16px), 0);
+}
+@media (min-width: 900px) {
+  .entry {
+    grid-template-columns: 3rem minmax(0, 1fr);
+    gap: 0.4rem 1.5rem;
+  }
+  /* Explicit, because auto-placement would drop the copy under the diagram. */
+  .entry .glyph { grid-area: 1 / 1 / 3 / 2; }
+  .entryName { grid-area: 1 / 2; }
+  .entryCopy { grid-area: 2 / 2; }
+}
+
+/* ---------- capability glyphs ----------
+   One diagram per row, all on a 48-unit bed. Each runs a closed loop: the last
+   keyframe is the first, so it can restart forever without a seam, and every
+   cycle spends most of its length at rest so six of them on one screen read as
+   a quiet index rather than a row of blinking lights. Loops only run while
+   their section is on screen.
+
+   Colour follows one rule: whatever carries the action is signal, whatever
+   holds still around it stays muted. So the focused pane is brand and the
+   three it displaced are not, the arrows are brand and the two devices they
+   run between are not — and where the whole diagram is the action, as in the
+   device grid and the closing capture frame, all of it is brand. That gives
+   the index a rhythm of loud and quiet rows instead of six uniform ones, and
+   the colour always means the same thing. */
+
+.glyph {
+  align-self: start;
+  height: 2.9rem;
+  width: 2.9rem;
+  overflow: visible;
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  transition: stroke 260ms var(--ease-out);
+}
+@media (min-width: 900px) {
+  .glyph { margin-top: -0.3rem; }
+}
+.glyph * {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-play-state: paused;
+}
+[data-scrubbing] .glyph * { animation-play-state: running; }
+
+/* f1 — a highlight rolling tile to tile, so the grid keeps filling. */
+@keyframes gTile {
+  0%, 26%, 100% { opacity: 0.45; transform: scale(0.88); }
+  8% { opacity: 1; transform: scale(1); }
+}
+.gTile {
+  stroke: var(--signal);
+  animation: gTile 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: calc(var(--rd, 0s) + var(--gd, 0s));
+}
+
+/* f2 — one pane taking the room the others give up, then handing it back. */
+@keyframes gFocus {
+  0%, 100% { transform: scale(0.9); }
+  50% { transform: scale(1.05); }
+}
+@keyframes gMinor {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.32; }
+}
+.gFocus {
+  stroke: var(--signal);
+  animation: gFocus 4.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: var(--rd, 0s);
+}
+.gMinor {
+  animation: gMinor 4.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: var(--rd, 0s);
+}
+
+/* f3 — the two directions taking turns, half a cycle apart. */
+@keyframes gShuttle {
+  0%, 58%, 100% { transform: translateX(calc(var(--dir) * 5px)); opacity: 0.28; }
+  20%, 38% { transform: translateX(0); opacity: 1; }
+}
+.gArrowA, .gArrowB {
+  stroke: var(--signal);
+  animation: gShuttle 3.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+.gArrowA { --dir: -1; animation-delay: var(--rd, 0s); }
+.gArrowB { --dir: 1; animation-delay: calc(var(--rd, 0s) + 1.8s); }
+
+/* f4 — the session crossing the arc, over and over. */
+@keyframes gCross {
+  0% { offset-distance: 0%; opacity: 0; }
+  12%, 84% { opacity: 1; }
+  100% { offset-distance: 100%; opacity: 0; }
+}
+@keyframes gFlow {
+  to { stroke-dashoffset: -10; }
+}
+.gArc {
+  stroke: var(--signal);
+  stroke-dasharray: 2 3;
+  opacity: 0.7;
+  animation: gFlow 1.8s linear infinite;
+}
+.gDot {
+  offset-path: path("M 10.5 17 Q 24 4 37.5 17");
+  offset-rotate: 0deg;
+  fill: var(--signal);
+  stroke: none;
+  animation: gCross 3.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation-delay: var(--rd, 0s);
+}
+
+/* f5 — the pointer arriving, the tap landing under it, the pointer leaving. */
+@keyframes gReach {
+  0%, 100% { transform: translate(7px, 7px); }
+  30%, 68% { transform: translate(0, 0); }
+}
+@keyframes gTap {
+  0%, 32%, 100% { opacity: 0; transform: scale(0.4); }
+  40% { opacity: 1; transform: scale(0.78); }
+  60% { opacity: 0; transform: scale(1.18); }
+}
+.gCursor {
+  /* Knocks the cursor out of whatever it crosses, so it must match the band. */
+  fill: var(--bg-surface);
+  stroke: var(--signal);
+  animation: gReach 4s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation-delay: var(--rd, 0s);
+}
+.gTap {
+  stroke: var(--signal);
+  opacity: 0;
+  animation: gTap 4s ease-out infinite;
+  animation-delay: var(--rd, 0s);
+}
+
+/* f6 — the frame closing on the shot, the marker firing as it lands. */
+@keyframes gClose {
+  0%, 100% { transform: translate(calc(var(--cx) * 4px), calc(var(--cy) * 4px)); }
+  38%, 66% { transform: translate(0, 0); }
+}
+@keyframes gShutter {
+  0%, 36%, 100% { opacity: 0.22; transform: scale(0.55); }
+  48% { opacity: 1; transform: scale(1); }
+  68% { opacity: 0.22; transform: scale(0.55); }
+}
+.gCorner {
+  stroke: var(--signal);
+  animation: gClose 4.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: var(--rd, 0s);
+}
+.gCorner:nth-of-type(1) { --cx: -1; --cy: -1; }
+.gCorner:nth-of-type(2) { --cx: 1; --cy: -1; }
+.gCorner:nth-of-type(3) { --cx: 1; --cy: 1; }
+.gCorner:nth-of-type(4) { --cx: -1; --cy: 1; }
+.gRec {
+  fill: var(--signal);
+  stroke: none;
+  animation: gShutter 4.4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: var(--rd, 0s);
+}
+.entryName {
+  font-size: clamp(1.15rem, 1.8vw, 1.4rem);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  color: var(--text-primary);
+}
+.entryCopy {
+  font-size: 0.925rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+/* No hover state. These six do not link anywhere and they do not open, so
+   there is nothing for a pointer to be told. Every version that was tried here
+   was decoration wearing the clothes of an affordance: a rule that drew itself
+   along the bottom edge and a name that slid right, which is what navigation
+   looks like; then the diagram turning brand-colour, which broke the one rule
+   the diagrams are drawn to; then recolouring the row's own hairline, which
+   only meant anything because the hairline was there, and the hairline was not
+   needed. The entries are legible standing still. */
+
+/* ---------- install narrative ---------- */
+
+/* A tint band, carried by the two enumerations. Sections of identical base
+   colour read as one endless plane, so the page alternates: hero and essay and
+   closer on base, the index and the sequence lifted onto surface. */
+.band {
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-surface);
+}
+/* Four across, not four down. The capability index above it is already a tall
+   column of rows, and a second stacked list read as more of the same; laid out
+   as a row the install sequence is a different shape on the page and its rules
+   draw left to right, in the order the reader takes the steps. */
+.narrative {
+  --gutter: 2.5rem;
+  position: relative;
+  margin-top: 3.5rem;
+  display: grid;
+  gap: var(--gutter);
+}
+@media (min-width: 640px) {
+  .narrative { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3rem var(--gutter); }
+}
+@media (min-width: 1024px) {
+  .narrative { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  /* One line through all four rather than four rules that happen to sit level:
+     these are stages of one install, and a rule that stops at each column edge
+     said they were four unrelated things. The signal runs the whole length,
+     crossing the gutters, and each step is a stop marked on it. */
+  .narrative::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto 0;
+    height: 1px;
+    background: var(--border-color);
+  }
+  /* And it has to stop somewhere. A run that reached the last step and simply
+     ran out of page read as a line that had been cut off rather than one that
+     finished. A filled terminus closes it, and is round where the four stops
+     are ticks so it cannot be mistaken for a fifth. It lands last, after the
+     step it belongs to. */
+  .narrative::after {
+    content: "";
+    position: absolute;
+    top: -2.5px;
+    right: 0;
+    height: 6px;
+    width: 6px;
+    border-radius: 50%;
+    background: var(--signal);
+    opacity: var(--t);
+    transform: scale(calc(0.4 + var(--t) * 0.6));
+  }
+}
+.beat {
+  --lag: calc(0.12 + var(--i, 0) * 0.07);
+  --rd: calc(var(--i, 0) * -0.7s);
+  position: relative;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--border-color);
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 16px), 0);
+}
+/* The signal draws across each column's rule as its step arrives, so the four
+   fill in sequence and the eye is pulled along the row. */
+.beat::after {
+  content: "";
+  position: absolute;
+  inset: -1px 0 auto 0;
+  height: 1px;
+  background: var(--signal);
+  transform: scaleX(var(--t));
+  transform-origin: left;
+}
+@media (min-width: 1024px) {
+  .beat { border-top: 0; }
+  /* Carries on into the gutter so the four fills meet end to end and the
+     signal arrives as one continuous run. The last one stops at the edge. */
+  .beat::after { top: 0; right: calc(var(--gutter) * -1); }
+  .beat:last-child::after { right: 0; }
+  /* The stop mark. It lights with its own step, so the line reads as a route
+     with four named points rather than a plain progress bar. */
+  .beat::before {
+    content: "";
+    position: absolute;
+    top: -4px;
+    left: 0;
+    height: 9px;
+    width: 1px;
+    background: var(--signal);
+    opacity: var(--t);
+  }
+}
+/* ---------- step glyphs ----------
+   Same bed and the same paused-until-visible rule as the capability diagrams,
+   so the two sets read as one hand. */
+
+.stepGlyph {
+  margin-top: 0.85rem;
+  display: block;
+  height: 2.7rem;
+  width: 2.7rem;
+  overflow: visible;
+  fill: none;
+  stroke: var(--text-muted);
+  stroke-width: 1.25;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.stepGlyph * {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation-play-state: paused;
+}
+[data-scrubbing] .stepGlyph * { animation-play-state: running; }
+
+/* w1 — the file coming down, the tray flashing as it lands. */
+@keyframes wDrop {
+  0%, 100% { transform: translateY(-5px); opacity: 0; }
+  22%, 52% { transform: translateY(0); opacity: 1; }
+  70% { transform: translateY(3px); opacity: 0; }
+}
+@keyframes wTray {
+  0%, 46%, 100% { stroke: var(--text-muted); }
+  56%, 66% { stroke: var(--signal); }
+}
+/* Same colour rule as the capability diagrams: the thing that happens is
+   signal, the equipment it happens to stays muted. */
+.wDrop {
+  stroke: var(--signal);
+  animation: wDrop 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: var(--rd, 0s);
+}
+.wTray {
+  animation: wTray 4s steps(1, end) infinite;
+  animation-delay: var(--rd, 0s);
+}
+
+/* w2 — the cable running out to the port, the port taking hold. */
+@keyframes wLink {
+  0%, 100% { stroke-dashoffset: 14; }
+  30%, 78% { stroke-dashoffset: 0; }
+}
+@keyframes wPort {
+  0%, 30%, 100% { opacity: 0; transform: scale(0.4); }
+  44%, 74% { opacity: 1; transform: scale(1); }
+}
+.wLink {
+  stroke: var(--signal);
+  stroke-dasharray: 14;
+  animation: wLink 3.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: var(--rd, 0s);
+}
+.wPort {
+  fill: var(--bg-surface);
+  stroke: var(--signal);
+  animation: wPort 3.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: var(--rd, 0s);
+}
+
+/* w3 — the screen arriving on the desktop one pane at a time. */
+@keyframes wPane {
+  0%, 100% { opacity: 0.18; transform: scale(0.8); }
+  22%, 62% { opacity: 1; transform: scale(1); }
+}
+.wPane {
+  stroke: var(--signal);
+  animation: wPane 4.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: calc(var(--rd, 0s) + var(--gd, 0s));
+}
+
+/* w4 — the hand reaching the glass, the session going out to the room. */
+@keyframes wHand {
+  0%, 100% { transform: translate(6px, 6px); }
+  28%, 66% { transform: translate(0, 0); }
+}
+@keyframes wTouch {
+  0%, 30%, 100% { opacity: 0; transform: scale(0.4); }
+  40% { opacity: 1; transform: scale(0.8); }
+  60% { opacity: 0; transform: scale(1.2); }
+}
+@keyframes wWave {
+  0%, 100% { opacity: 0.15; }
+  46% { opacity: 1; }
+  72% { opacity: 0.15; }
+}
+.wHand {
+  fill: var(--bg-surface);
+  stroke: var(--signal);
+  animation: wHand 4.2s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation-delay: var(--rd, 0s);
+}
+.wTouch {
+  stroke: var(--signal);
+  opacity: 0;
+  animation: wTouch 4.2s ease-out infinite;
+  animation-delay: var(--rd, 0s);
+}
+.wWave {
+  stroke: var(--signal);
+  opacity: 0.15;
+  animation: wWave 4.2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: calc(var(--rd, 0s) + var(--gd, 0s));
+}
+
+/* The numeral leads, directly under the stop it names — it was sitting below
+   the drawing, which put two rows between a tick and the label for it. */
+.beatNo {
+  display: block;
+  font-size: 0.72rem;
+  letter-spacing: 0.16em;
+  color: var(--signal);
+}
+.beatName {
+  margin-top: 0.75rem;
+  font-size: clamp(1.1rem, 1.6vw, 1.3rem);
+  font-weight: 600;
+  letter-spacing: -0.012em;
+  color: var(--text-primary);
+}
+.beatCopy {
+  margin-top: 0.55rem;
+  font-size: 0.9rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+/* ---------- scenes ---------- */
+
+/* Six scenes, three shapes of row: a wide plate with a tall one beside it, then
+   the reverse weighted the other way, then an even pair. Two rows of the same
+   shape would read as a list of photographs; three different ones read as a
+   contact sheet. Geometry is held by position rather than by a class per cell,
+   so the order in the component is the order on the page. */
+.essay {
+  margin-top: 3.5rem;
+  display: grid;
+  gap: 3rem;
+}
+.piece {
+  --lag: calc(0.08 + var(--i, 0) * 0.06);
+  display: grid;
+  gap: 1.1rem;
+  align-content: start;
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 26px), 0);
+}
+@media (min-width: 1024px) {
+  .essay { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 4rem 2.5rem; }
+  .piece:nth-child(1) { grid-column: 1 / span 8; }
+  .piece:nth-child(2) { grid-column: 9 / span 4; }
+  .piece:nth-child(3) { grid-column: 1 / span 4; }
+  .piece:nth-child(4) { grid-column: 5 / span 8; }
+  .piece:nth-child(5) { grid-column: 1 / span 6; }
+  .piece:nth-child(6) { grid-column: 7 / span 6; }
+}
+/* One frame class for both the photographs and the type plates, so a cell keeps
+   its proportions whichever it is currently showing. Landscape everywhere until
+   the mosaic exists: a 3:4 portrait in a single-column phone layout is most of
+   a screen for one scene. */
+.pieceFrame {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.625rem;
+  aspect-ratio: 16 / 10;
+  background: var(--bg-elevated);
+}
+@media (min-width: 1024px) {
+  .piece:nth-child(1) .pieceFrame { aspect-ratio: 16 / 9; }
+  .piece:nth-child(2) .pieceFrame { aspect-ratio: 3 / 4; }
+  .piece:nth-child(3) .pieceFrame { aspect-ratio: 3 / 4; }
+  .piece:nth-child(4) .pieceFrame { aspect-ratio: 16 / 9; }
+  .piece:nth-child(5) .pieceFrame { aspect-ratio: 4 / 3; }
+  .piece:nth-child(6) .pieceFrame { aspect-ratio: 4 / 3; }
+}
+.pieceShot img { object-fit: cover; }
+/* The stand-in. A title card rather than an empty grey box or a photograph
+   borrowed from another scene: it says what the frame is for, and it is
+   obviously composed rather than missing. */
+.piecePlate {
+  display: flex;
+  align-items: flex-end;
+  border: 1px solid var(--border-color);
+  background: var(--bg-surface);
+  padding: 1.6rem;
+}
+.plateName {
+  font-size: clamp(1.35rem, 2.4vw, 1.9rem);
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+.pieceCap {
+  border-top: 1px solid var(--border-color);
+  padding-top: 0.95rem;
+}
+.pieceLabel {
+  display: block;
+  margin-top: 0.55rem;
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--text-primary);
+}
+.pieceText {
+  margin-top: 0.55rem;
+  font-size: 0.875rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+/* ---------- closer ---------- */
+
+.closerSection {
+  position: relative;
+  overflow: hidden;
+}
+.closerSection::before {
+  content: "";
+  position: absolute;
+  inset: 20% -12% -30% 45%;
+  pointer-events: none;
+  background: radial-gradient(45% 55% at 65% 80%, var(--signal-soft), transparent 72%);
+}
+/* No rule of its own: the tint band directly above closes with one, and a
+   second a few rem below it read as a doubled line. */
+.closer {
+  display: grid;
+  gap: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .closer { grid-template-columns: repeat(12, minmax(0, 1fr)); align-items: end; gap: 2.5rem; }
+  .closerLeft { grid-column: 1 / span 7; }
+  .closerRight { grid-column: 9 / span 4; }
+}
+.closerTitle {
+  --lag: 0.04;
+  font-size: clamp(1.9rem, 4.4vw, 3.2rem);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 18px), 0);
+}
+.closerSub {
+  --lag: 0.12;
+  margin-top: 1rem;
+  max-width: 32rem;
+  line-height: 1.8;
+  color: var(--text-secondary);
+  opacity: var(--t);
+}
+.closerCta {
+  --lag: 0.18;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.4rem;
+  opacity: var(--t);
+  transform: translate3d(0, calc((1 - var(--t)) * 14px), 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .enter, .plateEnter { animation: none; opacity: 1; clip-path: none; }
+  .headTitle, .headSub, .entry, .beat, .piece,
+  .closerTitle, .closerSub, .closerCta {
+    opacity: 1;
+    transform: none;
+  }
+  /* The diagrams stay, at the point in their cycle where they read clearest. */
+  .glyph *, .stepGlyph * { animation: none; transform: none; }
+  .gTile, .gArrowA, .gArrowB, .gTap, .gRec { opacity: 1; }
+  .gDot { offset-distance: 100%; }
+  .wDrop, .wPort, .wPane, .wWave { opacity: 1; }
+  .wLink { stroke-dashoffset: 0; }
+  .wTouch { opacity: 0; }
+  .beat::after { transform: none; }
+  .beat::before { opacity: 1; }
+  .narrative::after { opacity: 1; transform: none; }
+}

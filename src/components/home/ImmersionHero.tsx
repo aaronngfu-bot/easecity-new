@@ -89,8 +89,12 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
   return (
     // The track must outrun the viewport or ScrollPin resolves `--p` to 1 on
     // load, which fades the copy out and drags the skyline off its footing.
-    <ScrollPin className="bg-[var(--bg-base)]" trackClassName="h-[155vh] md:h-[175vh]">
+    <ScrollPin className="bg-[var(--bg-base)]" trackClassName="h-[175vh] md:h-[200vh]">
       <div className="hero-stage">
+      {/* Behind the scene: the harbour's water carried on down, so the wipe at
+          the bottom of the stage reveals deeper water rather than the page. */}
+      <div className="hero-deep-water" aria-hidden />
+
       <div className="hero-scene-mask" aria-hidden>
         <div className="hero-enter-sky pointer-events-none absolute inset-0 z-0">
           <CityField className="hero-pin-sky h-full w-full" />
@@ -99,9 +103,6 @@ export function ImmersionHero({ onStartProject }: { onStartProject?: () => void 
           <HarbourSkyline className="hero-pin-city w-full" />
         </div>
       </div>
-
-      <div className="hero-scene-haze z-[2]" aria-hidden />
-      <div className="hero-scene-horizon z-[3]" aria-hidden />
 
       <div className="hero-pin-copy container-max relative z-10 flex h-full items-start">
         <div className="hero-copy-inner max-w-2xl text-left">

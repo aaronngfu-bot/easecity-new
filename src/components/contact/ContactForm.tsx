@@ -109,7 +109,7 @@ export function ContactForm() {
       {/* progress header */}
       <div className="mb-6">
         <div className="flex items-center justify-between">
-          <span className="label-mono text-signal/80">QUOTE.REQUEST</span>
+          <span className="label-mono text-signal/80">{c.quoteEyebrow}</span>
           <span className="label-mono text-text-muted">
             {c.stepOf.replace('{n}', String(step)).replace('{total}', String(TOTAL_STEPS))}
           </span>

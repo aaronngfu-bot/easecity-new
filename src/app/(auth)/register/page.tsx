@@ -8,7 +8,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { UserPlus, AlertCircle, Eye, EyeOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
-import { useTheme } from 'next-themes'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 import { BrandMark } from '@/components/brand/BrandMark'
 import { LoginBackground } from '@/components/auth/LoginBackground'
@@ -17,8 +16,7 @@ export default function RegisterPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
-  const { t } = useLanguage()
-  const { resolvedTheme } = useTheme()
+  const { t, language } = useLanguage()
   const googleAuthEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true'
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -34,7 +32,7 @@ export default function RegisterPage() {
     setError('')
 
     if (!turnstileToken) {
-      setError('請完成人機驗證')
+      setError(t.auth.turnstileRequired)
       return
     }
 
@@ -49,6 +47,8 @@ export default function RegisterPage() {
       const result = await res.json()
       if (!res.ok || !result.success) {
         setError(result.error?.message || 'Registration failed')
+        turnstileRef.current?.reset()
+        setTurnstileToken(null)
         setLoading(false)
         return
       }
@@ -183,16 +183,24 @@ export default function RegisterPage() {
         </div>
 
         <div className="flex justify-center">
+          {/* `key={language}` forces a full unmount/remount instead of letting the
+             library's own update path try to swap options on a live widget — that
+             in-place remove()-then-render() is where a stuck challenge iframe turns
+             into "Cloudflare 無法連接至頁面". `theme: 'auto'` also avoids a second,
+             unrelated remount: it used to follow `resolvedTheme`, which is `undefined`
+             until next-themes hydrates, so the widget mounted once as the fallback
+             and then immediately remounted when the real theme arrived. */}
           <Turnstile
+            key={language}
             ref={turnstileRef}
             siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
             onSuccess={(token) => setTurnstileToken(token)}
             onExpire={() => setTurnstileToken(null)}
             onError={() => {
               setTurnstileToken(null)
-              setError('人機驗證失敗，請重新整理頁面再試。')
+              setError(t.auth.turnstileError)
             }}
-            options={{ theme: resolvedTheme === 'light' ? 'light' : 'dark', language: 'zh-TW' }}
+            options={{ theme: 'auto', language: language === 'zh' ? 'zh-TW' : 'en' }}
           />
         </div>
 
