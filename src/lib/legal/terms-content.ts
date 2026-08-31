@@ -59,7 +59,7 @@ export const termsContent: Record<'en' | 'zh', LegalTerms> = {
           {
             title: '4.2 Free Trial',
             body: [
-              'We may offer a free trial period. No payment is required during the trial. At the end of the trial, your subscription will automatically convert to the paid plan you selected unless you cancel before the trial ends. Cancellation during the trial period results in immediate deactivation.',
+              'We may offer a free trial period. No payment is required during the trial (a valid payment method is required to start it). At the end of the trial, your subscription will automatically convert to the paid plan you selected unless you cancel before the trial ends. Cancellation during the trial period results in immediate deactivation.',
             ],
           },
           {
@@ -230,7 +230,7 @@ export const termsContent: Record<'en' | 'zh', LegalTerms> = {
           {
             title: '4.2 免費試用',
             body: [
-              '我們可能提供免費試用期。試用期間無需付款。試用結束時，您的訂閱將自動轉換為您所選擇的付費方案，除非您在試用結束前取消。在試用期間取消會導致立即停用。',
+              '我們可能提供免費試用期。試用期間無需付款（開始試用需先提供有效的付款方式）。試用結束時，除非您在試用結束前取消，否則您的訂閱將自動轉換為您所選擇的付費方案並扣款。在試用期間取消會導致立即停用。',
             ],
           },
           {
