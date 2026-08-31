@@ -64,13 +64,13 @@ export const SERVICE_CONTENT: Record<string, ServiceContent> = {
     deliverables: {
       en: [
         'A source repository you own, with build scripts that work on a clean machine.',
-        'A signed installer or deployable binary for each target platform.',
+        'A signed installer or deployable binary for the agreed target platforms.',
         'Operations notes: how to run it, what breaks, where the logs are.',
         'A handover session with whoever will maintain it.',
       ],
       zh: [
         '屬於你的原始碼倉庫，附上在乾淨機器上就能建置的腳本。',
-        '每個目標平台的簽章安裝檔或可部署執行檔。',
+        '約定目標平台的簽章安裝檔或可部署執行檔。',
         '運維筆記：怎麼啟動、會壞在哪裡、日誌在哪裡。',
         '與後續維護者的交接會議。',
       ],
@@ -555,8 +555,8 @@ export const STAGE_DETAIL: { output: Bilingual; yours: Bilingual }[] = [
   },
   {
     output: {
-      en: 'A working build every week, on a link you can open, with the changes listed.',
-      zh: '每週一個可運行的版本，一個你打得開的連結，並列出改了什麼。',
+      en: 'A working build on an agreed cadence (typically weekly), on a link you can open, with the changes listed.',
+      zh: '按約定節奏（一般每週）交付一個可運行的版本，一個你打得開的連結，並列出改了什麼。',
     },
     yours: {
       en: 'Twenty minutes a week to look at it and say what is wrong.',
