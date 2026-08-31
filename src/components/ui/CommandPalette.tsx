@@ -87,7 +87,7 @@ export function CommandPalette() {
       nav('/dashboard', 'Dashboard', 'Control deck', LayoutDashboard),
       nav('/login', 'Sign in', 'Auth entry', LogIn),
 
-      plan('/pricing#trial', 'Trial — 14 days free', 'No credit card required', Cpu),
+      plan('/pricing#trial', 'Trial — 14 days free', 'Card required · auto-converts at end', Cpu),
       plan('/pricing#pro', 'Pro — $19/mo', 'Individual Android mirroring', Zap),
       plan('/pricing#business', 'Business — $49/mo', 'Team sharing and audit log', ShieldCheck),
       plan('/pricing#enterprise', 'Enterprise — Contact us', 'SSO, RBAC, on-prem options', Building2),
