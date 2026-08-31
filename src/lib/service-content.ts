@@ -79,10 +79,12 @@ export const SERVICE_CONTENT: Record<string, ServiceContent> = {
       en: [
         'Round-the-clock on-call. We set up the monitoring and train your team, or we agree a support arrangement separately.',
         'Rescuing a codebase nobody has read. That starts as an audit, under consulting.',
+        'Machine-learning or AI features are included only where they are named in the scope. If you mention "AI" in a meeting, that prompts a scoping conversation, not an assumption that it is in the price.',
       ],
       zh: [
         '全天候值班待命。我們會建好監控並訓練你的團隊，或另行約定支援方式。',
         '搶救一份沒人讀過的程式碼庫。那要從稽核開始，屬於諮詢服務。',
+        '機器學習或 AI 功能，只有在範圍文件裡明確寫出時才會包含。如果會議中提到「AI」，那會觸發一次範圍討論，而不是預設它已含在價格內。',
       ],
     },
     needFromYou: {
@@ -296,10 +298,12 @@ export const SERVICE_CONTENT: Record<string, ServiceContent> = {
       en: [
         'A verdict on individual people. We review systems and process, not performance.',
         'Implementing the fixes as part of the audit. That is quoted separately, and you are free to take the report elsewhere.',
+        'Vetting a vendor claim about a feature that does not exist yet. We review what runs today and what a roadmap realistically commits to, not what a slide deck promises.',
       ],
       zh: [
         '對個別成員的評價。我們檢視系統與流程，不做績效考核。',
         '在稽核範圍內順手把問題修好。那會另外報價，而你也可以拿著報告去找別人做。',
+        '替還不存在的功能背書廠商的宣稱。我們審查今天實際上線的東西，以及路線圖真正承諾的範圍，而不是投影片上的承諾。',
       ],
     },
     needFromYou: {
@@ -481,15 +485,15 @@ export const COMMON_FAQ: FaqEntry[] = [
   {
     q: { en: 'How do we start?', zh: '怎麼開始？' },
     a: {
-      en: 'Send a note, or use the enquiry form on this page. You get a written reply within one business day, and a call only if there is something worth talking through.',
-      zh: '寄一封短訊，或用這個頁面上的查詢表單。你會在一個工作日內收到書面回覆，只有在真的有事情要談時才會安排通話。',
+      en: 'Send a note, or use the enquiry form on this page. You get a written reply, usually within one business day, and a call only if there is something worth talking through.',
+      zh: '寄一封短訊，或用這個頁面上的查詢表單。你通常會在一個工作日內收到書面回覆，只有在真的有事情要談時才會安排通話。',
     },
   },
   {
     q: { en: 'What does it cost?', zh: '費用怎麼算？' },
     a: {
-      en: 'It depends on scope, so the honest answer is a written quote rather than a number on a page. After a short call you get scope, milestones, and a timeline in writing within two business days, with no obligation.',
-      zh: '取決於範圍，所以誠實的答案是一份書面報價，而不是頁面上的一個數字。經過一次簡短通話後，你會在兩個工作日內收到書面的範圍、里程碑與時程，且不附帶任何義務。',
+      en: 'It depends on scope, so the honest answer is a written quote rather than a number on a page. After a short call you get scope, milestones, and a timeline in writing, usually within two business days, with no obligation.',
+      zh: '取決於範圍，所以誠實的答案是一份書面報價，而不是頁面上的一個數字。經過一次簡短通話後，你通常會在兩個工作日內收到書面的範圍、里程碑與時程，且不附帶任何義務。',
     },
   },
   {
@@ -504,6 +508,20 @@ export const COMMON_FAQ: FaqEntry[] = [
     a: {
       en: 'It usually does. Changes are priced as they come up and approved by you before they are built, so the surprise lands in the schedule rather than in the invoice.',
       zh: '通常都會變。變更會在發生時報價，並在動工前取得你的同意，所以意外會落在時程上，而不是帳單上。',
+    },
+  },
+  {
+    q: { en: 'Can you guarantee a performance figure up front?', zh: '你能在開始前保證某個效能數字嗎？' },
+    a: {
+      en: 'Not before the work starts, and it would be dishonest of anyone to say so. Measured results depend on your hardware, data, and workload, so we commit to a target and to how we will measure it in the written scope. If we beat it, good; if we miss it, you hear it in a review before it has cost you money.',
+      zh: '在開始之前沒人能保證，有人這樣說反而是不誠實。量測結果取決於你的硬體、資料與工作負載，所以我們會在書面範圍文件裡寫明目標，以及我們如何量測它。達標更好；若未達標，也會在真正花到你的錢之前，先在檢討會上讓你知情。',
+    },
+  },
+  {
+    q: { en: 'Do you take rush jobs or round-the-clock work?', zh: '你們接急單或做全天候工作嗎？' },
+    a: {
+      en: 'Rush is possible when the calendar allows, and it is quoted on top rather than folded in. Round-the-clock on-call or guaranteed response times are a separate support arrangement, not part of a build project.',
+      zh: '時程容許時可以接急單，會另外報價，而不是含在專案內。全天候待命或保證回應時間屬於獨立的支援合約，不包含在建置專案裡。',
     },
   },
 ]
