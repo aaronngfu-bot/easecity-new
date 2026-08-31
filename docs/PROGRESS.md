@@ -5,7 +5,19 @@
 
 ---
 
-## Last session: 2026-08-27 (site-images: hero plate split from the services case study, exact upload sizes, rounded corners)
+## Last session: 2026-08-31 (dev server `.next` corruption fixed; `/ec-share` hero no longer over-stretches on tall monitors)
+
+**Summary**: Reported "the first section leaves too much empty space at large sizes." Before touching CSS, the live page was rendering completely unstyled — `getComputedStyle` on `.editorial_hero__57Eoa` showed `display: block`, `min-height: 0`, no padding, i.e. none of `editorial.module.css` was applying. The page's own `<link rel="stylesheet">` for `/_next/static/css/app/(public)/ec-share/page.css` was 404ing: a leftover symptom of the previous session's concurrent `next dev` + `next build` against the same `.next` directory (noted then as a risk, not fully cleared). Killed the stale dev server, deleted `.next`, restarted clean — the CSS chunk resolved and the page rendered correctly again.
+
+With styling restored, the actual layout bug was measurable: `.hero` has `min-height: 100svh` with `justify-content: center` so the section never lets the next one peek above the fold. That is correct on ordinary laptop screens, where the hero's own content (icon+headline row, plate, stat row — roughly 1035px including padding at desktop widths) already exceeds a typical viewport. But `100svh` scales with the *monitor's* height, not the content's, so on anything taller than that — measured 2560×1440, a common desktop monitor — the section was forced to 1440px and the centered content sat in ~307px of pure air above the headline and ~267px below the stats, instead of the intended padding. Capped it: `min-height: min(100svh, 56.25rem)`. Below the 900px cap (virtually every laptop) nothing changes — content already decides the height there. Above it, the box now settles to its natural content height instead of stretching, so the padding is the only space left. Re-measured at 2560×1440 after the fix: gap above/below dropped to exactly `padding-top`/`padding-bottom` (104px / 64px), down from 307px / 267px.
+
+**Files changed**: `app/(public)/ec-share/editorial.module.css`, `docs/PROGRESS.md`, `docs/CHANGELOG.md`.
+
+**Verified**: `tsc --noEmit` clean, no new lints. Measured via CDP `Emulation.setDeviceMetricsOverride` + `getBoundingClientRect` at 1366×768 (content still exceeds viewport, no regression — next section still starts well below the fold), 1920×1080 (gap dropped from ~23px excess to 0), 1920×1200 and 2560×1440 (gap dropped from 200–300px excess to exactly the intended padding). Screenshot-confirmed the hero at the real browser viewport (1920×1080) still reads correctly.
+
+---
+
+## Previous session: 2026-08-27 (site-images: hero plate split from the services case study, exact upload sizes, rounded corners)
 
 **Summary**: `ecShareHero` still fed two placements — the product page's wide plate and the services page's lead case study — so replacing one silently changed the other. Split a `servicesCaseEcShare` slot out for the case study (`fallback` kept pointing at the same shipped photo, so nothing visibly changes until an admin uploads a distinct one), matching the split already done for the mosaic scene last session. `ServicesPageClient.tsx`'s `cases[0]` now reads `images.servicesCaseEcShare`.
 
@@ -150,6 +162,7 @@ See `docs/WEB_TEAM_TASKS.md`.
 
 ## Recent changes log
 
+- 2026-08-31 — Cleared a corrupted `.next` (stale dev server was 404ing the `/ec-share` CSS chunk, so the page rendered fully unstyled); capped the `/ec-share` hero's `min-height` so it no longer over-stretches with empty space on tall monitors (2560×1440 measured; excess gap gone).
 - 2026-08-27 — `servicesCaseEcShare` split out from `ecShareHero`; hero plate `sizes` fixed and exact upload dimensions added to its admin-visible `shape` text; rounded corners added to the `/ec-share` hero plate and scene mosaic (services case cards already had them; services' full-width hero band deliberately left square).
 - 2026-08-27 — Product loop animations (news/game/social/youtube/gallery) redesigned bolder; monitor-mirror screen now glued to its bezel during grid re-flow; disconnecting a device no longer touches its own screen, only the monitor's copy; blog card entrance no longer slides in from the side; `/ec-share`'s "one desk, eight live screens" scene split into its own image slot instead of reusing the hero photo.
 - 2026-08-27 — Registration Turnstile fixed across language switches; homepage blog skeleton matches real cards; first pass of five homepage product loop animations and device-disconnect interaction (superseded above).

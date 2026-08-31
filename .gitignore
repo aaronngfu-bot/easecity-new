@@ -64,3 +64,15 @@ Thumbs.db
 .impeccable/live/deferred-svelte-component-accepts.json
 .impeccable/live/*.png
 # impeccable-ignore-end
+
+# Scratch / debug artifacts (not part of the site)
+dev/
+Image_*.jpg
+Image_*.png
+fix.png
+fix2.png
+references.png
+wheel.png
+scripts/probe-*.ps1
+ec-share_logo.png
+logo.svg

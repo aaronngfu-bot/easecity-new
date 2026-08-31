@@ -56,14 +56,17 @@
    the fold. Without it the fold lands wherever the headline happens to stop,
    which differs by language, and the next heading peeks in on one and not the
    other. Centred rather than top-aligned so the slack on a tall screen reads as
-   air around the hero instead of a gap under it. */
+   air around the hero instead of a gap under it. Capped at 56.25rem: past that,
+   `100svh` kept outgrowing the content on a tall monitor (2560×1440 measured
+   ~300px of pure air above the headline), and nothing below the fold needs
+   protecting once the hero is already taller than its own content. */
 .hero {
   position: relative;
   overflow: hidden;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 100svh;
+  min-height: min(100svh, 56.25rem);
   /* The icon is a solid block where a line of small type used to sit, so it
      needs more clearance under the floating header than the eyebrow did. */
   padding: 6.5rem 0 3rem;

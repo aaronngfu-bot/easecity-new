@@ -1,7 +1,13 @@
 # MUPhone / EC-Share — Engineering Changelog
 
 所有從 Cursor 介入到目前狀態的實際改動記錄。
-最後更新：2026-08-27
+最後更新：2026-08-31
+
+## 2026-08-31 — 修復 dev server `.next` 損毀、`/ec-share` 首屏在大尺寸螢幕不再留過大空隙
+
+- **`.next` 損毀導致頁面完全無樣式**：使用者回報「產品頁首個 section 大尺寸留白太大」，實際檢查時發現 `.editorial_hero__57Eoa` 的 `getComputedStyle` 顯示 `display: block`、`min-height: 0`、無 padding——`editorial.module.css` 整個沒生效。追查發現頁面引用的 `/_next/static/css/app/(public)/ec-share/page.css` 回傳 404。根因是上一個 session 曾在 `next dev` 仍在跑的同時執行 `next build`，兩者共用同一個 `.next` 目錄，當時已知會撞出無關的 `MODULE_NOT_FOUND`，但沒有徹底清除留下的殘留狀態，讓 dev server 之後持續生成/提供錯誤或缺失的 CSS chunk。修法：關掉舊的 dev server process、刪除整個 `.next`、重新啟動，CSS chunk 正常編譯，頁面樣式恢復。
+- **`/ec-share` 首屏 `min-height: 100svh` 在大螢幕留白過大**：`.hero` 用 `min-height: 100svh` + `justify-content: center`，確保下一個 section 不會在摺線之上偷跑出來——這在一般筆電螢幕上沒問題，因為首屏內容本身（icon+標題列、寬幅圖、統計列，桌面寬度下約 1035px 含 padding）已經超過典型視窗高度。但 `100svh` 是跟著「螢幕高度」長大，不是跟著內容——實測 2560×1440（常見桌面顯示器解析度）時，section 被撐到 1440px 高，置中的內容上方留了約 307px 純空白、下方約 267px，而不是原本設計的 padding。修法：`min-height: min(100svh, 56.25rem)`——900px 以下（幾乎所有筆電）行為不變，超過時 section 改回貼著內容的自然高度，多出來的空間只剩原本的 padding。修復後在 2560×1440 重新量測：上下留白從 307px／267px 降回 104px／64px（剛好等於 `padding-top`／`padding-bottom`）。
+- 驗證：`tsc --noEmit` 乾淨，無新增 lint 錯誤。用 CDP `Emulation.setDeviceMetricsOverride` 分別在 1366×768（內容本身已超過視窗高度，行為不變，下個 section 依然在摺線之下）、1920×1080（多餘留白從約 23px 降到 0）、1920×1200 與 2560×1440（多餘留白從 200–300px 降到剛好等於 padding）量測 `getBoundingClientRect`，確認修復生效且沒有在正常筆電尺寸上造成回歸。並在真實瀏覽器視窗（1920×1080）截圖確認首屏視覺正常。
 
 ## 2026-08-27 — 服務頁主案例圖與產品頁寬幅圖分離、產品頁圖片精確尺寸、圖片圓角美化
 
