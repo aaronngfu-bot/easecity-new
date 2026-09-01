@@ -793,13 +793,15 @@
 .ec-key-1, .ec-key-2, .ec-key-3, .ec-key-4 {
   animation: ec-key-flash 6s ease-in-out infinite;
 }
-.ec-key-1 { animation-delay: 0.4s; }
-.ec-key-2 { animation-delay: 1.0s; }
-.ec-key-3 { animation-delay: 1.6s; }
-.ec-key-4 { animation-delay: 2.2s; }
+.ec-key-1 { animation-delay: 0.1s; }
+.ec-key-2 { animation-delay: 0.35s; }
+.ec-key-3 { animation-delay: 0.6s; }
+.ec-key-4 { animation-delay: 0.85s; }
+/* Short tap, confined to the typing window before send — no keyboard motion
+   after the message has been sent. */
 @keyframes ec-key-flash {
-  0%, 8%, 28%, 100% { fill: rgba(0,0,0,0.28); transform: scale(1); }
-  12%, 18% { fill: rgba(255,255,255,0.55); transform: scale(0.9); }
+  0%, 1.5%, 8%, 100% { fill: rgba(0,0,0,0.28); transform: scale(1); }
+  3%, 5% { fill: rgba(255,255,255,0.55); transform: scale(0.9); }
 }
 
 .ec-typed {
@@ -808,11 +810,15 @@
   transform-origin: left center;
 }
 @keyframes ec-typed {
-  0%, 8%, 78%, 100% { transform: scaleX(0.14); opacity: 0.35; }
-  18% { transform: scaleX(0.38); opacity: 0.8; }
-  28% { transform: scaleX(0.68); opacity: 0.95; }
-  38%, 52% { transform: scaleX(1); opacity: 1; }
-  62% { transform: scaleX(1); opacity: 0; }
+  /* Stepped growth that stays in lock-step with each key tap: after key-1 the
+     text is one chunk, key-2 two, key-3 three, key-4 four — not a smooth fill
+     that runs ahead of the keyboard. */
+  0%, 2% { transform: scaleX(0.12); opacity: 0.5; }
+  4%, 8% { transform: scaleX(0.3); opacity: 0.85; }    /* after key-1 */
+  10%, 14% { transform: scaleX(0.5); opacity: 0.95; }  /* after key-2 */
+  16%, 19% { transform: scaleX(0.7); opacity: 1; }     /* after key-3 */
+  20% { transform: scaleX(0.92); opacity: 1; }         /* after key-4, ready to send */
+  22%, 100% { transform: scaleX(0); opacity: 0; }      /* cleared the instant it's sent */
 }
 
 .ec-send-btn {
@@ -821,18 +827,38 @@
   transform-origin: center;
 }
 @keyframes ec-send-btn {
-  0%, 48%, 62%, 100% { transform: scale(1); }
-  54% { transform: scale(0.82); }
+  0%, 15%, 40%, 100% { transform: scale(1); }
+  19% { transform: scale(0.82); }
+  22% { transform: scale(1); }
 }
 
+/* No scrolling: the conversation is a fixed set A B C D, and only the send (E)
+   and reply (F) bubbles enter in order — so a later bubble can never appear
+   before an earlier one. */
 .ec-chat-stack {
-  animation: ec-chat-stack 6s ease-in-out infinite;
+  /* static stack */
 }
-@keyframes ec-chat-stack {
-  0%, 26% { transform: translateY(0); } /* idle: A B C D — waiting */
-  30%, 42% { transform: translateY(calc(-1 * var(--ec-step, 9.5px))); } /* my send: B C D E — A masked out */
-  46%, 58% { transform: translateY(calc(-2 * var(--ec-step, 9.5px))); } /* their reply: C D E F — B masked out */
-  100% { transform: translateY(calc(-6 * var(--ec-step, 9.5px))); } /* seamless to next pattern start */
+/* Story: when "my send" fires, the outgoing bubble rises up from the input
+   row (translateY = --rise) and fades in — it visibly leaves the compose bar
+   and lands in the chat. It starts hidden (opacity 0) until that beat. */
+.ec-chat-send {
+  animation: ec-chat-send 6s ease-in-out infinite;
+  transform-box: fill-box;
+}
+@keyframes ec-chat-send {
+  0%, 19% { opacity: 0; transform: translateY(var(--rise, 9.5px)); }
+  22% { opacity: 1; transform: translateY(0); }
+  40%, 100% { opacity: 1; transform: translateY(0); }
+}
+/* And when their reply comes in, the reply bubble rises one beat later. */
+.ec-chat-reply {
+  animation: ec-chat-reply 6s ease-in-out infinite;
+  transform-box: fill-box;
+}
+@keyframes ec-chat-reply {
+  0%, 42% { opacity: 0; transform: translateY(var(--rise, 9.5px)); }
+  46% { opacity: 1; transform: translateY(0); }
+  56%, 100% { opacity: 1; transform: translateY(0); }
 }
 
 /* `transform-box: fill-box` matters here: without it, a `%` translate on an
@@ -845,45 +871,167 @@
    at the size these devices actually render on the page they looked static.
    These three are rebuilt around one bold, unmistakable motif each instead. */
 
-/* News: one big tag swatch cycling through three colours (a new story each
-   time) next to two plain headline bars that never move — the colour swap
-   alone reads as "feed updating" without needing scrolling text. */
-.ec-news-thumb {
-  animation: ec-news-thumb-fade 9s ease-in-out infinite;
+/* News: a BBC-news-app style mobile feed on the tablet. The white paper base
+   and hairlines stay put; photo and headline share ONE swap window so they
+   change as a single atomic unit (never a bare headline over a stale or
+   missing photo), the red LIVE pill breathes, and the compact list rows
+   refresh on staggered offsets so the feed reads as updating itself. Closed
+   loops: frame 0 === frame 100. The layers render with opacity="0" in the
+   markup, so all visibility here is owned by the running animation — and
+   reduced-motion gets an explicit static state (lead story only) below. */
+.ec-news-hero,
+.ec-news-swap {
+  animation-duration: 9s;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
 }
-.ec-news-thumb-1 { animation-delay: -3s; }
-.ec-news-thumb-2 { animation-delay: -6s; }
-@keyframes ec-news-thumb-fade {
-  0%, 4% { opacity: 0; }
-  10%, 26% { opacity: 1; }
-  32%, 100% { opacity: 0; }
+.ec-news-hero { animation-name: ec-news-hero; }
+.ec-news-swap {
+  animation-name: ec-news-swap;
+  transform-box: fill-box;
+}
+/* Every layer uses the same shape, delayed +3s·i: visible on [0, 33), fading
+   out over [33, 38), hidden until 95, fading back in over [95, 100). The
+   incoming layer is fully opaque before the outgoing one starts fading
+   (fade-in ends at 3i+3, fade-out starts at 3i+2.97 → the brief overlap has
+   both layers ≥ ~0.93), so photo and headline areas are never empty
+   mid-handover. Frame 0 === frame 100. */
+.ec-news-lead { animation-name: ec-news-lead; }
+@keyframes ec-news-hero {
+  0%, 33% { opacity: 1; }
+  38%, 95% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes ec-news-swap {
+  0%, 33% { opacity: 1; transform: translateY(0); }
+  38%, 95% { opacity: 0; transform: translateY(-2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes ec-news-lead {
+  0%, 33% { opacity: 1; transform: translateY(0); }
+  38%, 95% { opacity: 0; transform: translateY(-2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+/* Continuous Ken Burns on the photo scene inside the swapped hero layers:
+   one drift 1.035 -> 1.09 -> 1.035 across the whole 9s cycle, so the camera
+   never resets when the story changes — it reads as one live shot instead of
+   three stills clicking past. Never below 1.0, so no edge gaps. */
+.ec-news-photo {
+  animation: ec-news-kenburns 9s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: 50% 60%;
+}
+@keyframes ec-news-kenburns {
+  0%, 100% { transform: scale(1.035); }
+  50% { transform: scale(1.09); }
+}
+.ec-news-live {
+  /* 2.25s × 4 = 9s: the breath closes exactly with the scene's master loop. */
+  animation: ec-news-live 2.25s ease-in-out infinite;
+}
+@keyframes ec-news-live {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.88; }
+}
+/* The pill's white dot pulses (BBC/live-broadcast read); the pill itself
+   stays put and only dims a touch so the badge never wobbles. */
+.ec-news-live-dot {
+  animation: ec-news-live-dot 2.25s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ec-news-live-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.5); }
 }
 
-/* Game: three score stars fill in sequence, then a bounce and reset — the
-   universal "combo counter" — while a single gem idles with its own bounce
-   underneath, so there is always something obviously alive on the screen. */
-.ec-game-star {
-  fill: rgba(255, 255, 255, 0.22);
-  animation: ec-game-star-fill 6s ease-in-out infinite;
+/* Game: a mobile runner, content only. The playfield fills the screen —
+   graded dusk sky + rolling ground — and the phone-ness comes from a
+   translucent thumb-zone: a round JUMP button (its halo flashes in step with
+   each hop) and a pause chip. Two spikes sweep the lane on one shared 6s
+   track at opposite phase; the player hops each exactly as it passes
+   underneath. All loops close (frame 0 === frame 100). */
+.ec-game-player {
+  animation: ec-game-player 6s cubic-bezier(0.3, 0, 0.4, 1) infinite;
+  transform-box: fill-box;
+  transform-origin: center bottom;
+}
+/* Lane maths (w=44 screen): a spike enters at x=48 and sweeps -52px over 6s
+   (linear), so its centre crosses the player's lane (x≈9.6-16.8) during
+   ~57-71% of the cycle; the second spike runs the same track half a cycle
+   out of phase, crossing during ~7-21%. The player hops twice per loop —
+   airborne exactly while a spike passes underneath — and the button press,
+   halo flash and dust puffs key off those two landings. The spikes'
+   loop-boundary teleport (x=-4 back to x=48) happens fully off-screen. */
+@keyframes ec-game-player {
+  0%, 2% { transform: translateY(0) scale(1, 1); }
+  4% { transform: translateY(0) scale(1.15, 0.85); }
+  6%, 22% { transform: translateY(-6.5px) scale(0.95, 1.05); }
+  24% { transform: translateY(0) scale(1.12, 0.88); }
+  28%, 52% { transform: translateY(0) scale(1, 1); }
+  54% { transform: translateY(0) scale(1.15, 0.85); }
+  56%, 72% { transform: translateY(-6.5px) scale(0.95, 1.05); }
+  74% { transform: translateY(0) scale(1.12, 0.88); }
+  78%, 100% { transform: translateY(0) scale(1, 1); }
+}
+.ec-game-obstacle {
+  animation: ec-game-obstacle 6s linear infinite;
+  transform-box: fill-box;
+}
+@keyframes ec-game-obstacle {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(calc(var(--gx, 52px) * -1)); }
+}
+/* The second spike runs the same track half a cycle out of phase. */
+.ec-game-obstacle-b { animation-delay: -3s; }
+/* Dust puffs kicked up at each landing (24% and 74%). */
+.ec-game-dust {
+  animation: ec-game-dust 6s ease-out infinite;
+}
+@keyframes ec-game-dust {
+  0%, 22% { opacity: 0; transform: translateX(0) scale(0.6); }
+  26% { opacity: 0.9; transform: translateX(-1.2px) scale(1); }
+  36% { opacity: 0; transform: translateX(-3.4px) scale(1.5); }
+  72% { opacity: 0; transform: translateX(0) scale(0.6); }
+  76% { opacity: 0.9; transform: translateX(-1.2px) scale(1); }
+  86%, 100% { opacity: 0; transform: translateX(-2px) scale(1.3); }
+}
+/* Ground speed dashes drift left; the drift ends at exactly --gd so the
+   pattern (drawn once per w*0.3) tiles seamlessly at the loop point. */
+.ec-game-ground {
+  animation: ec-game-ground 6s linear infinite;
+}
+@keyframes ec-game-ground {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(var(--gd, -16px)); }
+}
+/* The thumb-zone JUMP button: press-in (scale down) for each of the two
+   hops, released as the player lands. */
+.ec-game-btn {
+  animation: ec-game-btn 6s cubic-bezier(0.3, 0, 0.4, 1) infinite;
   transform-box: fill-box;
   transform-origin: center;
 }
-.ec-game-star-1 { animation-delay: 0.35s; }
-.ec-game-star-2 { animation-delay: 0.7s; }
-@keyframes ec-game-star-fill {
-  0%, 6% { fill: rgba(255, 255, 255, 0.22); transform: scale(1); }
-  14% { transform: scale(1.4); }
-  20%, 78% { fill: #fbbf24; transform: scale(1); }
-  86%, 100% { fill: rgba(255, 255, 255, 0.22); transform: scale(1); }
+@keyframes ec-game-btn {
+  0%, 2% { transform: scale(1); }
+  7%, 23% { transform: scale(0.88); }
+  28%, 52% { transform: scale(1); }
+  57%, 73% { transform: scale(0.88); }
+  78%, 100% { transform: scale(1); }
 }
-.ec-game-gem {
-  animation: ec-game-gem-bounce 1.6s ease-in-out infinite;
+/* Touch halo: a ring flash on the button at each hop start. */
+.ec-game-tap {
+  animation: ec-game-tap 6s ease-out infinite;
   transform-box: fill-box;
   transform-origin: center;
 }
-@keyframes ec-game-gem-bounce {
-  0%, 100% { transform: translateY(0) scale(1); }
-  50% { transform: translateY(-3px) scale(1.08); }
+@keyframes ec-game-tap {
+  0%, 2% { opacity: 0; transform: scale(0.9); }
+  6% { opacity: 0.7; transform: scale(1); }
+  18% { opacity: 0; transform: scale(1.35); }
+  52% { opacity: 0; transform: scale(0.9); }
+  56% { opacity: 0.7; transform: scale(1); }
+  68%, 100% { opacity: 0; transform: scale(1.2); }
 }
 
 /* Social: one still photo, no scrolling feed — the double-tap "like" burst
@@ -909,46 +1057,167 @@
   50% { opacity: 0.8; transform: scale(1); }
   70%, 100% { opacity: 0; transform: scale(1.6); }
 }
+/* Social: full-screen Instagram-style posts stacked vertically, scrolled down
+   the feed (swipe up → next post). Stack moves 0 → -postH → -2*postH. The
+   red like heart pops while the middle post (at -postH) is parked in view. */
+.ec-social-stack {
+  animation: ec-social-stack 9s ease-in-out infinite;
+}
+@keyframes ec-social-stack {
+  0%, 8% { transform: translateY(0); }
+  16%, 54% { transform: translateY(calc(-1 * var(--posth, 90px))); }
+  62%, 76% { transform: translateY(calc(-2 * var(--posth, 90px))); }
+  84%, 100% { transform: translateY(0); }
+}
+/* Red like heart pops in the middle of the parked post (during the mid-post
+   hold), like an IG double-tap. */
+.ec-social-like {
+  animation: ec-social-like 9s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ec-social-like {
+  0%, 18% { opacity: 0; transform: scale(0.3); }
+  23% { opacity: 1; transform: scale(1.35); }
+  30% { opacity: 1; transform: scale(1); }
+  38%, 100% { opacity: 0; transform: scale(1); }
+}
 
+/* Gallery: a 2×2 album and an enlarged single photo cross-fade on a loop. The
+   album holds first, then the enlarged photo scales/fades up over it (its
+   caption lines ride along), then back — all CSS-driven, closed loops. */
+.ec-gallery-album {
+  animation: ec-gallery-album 8s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ec-gallery-album {
+  0%, 40%, 100% { opacity: 1; transform: scale(1); }
+  50%, 90% { opacity: 0; transform: scale(1.03); }
+}
 .ec-gallery-photo {
-  animation: ec-gallery-photo 6.8s ease-in-out infinite;
+  animation: ec-gallery-photo 8s ease-in-out infinite;
   transform-box: fill-box;
   transform-origin: center;
 }
 @keyframes ec-gallery-photo {
-  0%, 18%, 88%, 100% { opacity: 0; transform: scale(0.55); }
-  28% { opacity: 1; transform: scale(1.04); }
-  36%, 78% { opacity: 1; transform: scale(1); }
+  0%, 38%, 100% { opacity: 0; transform: scale(0.8); }
+  48% { opacity: 1; transform: scale(1); }
+  70%, 86% { opacity: 1; transform: scale(1); }
+}
+/* Caption lines low inside the photo appear only while the photo view shows. */
+.ec-gallery-caption {
+  animation: ec-gallery-caption 8s ease-in-out infinite;
+}
+@keyframes ec-gallery-caption {
+  0%, 38%, 100% { opacity: 0; }
+  48%, 88% { opacity: 1; }
 }
 
-.ec-gallery-album {
-  animation: ec-gallery-album 6.8s ease-in-out infinite;
-}
-@keyframes ec-gallery-album {
-  0%, 18%, 88%, 100% { opacity: 1; }
-  28%, 78% { opacity: 0; }
-}
-
+/* Video: an 11s looping playback. Dusk → night plays while the progress bar
+   runs (0–70%), then the finished night scene holds for ~2.5s of "watch the
+   still" (70–92%), then everything snaps instantly back to the dusk start
+   (92%) so it replays. The snap is the only instant jump; within the play +
+   hold the transitions are smooth. */
 .ec-ytplay {
-  animation: ec-ytplay 8s ease-in-out infinite;
   transform-box: fill-box;
   transform-origin: center;
 }
-@keyframes ec-ytplay {
-  0%, 12%, 100% { opacity: 1; transform: scale(1); }
-  20% { opacity: 1; transform: scale(0.86); }
-  28%, 86% { opacity: 0; transform: scale(0.7); }
-  94% { opacity: 1; transform: scale(1); }
+/* Play triangle: at the start it "clicks" once — a single quick flash of the
+   play glyph — then instantly hands over to the pause glyph (no fade, a snap). */
+.ec-yt-playbtn {
+  animation: ec-yt-playbtn 11s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ec-yt-playbtn {
+  0%, 100% { opacity: 0; transform: scale(0.8); }
+  2% { opacity: 1; transform: scale(1); }
+  6% { opacity: 1; transform: scale(1); }
+  7%, 99.5% { opacity: 0; transform: scale(0.9); }
+}
+/* Pause glyph: appears the instant the play triangle is clicked (a snap), stays
+   through the play, then fades away toward the end of the clip. */
+.ec-yt-pausebtn {
+  animation: ec-yt-pausebtn 11s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ec-yt-pausebtn {
+  0%, 6.5% { opacity: 0; transform: scale(0.8); }
+  8%, 13% { opacity: 1; transform: scale(1); }
+  20%, 100% { opacity: 0; transform: scale(0.8); }
+}
+.ec-yt-sky {
+  animation: ec-yt-sky 11s ease-in-out infinite;
+  fill: #fb923c;
+}
+@keyframes ec-yt-sky {
+  0%, 14% { fill: #fb923c; opacity: 0.9; }
+  36% { fill: #f472b6; opacity: 0.92; }
+  54%, 92% { fill: #0f172a; opacity: 1; }
+  93%, 100% { fill: #fb923c; opacity: 0.9; }
+}
+.ec-yt-sun {
+  animation: ec-yt-sun 11s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ec-yt-sun {
+  0%, 14% { opacity: 0.95; transform: translateY(0); }
+  26% { opacity: 0.9; transform: translateY(5px); }
+  40%, 92% { opacity: 0; transform: translateY(10px); }
+  93%, 100% { opacity: 0.95; transform: translateY(0); }
+}
+.ec-yt-moon {
+  animation: ec-yt-moon 11s ease-in-out infinite;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+@keyframes ec-yt-moon {
+  0%, 40% { opacity: 0; transform: translateY(9px); }
+  78%, 92% { opacity: 0.9; transform: translateY(0); }
+  92.2%, 100% { opacity: 0; transform: translateY(0); }
+}
+.ec-yt-star {
+  animation: ec-yt-star 11s ease-in-out infinite;
+}
+@keyframes ec-yt-star {
+  0%, 42% { opacity: 0; }
+  54%, 92% { opacity: 1; }
+  93%, 100% { opacity: 0; }
+}
+.ec-yt-mountain {
+  animation: ec-yt-mountain 11s ease-in-out infinite;
+}
+@keyframes ec-yt-mountain {
+  0%, 16% { opacity: 0.78; }
+  50%, 92% { opacity: 1; }
+  93%, 100% { opacity: 0.78; }
 }
 
 .ec-progress {
-  animation: ec-progress 8s ease-in-out infinite;
+  animation: ec-progress 11s ease-in-out infinite;
   transform-box: fill-box;
   transform-origin: left center;
 }
 @keyframes ec-progress {
-  0%, 22%, 100% { transform: scaleX(0.08); }
-  86% { transform: scaleX(1); }
+  0%, 8% { transform: scaleX(0); }
+  72% { transform: scaleX(1); }
+  92% { transform: scaleX(1); }
+  92.2%, 100% { transform: scaleX(0); }
+}
+/* Playback head glides along the progress track, matching the fill. `--tw` is
+   the track width, set inline per device; translateX carries it along. */
+.ec-progress-head {
+  animation: ec-progress-head 11s ease-in-out infinite;
+  will-change: transform;
+}
+@keyframes ec-progress-head {
+  0%, 8% { transform: translateX(0); }
+  72% { transform: translateX(var(--tw, 40px)); }
+  92% { transform: translateX(var(--tw, 40px)); }
+  92.2%, 100% { transform: translateX(0); }
 }
 
 .ec-marquee,
@@ -959,12 +1228,20 @@
 
 @media (prefers-reduced-motion: reduce) {
   .ec-key-1, .ec-key-2, .ec-key-3, .ec-key-4,
-  .ec-typed, .ec-send-btn, .ec-chat-stack,
-  .ec-news-thumb, .ec-game-star, .ec-game-gem, .ec-like, .ec-like-ring,
-  .ec-ytplay, .ec-progress, .ec-gallery-photo, .ec-gallery-album {
+  .ec-typed, .ec-send-btn, .ec-chat-stack, .ec-chat-send, .ec-chat-reply,
+  .ec-news-hero, .ec-news-swap, .ec-news-live, .ec-news-photo, .ec-news-live-dot,
+  .ec-social-stack, .ec-social-like,
+  .ec-game-player, .ec-game-obstacle, .ec-game-dust, .ec-game-ground,
+  .ec-game-btn, .ec-game-tap,
+  .ec-like, .ec-like-ring,
+  .ec-ytplay, .ec-yt-playbtn, .ec-yt-pausebtn, .ec-progress, .ec-progress-head, .ec-yt-mountain, .ec-yt-sun, .ec-yt-sky, .ec-yt-moon, .ec-yt-star,
+  .ec-gallery-photo, .ec-gallery-album, .ec-gallery-caption {
     animation: none !important;
     transform: none !important;
   }
+  /* News layers own their visibility through the (now stopped) animation and
+     sit at opacity="0" in the markup — pin the lead story open statically. */
+  .ec-news-lead { opacity: 1; }
   .ec-mon-cell, .ec-mon-cell > rect, .ec-mon-cell > g, .ec-cable, .ec-device {
     transition: none !important;
   }
@@ -990,6 +1267,11 @@
     height 0.4s cubic-bezier(0.23, 1, 0.32, 1), d 0.4s cubic-bezier(0.23, 1, 0.32, 1),
     opacity 0.3s ease;
 }
+/* Disconnected mirror tile: the cell stays mounted (its screen animations
+   keep running, staying in phase with the physical device beside it) and is
+   only faded out. Reconnecting fades it straight back in at the same moment
+   the device screen shows — no animation restart, no phase jump. */
+.ec-mon-hidden { opacity: 0; pointer-events: none; }
 .ec-camera { fill: #000; }
 .dark .ec-camera { fill: #000; }
 :root:not(.dark) .ec-camera { fill: #fff; }
