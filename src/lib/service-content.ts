@@ -545,8 +545,8 @@ export const STAGE_DETAIL: { output: Bilingual; yours: Bilingual }[] = [
   },
   {
     output: {
-      en: 'Something you can click, or drawings precise enough to argue with.',
-      zh: '一個你能點擊的東西，或精確到足以拿來爭論的設計稿。',
+      en: 'Design artifacts matched to the project — wireframes, visual mockups, or a clickable prototype where one helps.',
+      zh: '按專案需要的設計產物——線框圖、視覺稿，或於有幫助時提供可點擊的原型。',
     },
     yours: {
       en: 'One round of honest reactions, from someone able to decide.',
