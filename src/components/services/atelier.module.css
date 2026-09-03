@@ -302,9 +302,14 @@
   align-items: start;
   gap: 1.1rem;
   width: 100%;
-  padding: 1.45rem 1.4rem;
+  /* Tighter on phones: the 3-col row + icon leaves ~230px of text at 320px,
+     so the horizontal padding steps down until the icon column can breathe. */
+  padding: 1.2rem 1rem;
   text-align: left;
   cursor: pointer;
+}
+@media (min-width: 768px) {
+  .itemBtn { padding: 1.45rem 1.4rem; }
 }
 .itemIcon {
   display: flex;
@@ -364,14 +369,17 @@
 .panelBody {
   display: grid;
   gap: 1.4rem;
-  padding: 0 1.4rem 1.6rem;
+  /* Aligns the bullets with the title text column (itemBtn padding 1rem +
+     icon 2.25rem + gap 1.1rem), the phone counterpart of the 4.75rem rule
+     below — the dashes clear the card edge by the icon's full width. */
+  padding: 0 1rem 1.4rem 4.35rem;
 }
 @media (min-width: 768px) {
   .panelBody {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: 2.5rem;
     /* Lines up under the heading, not under the icon beside it. */
-    padding-left: 4.75rem;
+    padding: 0 1.4rem 1.6rem 4.75rem;
   }
 }
 .bullets { display: grid; gap: 0.7rem; }
@@ -393,6 +401,11 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 1.1rem;
+}
+/* Phones: the action clears the bullet column and lands on the right edge,
+   matching where the row's plus icon sits. md+ keeps the far-corner rule. */
+@media (max-width: 767.98px) {
+  .detail { align-self: flex-end; }
 }
 /* The action goes to the far corner of the panel rather than following the
    tags: it is where the row ends, and it stops the button competing with the

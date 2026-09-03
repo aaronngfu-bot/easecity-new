@@ -66,15 +66,17 @@ export function PageHero({
 
           {meta && meta.length > 0 && (
             <div className={cn(
-              'mt-10 flex flex-wrap items-stretch gap-0 border-y border-[var(--border-color)] md:mt-14',
-              align === 'center' && 'justify-center'
+              // Phones: stacked rows with rules between them (flex-wrap leaves
+              // items touching at 393px). sm+: the ruled inline strip.
+              'mt-10 border-y border-[var(--border-color)] max-sm:grid sm:flex sm:flex-wrap sm:items-stretch md:mt-14',
+              align === 'center' && 'sm:justify-center'
             )}>
               {meta.map((item, i) => (
                 <div
                   key={item.label}
                   className={cn(
-                    'flex flex-col py-4 pr-8 md:py-5 md:pr-12',
-                    i > 0 && 'border-l border-[var(--border-color)] pl-8 md:pl-12'
+                    'flex flex-col py-4 pr-6 sm:pr-8 md:py-5 md:pr-12',
+                    i > 0 && 'max-sm:border-t sm:border-l sm:border-[var(--border-color)] sm:pl-8 md:pl-12'
                   )}
                 >
                   <span className="label-mono mb-2">{item.label}</span>

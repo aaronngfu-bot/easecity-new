@@ -344,7 +344,10 @@
   }
 }
 
-@media (max-width: 900px), (max-height: 540px) {
+/* 960, not 900: the EN nav measures 821px wide (ZH 698px). At the old 901px
+   breakpoint the EN pill left only ~37px of side padding; below 960px the
+   hamburger carries both languages. */
+@media (max-width: 959px), (max-height: 540px) {
   .desktop-only {
     display: none !important;
   }
@@ -353,7 +356,7 @@
   }
 }
 
-@media (min-width: 901px) and (min-height: 541px) {
+@media (min-width: 960px) and (min-height: 541px) {
   .mobile-only {
     display: none !important;
   }

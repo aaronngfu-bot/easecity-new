@@ -34,9 +34,12 @@
   from { opacity: 0; transform: translate3d(0, 22px, 0); }
   to { opacity: 1; transform: none; }
 }
+/* The wipe's end state sits 96px OUTSIDE the box, not at inset(0): fill-mode
+   forwards keeps the final clip-path applied forever, and an inset(0) rect
+   would amputate the plate's drop shadow along its whole perimeter. */
 @keyframes reveal {
   from { opacity: 0; clip-path: inset(0 0 0 100%); }
-  to { opacity: 1; clip-path: inset(0 0 0 0); }
+  to { opacity: 1; clip-path: inset(-96px); }
 }
 
 .enter { opacity: 0; animation: slide 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -134,6 +137,16 @@
   .appIcon { grid-area: 1 / 1 / 3 / 2; align-self: start; }
   .title { grid-area: 2 / 2; }
 }
+/* Phones run their own size band. The base clamp bottoms out at 2.3rem (4.4vw
+   is tiny at phone widths), which forces the EN headline "Every Android device"
+   (426px at 36.8px) into an orphan third line. 7.2vw keeps that line intact at
+   every phone width (measured 393→28.3px/327px, 320→23px/266px against 272px
+   available); the icon scales with it via --icon-size. */
+@media (max-width: 639.98px) {
+  .lead {
+    --title-size: clamp(1.3rem, 7.2vw, 2.6rem);
+  }
+}
 .appIcon {
   position: relative;
   height: var(--icon-size);
@@ -169,6 +182,12 @@
   font-size: 1.02rem;
   line-height: 1.8;
   color: var(--text-secondary);
+}
+/* EN copy runs ~1.7x the length of ZH; on phones that pushes the subtitle to
+   6 wrapped lines and it starts competing with the headline. A step down keeps
+   the same measure for ZH (line count unchanged) and buys EN back two lines. */
+@media (max-width: 639.98px) {
+  .sub { font-size: 0.94rem; }
 }
 .ctas {
   margin-top: 1.6rem;
@@ -211,27 +230,89 @@
   margin-top: 3rem;
   aspect-ratio: 21 / 9;
   overflow: hidden;
-  border-radius: 0.75rem;
-  background: var(--bg-elevated);
+  border-radius: 1rem;
+  /* dark-room finish: the screenshot lives on its own same-source navy, so
+     the plate reads as a lit screen in a dim studio in light mode and merges
+     with the page in dark mode. Vignette pulls the eye inward; the frame is
+     the same single hairline the nav capsule wears (`--nav-border`), so the
+     two keep one border language across both page themes. */
+  background: #0d1420;
+  border: 1px solid var(--nav-border);
+  box-shadow:
+    inset 0 0 0 1px rgba(0, 0, 0, 0.55),        /* inner dark ring right against the photo */
+    inset 0 0 4.5rem rgba(0, 0, 0, 0.5),         /* corner vignette */
+    0 1.75rem 3.5rem -1.25rem rgba(2, 8, 20, 0.55);
+}
+:root:not(.dark) .heroPlate {
+  /* A hairline reads only where it contrasts with its own surface. The nav
+     capsule wears a dark line because its surface is white; this plate's
+     surface is dark in BOTH themes, so its line is light in both too.
+     0.25 measures ΔL≈74 against the plate — quiet, but unmistakable. */
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.14),  /* inner light ring separates frame from photo */
+    inset 0 0 4.5rem rgba(0, 0, 0, 0.5),
+    0 1.75rem 3.5rem -1.25rem rgba(2, 8, 20, 0.5);
 }
 .heroPlate img { object-fit: cover; }
+/* Phones keep a wide frame, not 4:3. The composite that actually ships here
+   (and any competent marketing hero) is ~2.4:1; at 4:3 the cover crop amputates
+   ~44% of its width — the baked-in headline was losing its first characters.
+   21:9 keeps the full composition (2.8% trim) while staying short enough that
+   the plate doesn't swallow a phone viewport. */
 @media (max-width: 767.98px) {
-  .heroPlate { aspect-ratio: 4 / 3; }
+  .heroPlate { aspect-ratio: 21 / 9; }
 }
+/* Stat pill straddling the plate's bottom edge — the composition ends on a
+   landed beat. It is cut from the same material as the plate: same navy
+   ground, same hairline border token, so the two read as one object with a
+   text band on it rather than a card parked on a photo. */
 .figures {
   display: grid;
-  gap: 0.5rem 2.5rem;
-  border-top: 1px solid var(--border-color);
-  margin-top: 1rem;
-  padding-top: 1rem;
+  grid-template-columns: repeat(3, 1fr);
+  /* 48.5rem, not 44: EN cell 2 ("Low latency LATENCY") needs 211px of content;
+     at 44rem it had 7px of total slack and sat against the dividers. */
+  width: min(100%, 48.5rem);
+  margin: -2.1rem auto 0;
+  position: relative;
+  z-index: 2;
+  padding: 0.9rem 1.5rem;
+  border-radius: 1rem;
+  background: #0d1420;
+  border: 1px solid var(--nav-border);
+  box-shadow: 0 1.25rem 2.5rem -1rem rgba(2, 8, 20, 0.4);
 }
-@media (min-width: 640px) {
-  .figures { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+:root:not(.dark) .figures {
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 1.25rem 2.5rem -1rem rgba(2, 8, 20, 0.5);
 }
+/* The stats sit ON the dark ground now, so their type is light in both themes
+   — same rule the plate's frame follows. */
+.figures .figureVal { color: #f2f6f7; }
+.figures .figureKey { color: rgba(235, 244, 245, 0.55); }
 .figure {
   display: flex;
   align-items: baseline;
+  justify-content: center;
   gap: 0.7rem;
+  /* The air between each stat and its divider — without it wide EN values
+     touch the rules. */
+  padding-inline: 0.9rem;
+}
+.figure + .figure { border-left: 1px solid rgba(235, 244, 245, 0.14); }
+@media (max-width: 767.98px) {
+  .figures {
+    grid-template-columns: 1fr;
+    gap: 0.4rem;
+    margin-top: -1.4rem;
+    width: min(100%, 26rem);
+  }
+  .figure { justify-content: flex-start; padding-inline: 0.25rem; }
+  .figure + .figure {
+    border-left: none;
+    border-top: 1px solid rgba(235, 244, 245, 0.14);
+    padding-top: 0.4rem;
+  }
 }
 .figureVal {
   font-size: 1.35rem;

@@ -41,7 +41,7 @@ export function DownloadPageClient({
       <section className="pt-4 pb-14 md:pb-16">
         <div className="container-max">
           <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="glass-prominent overflow-hidden p-6 md:p-8">
+            <div className="glass-prominent min-w-0 overflow-hidden p-6 md:p-8">
               <div className="mb-8 flex flex-col gap-4 border-b border-border  pb-8 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="label-mono mb-4">{copy.primaryInstallerLabel}</p>
@@ -56,7 +56,10 @@ export function DownloadPageClient({
               </div>
 
               <div className="grid gap-6 md:grid-cols-[0.9fr_1.1fr]">
-                <div className="rounded-2xl border border-border  bg-bg-base/50 p-5">
+                {/* min-w-0: grid/flex children default to min-width:auto, so a
+                    single unbreakable token (the env var name below) would
+                    otherwise blow this column past the viewport on phones. */}
+                <div className="min-w-0 rounded-2xl border border-border  bg-bg-base/50 p-5">
                   <p className="label-mono mb-3">{copy.releaseCardLabel}</p>
                   <p className="mb-2 font-display text-2xl font-bold text-text-primary">
                     {copy.releaseCardTitle}
@@ -82,7 +85,7 @@ export function DownloadPageClient({
                   </div>
                 </div>
 
-                <div className="flex flex-col justify-between">
+                <div className="flex min-w-0 flex-col justify-between">
                   <div>
                     <p className="text-text-secondary leading-relaxed">{copy.primaryDesc}</p>
                     <div className="mt-6 flex flex-col gap-3 sm:flex-row">
@@ -105,8 +108,10 @@ export function DownloadPageClient({
                   </div>
 
                   {!hasInstaller && (
-                    <p className="mt-5 rounded-xl border border-status-warning/25 bg-status-warning/10 px-4 py-3 text-sm leading-relaxed text-status-warning">
-                      {copy.pendingNotice}
+                    <p className="mt-5 rounded-xl border border-status-warning/25 bg-status-warning/10 px-4 py-3 text-sm leading-relaxed text-status-warning [&_wbr]:hidden">
+                      {/* break-all: the copy embeds a 42-char env-var token that
+                          cannot wrap on its own and would overflow the card. */}
+                      <span className="break-all">{copy.pendingNotice}</span>
                     </p>
                   )}
                 </div>
@@ -165,7 +170,7 @@ export function DownloadPageClient({
 
       <section className="section-padding border-t border-border ">
         <div className="container-max grid gap-6 lg:grid-cols-[0.95fr_1.05fr]">
-          <div className="glass-panel p-6 md:p-8">
+          <div className="glass-panel min-w-0 p-6 md:p-8">
             <p className="label-mono mb-4">{copy.verificationLabel}</p>
             <h2 className="font-display text-2xl font-bold text-text-primary mb-5">
               {copy.verificationTitle}
@@ -182,12 +187,12 @@ export function DownloadPageClient({
             </div>
           </div>
 
-          <div className="glass-panel p-6 md:p-8">
+          <div className="glass-panel min-w-0 p-6 md:p-8">
             <p className="label-mono mb-4">{copy.updateChannelLabel}</p>
             <h2 className="font-display text-2xl font-bold text-text-primary mb-4">
               {copy.updateChannelTitle}
             </h2>
-            <p className="text-text-secondary leading-relaxed">
+            <p className="min-w-0 text-text-secondary leading-relaxed [overflow-wrap:anywhere]">
               {copy.updateChannelBefore}{' '}
               <a
                 href={defaultManifestUrl}

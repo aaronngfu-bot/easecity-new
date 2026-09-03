@@ -125,10 +125,6 @@ export function ServicesPageClient({ images }: { images: SiteImages }) {
                   <p className={`${s.scrubbed} ${s.colSub}`}>{c.servicesSubtitle}</p>
                   <dl className={`${s.scrubbed} ${s.meta}`}>
                     <div className={s.metaRow}>
-                      <dt className={`${s.metaKey} font-mono`}>{c.metaBasedIn}</dt>
-                      <dd className={s.metaVal}>{c.metaBasedValue}</dd>
-                    </div>
-                    <div className={s.metaRow}>
                       <dt className={`${s.metaKey} font-mono`}>{c.metaTeam}</dt>
                       <dd className={s.metaVal}>{c.metaTeamValue}</dd>
                     </div>
