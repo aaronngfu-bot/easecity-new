@@ -6,6 +6,7 @@ import { EASE_OUT } from '@/lib/motion'
 import { X, ArrowLeft, ArrowRight, Send, CheckCircle2, AlertCircle, Phone } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
+import { copyKey } from '@/i18n/translations'
 import { getQuestionnaire, defaultQuestionnaire, type Question } from '@/lib/questionnaires'
 
 interface QuoteModalProps {
@@ -105,7 +106,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
     const opts = questions.find((x) => x.id === qid)?.options ?? []
     const list = Array.isArray(val) ? val : [val]
     return list
-      .map((v) => opts.find((o) => o.en === v || o.zh === v)?.[language] ?? v)
+      .map((v) => opts.find((o) => o.en === v || o.zh === v)?.[copyKey(language)] ?? v)
       .join(', ')
   }
 
@@ -136,7 +137,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
     const parts: string[] = []
     if (serviceTitle) parts.push(`Service: ${serviceTitle}`)
     for (const q of questions) {
-      const label = q.label[language]
+      const label = q.label[copyKey(language)]
       const ans = answerLabel(q.id)
       if (ans) parts.push(`${label}: ${ans}`)
     }
@@ -237,8 +238,8 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
               </motion.div>
             ) : isQuestionStep && curQ ? (
               <motion.div key={`q-${step}`} initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.18, ease: EASE_OUT }}>
-                {step === 0 && <p className="mb-4 text-sm text-[var(--text-secondary)]">{questionnaire.intro[language]}</p>}
-                <h3 className="font-display text-xl font-semibold text-[var(--text-primary)]">{curQ.label[language]}</h3>
+                {step === 0 && <p className="mb-4 text-sm text-[var(--text-secondary)]">{questionnaire.intro[copyKey(language)]}</p>}
+                <h3 className="font-display text-xl font-semibold text-[var(--text-primary)]">{curQ.label[copyKey(language)]}</h3>
 
                 {curQ.type === 'single' && curQ.options && (
                   <div className="mt-4 grid gap-2">
@@ -246,16 +247,16 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
                       <button
                         key={opt.en}
                         type="button"
-                        onClick={() => toggleOption(curQ.id, opt[language], false)}
+                        onClick={() => toggleOption(curQ.id, opt[copyKey(language)], false)}
                         className={cn(
                           'flex items-center justify-between rounded-lg border px-4 py-3 text-left text-sm transition-colors',
-                          answers[curQ.id] === opt[language]
+                          answers[curQ.id] === opt[copyKey(language)]
                             ? 'border-[var(--signal)] bg-[var(--signal-soft)] text-[var(--text-primary)]'
                             : 'border-[var(--border-color)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:border-[var(--signal)]'
                         )}
                       >
-                        {opt[language]}
-                        {answers[curQ.id] === opt[language] && <CheckCircle2 size={16} className="text-[var(--signal)]" />}
+                        {opt[copyKey(language)]}
+                        {answers[curQ.id] === opt[copyKey(language)] && <CheckCircle2 size={16} className="text-[var(--signal)]" />}
                       </button>
                     ))}
                   </div>
@@ -264,12 +265,12 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
                 {curQ.type === 'multi' && curQ.options && (
                   <div className="mt-4 grid gap-2">
                     {curQ.options.map((opt) => {
-                      const selected = (answers[curQ.id] as string[] | undefined)?.includes(opt[language])
+                      const selected = (answers[curQ.id] as string[] | undefined)?.includes(opt[copyKey(language)])
                       return (
                         <button
                           key={opt.en}
                           type="button"
-                          onClick={() => toggleOption(curQ.id, opt[language], true)}
+                          onClick={() => toggleOption(curQ.id, opt[copyKey(language)], true)}
                           className={cn(
                             'flex items-center justify-between rounded-lg border px-4 py-3 text-left text-sm transition-colors',
                             selected
@@ -277,7 +278,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
                               : 'border-[var(--border-color)] bg-[var(--bg-surface)] text-[var(--text-secondary)] hover:border-[var(--signal)]'
                           )}
                         >
-                          {opt[language]}
+                          {opt[copyKey(language)]}
                           {selected && <CheckCircle2 size={16} className="text-[var(--signal)]" />}
                         </button>
                       )
@@ -292,7 +293,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
                         rows={4}
                         value={(answers[curQ.id] as string) ?? ''}
                         onChange={(e) => setAnswers((p) => ({ ...p, [curQ.id]: e.target.value }))}
-                        placeholder={curQ.placeholder?.[language]}
+                        placeholder={curQ.placeholder?.[copyKey(language)]}
                         className="glass-input resize-none"
                       />
                     ) : (
@@ -300,7 +301,7 @@ export function QuoteModal({ open, onClose, serviceSlug, serviceTitle }: QuoteMo
                         type="text"
                         value={(answers[curQ.id] as string) ?? ''}
                         onChange={(e) => setAnswers((p) => ({ ...p, [curQ.id]: e.target.value }))}
-                        placeholder={curQ.placeholder?.[language]}
+                        placeholder={curQ.placeholder?.[copyKey(language)]}
                         className="glass-input"
                       />
                     )}

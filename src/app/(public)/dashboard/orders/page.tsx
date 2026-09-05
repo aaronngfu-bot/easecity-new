@@ -18,8 +18,9 @@ export default async function OrdersPage() {
 
   const h = await headers()
   const acceptLang = h.get('accept-language') || ''
+  const wantsSimplified = /(^|,|;)s*zh-CN|zh-SG/i.test(acceptLang)
   const isZh = acceptLang.startsWith('zh')
-  const locale = isZh ? 'zh-TW' : 'en-US'
+  const locale = isZh ? (wantsSimplified ? 'zh-CN' : 'zh-TW') : 'en-US'
 
   const statusLabel: Record<string, string> = isZh
     ? {
@@ -44,11 +45,11 @@ export default async function OrdersPage() {
             <span className="h-px w-12 bg-gradient-to-r from-signal/40 to-transparent" />
             <span className="signal-badge">PAYMENTS</span>
           </div>
-          <h1 className="font-display text-4xl font-semibold tracking-[-0.05em] text-text-primary md:text-5xl">{isZh ? '付款紀錄' : 'Payment History'}</h1>
-          <p className="mt-2 text-sm text-text-secondary">{isZh ? '所有訂閱付款與交易記錄' : 'All subscription payments and transactions'}</p>
+          <h1 className="font-display text-4xl font-semibold tracking-[-0.05em] text-text-primary md:text-5xl">{isZh ? (wantsSimplified ? '付款记录' : '付款紀錄') : 'Payment History'}</h1>
+          <p className="mt-2 text-sm text-text-secondary">{isZh ? (wantsSimplified ? '所有订阅付款与交易记录' : '所有訂閱付款與交易記錄') : 'All subscription payments and transactions'}</p>
         </div>
         <Link href="/dashboard" className="signal-secondary">
-          {isZh ? '← 返回控制台' : '← Back to Dashboard'}
+          {isZh ? (wantsSimplified ? '← 返回控制台' : '← 返回控制台') : '← Back to Dashboard'}
         </Link>
       </div>
 

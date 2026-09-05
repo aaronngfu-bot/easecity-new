@@ -2,9 +2,9 @@
 
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useSession, signOut } from 'next-auth/react'
-import { LayoutDashboard, LogOut } from 'lucide-react'
+import { ChevronRight, LayoutDashboard, LogOut } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { BrandMark } from '@/components/brand/BrandMark'
@@ -28,6 +28,28 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
   const { language, setLanguage, t } = useLanguage()
   const { data: session, status } = useSession()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  const closeMobileMenu = () => setMobileMenuOpen(false)
+
+  // Escape closes the mobile menu.
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [mobileMenuOpen])
+
+  // Lock body scroll while the sheet is open, so the page behind doesn't move.
+  useEffect(() => {
+    if (!mobileMenuOpen) return
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [mobileMenuOpen])
 
   // Nav stays pinned & visible — no hide-on-scroll-down behavior.
   const authed = status === 'authenticated'
@@ -90,6 +112,16 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
           >
             繁中
           </button>
+          <span aria-hidden="true">/</span>
+          <button
+            type="button"
+            onClick={() => setLanguage('zh-CN')}
+            className={language === 'zh-CN' ? 'is-active' : ''}
+            aria-label={t.a11y.switchToSimplified}
+            aria-pressed={language === 'zh-CN'}
+          >
+            简体
+          </button>
         </div>
 
         <ThemeToggle className="desktop-only" />
@@ -140,9 +172,10 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
         <button
           type="button"
           className={`mobile-menu-button mobile-only ${mobileMenuOpen ? 'is-open' : ''}`}
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          onClick={() => setMobileMenuOpen((v) => !v)}
           aria-label={mobileMenuOpen ? t.a11y.closeMenu : t.a11y.openMenu}
           aria-expanded={mobileMenuOpen}
+          aria-controls="mobile-menu-sheet"
         >
           <span className="hamburger-line" />
           <span className="hamburger-line" />
@@ -150,111 +183,142 @@ export default function PillNav({ items, className = '' }: PillNavProps) {
         </button>
       </nav>
 
-      {mobileMenuOpen && (
-        <div className="mobile-menu-popover mobile-only">
-          <ul className="mobile-menu-list">
-            <li>
-              <div className="mobile-language-toggle" aria-label={t.a11y.language}>
-                <button
-                  type="button"
-                  onClick={() => setLanguage('en')}
-                  className={language === 'en' ? 'is-active' : ''}
-                  aria-label={t.a11y.switchToEnglish}
-                  aria-pressed={language === 'en'}
-                >
-                  EN
-                </button>
-                <span aria-hidden="true">/</span>
-                <button
-                  type="button"
-                  onClick={() => setLanguage('zh')}
-                  className={language === 'zh' ? 'is-active' : ''}
-                  aria-label={t.a11y.switchToChinese}
-                  aria-pressed={language === 'zh'}
-                >
-                  繁中
-                </button>
-              </div>
-            </li>
-            <li>
-              <div className="flex items-center gap-2 py-1">
-                <ThemeToggle />
-                <span className="text-sm text-text-muted">{t.a11y.theme}</span>
-              </div>
-            </li>
+      {/* Always-mounted right sheet. `is-open` drives scrim opacity and the
+          panel's translateX; pointer-events keeps the closed sheet untouchable.
+          Exit plays by the same transition (no mount/unmount race). */}
+      <div
+        className={`mobile-menu-scrim mobile-only ${mobileMenuOpen ? 'is-visible' : ''}`}
+        aria-hidden="true"
+        onClick={closeMobileMenu}
+      />
+      <aside
+        id="mobile-menu-sheet"
+        className={`mobile-menu-sheet mobile-only ${mobileMenuOpen ? 'is-open' : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={t.a11y.primaryNav}
+        aria-hidden={!mobileMenuOpen}
+      >
+        <nav className="mobile-menu-body" aria-label={t.a11y.primaryNav}>
+          <ol className="mobile-menu-list">
             {items.map((item, i) => {
               const label = getItemLabel(item)
+              const active = isActive(item.href)
               return (
-                <li key={item.href || `mobile-item-${i}`}>
+                <li key={item.href || `m-item-${i}`}>
                   <Link
                     href={item.href}
-                    className={`mobile-menu-link ${isActive(item.href) ? 'is-active' : ''}`}
-                    aria-current={isActive(item.href) ? 'page' : undefined}
-                    onClick={() => setMobileMenuOpen(false)}
+                    className={`mobile-menu-link ${active ? 'is-active' : ''}`}
+                    aria-current={active ? 'page' : undefined}
+                    onClick={closeMobileMenu}
+                    tabIndex={mobileMenuOpen ? 0 : -1}
                   >
-                    {label}
+                    <span className="mobile-menu-label">{label}</span>
+                    <ChevronRight
+                      size={16}
+                      className={`mobile-menu-chevron ${active ? 'is-active' : ''}`}
+                      aria-hidden
+                    />
                   </Link>
                 </li>
               )
             })}
-            {!authed && (
-              <>
-                <li>
-                  <button
-                    type="button"
-                    className="mobile-menu-link w-full text-left"
-                    onClick={() => {
-                      router.push('/login')
-                      setMobileMenuOpen(false)
-                    }}
-                  >
-                    {t.nav.signIn}
-                  </button>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="mobile-menu-link w-full text-left font-semibold text-[var(--signal)]"
-                    onClick={() => {
-                      router.push('/signup')
-                      setMobileMenuOpen(false)
-                    }}
-                  >
-                    {t.nav.cta}
-                  </button>
-                </li>
-              </>
-            )}
-            {authed && (
-              <>
-                <li>
-                  <Link
-                    href="/dashboard"
-                    className="mobile-menu-link flex items-center gap-2"
-                    onClick={() => setMobileMenuOpen(false)}
-                  >
-                    <LayoutDashboard size={16} />
-                    {t.auth.dashboard}
-                  </Link>
-                </li>
-                <li>
-                  <button
-                    type="button"
-                    className="mobile-menu-link flex w-full items-center gap-2 text-left"
-                    onClick={() => {
-                      signOut({ callbackUrl: '/' })
-                      setMobileMenuOpen(false)
-                    }}
-                  >
-                    <LogOut size={16} />
-                    {t.auth.signOut}
-                  </button>
-                </li>
-              </>
-            )}
-          </ul>
+          </ol>
+
+          {!authed && (
+            <div className="mobile-menu-auth">
+              <button
+                type="button"
+                className="mobile-menu-signin"
+                tabIndex={mobileMenuOpen ? 0 : -1}
+                onClick={() => {
+                  router.push('/login')
+                  closeMobileMenu()
+                }}
+              >
+                {t.nav.signIn}
+              </button>
+              <button
+                type="button"
+                className="mobile-menu-cta"
+                tabIndex={mobileMenuOpen ? 0 : -1}
+                onClick={() => {
+                  router.push('/signup')
+                  closeMobileMenu()
+                }}
+              >
+                {t.nav.cta}
+                <ChevronRight size={15} aria-hidden />
+              </button>
+            </div>
+          )}
+
+          {authed && (
+            <div className="mobile-menu-auth">
+              <Link
+                href="/dashboard"
+                className="mobile-menu-account"
+                tabIndex={mobileMenuOpen ? 0 : -1}
+                onClick={closeMobileMenu}
+              >
+                <LayoutDashboard size={16} />
+                {t.auth.dashboard}
+              </Link>
+              <button
+                type="button"
+                className="mobile-menu-signout"
+                tabIndex={mobileMenuOpen ? 0 : -1}
+                onClick={() => {
+                  signOut({ callbackUrl: '/' })
+                  closeMobileMenu()
+                }}
+              >
+                <LogOut size={15} />
+                {t.auth.signOut}
+              </button>
+            </div>
+          )}
+        </nav>
+
+        <div className="mobile-menu-foot">
+          <div className="mobile-seg" role="group" aria-label={t.a11y.language}>
+            <button
+              type="button"
+              onClick={() => setLanguage('en')}
+              className={language === 'en' ? 'is-active' : ''}
+              aria-label={t.a11y.switchToEnglish}
+              aria-pressed={language === 'en'}
+              tabIndex={mobileMenuOpen ? 0 : -1}
+            >
+              EN
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage('zh')}
+              className={language === 'zh' ? 'is-active' : ''}
+              aria-label={t.a11y.switchToChinese}
+              aria-pressed={language === 'zh'}
+              tabIndex={mobileMenuOpen ? 0 : -1}
+            >
+              繁中
+            </button>
+            <button
+              type="button"
+              onClick={() => setLanguage('zh-CN')}
+              className={language === 'zh-CN' ? 'is-active' : ''}
+              aria-label={t.a11y.switchToSimplified}
+              aria-pressed={language === 'zh-CN'}
+              tabIndex={mobileMenuOpen ? 0 : -1}
+            >
+              简体
+            </button>
+          </div>
+          <div className="mobile-menu-theme">
+            <ThemeToggle />
+            <span className="text-sm text-text-muted">{t.a11y.theme}</span>
+          </div>
         </div>
-      )}
+      </aside>
     </div>
   )
 }

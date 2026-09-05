@@ -1,6 +1,7 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
+import { isZh } from '@/i18n/translations'
 
 /**
  * Route-loading screen. Shows a localized label (EN/ZH per the active
@@ -9,9 +10,9 @@ import { useLanguage } from '@/context/LanguageContext'
  */
 export default function Loading() {
   const { language } = useLanguage()
-  const zh = language === 'zh'
-  const signal = zh ? '正在取得訊號' : 'Acquiring signal'
-  const label = zh ? '載入中…' : 'Loading…'
+  const zh = isZh(language)
+  const signal = zh ? (language === 'zh-CN' ? '正在获取信号' : '正在取得訊號') : 'Acquiring signal'
+  const label = zh ? (language === 'zh-CN' ? '加载中…' : '載入中…') : 'Loading…'
 
   return (
     <div className="control-canvas grid min-h-screen place-items-center">

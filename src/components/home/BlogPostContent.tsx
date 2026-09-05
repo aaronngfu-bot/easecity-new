@@ -5,6 +5,7 @@ import { Calendar } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useLanguage } from '@/context/LanguageContext'
+import { isZh } from '@/i18n/translations'
 
 interface BlogPost {
   slug: string
@@ -26,9 +27,9 @@ interface BlogPost {
  */
 export function BlogPostContent({ post }: { post: BlogPost }) {
   const { language } = useLanguage()
-  const title = language === 'zh' ? post.title_zh || post.title : post.title
-  const excerpt = language === 'zh' ? post.excerpt_zh || post.excerpt : post.excerpt
-  const content = language === 'zh' ? post.content_zh || post.content : post.content
+  const title = isZh(language) ? post.title_zh || post.title : post.title
+  const excerpt = isZh(language) ? post.excerpt_zh || post.excerpt : post.excerpt
+  const content = isZh(language) ? post.content_zh || post.content : post.content
 
   return (
     <article>

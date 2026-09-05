@@ -3,6 +3,7 @@ import { Instrument_Sans, JetBrains_Mono, Syne } from 'next/font/google'
 import { cookies } from 'next/headers'
 import './globals.css'
 import { LanguageProvider } from '@/context/LanguageContext'
+import { type Language, htmlLangFor } from '@/i18n/translations'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 import { ThemeProvider } from '@/components/providers/ThemeProvider'
 import { OrganizationJsonLd, WebSiteJsonLd } from '@/components/seo/JsonLd'
@@ -103,18 +104,19 @@ export default function RootLayout({
   // Resolve the initial language server-side from the cookie so the SSR HTML
   // already matches what the client will render — eliminating the hydration
   // mismatch that previously surfaced as a "text content does not match" error
-  // and a brief English→Chinese flash on refresh.
-  let initialLang: 'en' | 'zh' = 'en'
+  // and a brief English→Chinese flash on refresh. `zh-CN` is the third
+  // language; anything unknown falls back to en.
+  let initialLang: Language = 'en'
   try {
     const v = cookies().get('easecity-lang')?.value
-    if (v === 'zh') initialLang = 'zh'
+    if (v === 'zh' || v === 'zh-CN') initialLang = v
   } catch {
     /* cookies unavailable at build/prerender — default to en */
   }
 
   return (
     <html
-      lang={initialLang === 'zh' ? 'zh-HK' : 'en'}
+      lang={htmlLangFor(initialLang)}
       className={`${instrumentSans.variable} ${jetbrainsMono.variable} ${syne.variable}`}
       suppressHydrationWarning
     >

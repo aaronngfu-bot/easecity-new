@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Calendar, Search } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { isZh } from '@/i18n/translations'
 
 interface PostListItem {
   id: string
@@ -28,8 +29,8 @@ export function BlogList({ posts }: { posts: PostListItem[] }) {
     () =>
       posts.map((p) => ({
         ...p,
-        title: language === 'zh' && p.title_zh ? p.title_zh : p.title,
-        excerpt: language === 'zh' && p.excerpt_zh ? p.excerpt_zh : p.excerpt,
+        title: isZh(language) && p.title_zh ? p.title_zh : p.title,
+        excerpt: isZh(language) && p.excerpt_zh ? p.excerpt_zh : p.excerpt,
       })),
     [posts, language]
   )

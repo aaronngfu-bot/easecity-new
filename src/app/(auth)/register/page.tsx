@@ -200,7 +200,7 @@ export default function RegisterPage() {
               setTurnstileToken(null)
               setError(t.auth.turnstileError)
             }}
-            options={{ theme: 'auto', language: language === 'zh' ? 'zh-TW' : 'en' }}
+            options={{ theme: 'auto', language: language === 'zh-CN' ? 'zh-CN' : language === 'zh' ? 'zh-TW' : 'en' }}
           />
         </div>
 

@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { ArrowRight, ArrowUpRight, Mail, Plus } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { copyKey } from '@/i18n/translations'
 import { Scrub } from '@/components/ui/Scrub'
 import { ServiceIcon } from '@/components/ui/ServiceIcon'
 import { QuoteModal } from '@/components/contact/QuoteModal'
@@ -24,8 +25,8 @@ export function ServicesPageClient({ images }: { images: SiteImages }) {
     icon: item.icon,
     title: c[item.titleKey],
     body: c[item.bodyKey],
-    tags: item.tags[language],
-    bullets: language === 'zh' ? item.bullets.zh : item.bullets.en,
+    tags: item.tags[copyKey(language)],
+    bullets: item.bullets[copyKey(language)],
   }))
 
   const stages = [

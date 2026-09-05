@@ -3,6 +3,7 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { copyKey } from '@/i18n/translations'
 
 /**
  * Global "back" affordance for pages not reachable directly from the primary
@@ -20,7 +21,7 @@ export function BackButton() {
 
   if (pathname === '/' || NAV_ROOTS.has(pathname)) return null
 
-  const label = language === 'zh' ? '返回' : 'Back'
+  const label = language === 'en' ? 'Back' : '返回'
 
   return (
     <div className="mt-12">

@@ -9,6 +9,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useLanguage } from '@/context/LanguageContext'
+import { nextLanguage } from '@/i18n/translations'
 
 type CommandItem = {
   id: string
@@ -92,17 +93,17 @@ export function CommandPalette() {
       plan('/pricing#business', 'Business — $49/mo', 'Team sharing and audit log', ShieldCheck),
       plan('/pricing#enterprise', 'Enterprise — Contact us', 'SSO, RBAC, on-prem options', Building2),
 
-      action('copy-email', 'Copy contact email', 'hello@easecity.hk → clipboard', MailIcon, async () => {
+      action('copy-email', 'Copy contact email', 'admin@easecity.hk → clipboard', MailIcon, async () => {
         try {
-          await navigator.clipboard.writeText('hello@easecity.hk')
-          fire('easecity:toast', { message: 'hello@easecity.hk copied' })
+          await navigator.clipboard.writeText('admin@easecity.hk')
+          fire('easecity:toast', { message: 'admin@easecity.hk copied' })
         } catch {
           fire('easecity:toast', { message: 'Copy failed — try again' })
         }
       }),
-      action('toggle-lang', `Switch language → ${language === 'en' ? 'zh' : 'en'}`, 'Toggle UI language', Languages, () => {
-        setLanguage(language === 'en' ? 'zh' : 'en')
-      }, 'EN/ZH'),
+      action('toggle-lang', `Switch language → ${nextLanguage(language)}`, 'Toggle UI language', Languages, () => {
+        setLanguage(nextLanguage(language))
+      }, 'EN/ZH/简'),
       action('show-shortcuts', 'Show all shortcuts', 'Full keyboard cheatsheet', Keyboard, () => {
         fire('easecity:cheatsheet')
       }, '?'),

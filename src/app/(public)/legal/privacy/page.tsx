@@ -3,12 +3,13 @@ import { cookies } from 'next/headers'
 import { PrivacyContent } from '@/components/legal/PrivacyContent'
 
 export async function generateMetadata(): Promise<Metadata> {
-  const lang = cookies().get('easecity-lang')?.value === 'zh' ? 'zh' : 'en'
+  const raw = cookies().get('easecity-lang')?.value
+  const lang: 'en' | 'zh' | 'zh-CN' = raw === 'zh' || raw === 'zh-CN' ? raw : 'en'
   return {
-    title: lang === 'zh' ? '隱私權政策' : 'Privacy Policy',
+    title: lang === 'zh-CN' ? '隐私政策' : lang === 'zh' ? '隱私權政策' : 'Privacy Policy',
     description:
       lang === 'zh'
-        ? 'easecity 隱私權政策 — 我們如何收集、使用與保護您的個人資料。'
+        ? 'easecity 隐私政策 — 我们如何收集、使用与保护您的个人资料。'
         : 'easecity Privacy Policy — how we collect, use, and protect your personal data.',
     robots: { index: true, follow: true },
   }

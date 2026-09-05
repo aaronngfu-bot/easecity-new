@@ -67,7 +67,7 @@ function getPlanKey(priceId: string): string {
 
 function formatDate(iso: string | null, locale: string): string {
   if (!iso) return '—'
-  return new Date(iso).toLocaleDateString(locale === 'zh' ? 'zh-TW' : 'en-US', {
+  return new Date(iso).toLocaleDateString(locale === 'zh-CN' ? 'zh-CN' : locale === 'zh' ? 'zh-TW' : 'en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
   })
 }
@@ -114,9 +114,11 @@ function AlertBanner({ subscription }: { subscription: SerializedSubscription })
       <div className="glass-panel flex items-center gap-3 px-5 py-3.5 !border-status-warning/40 text-status-warning text-sm">
         <AlertCircle size={16} className="shrink-0" />
         <span className="flex-1">
-          {language === 'zh'
-            ? '付款失敗。請更新你的付款方式以維持服務存取。'
-            : 'Payment failed. Update your payment method to maintain service access.'}
+          {language === 'en'
+            ? 'Payment failed. Update your payment method to maintain service access.'
+            : language === 'zh-CN'
+              ? '付款失败。请更新你的付款方式以维持服务访问。'
+              : '付款失敗。請更新你的付款方式以維持服務存取。'}
         </span>
         <ManageBillingButton
           label={t.dashboard.alertUpdatePayment}
@@ -131,9 +133,11 @@ function AlertBanner({ subscription }: { subscription: SerializedSubscription })
       <div className="glass-prominent flex items-center gap-3 px-5 py-3.5 text-sm">
         <Clock size={16} className="shrink-0 text-signal" />
         <span className="flex-1 text-signal">
-          {language === 'zh'
-            ? `試用期剩 ${trialDays} 天。到期後自動轉為正式訂閱，不需要重新設定。`
-            : `${trialDays} days left in your trial. Auto-converts to paid — no reconfiguration needed.`}
+          {language === 'en'
+            ? `${trialDays} days left in your trial. Auto-converts to paid — no reconfiguration needed.`
+            : language === 'zh-CN'
+              ? `试用期剩 ${trialDays} 天。到期后自动转为正式订阅，不需要重新设置。`
+              : `試用期剩 ${trialDays} 天。到期後自動轉為正式訂閱，不需要重新設定。`}
         </span>
         <ManageBillingButton
           label={t.dashboard.alertManageBilling}
@@ -148,9 +152,11 @@ function AlertBanner({ subscription }: { subscription: SerializedSubscription })
       <div className="glass-panel flex items-center gap-3 px-5 py-3.5 !border-status-warning/40 text-status-warning text-sm">
         <XCircle size={16} className="shrink-0" />
         <span className="flex-1">
-          {language === 'zh'
-            ? `服務將於 ${periodDays} 天後終止。如需繼續使用，請重新啟用訂閱。`
-            : `Service ends in ${periodDays} days. Renew to maintain access.`}
+          {language === 'en'
+            ? `Service ends in ${periodDays} days. Renew to maintain access.`
+            : language === 'zh-CN'
+              ? `服务将于 ${periodDays} 天后终止。如需继续使用，请重新启用订阅。`
+              : `服務將於 ${periodDays} 天後終止。如需繼續使用，請重新啟用訂閱。`}
         </span>
         <ManageBillingButton
           label={t.dashboard.alertRenew}
@@ -394,7 +400,7 @@ function PaymentHistory({ orders, locale }: { orders: SerializedOrder[]; locale:
             <div className="min-w-0">
               <p className="text-xs text-text-muted font-mono tracking-wider">{order.id.slice(0, 14)}…</p>
               <p className="text-xs text-text-muted mt-0.5">
-                {new Date(order.createdAt).toLocaleDateString(locale === 'zh' ? 'zh-TW' : 'en-US', {
+                {new Date(order.createdAt).toLocaleDateString(locale === 'zh-CN' ? 'zh-CN' : locale === 'zh' ? 'zh-TW' : 'en-US', {
                   year: 'numeric', month: 'short', day: 'numeric',
                 })}
               </p>
@@ -431,7 +437,7 @@ export default function DashboardClient({ userName, isAdminUser, subscription, r
         <div>
           <h1 className="font-display text-4xl font-semibold tracking-tight text-[var(--text-primary)] md:text-5xl">
             {userName
-              ? (language === 'zh' ? `${userName}，你好` : `Welcome, ${userName}`)
+              ? (language === 'en' ? `Welcome, ${userName}` : `${userName}，你好`)
               : 'Dashboard'}
           </h1>
           <p className="mt-2 text-sm text-[var(--text-secondary)]">
@@ -443,7 +449,7 @@ export default function DashboardClient({ userName, isAdminUser, subscription, r
             href="/admin"
             className="inline-flex items-center gap-2 rounded-lg border border-[var(--signal)] bg-[var(--signal)] px-4 py-2.5 text-sm font-semibold text-[var(--signal-ink)] transition-colors hover:bg-[var(--signal-light)]"
           >
-            {language === 'zh' ? '後台管理' : 'Admin Panel'}
+            {language === 'en' ? 'Admin Panel' : language === 'zh-CN' ? '后台管理' : '後台管理'}
             <Settings size={15} />
           </Link>
         )}

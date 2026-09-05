@@ -6,6 +6,7 @@ import { notFound } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { ArrowUpRight, Check } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { copyKey } from '@/i18n/translations'
 import { getService } from '@/lib/services'
 import { QuoteModal } from '@/components/contact/QuoteModal'
 import { ServiceIcon } from '@/components/ui/ServiceIcon'
@@ -20,8 +21,8 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
   const c = t.servicesPage
   const title = c[service.titleKey as keyof typeof c] as string
   const body = c[service.bodyKey as keyof typeof c] as string
-  const bullets = language === 'zh' ? service.bullets.zh : service.bullets.en
-  const subject = language === 'zh' ? service.subject.zh : service.subject.en
+  const bullets = service.bullets[copyKey(language)]
+  const subject = service.subject[copyKey(language)]
 
   return (
     <div className="relative min-h-screen bg-[var(--bg-base)]">
@@ -59,7 +60,7 @@ export default function ServiceDetailPage({ params }: { params: { slug: string }
             </ul>
 
             <div className="mt-6 flex flex-wrap gap-2">
-              {service.tags[language].map((tag) => (
+              {service.tags[copyKey(language)].map((tag) => (
                 <span key={tag} className="badge">{tag}</span>
               ))}
             </div>

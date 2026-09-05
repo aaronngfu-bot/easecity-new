@@ -217,12 +217,12 @@
   body {
     background: var(--body-bg);
     color: var(--body-text);
-    font-family: var(--font-body), "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
+    font-family: var(--font-body), "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Noto Sans SC", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
     overflow-x: clip;
     line-height: 1.6;
     font-feature-settings: 'ss01', 'cv11';
   }
-  :lang(zh-HK) body {
+  :lang(zh-HK) body , :lang(zh-CN) body  {
     line-height: 1.65;
   }
 
@@ -512,16 +512,20 @@
 }
 .prose-async h1, .prose-async h2, .prose-async h3, .prose-async h4 {
   color: var(--text-primary);
-  font-family: var(--font-display), "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", system-ui, sans-serif;
+  font-family: var(--font-display), "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", "Noto Sans SC", "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.3;
   margin-top: 1.6em;
 }
 :lang(zh-HK) .prose-async h1,
+:lang(zh-CN) .prose-async h1,
 :lang(zh-HK) .prose-async h2,
+:lang(zh-CN) .prose-async h2,
 :lang(zh-HK) .prose-async h3,
-:lang(zh-HK) .prose-async h4 {
+:lang(zh-CN) .prose-async h3,
+:lang(zh-HK) .prose-async h4,
+:lang(zh-CN) .prose-async h4 {
   letter-spacing: 0.01em;
   line-height: 1.45;
 }
@@ -1496,6 +1500,41 @@
     var(--bg-base) 100%
   );
 }
+/* Light mode fades the harbour into the page as atmosphere, not depth. The
+   water→deep→page ramp dips ~13 L* darker before climbing ~40 L* to the
+   near-white base — a V that reads as fog cutting in. Hold the surface tone,
+   then relax it in oklab (an RGB blend sheds chroma first and passes through
+   muddy gray). Dark mode keeps the sink ramp: down there water-deep and
+   bg-base are near-identical luminance, so the seam already reads as one
+   continuous depth.
+
+   This variant also UNHOOKS the layer from scroll: the dark box travels
+   -30vh on translate3d, which promotes it to its own composited layer, and
+   on zoomed/scaled displays that layer's tile seams can render as a hard
+   1px step mid-ramp that screenshots never show. Pinning the box to the
+   stage bottom with no transform keeps it inside the normal paint order,
+   and the ramp still reaches --bg-base (solid from 92%) before the next
+   section, so every possible boundary below is the same opaque pixel. */
+/* Light mode: the canvas owns the whole water→page fade (see HarbourWater);
+   this layer only fills the gap BELOW the canvas bitmap with the page tone.
+   Solid from 42% down — no CSS gradient ramp at all, because composited-layer
+   tile seams banded the previous ramps into a hard 1px line on some displays
+   (screenshots never showed it; live pixels did). Dark mode keeps its ramp:
+   down there water-deep and bg-base are near-identical luminance, so the
+   seam already reads as one continuous depth. */
+:root:not(.dark) .hero-deep-water {
+  top: auto;
+  height: 46vh;
+  bottom: 0;
+  transform: none;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    transparent 40%,
+    var(--bg-base) 42%,
+    var(--bg-base) 100%
+  );
+}
 .hero-pin-copy {
   /* Full fade. `* 0.42` left the title at 58% and the mask wiped from the
      bottom, so the heading block never actually left. */
@@ -1513,7 +1552,7 @@
   letter-spacing: -0.04em;
   line-height: 0.98;
 }
-:lang(zh-HK) .hero-title {
+:lang(zh-HK) .hero-title , :lang(zh-CN) .hero-title  {
   letter-spacing: 0;
   line-height: 1.18;
   font-size: clamp(2.15rem, 8vw, 2.55rem);
@@ -1524,7 +1563,7 @@
   line-height: 1.65;
   letter-spacing: 0.01em;
 }
-:lang(zh-HK) .hero-lede {
+:lang(zh-HK) .hero-lede , :lang(zh-CN) .hero-lede  {
   letter-spacing: 0;
   line-height: 1.7;
 }
@@ -1532,7 +1571,7 @@
   letter-spacing: -0.035em;
   line-height: 1.05;
 }
-:lang(zh-HK) .type-section {
+:lang(zh-HK) .type-section , :lang(zh-CN) .type-section  {
   letter-spacing: 0;
   line-height: 1.28;
   font-size: clamp(1.5rem, 2.2vw, 1.875rem);
@@ -1553,12 +1592,12 @@
     padding-top: max(10rem, calc(env(safe-area-inset-top, 0px) + 8.5rem));
   }
   .hero-title { font-size: 3.75rem; }
-  :lang(zh-HK) .hero-title { font-size: 3.25rem; }
+  :lang(zh-HK) .hero-title , :lang(zh-CN) .hero-title  { font-size: 3.25rem; }
   .hero-lede { font-size: 1.125rem; }
 }
 @media (min-width: 1024px) and (min-height: 720px) {
   .hero-title { font-size: 4.5rem; }
-  :lang(zh-HK) .hero-title { font-size: 3.5rem; }
+  :lang(zh-HK) .hero-title , :lang(zh-CN) .hero-title  { font-size: 3.5rem; }
 }
 @media (max-height: 540px) {
   .hero-pin-copy {
@@ -1566,7 +1605,7 @@
   }
   .hero-copy-inner { padding-bottom: 3rem; }
   .hero-title { font-size: clamp(1.7rem, 5.2vw, 2.15rem); }
-  :lang(zh-HK) .hero-title { font-size: clamp(1.85rem, 5.6vw, 2.25rem); }
+  :lang(zh-HK) .hero-title , :lang(zh-CN) .hero-title  { font-size: clamp(1.85rem, 5.6vw, 2.25rem); }
   .hero-lede { margin-top: 0.7rem; font-size: 0.9375rem; }
   .hero-actions { margin-top: 0.9rem; gap: 0.55rem; }
   .hero-pin-cue { display: none; }

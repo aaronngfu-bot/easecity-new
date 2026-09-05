@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Star } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { copyKey } from '@/i18n/translations'
 import SectionHeading from '@/components/SectionHeading'
 import { Scrub } from '@/components/ui/Scrub'
 import { ImmersionHero } from '@/components/home/ImmersionHero'
@@ -187,7 +188,7 @@ export function HomeContent() {
     let active = true
     setBlogLoading(true)
     setBlogError(false)
-    const params = new URLSearchParams({ limit: '10', lang: language })
+    const params = new URLSearchParams({ limit: '10', lang: copyKey(language) })
     fetch(`/api/blog?${params}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {
@@ -248,9 +249,15 @@ export function HomeContent() {
       {/* Hero — full-viewport living city */}
       <ImmersionHero onStartProject={() => setQuoteOpen(true)} />
 
-      {/* Blog — clip-reveal from the left */}
+      {/* Blog — clip-reveal from the left. The top edge carries a short fade-down
+          from the hero's base so the deep-water gradient's last step never lands
+          as a hard tonal line against this section's own background. */}
       <Scrub pace="tight">
         <section id="latest" className="relative z-10 section-padding bg-[var(--bg-base)]">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-[var(--bg-base)] to-transparent"
+          />
           <div className="container-max">
             <div className="scrub-blog-head">
               <SectionHeading
@@ -423,7 +430,7 @@ export function HomeContent() {
                 </button>
               </div>
               <p className="scrub-sub mt-5 text-sm text-[var(--text-muted)]">
-                <a href="mailto:hello@easecity.hk" className="underline decoration-[var(--border-color)] underline-offset-4 transition-colors hover:text-[var(--signal)] hover:decoration-[var(--signal)]">
+                <a href="mailto:admin@easecity.hk" className="underline decoration-[var(--border-color)] underline-offset-4 transition-colors hover:text-[var(--signal)] hover:decoration-[var(--signal)]">
                   {c.homeCtaEmail}
                 </a>
               </p>

@@ -1,5 +1,6 @@
 import { unstable_cache } from 'next/cache'
 import { prisma } from '@/lib/db'
+import type { Language } from '@/i18n/translations'
 
 /**
  * The photographs and the app icon on the product and services pages, as a
@@ -17,6 +18,9 @@ import { prisma } from '@/lib/db'
 
 export const SITE_IMAGES_TAG = 'site-images'
 const KEY_PREFIX = 'image:'
+/** Language-scoped override keys: `image:<id>:en` / `image:<id>:zh`.
+ *  zh-CN has no separate admin uploads — it falls back through zh. */
+const LANG_SUFFIX: Record<'en' | 'zh', string> = { en: ':en', zh: ':zh' }
 
 type Slot = {
   readonly id: string
@@ -152,7 +156,11 @@ export function isSiteImageId(value: string): value is SiteImageId {
   return (SLOT_IDS as readonly string[]).includes(value)
 }
 
-export function siteImageKey(id: SiteImageId): string {
+/**
+ * The SiteSetting key for one slot's base (EN) column. Takes `string` — both
+ * call sites validate against `isSiteImageId` before reaching here.
+ */
+export function siteImageKey(id: string): string {
   return `${KEY_PREFIX}${id}`
 }
 
@@ -182,17 +190,31 @@ export function isReplaced(images: SiteImages, id: SiteImageId): boolean {
   return !!slot && images[id] !== slot.fallback
 }
 
-async function readOverrides(): Promise<Partial<SiteImages>> {
+/**
+ * Language-scoped overrides, one map per language. The legacy un-suffixed key
+ * (`image:<id>`) is read as the EN column so rows saved before per-language
+ * images existed keep working — the shipped fallbacks were English-first.
+ */
+type Overrides = { en: Partial<SiteImages>; zh: Partial<SiteImages> }
+
+async function readOverrides(): Promise<Overrides> {
   const rows = await prisma.siteSetting.findMany({
     where: { key: { startsWith: KEY_PREFIX } },
   })
 
-  const out: Partial<SiteImages> = {}
+  const out: Overrides = { en: {}, zh: {} }
   for (const row of rows) {
-    const id = row.key.slice(KEY_PREFIX.length)
-    if (!isSiteImageId(id)) continue
     if (!row.value || !isRenderableImageSrc(row.value)) continue
-    out[id] = row.value
+    const rest = row.key.slice(KEY_PREFIX.length)
+    // Language-scoped: `image:<id>:en` / `image:<id>:zh`.
+    const suffixed = (['en', 'zh'] as const).find((lang) => rest.endsWith(LANG_SUFFIX[lang]))
+    if (suffixed) {
+      const id = rest.slice(0, -LANG_SUFFIX[suffixed].length)
+      if (isSiteImageId(id)) out[suffixed][id] = row.value
+      continue
+    }
+    // Legacy un-suffixed key → EN column.
+    if (isSiteImageId(rest)) out.en[rest] = row.value
   }
   return out
 }
@@ -210,9 +232,18 @@ const readOverridesCached = unstable_cache(readOverrides, ['site-images'], {
   revalidate: 3600,
 })
 
-export async function getSiteImages(): Promise<SiteImages> {
+export async function getSiteImages(lang: Language = 'en'): Promise<SiteImages> {
   try {
-    return { ...defaultSiteImages(), ...(await readOverridesCached()) }
+    const overrides = await readOverridesCached()
+    // zh-CN shares the zh upload slots (admin only offers EN / 繁中).
+    const base: 'en' | 'zh' = lang === 'en' ? 'en' : 'zh'
+    const own = overrides[base]
+    const other = overrides[base === 'en' ? 'zh' : 'en']
+    // Per-language override first; when this language has none for a slot, the
+    // OTHER language's override stands in (an image with baked-in copy beats
+    // the shipped default showing the wrong language's copy); shipped asset
+    // last.
+    return { ...defaultSiteImages(), ...other, ...own }
   } catch {
     // No database at build time, or the query failed. The shipped assets are
     // always a correct answer, so the pages render either way.

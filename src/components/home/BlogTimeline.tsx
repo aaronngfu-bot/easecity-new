@@ -5,6 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
+import { isZh } from '@/i18n/translations'
 
 interface BlogPost {
   id: string
@@ -116,8 +117,8 @@ export function BlogTimeline({
     date: p.publishedAt
       ? new Date(p.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
       : '',
-    title: language === 'zh' ? p.title_zh || p.title : p.title,
-    body: (language === 'zh' ? p.excerpt_zh || p.excerpt : p.excerpt) ?? '',
+    title: isZh(language) ? p.title_zh || p.title : p.title,
+    body: (isZh(language) ? p.excerpt_zh || p.excerpt : p.excerpt) ?? '',
     slug: p.slug,
     image: p.image,
   }))

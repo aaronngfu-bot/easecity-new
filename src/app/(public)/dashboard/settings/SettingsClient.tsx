@@ -6,6 +6,7 @@ import { Settings, LogOut, CreditCard, Loader2, ExternalLink, CheckCircle, Clock
 import { cn } from '@/lib/utils'
 import { getPortalSessionUrl } from '@/actions/stripe'
 import { useLanguage } from '@/context/LanguageContext'
+import { isZh, type Language } from '@/i18n/translations'
 
 interface SubscriptionInfo {
   status: string
@@ -24,8 +25,8 @@ interface Props {
   subscription: SubscriptionInfo | null
 }
 
-function StatusBadge({ status, language }: { status: string; language: string }) {
-  const zh = language === 'zh'
+function StatusBadge({ status, language }: { status: string; language: Language }) {
+  const zh = isZh(language)
   const config: Record<string, { label: string; icon: React.ElementType; className: string }> = {
     trialing:   { label: zh ? '試用中' : 'Trial',      icon: Clock,       className: 'text-signal bg-signal/10 border-signal/25' },
     active:     { label: zh ? '已啟用' : 'Active',     icon: CheckCircle, className: 'text-signal bg-signal/10 border-signal/25' },
@@ -43,9 +44,9 @@ function StatusBadge({ status, language }: { status: string; language: string })
   )
 }
 
-function formatDate(dateStr: string | null, language: string) {
+function formatDate(dateStr: string | null, language: Language) {
   if (!dateStr) return null
-  return new Date(dateStr).toLocaleDateString(language === 'zh' ? 'zh-TW' : 'en-US', {
+  return new Date(dateStr).toLocaleDateString(isZh(language) ? (language === 'zh-CN' ? 'zh-CN' : 'zh-TW') : 'en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
@@ -56,7 +57,8 @@ export default function SettingsClient({ user, subscription }: Props) {
   const [signingOut, setSigningOut] = useState(false)
   const [isPending, startTransition] = useTransition()
   const { language } = useLanguage()
-  const zh = language === 'zh'
+  const zh = isZh(language)
+  const isCN = language === 'zh-CN'
 
   const handleSignOut = async () => {
     setSigningOut(true)
@@ -69,7 +71,7 @@ export default function SettingsClient({ user, subscription }: Props) {
         const url = await getPortalSessionUrl()
         window.open(url, '_blank', 'noopener,noreferrer')
       } catch {
-        alert(zh ? '無法開啟帳單管理。請確認您已有有效的訂閱。' : 'Unable to open billing. Please ensure you have an active subscription.')
+        alert(zh ? (isCN ? '无法打开账单管理。请确认您已有有效的订阅。' : '無法開啟帳單管理。請確認您已有有效的訂閱。') : 'Unable to open billing. Please ensure you have an active subscription.')
       }
     })
   }
@@ -84,14 +86,14 @@ export default function SettingsClient({ user, subscription }: Props) {
           <span className="h-px w-12 bg-gradient-to-r from-signal/40 to-transparent" />
           <span className="signal-badge">
             <Settings size={10} />
-            {zh ? '設定' : 'SETTINGS'}
+            {zh ? (isCN ? '设置' : '設定') : 'SETTINGS'}
           </span>
         </div>
         <h1 className="font-display text-4xl font-semibold tracking-[-0.05em] text-text-primary md:text-5xl">
-          {zh ? '帳號設定' : 'Account Settings'}
+          {zh ? (isCN ? '账号设置' : '帳號設定') : 'Account Settings'}
         </h1>
         <p className="text-text-secondary text-sm mt-2">
-          {zh ? '管理帳號資訊與訂閱方案' : 'Manage account info and subscription plans'}
+          {zh ? (isCN ? '管理账号信息与订阅方案' : '管理帳號資訊與訂閱方案') : 'Manage account info and subscription plans'}
         </p>
       </div>
 
@@ -100,12 +102,12 @@ export default function SettingsClient({ user, subscription }: Props) {
         <div className="signal-panel space-y-4 p-6">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-signal/60" />
-            <h2 className="label-mono text-signal/80">{zh ? '個人資訊' : 'PROFILE'}</h2>
+            <h2 className="label-mono text-signal/80">{zh ? (isCN ? '个人信息' : '個人資訊') : 'PROFILE'}</h2>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <p className="label-mono mb-1">{zh ? '名稱' : 'Name'}</p>
-              <p className="text-sm text-text-primary">{user.name || (zh ? '未設定' : 'Not set')}</p>
+              <p className="label-mono mb-1">{zh ? (isCN ? '名称' : '名稱') : 'Name'}</p>
+              <p className="text-sm text-text-primary">{user.name || (zh ? (isCN ? '未设置' : '未設定') : 'Not set')}</p>
             </div>
             <div>
               <p className="label-mono mb-1">Email</p>
@@ -125,7 +127,7 @@ export default function SettingsClient({ user, subscription }: Props) {
               <span className="w-1.5 h-1.5 rounded-full bg-signal/60" />
               <h2 className="label-mono text-signal/80 flex items-center gap-2">
                 <CreditCard size={12} />
-                {zh ? '訂閱方案與帳單' : 'SUBSCRIPTION & BILLING'}
+                {zh ? (isCN ? '订阅方案与账单' : '訂閱方案與帳單') : 'SUBSCRIPTION & BILLING'}
               </h2>
             </div>
           </div>
@@ -137,7 +139,7 @@ export default function SettingsClient({ user, subscription }: Props) {
                 <StatusBadge status={subscription.status} language={language} />
                 {subscription.cancelAtPeriodEnd && (
                   <span className="text-xs text-status-warning bg-status-warning/10 border border-status-warning/20 px-2.5 py-1 rounded-full">
-                    {zh ? '到期後取消' : 'Cancels at period end'}
+                    {zh ? (isCN ? '到期后取消' : '到期後取消') : 'Cancels at period end'}
                   </span>
                 )}
               </div>
@@ -145,7 +147,7 @@ export default function SettingsClient({ user, subscription }: Props) {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm">
                 {subscription.status === 'trialing' && subscription.trialEnd && (
                   <div className="p-3 rounded-lg bg-signal/5 border border-signal/20">
-                    <p className="label-mono mb-1">{zh ? '試用期截止' : 'Trial ends'}</p>
+                    <p className="label-mono mb-1">{zh ? (isCN ? '试用期截止' : '試用期截止') : 'Trial ends'}</p>
                     <p className="text-signal font-medium tabular-nums">{formatDate(subscription.trialEnd, language)}</p>
                   </div>
                 )}
@@ -153,8 +155,8 @@ export default function SettingsClient({ user, subscription }: Props) {
                   <div className="p-3 rounded-lg bg-bg-base/40 border border-border">
                     <p className="label-mono mb-1">
                       {subscription.cancelAtPeriodEnd
-                        ? (zh ? '服務到期日' : 'Service ends')
-                        : (zh ? '下次扣款日' : 'Next billing')}
+                        ? (zh ? (isCN ? '服务到期日' : '服務到期日') : 'Service ends')
+                        : (zh ? (isCN ? '下次扣款日' : '下次扣款日') : 'Next billing')}
                     </p>
                     <p className="text-text-primary font-medium tabular-nums">{formatDate(subscription.currentPeriodEnd, language)}</p>
                   </div>
@@ -169,7 +171,7 @@ export default function SettingsClient({ user, subscription }: Props) {
                 {isPending ? <Loader2 size={14} className="animate-spin" /> : (
                   <>
                     <ExternalLink size={13} />
-                    {zh ? '管理帳單 / 更改方案' : 'Manage billing / Change plan'}
+                    {zh ? (isCN ? '管理账单 / 更改方案' : '管理帳單 / 更改方案') : 'Manage billing / Change plan'}
                   </>
                 )}
               </button>
@@ -177,7 +179,7 @@ export default function SettingsClient({ user, subscription }: Props) {
           ) : (
             <div className="space-y-3">
               <p className="text-sm text-text-secondary">
-                {zh ? '您目前沒有有效的訂閱方案。' : 'You do not have an active subscription.'}
+                {zh ? (isCN ? '您目前没有有效的订阅方案。' : '您目前沒有有效的訂閱方案。') : 'You do not have an active subscription.'}
               </p>
               <a href="/pricing" className="signal-cta">
                 {zh ? '查看方案' : 'See plans'}
@@ -190,7 +192,7 @@ export default function SettingsClient({ user, subscription }: Props) {
         <div className="signal-panel space-y-4 border-status-danger/25 p-6">
           <div className="flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-status-danger/70" />
-            <h2 className="label-mono !text-status-danger">{zh ? '登出' : 'SIGN OUT'}</h2>
+            <h2 className="label-mono !text-status-danger">{zh ? (isCN ? '退出' : '登出') : 'SIGN OUT'}</h2>
           </div>
           <button
             onClick={handleSignOut}
@@ -202,7 +204,7 @@ export default function SettingsClient({ user, subscription }: Props) {
             )}
           >
             <LogOut size={16} />
-            {signingOut ? (zh ? '登出中…' : 'Signing out…') : (zh ? '登出' : 'Sign out')}
+            {signingOut ? (zh ? (isCN ? '退出中…' : '登出中…') : 'Signing out…') : (zh ? (isCN ? '退出' : '登出') : 'Sign out')}
           </button>
         </div>
       </div>

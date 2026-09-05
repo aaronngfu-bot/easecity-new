@@ -2,7 +2,14 @@
 
 import { createContext, useContext, useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
-import { type Language, translations, type T } from '@/i18n/translations'
+import {
+  type Language,
+  translations,
+  type T,
+  isZh,
+  nextLanguage,
+  htmlLangFor,
+} from '@/i18n/translations'
 
 interface LanguageContextValue {
   language: Language
@@ -24,15 +31,23 @@ interface LanguageProviderProps {
   initialLang?: Language
 }
 
+function isStoredLanguage(v: string | null | undefined): v is Language {
+  return v === 'en' || v === 'zh' || v === 'zh-CN'
+}
+
 function detectBrowserLanguage(): Language {
   if (typeof window === 'undefined') return 'en'
   const nav = navigator.language?.toLowerCase() ?? ''
-  return /^(zh|yue|zh-hk|zh-tw|zh-mo|zh-cn)/.test(nav) ? 'zh' : 'en'
+  // Simplified-script regions get zh-CN; every other Chinese locale keeps the
+  // Traditional default (zh-Hant is the site's primary Chinese voice).
+  if (/^(zh-cn|zh-sg|zh-my)/.test(nav)) return 'zh-CN'
+  return /^(zh|yue)/.test(nav) ? 'zh' : 'en'
 }
 
 const SITE_SUFFIX: Record<Language, string> = {
   en: 'EaseCity',
   zh: 'EaseCity',
+  'zh-CN': 'EaseCity',
 }
 
 // Per-page title segments (before " | EaseCity"), localized.
@@ -63,6 +78,19 @@ const PAGE_TITLES: Record<Language, Record<string, string>> = {
     '/legal/privacy': '隱私權政策 | EaseCity',
     '/legal/terms': '服務條款 | EaseCity',
   },
+  'zh-CN': {
+    '/': 'EaseCity — 网上服务、系统架构与 AI',
+    '/services': '服务 | EaseCity',
+    '/pricing': '方案价格 | EaseCity',
+    '/download': '下载 | EaseCity',
+    '/about': '关于我们 | EaseCity',
+    '/ec-share': 'EC-Share | EaseCity',
+    '/blog': '博客 | EaseCity',
+    '/login': '登录 | EaseCity',
+    '/register': '注册 | EaseCity',
+    '/legal/privacy': '隐私政策 | EaseCity',
+    '/legal/terms': '服务条款 | EaseCity',
+  },
 }
 
 function applyDocumentTitle(lang: Language, pathname: string) {
@@ -71,7 +99,7 @@ function applyDocumentTitle(lang: Language, pathname: string) {
   const map = PAGE_TITLES[lang]
   const title = map[pathname] ?? map[Object.keys(map).find((k) => k !== '/' && pathname.startsWith(k)) || '/']
   document.title = title ?? SITE_SUFFIX[lang]
-  document.documentElement.lang = lang === 'zh' ? 'zh-HK' : 'en'
+  document.documentElement.lang = htmlLangFor(lang)
 }
 
 export function LanguageProvider({ children, initialLang }: LanguageProviderProps) {
@@ -80,11 +108,11 @@ export function LanguageProvider({ children, initialLang }: LanguageProviderProp
   // client: server passes initialLang (from cookie); if the client has a stored
   // preference it's already in the same cookie, so we stay consistent.
   const [language, setLang] = useState<Language>(() => {
-    if (initialLang === 'zh' || initialLang === 'en') return initialLang
+    if (isStoredLanguage(initialLang)) return initialLang
     if (typeof window !== 'undefined') {
       try {
         const stored = localStorage.getItem(STORAGE_KEY)
-        if (stored === 'en' || stored === 'zh') return stored
+        if (isStoredLanguage(stored)) return stored
       } catch {
         /* ignore */
       }
@@ -111,7 +139,7 @@ export function LanguageProvider({ children, initialLang }: LanguageProviderProp
   }, [])
 
   const toggleLanguage = useCallback(() => {
-    setLang((prev) => (prev === 'en' ? 'zh' : 'en'))
+    setLang(nextLanguage)
   }, [])
 
   return (
@@ -127,4 +155,10 @@ export function useLanguage() {
   const ctx = useContext(LanguageContext)
   if (!ctx) throw new Error('useLanguage must be used within LanguageProvider')
   return ctx
+}
+
+/** Convenience: is the active language any Chinese variant. */
+export function useIsZh(): boolean {
+  const { language } = useLanguage()
+  return isZh(language)
 }

@@ -1,19 +1,20 @@
 'use client'
 
 import { useLanguage } from '@/context/LanguageContext'
+import { copyKey } from '@/i18n/translations'
 import { termsContent } from '@/lib/legal/terms-content'
 
 export function TermsContent() {
   const { language } = useLanguage()
-  const c = termsContent[language]
+  const c = termsContent[copyKey(language)]
 
   return (
     <>
       <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-border bg-bg-surface text-xs text-text-muted font-mono mb-6">
-        {language === 'zh' ? '法律文件' : 'Legal'}
+        {language === 'en' ? 'Legal' : '法律文件'}
       </div>
       <h1 className="font-display text-4xl font-bold text-text-primary mb-4">
-        {language === 'zh' ? '服務條款' : 'Terms of Service'}
+        {language === 'zh' ? '服務條款' : language === 'zh-CN' ? '服务条款' : 'Terms of Service'}
       </h1>
       <p className="text-text-muted text-sm">Last updated: {c.lastUpdated}</p>
       <div className="mt-6 rounded-xl border border-border bg-bg-surface p-4 text-sm text-text-secondary leading-relaxed">
