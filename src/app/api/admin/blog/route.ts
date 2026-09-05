@@ -12,6 +12,7 @@ export const dynamic = 'force-dynamic'
 const blogSchema = z.object({
   title: z.string().min(1).max(160),
   title_zh: z.string().max(160).optional().nullable(),
+  title_zh_cn: z.string().max(160).optional().nullable(),
   slug: z
     .string()
     .min(1)
@@ -19,9 +20,11 @@ const blogSchema = z.object({
     .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'lowercase letters, numbers, and hyphens only'),
   excerpt: z.string().max(300).optional().nullable(),
   excerpt_zh: z.string().max(300).optional().nullable(),
+  excerpt_zh_cn: z.string().max(300).optional().nullable(),
   image: z.string().max(2000).optional().nullable(),
   content: z.string().min(1),
   content_zh: z.string().min(1).optional().nullable(),
+  content_zh_cn: z.string().min(1).optional().nullable(),
   published: z.boolean().optional(),
   publishedAt: z.string().datetime().optional().nullable(),
 })
@@ -64,12 +67,15 @@ export const POST = withErrorHandler(async (req) => {
     data: {
       title: data.title,
       title_zh: data.title_zh || null,
+      title_zh_cn: data.title_zh_cn || null,
       slug: data.slug,
       excerpt: data.excerpt || null,
       excerpt_zh: data.excerpt_zh || null,
+      excerpt_zh_cn: data.excerpt_zh_cn || null,
       image: data.image || null,
       content: data.content,
       content_zh: data.content_zh || null,
+      content_zh_cn: data.content_zh_cn || null,
       published: data.published ?? false,
       publishedAt: data.published ? (data.publishedAt ? new Date(data.publishedAt) : new Date()) : null,
     },

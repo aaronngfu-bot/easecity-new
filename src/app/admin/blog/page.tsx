@@ -20,24 +20,30 @@ interface EditorState {
   originalSlug?: string
   title: string
   title_zh: string
+  title_zh_cn: string
   slug: string
   excerpt: string
   excerpt_zh: string
+  excerpt_zh_cn: string
   image: string
   content: string
   content_zh: string
+  content_zh_cn: string
   published: boolean
 }
 
 const EMPTY: EditorState = {
   title: '',
   title_zh: '',
+  title_zh_cn: '',
   slug: '',
   excerpt: '',
   excerpt_zh: '',
+  excerpt_zh_cn: '',
   image: '',
   content: '',
   content_zh: '',
+  content_zh_cn: '',
   published: false,
 }
 
@@ -54,7 +60,7 @@ export default function AdminBlogPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [editor, setEditor] = useState<EditorState | null>(null)
-  const [editorLang, setEditorLang] = useState<'en' | 'zh'>('zh')
+  const [editorLang, setEditorLang] = useState<'en' | 'zh' | 'zh-cn'>('zh')
   const [saving, setSaving] = useState(false)
   const [saveMsg, setSaveMsg] = useState('')
 
@@ -90,12 +96,15 @@ export default function AdminBlogPage() {
         originalSlug: d.data.slug,
         title: d.data.title,
         title_zh: d.data.title_zh ?? '',
+        title_zh_cn: d.data.title_zh_cn ?? '',
         slug: d.data.slug,
         excerpt: d.data.excerpt ?? '',
         excerpt_zh: d.data.excerpt_zh ?? '',
+        excerpt_zh_cn: d.data.excerpt_zh_cn ?? '',
         image: d.data.image ?? '',
         content: d.data.content ?? '',
         content_zh: d.data.content_zh ?? '',
+        content_zh_cn: d.data.content_zh_cn ?? '',
         published: d.data.published,
       })
       setEditorLang('zh')
@@ -120,12 +129,15 @@ export default function AdminBlogPage() {
           body: JSON.stringify({
             title: editor.title,
             title_zh: editor.title_zh,
+            title_zh_cn: editor.title_zh_cn,
             slug: editor.slug,
             excerpt: editor.excerpt,
             excerpt_zh: editor.excerpt_zh,
+            excerpt_zh_cn: editor.excerpt_zh_cn,
             image: editor.image,
             content: editor.content,
             content_zh: editor.content_zh,
+            content_zh_cn: editor.content_zh_cn,
             published: editor.published,
           }),
         })
@@ -138,12 +150,15 @@ export default function AdminBlogPage() {
           body: JSON.stringify({
             title: editor.title,
             title_zh: editor.title_zh,
+            title_zh_cn: editor.title_zh_cn,
             slug: editor.slug,
             excerpt: editor.excerpt,
             excerpt_zh: editor.excerpt_zh,
+            excerpt_zh_cn: editor.excerpt_zh_cn,
             image: editor.image,
             content: editor.content,
             content_zh: editor.content_zh,
+            content_zh_cn: editor.content_zh_cn,
             published: editor.published,
           }),
         })
@@ -203,22 +218,22 @@ export default function AdminBlogPage() {
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-lg font-semibold text-text-primary">{editor.originalSlug ? 'Edit post' : 'New post'}</h2>
             <div className="flex items-center gap-3">
-              {editorLang === 'zh' && (
-                <span className="text-xs text-status-success">繁中</span>
+              {editorLang !== 'en' && (
+                <span className="text-xs text-status-success">{editorLang === 'zh' ? '繁中' : '简体'}</span>
               )}
               <button onClick={() => setEditor(null)} className="text-sm text-text-muted hover:text-text-primary">Cancel</button>
             </div>
           </div>
 
           <div className="mb-4 inline-flex rounded-md border border-border bg-bg-elevated p-0.5 text-sm">
-            {(['en', 'zh'] as const).map((lang) => (
+            {(['en', 'zh', 'zh-cn'] as const).map((lang) => (
               <button
                 key={lang}
                 type="button"
                 onClick={() => setEditorLang(lang)}
                 className={`rounded px-3 py-1.5 transition-colors ${editorLang === lang ? 'bg-signal text-signal-ink' : 'text-text-muted hover:text-text-primary'}`}
               >
-                {lang === 'en' ? 'EN' : '繁中'}
+                {lang === 'en' ? 'EN' : lang === 'zh' ? '繁中' : '简体'}
               </button>
             ))}
           </div>
@@ -226,13 +241,15 @@ export default function AdminBlogPage() {
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label className="mb-1.5 block text-sm font-medium text-text-secondary">
-                {editorLang === 'en' ? 'Title' : '標題（繁中）'}
+                {editorLang === 'en' ? 'Title' : editorLang === 'zh-cn' ? '标题（简体，留空自动转换）' : '標題（繁中）'}
               </label>
               <input
-                value={editorLang === 'en' ? editor.title : editor.title_zh}
-                onChange={(e) => setEditor({ ...editor, ...(editorLang === 'en' ? { title: e.target.value } : { title_zh: e.target.value }) })}
+                value={editorLang === 'en' ? editor.title : editorLang === 'zh-cn' ? editor.title_zh_cn : editor.title_zh}
+                onChange={(e) =>
+                  setEditor({ ...editor, ...(editorLang === 'en' ? { title: e.target.value } : editorLang === 'zh-cn' ? { title_zh_cn: e.target.value } : { title_zh: e.target.value }) })
+                }
                 className="glass-input"
-                placeholder={editorLang === 'en' ? 'Brand refresh & transparent mark' : '品牌重塑與透明標記'}
+                placeholder={editorLang === 'en' ? 'Brand refresh & transparent mark' : editorLang === 'zh-cn' ? '品牌重塑与透明标记' : '品牌重塑與透明標記'}
               />
             </div>
             <div>
@@ -258,11 +275,13 @@ export default function AdminBlogPage() {
 
           <div className="mt-4">
             <label className="mb-1.5 block text-sm font-medium text-text-secondary">
-              {editorLang === 'en' ? 'Excerpt (optional)' : '摘要（繁中，選填）'}
+              {editorLang === 'en' ? 'Excerpt (optional)' : editorLang === 'zh-cn' ? '摘要（简体，留空自动转换）' : '摘要（繁中，選填）'}
             </label>
             <input
-              value={editorLang === 'en' ? editor.excerpt : editor.excerpt_zh}
-              onChange={(e) => setEditor({ ...editor, ...(editorLang === 'en' ? { excerpt: e.target.value } : { excerpt_zh: e.target.value }) })}
+              value={editorLang === 'en' ? editor.excerpt : editorLang === 'zh-cn' ? editor.excerpt_zh_cn : editor.excerpt_zh}
+              onChange={(e) =>
+                setEditor({ ...editor, ...(editorLang === 'en' ? { excerpt: e.target.value } : editorLang === 'zh-cn' ? { excerpt_zh_cn: e.target.value } : { excerpt_zh: e.target.value }) })
+              }
               className="glass-input"
               placeholder="One-line summary shown on the timeline"
             />
@@ -329,11 +348,13 @@ export default function AdminBlogPage() {
 
           <div className="mt-4">
             <label className="mb-1.5 block text-sm font-medium text-text-secondary">
-              {editorLang === 'en' ? 'Content (Markdown)' : '內容（繁中，Markdown）'}
+              {editorLang === 'en' ? 'Content (Markdown)' : editorLang === 'zh-cn' ? '内容（简体，留空自动转换）' : '內容（繁中，Markdown）'}
             </label>
             <textarea
-              value={editorLang === 'en' ? editor.content : editor.content_zh}
-              onChange={(e) => setEditor({ ...editor, ...(editorLang === 'en' ? { content: e.target.value } : { content_zh: e.target.value }) })}
+              value={editorLang === 'en' ? editor.content : editorLang === 'zh-cn' ? editor.content_zh_cn : editor.content_zh}
+              onChange={(e) =>
+                setEditor({ ...editor, ...(editorLang === 'en' ? { content: e.target.value } : editorLang === 'zh-cn' ? { content_zh_cn: e.target.value } : { content_zh: e.target.value }) })
+              }
               rows={14}
               className="glass-input resize-y font-mono text-sm"
               placeholder={'## What shipped\n\n- item one\n- item two\n\nDetails here…'}

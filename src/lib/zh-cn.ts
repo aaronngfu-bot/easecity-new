@@ -79,26 +79,25 @@ function toSimplified(text: string): string {
   return out
 }
 
-function pick(lang: Language, en: string, zhHant: string | null, fallback: string): string {
+function pick(lang: Language, en: string, zhHant: string | null, fallback: string, zhCnStored?: string | null): string {
   if (lang === 'en') return en
-  const zh = zhHant || fallback
-  return lang === 'zh-CN' ? toSimplified(zh) : zh
+  if (lang === 'zh-CN') return zhCnStored || toSimplified(zhHant || fallback)
+  return zhHant || fallback
 }
 
 export const zhCn = {
-  /** Derived zh-CN title for a bilingual post row. */
-  title(lang: Language, title: string, titleZh: string | null): string {
-    return pick(lang, title, titleZh, title)
+  /** zh-CN reading: a hand-edit wins, otherwise derived from the Traditional
+   *  fields (stored *_zh_cn column first, then on-the-fly conversion). */
+  title(lang: Language, title: string, titleZh: string | null, titleZhCn?: string | null): string {
+    return pick(lang, title, titleZh, title, titleZhCn)
   },
-  /** Derived zh-CN excerpt. */
-  excerpt(lang: Language, excerpt: string | null, excerptZh: string | null): string | null {
+  excerpt(lang: Language, excerpt: string | null, excerptZh: string | null, excerptZhCn?: string | null): string | null {
     if (lang === 'en') return excerpt
-    return lang === 'zh-CN' ? toSimplified(excerptZh || excerpt || '') : excerptZh || excerpt
+    if (lang === 'zh-CN') return excerptZhCn || toSimplified(excerptZh || excerpt || '') || null
+    return excerptZh || excerpt
   },
-  /** Derived zh-CN markdown body. */
-  content(lang: Language, content: string, contentZh: string | null): string {
-    if (lang === 'en') return content
-    return lang === 'zh-CN' ? toSimplified(contentZh || content) : contentZh || content
+  content(lang: Language, content: string, contentZh: string | null, contentZhCn?: string | null): string {
+    return pick(lang, content, contentZh, content, contentZhCn)
   },
   /** Convert an arbitrary Traditional Chinese string (e.g. seeded hero lines). */
   convert: toSimplified,

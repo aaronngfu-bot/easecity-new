@@ -24,10 +24,13 @@ export const GET = withErrorHandler(async (_req, context) => {
     slug: post.slug,
     title: post.title,
     title_zh: post.title_zh,
+    title_zh_cn: post.title_zh_cn,
     excerpt: post.excerpt,
     excerpt_zh: post.excerpt_zh,
+    excerpt_zh_cn: post.excerpt_zh_cn,
     content: post.content,
     content_zh: post.content_zh,
+    content_zh_cn: post.content_zh_cn,
     published: post.published,
     publishedAt: post.publishedAt?.toISOString() ?? null,
     updatedAt: post.updatedAt.toISOString(),
@@ -37,6 +40,7 @@ export const GET = withErrorHandler(async (_req, context) => {
 const blogPatchSchema = z.object({
   title: z.string().min(1).max(160).optional(),
   title_zh: z.string().max(160).nullable().optional(),
+  title_zh_cn: z.string().max(160).nullable().optional(),
   slug: z
     .string()
     .min(1)
@@ -45,9 +49,11 @@ const blogPatchSchema = z.object({
     .optional(),
   excerpt: z.string().max(300).nullable().optional(),
   excerpt_zh: z.string().max(300).nullable().optional(),
+  excerpt_zh_cn: z.string().max(300).nullable().optional(),
   image: z.string().max(2000).nullable().optional(),
   content: z.string().min(1).optional(),
   content_zh: z.string().min(1).nullable().optional(),
+  content_zh_cn: z.string().min(1).nullable().optional(),
   published: z.boolean().optional(),
   publishedAt: z.string().datetime().nullable().optional(),
 })

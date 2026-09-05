@@ -44,11 +44,14 @@ export default async function BlogDetailPage({ params }: Props) {
       slug: true,
       title: true,
       title_zh: true,
+      title_zh_cn: true,
       excerpt: true,
       excerpt_zh: true,
+      excerpt_zh_cn: true,
       image: true,
       content: true,
       content_zh: true,
+      content_zh_cn: true,
       publishedAt: true,
     },
   })
@@ -60,9 +63,9 @@ export default async function BlogDetailPage({ params }: Props) {
   // never depends on OpenCC in the browser bundle.
   const trilingual = {
     ...post,
-    title_zh_cn: zhCn.convert(post.title_zh || post.title),
-    excerpt_zh_cn: post.excerpt_zh || post.excerpt ? zhCn.convert(post.excerpt_zh || post.excerpt || '') : null,
-    content_zh_cn: zhCn.convert(post.content_zh || post.content),
+    title_zh_cn: post.title_zh_cn || zhCn.convert(post.title_zh || post.title),
+    excerpt_zh_cn: post.excerpt_zh_cn || (post.excerpt_zh || post.excerpt ? zhCn.convert(post.excerpt_zh || post.excerpt || '') : null),
+    content_zh_cn: post.content_zh_cn || zhCn.convert(post.content_zh || post.content),
   }
 
   return (

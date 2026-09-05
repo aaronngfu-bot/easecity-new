@@ -19,8 +19,10 @@ export default async function BlogPage() {
       slug: true,
       title: true,
       title_zh: true,
+      title_zh_cn: true,
       excerpt: true,
       excerpt_zh: true,
+      excerpt_zh_cn: true,
       publishedAt: true,
     },
   })
@@ -38,8 +40,8 @@ export default async function BlogPage() {
           <BlogList
             posts={posts.map((p) => ({
               ...p,
-              title_zh_cn: zhCn.convert(p.title_zh || p.title),
-              excerpt_zh_cn: p.excerpt_zh || p.excerpt ? zhCn.convert(p.excerpt_zh || p.excerpt || '') : null,
+              title_zh_cn: p.title_zh_cn || zhCn.convert(p.title_zh || p.title),
+              excerpt_zh_cn: p.excerpt_zh_cn || (p.excerpt_zh || p.excerpt ? zhCn.convert(p.excerpt_zh || p.excerpt || '') : null),
             }))}
           />
         </div>

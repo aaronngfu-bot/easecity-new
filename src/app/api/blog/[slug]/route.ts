@@ -26,10 +26,10 @@ export const GET = withErrorHandler(async (_req, context) => {
   return apiSuccess({
     id: post.id,
     slug: post.slug,
-    title: zhCn.title(lang, post.title, post.title_zh),
-    excerpt: zhCn.excerpt(lang, post.excerpt, post.excerpt_zh),
+    title: zhCn.title(lang, post.title, post.title_zh, post.title_zh_cn),
+    excerpt: zhCn.excerpt(lang, post.excerpt, post.excerpt_zh, post.excerpt_zh_cn),
     image: post.image,
-    content: zhCn.content(lang, post.content, post.content_zh),
+    content: zhCn.content(lang, post.content, post.content_zh, post.content_zh_cn),
     publishedAt: post.publishedAt?.toISOString() ?? null,
   })
 })
