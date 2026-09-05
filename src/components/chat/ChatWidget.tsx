@@ -434,7 +434,9 @@ export function ChatWidget() {
                 </div>
 
                 {/* FAQ chips — manual toggle: stays open across the conversation,
-                    closes only via its own X, reopens from the collapsed bar */}
+                    closes only via its own X, reopens from the collapsed bar.
+                    The tray is height-capped with its own scroll so it can never
+                    be clipped by the panel edge or push the input out. */}
                 <AnimatePresence initial={false}>
                   {showFaqChips && (
                     <motion.div
@@ -442,7 +444,7 @@ export function ChatWidget() {
                       animate={{ opacity: 1, height: 'auto' }}
                       exit={reduce ? { opacity: 0 } : { opacity: 0, height: 0 }}
                       transition={{ duration: 0.25, ease: EASE_OUT }}
-                      className="overflow-hidden border-t border-border/60 bg-bg-base/30 px-3 pb-1 pt-2.5"
+                      className="shrink-0 overflow-hidden border-t border-border/60 bg-bg-base/30 px-3 pb-1 pt-2.5"
                     >
                       <div className="mb-2 flex items-center justify-between">
                         <p className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted">
@@ -458,7 +460,7 @@ export function ChatWidget() {
                           <X size={12} aria-hidden="true" />
                         </button>
                       </div>
-                      <div className="flex flex-wrap gap-1.5 pb-1.5">
+                      <div className="flex max-h-[104px] flex-wrap content-start gap-1.5 overflow-y-auto pb-1.5">
                         {faqs.map((f, i) => (
                           <motion.button
                             key={f.q}
