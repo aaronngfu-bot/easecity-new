@@ -17,8 +17,8 @@ interface ChatMessage {
 
 const POLL_MS = 4000
 /** Fake "thinking" window so EC feels deliberate instead of instant. */
-const THINK_MIN_MS = 900
-const THINK_MAX_MS = 1800
+const THINK_MIN_MS = 1600
+const THINK_MAX_MS = 2800
 const thinkDelay = () => THINK_MIN_MS + Math.random() * (THINK_MAX_MS - THINK_MIN_MS)
 
 /** Common questions surfaced as one-tap chips above the input. */
@@ -72,6 +72,7 @@ export function ChatWidget() {
   const [escalating, setEscalating] = useState(false)
   const [sessionToken, setSessionToken] = useState<string | null>(null)
   const [sessionEnded, setSessionEnded] = useState(false)
+  const [faqOpen, setFaqOpen] = useState(true)
   const scrollRef = useRef<HTMLDivElement>(null)
   const abortRef = useRef<AbortController | null>(null)
   const faqs = useFaqs()
@@ -245,7 +246,7 @@ export function ChatWidget() {
     ? [{ id: 'welcome', role: 'assistant', content: c.welcome }, ...messages]
     : messages
 
-  const showFaqChips = mode === 'ai' && messages.length === 0
+  const showFaqChips = mode === 'ai' && faqOpen
 
   /* message bubble enter animation */
   const bubbleAnim = reduce
@@ -431,8 +432,9 @@ export function ChatWidget() {
                   )}
                 </div>
 
-                {/* FAQ chips */}
-                <AnimatePresence>
+                {/* FAQ chips — manual toggle: stays open across the conversation,
+                    closes only via its own X, reopens from the collapsed bar */}
+                <AnimatePresence initial={false}>
                   {showFaqChips && (
                     <motion.div
                       initial={reduce ? { opacity: 0 } : { opacity: 0, height: 0 }}
@@ -441,9 +443,20 @@ export function ChatWidget() {
                       transition={{ duration: 0.25, ease: EASE_OUT }}
                       className="overflow-hidden border-t border-border/60 bg-bg-base/30 px-3 pb-1 pt-2.5"
                     >
-                      <p className="mb-2 flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted">
-                        <Sparkles size={9} className="text-signal" /> {c.faqTitle}
-                      </p>
+                      <div className="mb-2 flex items-center justify-between">
+                        <p className="flex items-center gap-1 font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted">
+                          <Sparkles size={9} className="text-signal" /> {c.faqTitle}
+                        </p>
+                        <button
+                          type="button"
+                          onClick={() => setFaqOpen(false)}
+                          className="rounded-md p-0.5 text-text-muted transition-colors hover:text-text-primary"
+                          aria-label={c.faqHide}
+                          title={c.faqHide}
+                        >
+                          <X size={12} aria-hidden="true" />
+                        </button>
+                      </div>
                       <div className="flex flex-wrap gap-1.5 pb-1.5">
                         {faqs.map((f, i) => (
                           <motion.button
@@ -465,6 +478,28 @@ export function ChatWidget() {
                           </motion.button>
                         ))}
                       </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* collapsed FAQ reopen bar */}
+                <AnimatePresence initial={false}>
+                  {!showFaqChips && mode === 'ai' && (
+                    <motion.div
+                      initial={reduce ? { opacity: 0 } : { opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={reduce ? { opacity: 0 } : { opacity: 0, height: 0 }}
+                      transition={{ duration: 0.25, ease: EASE_OUT }}
+                      className="overflow-hidden border-t border-border/60 bg-bg-base/30"
+                    >
+                      <button
+                        type="button"
+                        onClick={() => setFaqOpen(true)}
+                        className="flex w-full items-center justify-center gap-1.5 px-3 py-2 font-mono text-[9px] uppercase tracking-[0.16em] text-text-muted transition-colors hover:bg-signal/5 hover:text-signal"
+                      >
+                        <Sparkles size={9} className="text-signal" aria-hidden="true" />
+                        {c.faqShow}
+                      </button>
                     </motion.div>
                   )}
                 </AnimatePresence>
