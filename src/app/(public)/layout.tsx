@@ -3,7 +3,7 @@ import { Footer } from '@/components/layout/Footer'
 import { ChatWidget } from '@/components/chat/ChatWidget'
 import { CommandPalette } from '@/components/ui/CommandPalette'
 import { KeyboardLayer } from '@/components/ui/KeyboardLayer'
-import { BackButton, BackButtonSpacer } from '@/components/ui/BackButton'
+import { BackButton } from '@/components/ui/BackButton'
 import { SkipLink } from '@/components/a11y/SkipLink'
 
 const navItems = [
@@ -27,9 +27,8 @@ export default function PublicLayout({
         items={navItems}
       />
       <main id="main" tabIndex={-1} className="relative z-[2] min-h-screen">
-        <BackButtonSpacer />
-        {children}
         <BackButton />
+        {children}
       </main>
       <Footer />
 
