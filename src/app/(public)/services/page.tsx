@@ -1,6 +1,5 @@
 import type { Metadata } from 'next'
-import { getSiteImages } from '@/lib/site-images'
-import { getServerLanguage } from '@/lib/server-language'
+import { getAllSiteImages } from '@/lib/site-images'
 import { ServicesPageClient } from '@/components/services/ServicesPageClient'
 
 export const metadata: Metadata = {
@@ -10,7 +9,8 @@ export const metadata: Metadata = {
 }
 
 export default async function ServicesPage() {
-  const lang = await getServerLanguage()
-  const images = await getSiteImages(lang)
+  // All three languages in one payload — ServicesPageClient swaps the set LIVE
+  // on the language toggle instead of waiting for a reload.
+  const images = await getAllSiteImages()
   return <ServicesPageClient images={images} />
 }

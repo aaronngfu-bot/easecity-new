@@ -233,20 +233,35 @@ const readOverridesCached = unstable_cache(readOverrides, ['site-images'], {
 })
 
 export async function getSiteImages(lang: Language = 'en'): Promise<SiteImages> {
+  const all = await getAllSiteImages()
+  return all[lang]
+}
+
+/**
+ * Every language's resolved images in one payload, so a client component can
+ * swap the set LIVE when the visitor flips the language toggle — the server
+ * snapshot (getSiteImages) is frozen at request time and would keep showing
+ * the old language's photos until a reload.
+ *
+ * Failure path mirrors getSiteImages: shipped fallbacks for all languages.
+ */
+export type AllSiteImages = Record<Language, SiteImages>
+
+export async function getAllSiteImages(): Promise<AllSiteImages> {
   try {
     const overrides = await readOverridesCached()
-    // zh-CN shares the zh upload slots (admin only offers EN / 繁中).
-    const base: 'en' | 'zh' = lang === 'en' ? 'en' : 'zh'
-    const own = overrides[base]
-    const other = overrides[base === 'en' ? 'zh' : 'en']
-    // Per-language override first; when this language has none for a slot, the
-    // OTHER language's override stands in (an image with baked-in copy beats
-    // the shipped default showing the wrong language's copy); shipped asset
-    // last.
-    return { ...defaultSiteImages(), ...other, ...own }
+    const resolve = (base: 'en' | 'zh'): SiteImages => {
+      const own = overrides[base]
+      const other = overrides[base === 'en' ? 'zh' : 'en']
+      // Per-language override first; when this language has none for a slot,
+      // the OTHER language's override stands in (an image with baked-in copy
+      // beats the shipped default showing the wrong language's copy); shipped
+      // asset last.
+      return { ...defaultSiteImages(), ...other, ...own }
+    }
+    return { en: resolve('en'), zh: resolve('zh'), 'zh-CN': resolve('zh') }
   } catch {
-    // No database at build time, or the query failed. The shipped assets are
-    // always a correct answer, so the pages render either way.
-    return defaultSiteImages()
+    const defaults = defaultSiteImages()
+    return { en: defaults, zh: defaults, 'zh-CN': defaults }
   }
 }

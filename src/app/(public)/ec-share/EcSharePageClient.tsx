@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 import { Scrub } from '@/components/ui/Scrub'
-import type { SiteImages } from '@/lib/site-images'
+import type { AllSiteImages } from '@/lib/site-images'
 import { FeatureGlyph } from './FeatureGlyph'
 import { StepGlyph } from './StepGlyph'
 import s from './editorial.module.css'
@@ -14,18 +14,20 @@ const FEATURES = ['f1', 'f2', 'f3', 'f4', 'f5', 'f6'] as const
 const STEPS = ['w1', 'w2', 'w3', 'w4'] as const
 
 export function EcSharePageClient({
-  images,
+  images: allImages,
   iconIsPlaceholder,
 }: {
-  images: SiteImages
+  images: AllSiteImages
   /** The shipped company mark bleeds to its edges and its dark half vanishes on
    *  a dark surface, so it needs the white plate. A real app icon uploaded from
    *  the admin does not, and would be inset inside a white square if it kept
    *  it. */
   iconIsPlaceholder: boolean
 }) {
-  const { t } = useLanguage()
+  const { t, language } = useLanguage()
   const c = t.ecSharePage as Record<string, string>
+  // Live per-language image set: swaps the moment the toggle flips.
+  const images = allImages[language]
 
   /* Home and work, alternating, because the product is the same either way and
      a reader who came for one should meet the other. Order is also the mosaic's

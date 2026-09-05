@@ -10,12 +10,14 @@ import { Scrub } from '@/components/ui/Scrub'
 import { ServiceIcon } from '@/components/ui/ServiceIcon'
 import { QuoteModal } from '@/components/contact/QuoteModal'
 import { services as catalog } from '@/lib/services'
-import type { SiteImages } from '@/lib/site-images'
+import type { AllSiteImages } from '@/lib/site-images'
 import { QuoteGlyph } from './QuoteGlyph'
 import s from './atelier.module.css'
 
-export function ServicesPageClient({ images }: { images: SiteImages }) {
+export function ServicesPageClient({ images: allImages }: { images: AllSiteImages }) {
   const { t, language } = useLanguage()
+  // Live per-language image set: swaps the moment the toggle flips.
+  const images = allImages[language]
   const c = t.servicesPage as Record<string, string>
   const [open, setOpen] = useState<string | null>(catalog[0]?.slug ?? null)
   const [quoteOpen, setQuoteOpen] = useState(false)
