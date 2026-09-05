@@ -365,8 +365,9 @@ export function ChatWidget() {
               </div>
             ) : (
               <>
-                {/* messages */}
-                <div ref={scrollRef} className="min-h-[280px] flex-1 space-y-3.5 overflow-y-auto px-4 py-4">
+                {/* messages — the ONLY shrinking region (min-h-0): FAQ + input
+                    stay pinned at the bottom no matter how long the chat gets */}
+                <div ref={scrollRef} className="min-h-0 flex-1 space-y-3.5 overflow-y-auto px-4 py-4">
                   {allMessages.map((msg, i) => (
                     msg.role === 'system' ? (
                       <motion.div key={msg.id} {...bubbleAnim} className="flex justify-center">
