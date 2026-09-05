@@ -56,9 +56,18 @@ function shell(inner: string, footerNote: string): string {
       <td align="center">
         <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px; width:100%;">
           <tr>
-            <td style="padding:0 8px 20px; font-family:Georgia, 'Times New Roman', serif;">
-              <span style="font-size:20px; font-weight:700; color:${BRAND.tealDeep}; letter-spacing:0.5px;">Ease<span style="color:${BRAND.teal};">City</span></span>
-              <span style="font-size:11px; color:${BRAND.muted}; letter-spacing:2.5px; margin-left:10px; vertical-align:2px;">TECHNOLOGIES</span>
+            <td style="padding:0 8px 20px;">
+              <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="vertical-align:middle; padding-right:10px;">
+                    <img src="https://easecity.hk/images/easecity-logo-light-128.png" width="30" height="30" alt="EaseCity" style="display:block; border:0;" />
+                  </td>
+                  <td style="vertical-align:middle; font-family:Georgia, 'Times New Roman', serif;">
+                    <span style="font-size:20px; font-weight:700; color:${BRAND.tealDeep}; letter-spacing:0.5px;">Ease<span style="color:${BRAND.teal};">City</span></span>
+                    <span style="font-size:11px; color:${BRAND.muted}; letter-spacing:2.5px; margin-left:10px; vertical-align:2px;">TECHNOLOGIES</span>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           <tr>
