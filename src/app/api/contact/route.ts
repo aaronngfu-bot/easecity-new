@@ -4,6 +4,8 @@ import { rateLimit, getClientIp } from '@/lib/rate-limit'
 import { contactSchema } from '@/lib/validations/contact'
 import { sendContactEmail } from '@/lib/email/send'
 import { prisma } from '@/lib/db'
+import type { Language } from '@/i18n/translations'
+import { cookies } from 'next/headers'
 
 export const POST = withErrorHandler(async (req) => {
   const ip = getClientIp(req)
@@ -20,6 +22,15 @@ export const POST = withErrorHandler(async (req) => {
   const body = await req.json()
   const data = contactSchema.parse(body)
 
+  // Both emails follow the language the visitor was reading the site in.
+  let language: Language = 'en'
+  try {
+    const v = (await cookies()).get('easecity-lang')?.value
+    if (v === 'zh' || v === 'zh-CN') language = v
+  } catch {
+    /* no cookie — default en */
+  }
+
   await prisma.contactSubmission.create({
     data: {
       name: data.name,
@@ -34,7 +45,7 @@ export const POST = withErrorHandler(async (req) => {
 
   if (process.env.RESEND_API_KEY) {
     try {
-      await sendContactEmail(data)
+      await sendContactEmail({ ...data, language })
     } catch (emailError) {
       console.error('[Email Error]', emailError)
       // Submission is saved; email failure is non-blocking
