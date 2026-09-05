@@ -1156,9 +1156,9 @@ const en = {
   },
 
   chat: {
-    title: 'easecity AI',
+    title: 'EC',
     online: 'Online',
-    welcome: "Hi! I'm easecity's AI assistant. Pick a common question below, or ask me anything.",
+    welcome: "Hi! I'm EC, easecity's AI assistant. Pick a common question below, or ask me anything.",
     placeholder: 'Ask anything about easecity...',
     error: 'Something went wrong. Please try again.',
     open: 'Open chat',
@@ -1178,7 +1178,7 @@ const en = {
     agentTyping: 'Agent is typing',
     endChat: 'End conversation',
     ended: 'Conversation ended. Reopen the chat any time — a new session starts fresh.',
-    notice: 'Questions? Chat with our AI or reach a human.',
+    notice: 'Questions? Chat with EC or reach a human.',
     noticeCta: 'Chat now',
   },
 
@@ -2394,9 +2394,9 @@ const zh: typeof en = {
   },
 
   chat: {
-    title: 'easecity AI',
+    title: 'EC',
     online: '在線',
-    welcome: '你好！我是 easecity 的 AI 助手。可點選下方常見問題，或直接輸入你的問題。',
+    welcome: '你好！我是 EC，easecity 的 AI 助手。可點選下方常見問題，或直接輸入你的問題。',
     placeholder: '詢問任何關於 easecity 的問題…',
     error: '出現錯誤，請重試。',
     open: '開啟對話',
@@ -2416,7 +2416,7 @@ const zh: typeof en = {
     agentTyping: '客服正在輸入',
     endChat: '結束對話',
     ended: '對話已結束。隨時可重新打開對話，將開始新的工作階段。',
-    notice: '有問題？與 AI 對話或聯絡真人客服。',
+    notice: '有問題？與 EC 對話或聯絡真人客服。',
     noticeCta: '立即對話',
   },
 
@@ -3632,9 +3632,9 @@ const zhCN = {
   },
 
   chat: {
-    title: 'easecity AI',
+    title: 'EC',
     online: '在线',
-    welcome: '你好！我是 easecity 的 AI 助手。可点选下方常见问题，或直接输入你的问题。',
+    welcome: '你好！我是 EC，easecity 的 AI 助手。可点选下方常见问题，或直接输入你的问题。',
     placeholder: '询问任何关于 easecity 的问题…',
     error: '出现错误，请重试。',
     open: '打开对话',
@@ -3654,7 +3654,7 @@ const zhCN = {
     agentTyping: '客服正在输入',
     endChat: '结束对话',
     ended: '对话已结束。随时可重新打开对话，将开始新的会话。',
-    notice: '有问题？与 AI 对话或联系真人客服。',
+    notice: '有问题？与 EC 对话或联系真人客服。',
     noticeCta: '立即对话',
   },
 
