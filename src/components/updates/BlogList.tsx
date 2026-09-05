@@ -4,15 +4,18 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { Calendar, Search } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { isZh } from '@/i18n/translations'
 
 interface PostListItem {
   id: string
   slug: string
   title: string
   title_zh: string | null
+  /** Simplified readings derived server-side from the Traditional fields
+   *  (lib/zh-cn) so zh-CN shows real Simplified without a DB column. */
+  title_zh_cn?: string | null
   excerpt: string | null
   excerpt_zh: string | null
+  excerpt_zh_cn?: string | null
   publishedAt: string | Date | null
 }
 
@@ -29,8 +32,18 @@ export function BlogList({ posts }: { posts: PostListItem[] }) {
     () =>
       posts.map((p) => ({
         ...p,
-        title: isZh(language) && p.title_zh ? p.title_zh : p.title,
-        excerpt: isZh(language) && p.excerpt_zh ? p.excerpt_zh : p.excerpt,
+        title:
+          language === 'en'
+            ? p.title
+            : language === 'zh-CN'
+              ? p.title_zh_cn || p.title_zh || p.title
+              : p.title_zh || p.title,
+        excerpt:
+          language === 'en'
+            ? p.excerpt
+            : language === 'zh-CN'
+              ? p.excerpt_zh_cn || p.excerpt_zh || p.excerpt
+              : p.excerpt_zh || p.excerpt,
       })),
     [posts, language]
   )

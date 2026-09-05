@@ -4,7 +4,6 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { ArrowRight, Star } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { copyKey } from '@/i18n/translations'
 import SectionHeading from '@/components/SectionHeading'
 import { Scrub } from '@/components/ui/Scrub'
 import { ImmersionHero } from '@/components/home/ImmersionHero'
@@ -188,7 +187,7 @@ export function HomeContent() {
     let active = true
     setBlogLoading(true)
     setBlogError(false)
-    const params = new URLSearchParams({ limit: '10', lang: copyKey(language) })
+    const params = new URLSearchParams({ limit: '10', lang: language })
     fetch(`/api/blog?${params}`)
       .then((r) => (r.ok ? r.json() : null))
       .then((d) => {

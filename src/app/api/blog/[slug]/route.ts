@@ -1,13 +1,16 @@
 import { withErrorHandler, NotFoundError } from '@/lib/api-handler'
 import { apiSuccess } from '@/lib/api-response'
 import { prisma } from '@/lib/db'
+import { zhCn } from '@/lib/zh-cn'
+import type { Language } from '@/i18n/translations'
 
 export const dynamic = 'force-dynamic'
 
 /**
- * Public single post by slug — markdown content included. Supports ?lang=zh
- * to select the Chinese title/excerpt/content, falling back to English when a
- * locale field is missing.
+ * Public single post by slug — markdown content included. Supports
+ * ?lang=en|zh|zh-CN to select the title/excerpt/content locale, falling back
+ * to English when a locale field is missing; zh-CN is derived from the
+ * Traditional Chinese fields via OpenCC (see lib/zh-cn).
  */
 export const GET = withErrorHandler(async (_req, context) => {
   const { slug } = await context.params
@@ -17,15 +20,16 @@ export const GET = withErrorHandler(async (_req, context) => {
 
   if (!post) throw new NotFoundError('Post not found')
 
-  const lang = new URL(_req.url).searchParams.get('lang') === 'zh' ? 'zh' : 'en'
+  const rawLang = new URL(_req.url).searchParams.get('lang')
+  const lang: Language = rawLang === 'zh' || rawLang === 'zh-CN' ? rawLang : 'en'
 
   return apiSuccess({
     id: post.id,
     slug: post.slug,
-    title: lang === 'zh' ? post.title_zh || post.title : post.title,
-    excerpt: lang === 'zh' ? post.excerpt_zh || post.excerpt : post.excerpt,
+    title: zhCn.title(lang, post.title, post.title_zh),
+    excerpt: zhCn.excerpt(lang, post.excerpt, post.excerpt_zh),
     image: post.image,
-    content: lang === 'zh' ? post.content_zh || post.content : post.content,
+    content: zhCn.content(lang, post.content, post.content_zh),
     publishedAt: post.publishedAt?.toISOString() ?? null,
   })
 })

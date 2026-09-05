@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { prisma } from '@/lib/db'
 import { BlogList } from '@/components/updates/BlogList'
 import { BlogPageHeader } from '@/components/home/BlogPageHeader'
+import { zhCn } from '@/lib/zh-cn'
 
 // ISR — the list is static (BlogList + BlogPageHeader are client components
 // that localize on the client), so no per-request server render / DB query.
@@ -31,7 +32,16 @@ export default async function BlogPage() {
         <BlogPageHeader />
 
         <div className="mt-10">
-          <BlogList posts={posts} />
+          {/* title_zh_cn/excerpt_zh_cn are the Simplified readings derived from
+              the Traditional fields server-side (lib/zh-cn), so the client can
+              switch all three Chinese/English variants with no round-trip. */}
+          <BlogList
+            posts={posts.map((p) => ({
+              ...p,
+              title_zh_cn: zhCn.convert(p.title_zh || p.title),
+              excerpt_zh_cn: p.excerpt_zh || p.excerpt ? zhCn.convert(p.excerpt_zh || p.excerpt || '') : null,
+            }))}
+          />
         </div>
       </div>
     </div>

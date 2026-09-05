@@ -5,31 +5,44 @@ import { Calendar } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { useLanguage } from '@/context/LanguageContext'
-import { isZh } from '@/i18n/translations'
 
 interface BlogPost {
   slug: string
   title: string
   title_zh: string | null
+  /** Simplified readings derived server-side from the Traditional fields
+   *  (lib/zh-cn) so zh-CN shows real Simplified without a DB column. */
+  title_zh_cn?: string | null
   excerpt: string | null
   excerpt_zh: string | null
+  excerpt_zh_cn?: string | null
   image: string | null
   content: string
   content_zh: string | null
+  /** Derived Simplified body; when absent the client falls back through zh. */
+  content_zh_cn?: string | null
   publishedAt: string | Date | null
 }
 
 /**
- * Renders a single blog post's text, choosing English or Chinese via
- * useLanguage so switching language on the page updates the title/excerpt/body
- * immediately (no server round-trip). The bilingual data is injected from the
- * server parent, so first paint is still server-rendered.
+ * Renders a single blog post's text, choosing English, Traditional or derived
+ * Simplified Chinese via useLanguage so switching language on the page updates
+ * the title/excerpt/body immediately (no server round-trip). The trilingual
+ * data is injected from the server parent, so first paint is still
+ * server-rendered.
  */
 export function BlogPostContent({ post }: { post: BlogPost }) {
   const { language } = useLanguage()
-  const title = isZh(language) ? post.title_zh || post.title : post.title
-  const excerpt = isZh(language) ? post.excerpt_zh || post.excerpt : post.excerpt
-  const content = isZh(language) ? post.content_zh || post.content : post.content
+  const title =
+    language === 'en' ? post.title : language === 'zh-CN' ? post.title_zh_cn || post.title_zh || post.title : post.title_zh || post.title
+  const excerpt =
+    language === 'en'
+      ? post.excerpt
+      : language === 'zh-CN'
+        ? post.excerpt_zh_cn || post.excerpt_zh || post.excerpt
+        : post.excerpt_zh || post.excerpt
+  const content =
+    language === 'en' ? post.content : language === 'zh-CN' ? post.content_zh_cn || post.content_zh || post.content : post.content_zh || post.content
 
   return (
     <article>

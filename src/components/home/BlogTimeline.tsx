@@ -5,7 +5,6 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { Calendar, ArrowRight } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { isZh } from '@/i18n/translations'
 
 interface BlogPost {
   id: string
@@ -117,8 +116,10 @@ export function BlogTimeline({
     date: p.publishedAt
       ? new Date(p.publishedAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short' })
       : '',
-    title: isZh(language) ? p.title_zh || p.title : p.title,
-    body: (isZh(language) ? p.excerpt_zh || p.excerpt : p.excerpt) ?? '',
+    // The API (/api/blog?lang=) already returns the locale-correct fields:
+    // zh and derived zh-CN both land in `title` / `excerpt`.
+    title: p.title,
+    body: p.excerpt ?? '',
     slug: p.slug,
     image: p.image,
   }))
