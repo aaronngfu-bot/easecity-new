@@ -69,6 +69,8 @@ Thumbs.db
 dev/
 .tmp-shots/
 .tmp-email-preview/
+.tmp-*.png
+.tmp-*.js
 Image_*.jpg
 Image_*.png
 fix.png
