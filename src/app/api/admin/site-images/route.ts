@@ -14,27 +14,53 @@ import {
   isSiteImageId,
   siteImageKey,
 } from '@/lib/site-images'
+import type { Language } from '@/i18n/translations'
 
 export const dynamic = 'force-dynamic'
 
 const patchSchema = z.object({
   id: z.string().min(1).max(80),
   /**
-   * An uploaded URL, or null to drop the override. The slot then falls back to
-   * its shipped asset, or to nothing at all for the slots that ship without one.
+   * Which language column this override belongs to. Omitted = 'en', which is
+   * also how the pre-per-language rows were stored, so old rows keep reading
+   * as the EN column.
+   */
+  lang: z.enum(['en', 'zh']).default('en'),
+  /**
+   * An uploaded URL, or null to drop the override. The slot then falls back —
+   * first to the other language's override, then to its shipped asset, or to
+   * nothing at all for the slots that ship without one.
    */
   url: z.string().max(1000).nullable(),
 })
+
+function langKey(id: string, lang: Language): string {
+  const base = siteImageKey(id)
+  return lang === 'zh' ? `${base}:zh` : base
+}
 
 async function currentState() {
   const rows = await prisma.siteSetting.findMany({
     where: { key: { startsWith: 'image:' } },
   })
 
-  const overrides: Record<string, string> = {}
+  const overrides: { en: Record<string, string>; zh: Record<string, string> } = {
+    en: {},
+    zh: {},
+  }
   for (const row of rows) {
-    const id = row.key.slice('image:'.length)
-    if (isSiteImageId(id) && row.value) overrides[id] = row.value
+    if (!row.value) continue
+    const rest = row.key.slice('image:'.length)
+    if (rest.endsWith(':zh')) {
+      const id = rest.slice(0, -3)
+      if (isSiteImageId(id)) overrides.zh[id] = row.value
+    } else if (rest.endsWith(':en')) {
+      const id = rest.slice(0, -3)
+      if (isSiteImageId(id)) overrides.en[id] = row.value
+    } else if (isSiteImageId(rest)) {
+      // Legacy un-suffixed rows read as the EN column.
+      overrides.en[rest] = row.value
+    }
   }
 
   return {
@@ -53,13 +79,13 @@ export const GET = withErrorHandler(async () => {
   return apiSuccess(await currentState())
 })
 
-/** Point one slot at an uploaded image, or clear the override. */
+/** Point one slot's language column at an uploaded image, or clear it. */
 export const PATCH = withErrorHandler(async (req) => {
   const session = await getServerSession(authOptions)
   if (!session?.user) throw new AuthError()
   if (!isAdmin(session.user.role)) throw new ForbiddenError()
 
-  const { id, url } = patchSchema.parse(await req.json())
+  const { id, lang, url } = patchSchema.parse(await req.json())
 
   if (!isSiteImageId(id)) {
     return apiError('UNKNOWN_SLOT', `No image slot named "${id}"`, 400)
@@ -72,7 +98,7 @@ export const PATCH = withErrorHandler(async (req) => {
     )
   }
 
-  const key = siteImageKey(id)
+  const key = langKey(id, lang)
   if (url === null) {
     await prisma.siteSetting.deleteMany({ where: { key } })
   } else {

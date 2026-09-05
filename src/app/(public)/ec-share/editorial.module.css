@@ -141,11 +141,18 @@
    is tiny at phone widths), which forces the EN headline "Every Android device"
    (426px at 36.8px) into an orphan third line. 7.2vw keeps that line intact at
    every phone width (measured 393→28.3px/327px, 320→23px/266px against 272px
-   available); the icon scales with it via --icon-size. */
+   available); the icon scales with it via --icon-size. The block also centres
+   on phones: stacked full-width text with a left-hanging icon read as two
+   unrelated columns, so everything reports to one axis instead. */
 @media (max-width: 639.98px) {
   .lead {
     --title-size: clamp(1.3rem, 7.2vw, 2.6rem);
+    justify-items: center;
+    text-align: center;
   }
+  .accent { text-indent: 0; }
+  .ctas { justify-content: center; }
+  .topRight { justify-items: center; text-align: center; }
 }
 .appIcon {
   position: relative;
@@ -243,7 +250,11 @@
     inset 0 0 4.5rem rgba(0, 0, 0, 0.5),         /* corner vignette */
     0 1.75rem 3.5rem -1.25rem rgba(2, 8, 20, 0.55);
 }
-:root:not(.dark) .heroPlate {
+/* :global on the theme class here too — CSS modules hashes `dark` inside
+   :not() otherwise, and `:root:not(.editorial_dark__hash)` matches in BOTH
+   themes (the hash never exists in the DOM), forcing the light hairline on
+   in dark mode while the figures card correctly flips. */
+:root:not(:global(.dark)) .heroPlate {
   /* A hairline reads only where it contrasts with its own surface. The nav
      capsule wears a dark line because its surface is white; this plate's
      surface is dark in BOTH themes, so its line is light in both too.
@@ -264,9 +275,8 @@
   .heroPlate { aspect-ratio: 21 / 9; }
 }
 /* Stat pill straddling the plate's bottom edge — the composition ends on a
-   landed beat. It is cut from the same material as the plate: same navy
-   ground, same hairline border token, so the two read as one object with a
-   text band on it rather than a card parked on a photo. */
+   landed beat. Dark mode cuts it from the plate's own navy so the two read as
+   one object; light mode keeps it a light card, matching the page it sits on. */
 .figures {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -278,18 +288,18 @@
   z-index: 2;
   padding: 0.9rem 1.5rem;
   border-radius: 1rem;
-  background: #0d1420;
-  border: 1px solid var(--nav-border);
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
   box-shadow: 0 1.25rem 2.5rem -1rem rgba(2, 8, 20, 0.4);
 }
-:root:not(.dark) .figures {
-  border-color: rgba(255, 255, 255, 0.25);
-  box-shadow: 0 1.25rem 2.5rem -1rem rgba(2, 8, 20, 0.5);
+/* `.dark` lives on <html>, outside this module — without :global the class
+   gets scoped/hashed and the rule can never match the real DOM. */
+:global(.dark) .figures {
+  background: #0d1420;
+  border-color: var(--nav-border);
 }
-/* The stats sit ON the dark ground now, so their type is light in both themes
-   — same rule the plate's frame follows. */
-.figures .figureVal { color: #f2f6f7; }
-.figures .figureKey { color: rgba(235, 244, 245, 0.55); }
+.figures .figure + .figure { border-left-color: var(--border-color); }
+:global(.dark) .figures .figure + .figure { border-left-color: rgba(235, 244, 245, 0.14); }
 .figure {
   display: flex;
   align-items: baseline;
@@ -300,20 +310,6 @@
   padding-inline: 0.9rem;
 }
 .figure + .figure { border-left: 1px solid rgba(235, 244, 245, 0.14); }
-@media (max-width: 767.98px) {
-  .figures {
-    grid-template-columns: 1fr;
-    gap: 0.4rem;
-    margin-top: -1.4rem;
-    width: min(100%, 26rem);
-  }
-  .figure { justify-content: flex-start; padding-inline: 0.25rem; }
-  .figure + .figure {
-    border-left: none;
-    border-top: 1px solid rgba(235, 244, 245, 0.14);
-    padding-top: 0.4rem;
-  }
-}
 .figureVal {
   font-size: 1.35rem;
   font-weight: 700;
@@ -326,6 +322,66 @@
   text-transform: uppercase;
   color: var(--text-muted);
 }
+/* AFTER the base rules on purpose: the mobile overrides below must win the
+   equal-specificity cascade over .figureVal/.figureKey above. */
+@media (max-width: 767.98px) {
+  .figures {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0;
+    /* A compact stat strip hugging the plate, not a floating narrow card:
+       full-width, no card chrome, cells separated by hairlines. One row of
+       three beats three stacked rows on a phone — same language as desktop. */
+    margin-top: 0.9rem;
+    width: 100%;
+    padding: 0.85rem 0.4rem;
+    background: transparent;
+    border: none;
+    border-top: 1px solid var(--border-color);
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 0;
+    box-shadow: none;
+  }
+  /* Dark strip hairlines join the plate's frame language (nav-border 0.14),
+     not the page's own darker --border-color. */
+  :global(.dark) .figures {
+    border-top-color: var(--nav-border);
+    border-bottom-color: var(--nav-border);
+  }
+  .figure {
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.3rem;
+    padding-inline: 0.25rem;
+    min-width: 0;
+  }
+  .figures .figure + .figure {
+    border-left: 1px solid var(--border-color);
+    border-top: none;
+    padding-top: 0;
+  }
+  :global(.dark) .figures .figure + .figure { border-left-color: rgba(235, 244, 245, 0.14); }
+  /* EN "Low latency" must stay on one line — a wrapped middle cell breaks the
+     row's shared top edge. 0.88rem fits it inside a 1/3 column at 360px. */
+  .figureVal {
+    font-size: 0.92rem;
+    line-height: 1.15;
+    text-align: center;
+    white-space: nowrap;
+  }
+  .figureKey {
+    font-size: 0.55rem;
+    letter-spacing: 0.12em;
+    text-align: center;
+  }
+}
+
+@keyframes load-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* ---- hero figures (Up to 15 / Low latency / Windows) ---- */
 
 /* ---------- section heads ---------- */
 

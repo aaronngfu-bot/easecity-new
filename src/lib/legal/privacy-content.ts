@@ -26,7 +26,7 @@ export const privacyContent: Record<'en' | 'zh', LegalContent> = {
         title: '1. Who We Are',
         body: [
           'easecity is a technology company incorporated in the Hong Kong Special Administrative Region. We operate the products and services platform available at easecity.hk and its associated subdomains.',
-          'For any privacy-related enquiries, you can reach our team at: hello@easecity.hk',
+          'For any privacy-related enquiries, you can reach our team at: admin@easecity.hk',
         ],
       },
       {
@@ -118,7 +118,7 @@ export const privacyContent: Record<'en' | 'zh', LegalContent> = {
           'Portability: Receive your data in a structured, machine-readable format.',
           'Objection / Restriction: Object to or restrict certain processing activities.',
           'Withdraw consent: Where processing is based on consent, withdraw it at any time without affecting prior processing.',
-          'To exercise any of these rights, contact us at hello@easecity.hk. We will respond within 30 days. Hong Kong residents may also refer to the Office of the Privacy Commissioner for Personal Data (PCPD).',
+          'To exercise any of these rights, contact us at admin@easecity.hk. We will respond within 30 days. Hong Kong residents may also refer to the Office of the Privacy Commissioner for Personal Data (PCPD).',
         ],
       },
       {
@@ -139,7 +139,7 @@ export const privacyContent: Record<'en' | 'zh', LegalContent> = {
           'HTTP security headers (CSP, HSTS, X-Frame-Options)',
           'Database connections over encrypted channels with SSL',
           'Role-based access control (RBAC) for administrative functions',
-          'No method of electronic transmission is 100% secure. If you discover a security vulnerability, please report it responsibly to hello@easecity.hk.',
+          'No method of electronic transmission is 100% secure. If you discover a security vulnerability, please report it responsibly to admin@easecity.hk.',
         ],
       },
       {
@@ -160,7 +160,7 @@ export const privacyContent: Record<'en' | 'zh', LegalContent> = {
           'For any questions, requests, or complaints regarding this Privacy Policy or our data practices:',
           'easecity',
           'Hong Kong Special Administrative Region',
-          'hello@easecity.hk',
+          'admin@easecity.hk',
         ],
       },
     ],
@@ -175,7 +175,7 @@ export const privacyContent: Record<'en' | 'zh', LegalContent> = {
         title: '1. 我們是誰',
         body: [
           'easecity 是一家於香港特別行政區註冊成立的科技公司。我們營運位於 easecity.hk 及其相關子網域的產品與服務平台。',
-          '如對隱私事宜有任何查詢，歡迎透過 hello@easecity.hk 聯繫我們的團隊。',
+          '如對隱私事宜有任何查詢，歡迎透過 admin@easecity.hk 聯繫我們的團隊。',
         ],
       },
       {
@@ -267,7 +267,7 @@ export const privacyContent: Record<'en' | 'zh', LegalContent> = {
           '可攜性：以結構化、機器可讀的格式接收您的資料。',
           '異議／限制處理：對特定處理活動提出異議或要求限制。',
           '撤回同意：若處理乃基於同意而進行，您可隨時撤回同意，且不影響撤回前已進行的處理。',
-          '如需行使上述任何權利，請透過 hello@easecity.hk 聯繫我們。我們將於 30 天內回覆。香港居民亦可向個人資料私隱專員公署（PCPD）提出查詢。',
+          '如需行使上述任何權利，請透過 admin@easecity.hk 聯繫我們。我們將於 30 天內回覆。香港居民亦可向個人資料私隱專員公署（PCPD）提出查詢。',
         ],
       },
       {
@@ -288,7 +288,7 @@ export const privacyContent: Record<'en' | 'zh', LegalContent> = {
           'HTTP 安全標頭（CSP、HSTS、X-Frame-Options）',
           '資料庫連線經 SSL 加密通道',
           '對管理功能實施基於角色的存取控制（RBAC）',
-          '任何電子傳輸方法皆非百分之百安全。若您發現安全漏洞，請以負責任的方式通報至 hello@easecity.hk。',
+          '任何電子傳輸方法皆非百分之百安全。若您發現安全漏洞，請以負責任的方式通報至 admin@easecity.hk。',
         ],
       },
       {
@@ -309,7 +309,7 @@ export const privacyContent: Record<'en' | 'zh', LegalContent> = {
           '如有任何有關本隱私政策或我們資料處理作法的問題、請求或申訴：',
           'easecity',
           '香港特別行政區',
-          'hello@easecity.hk',
+          'admin@easecity.hk',
         ],
       },
     ],

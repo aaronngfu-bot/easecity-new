@@ -200,7 +200,7 @@
 }
 
 .mobile-menu-button:active {
-  transform: scale(0.97);
+  transform: scale(0.94);
 }
 
 .hamburger-line {
@@ -212,56 +212,79 @@
   transition: transform 180ms var(--ease-out), opacity 150ms var(--ease-out);
 }
 
-/* Animate to an X when open */
+/* Animate to an X when open. translateY(±7) puts the two lines' centres on the
+   button's vertical midline (lines sit 7px apart, so ±7 meets them exactly at
+   the middle — ±6 left the crossing 1px high and the X looked lopsided). */
 .mobile-menu-button.is-open .hamburger-line:nth-child(1) {
-  transform: translateY(6px) rotate(45deg);
+  transform: translateY(7px) rotate(45deg);
 }
 .mobile-menu-button.is-open .hamburger-line:nth-child(2) {
   opacity: 0;
 }
 .mobile-menu-button.is-open .hamburger-line:nth-child(3) {
-  transform: translateY(-6px) rotate(-45deg);
+  transform: translateY(-7px) rotate(-45deg);
 }
 
-.mobile-menu-popover {
+.mobile-menu-scrim {
   position: fixed;
-  top: calc(64px + env(safe-area-inset-top, 0px));
-  left: max(16px, env(safe-area-inset-left, 0px));
-  right: max(16px, env(safe-area-inset-right, 0px));
-  background: var(--bg-surface);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-  box-shadow: var(--shadow-lg);
-  padding: 8px;
-  z-index: 99;
+  inset: 0;
+  z-index: 98;
+  background: rgba(0, 0, 0, 0);
+  pointer-events: none;
+  transition: background-color 240ms var(--ease-out);
+}
+
+.mobile-menu-scrim.is-visible {
+  background: rgba(4, 10, 12, 0.4);
   pointer-events: auto;
-  transform-origin: top right;
-  animation: mobile-menu-in 200ms var(--ease-out);
 }
 
-@keyframes mobile-menu-in {
-  from {
-    opacity: 0;
-    transform: translateY(-6px) scale(0.96);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+/* Full-height right sheet — the modern drawer. Always mounted; `is-open`
+   slides it in. Solid surface, its own column of light, no floating-card
+   chrome. Width caps so it never eats the whole frame on tablets. */
+.mobile-menu-sheet {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99;
+  display: flex;
+  flex-direction: column;
+  width: min(84vw, 340px);
+  /* Content starts below the 56px mobile bar so the bar's close control owns
+     the top edge; the sheet itself carries no duplicate header. */
+  padding-top: calc(56px + env(safe-area-inset-top, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  background: var(--bg-surface);
+  border-left: 1px solid var(--border-color);
+  border-radius: 0;
+  box-shadow: -24px 0 60px -24px rgba(2, 8, 20, 0.5);
+  pointer-events: none;
+  transform: translateX(105%);
+  visibility: hidden;
+  /* iOS drawer curve; exit is quicker than enter */
+  transition:
+    transform 320ms cubic-bezier(0.32, 0.72, 0, 1),
+    visibility 0s linear 320ms;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .mobile-menu-popover {
-    animation: none;
-  }
-  .pill-logo:active,
-  .pill:active,
-  .pill-sign-in:active,
-  .pill-cta:active,
-  .pill-auth:active,
-  .mobile-menu-button:active {
-    transform: none;
-  }
+.mobile-menu-sheet.is-open {
+  pointer-events: auto;
+  transform: translateX(0);
+  visibility: visible;
+  transition:
+    transform 360ms cubic-bezier(0.32, 0.72, 0, 1),
+    visibility 0s;
+}
+
+.mobile-menu-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
 }
 
 .mobile-menu-list {
@@ -270,46 +293,233 @@
   padding: 0;
 }
 
+/* 52px touch rows: index number, label, chevron. Staggered slide-in when the
+   sheet opens (30ms steps); the whole row is the hit target. */
 .mobile-menu-list > li {
-  padding: 4px 0;
+  padding: 1px 0;
 }
 
 .mobile-menu-link {
-  display: block;
-  padding: 10px 12px;
-  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 52px;
+  padding: 0 10px 0 14px;
+  border: none;
+  border-radius: 12px;
+  background: none;
   color: var(--text-primary);
-  font-size: 14px;
+  font-size: 16px;
   font-weight: 500;
+  letter-spacing: -0.01em;
+  text-align: left;
   text-decoration: none;
-  transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out);
+  opacity: 0;
+  transform: translateX(14px);
+  transition:
+    background-color 150ms var(--ease-out),
+    color 150ms var(--ease-out),
+    opacity 260ms var(--ease-out),
+    transform 300ms cubic-bezier(0.32, 0.72, 0, 1);
+  transition-delay: 0s;
+}
+
+.mobile-menu-sheet.is-open .mobile-menu-link {
+  opacity: 1;
+  transform: translateX(0);
+  transition-delay: calc(60ms + var(--i, 0) * 30ms);
+}
+
+.mobile-menu-label {
+  flex: 1;
+  min-width: 0;
+}
+
+.mobile-menu-chevron {
+  color: var(--text-faint);
+  opacity: 0;
+  transform: translateX(-4px);
+  transition: opacity 150ms var(--ease-out), transform 150ms var(--ease-out), color 150ms var(--ease-out);
+}
+
+.mobile-menu-link:active {
+  background: var(--signal-soft);
 }
 
 .mobile-menu-link.is-active {
   background: var(--signal-soft);
   color: var(--signal);
+  font-weight: 600;
 }
 
-.mobile-language-toggle {
+.mobile-menu-link.is-active .mobile-menu-chevron,
+.mobile-menu-link:active .mobile-menu-chevron {
+  opacity: 1;
+  transform: translateX(0);
+  color: var(--signal);
+}
+
+/* Auth rows pinned to the bottom of the list area. */
+.mobile-menu-auth {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.mobile-menu-signin {
   display: flex;
   align-items: center;
-  gap: 4px;
-  padding: 10px 12px;
-}
-
-.mobile-language-toggle button {
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  font-size: 14px;
+  justify-content: center;
+  min-height: 46px;
+  padding: 0 16px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 15px;
   font-weight: 600;
-  padding: 4px 8px;
-  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 150ms var(--ease-out), color 150ms var(--ease-out);
 }
 
-.mobile-language-toggle button.is-active {
+.mobile-menu-cta {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 48px;
+  padding: 0 16px;
+  border: none;
+  border-radius: 12px;
+  background: var(--signal);
+  color: var(--signal-ink);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms var(--ease-out), transform 120ms var(--ease-out);
+}
+
+.mobile-menu-cta:active,
+.mobile-menu-signin:active {
+  transform: scale(0.98);
+}
+
+.mobile-menu-account {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 14px;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-elevated);
+  color: var(--text-primary);
+  font-size: 15px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.mobile-menu-signout {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 14px;
+  border: none;
+  border-radius: 12px;
+  background: none;
+  color: var(--text-muted);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: color 150ms var(--ease-out);
+}
+
+.mobile-menu-signout:hover {
+  color: var(--status-danger, #d64545);
+}
+
+/* Footer: language segmented control + theme, above the home indicator. */
+.mobile-menu-foot {
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.mobile-seg {
+  display: inline-flex;
+  padding: 3px;
+  gap: 2px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-color);
+  border-radius: 9999px;
+}
+
+.mobile-seg button {
+  min-width: 52px;
+  min-height: 32px;
+  padding: 0 12px;
+  border: none;
+  border-radius: 9999px;
+  background: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 150ms var(--ease-out), color 150ms var(--ease-out);
+}
+
+.mobile-seg button.is-active {
+  background: var(--bg-surface);
   color: var(--signal);
+  box-shadow: 0 1px 3px rgba(2, 8, 20, 0.12);
+}
+
+.mobile-menu-theme {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-menu-sheet,
+  .mobile-menu-scrim,
+  .mobile-menu-link {
+    transition: none;
+  }
+  /* No slide under reduced motion — the sheet toggles on visibility alone
+     (it pops in place), and the closed sheet must still leave the screen. */
+  .mobile-menu-sheet {
+    visibility: hidden;
+    transform: none;
+  }
+  .mobile-menu-sheet.is-open {
+    visibility: visible;
+    transform: none;
+  }
+  .mobile-menu-link {
+    opacity: 1;
+    transform: none;
+  }
+  .mobile-menu-scrim.is-visible {
+    background: rgba(4, 10, 12, 0.4);
+  }
+  .pill-logo:active,
+  .pill:active,
+  .pill-sign-in:active,
+  .pill-cta:active,
+  .pill-auth:active,
+  .mobile-menu-button:active,
+  .mobile-menu-cta:active {
+    transform: none;
+  }
 }
 
 /* Width-only 768px treats landscape phones as desktop. */
@@ -345,14 +555,86 @@
 }
 
 /* 960, not 900: the EN nav measures 821px wide (ZH 698px). At the old 901px
-   breakpoint the EN pill left only ~37px of side padding; below 960px the
-   hamburger carries both languages. */
+   breakpoint the EN nav left only ~37px of side padding; below 960px the
+   compact bar + drawer carry both languages.
+
+   Mobile bar: a full-width frosted top bar, not the floating pill. The drawer
+   it opens is a solid professional sheet, so the bar above it reads as the
+   same system: straight edges, hairline rule, brand left / controls right. */
 @media (max-width: 959px), (max-height: 540px) {
   .desktop-only {
     display: none !important;
   }
   .mobile-menu-button {
     display: flex;
+  }
+
+  .pill-nav-container {
+    display: block;
+    padding: 0;
+  }
+
+  .pill-nav {
+    gap: 0;
+    width: 100%;
+    border-radius: 0;
+    border: none;
+    border-bottom: 1px solid var(--nav-border);
+    padding: 0 14px 0 16px;
+    height: calc(56px + env(safe-area-inset-top, 0px));
+    padding-top: env(safe-area-inset-top, 0px);
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .pill-logo {
+    padding: 4px 0;
+    margin-right: auto;
+  }
+  .pill-logo:active {
+    transform: none;
+  }
+
+  .pill-wordmark-brand {
+    font-size: 15px;
+  }
+
+  /* Compact language pair: the same words as desktop, quieter weight so the
+     hamburger stays the loudest control on the bar. */
+  .pill-language-toggle {
+    gap: 2px;
+    margin-right: 6px;
+  }
+  .pill-language-toggle button {
+    font-size: 12px;
+    padding: 5px 7px;
+    border-radius: 7px;
+  }
+  .pill-language-toggle button.is-active {
+    background: var(--signal-soft);
+  }
+
+  /* Square-cornered 40px control matching the sheet's X button. */
+  .mobile-menu-button {
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    gap: 5px;
+    border-radius: 12px;
+    background: var(--bg-elevated);
+  }
+  .hamburger-line {
+    width: 17px;
+  }
+
+  /* While the drawer is open, the bar rides above scrim and sheet so its
+     hamburger (morphed to an X) is the single close control. The z-index must
+     beat the sheet's own 99 — the sheet is a sibling inside this container,
+     so the container's z-index does nothing for the bar itself. */
+  .pill-nav-container:has(.mobile-menu-sheet.is-open) .pill-nav {
+    position: relative;
+    z-index: 102;
+    border-bottom-color: transparent;
   }
 }
 

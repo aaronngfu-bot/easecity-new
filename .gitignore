@@ -67,6 +67,7 @@ Thumbs.db
 
 # Scratch / debug artifacts (not part of the site)
 dev/
+.tmp-shots/
 Image_*.jpg
 Image_*.png
 fix.png

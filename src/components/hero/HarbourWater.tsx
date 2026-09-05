@@ -155,13 +155,30 @@ export function HarbourWater({ className = '' }: { className?: string }) {
       if (!ctx) return
       const deep = pal['--hk-water-deep']
       const surf = pal['--hk-water']
+      // Light mode: the canvas owns the entire water→page fade. Its deep stop
+      // lands ON --bg-base so the bitmap's bottom edge is the page color —
+      // nothing below it can band or cut. (GPU tile seams kept banding the
+      // CSS gradient on some displays; canvas rasterization dithers for free
+      // behind the animated chops.)
+      const lightWater = (surf[0] + surf[1] + surf[2]) / 3 > 90
+      let deepStop = deep
+      if (lightWater) {
+        const baseRaw = getComputedStyle(document.documentElement).getPropertyValue('--bg-base')
+        deepStop = hexToRgb(baseRaw, [237, 241, 243])
+      }
 
       ctx.clearRect(0, 0, VB_W, WATER_H)
 
       const grad = ctx.createLinearGradient(0, 0, 0, WATER_H)
       grad.addColorStop(0, rgba(surf, 1))
       grad.addColorStop(0.55, rgba(surf, 1))
-      grad.addColorStop(1, rgba(deep, 1))
+      if (lightWater) {
+        // Ease out: hold tone, then relax in widening steps. Mid color =
+        // surf mixed ~55% toward the page tone.
+        const mid = mixRgb(surf, deepStop, 0.55)
+        grad.addColorStop(0.78, rgba(mid, 1))
+      }
+      grad.addColorStop(1, rgba(deepStop, 1))
       ctx.fillStyle = grad
       ctx.fillRect(0, 0, VB_W, WATER_H)
 
@@ -173,7 +190,6 @@ export function HarbourWater({ className = '' }: { className?: string }) {
       ctx.fillRect(0, CLIP_TOP, VB_W, 28)
 
       // Harbour chops — cream ticks that appear, stretch, and vanish in place.
-      const lightWater = (surf[0] + surf[1] + surf[2]) / 3 > 90
       const foam = mixRgb(surf, pal['--hk-hull-light'], lightWater ? 0.78 : 0.64)
       const chopGain = lightWater ? 0.48 : 0.36
       for (const r of RIPPLES) {
