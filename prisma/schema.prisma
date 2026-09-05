@@ -287,3 +287,37 @@ model SiteSetting {
   value     String?
   updatedAt DateTime  @updatedAt
 }
+
+// ─── Live support (chat widget → human agent) ───
+
+// One visitor escalation from the AI chat widget to a human agent. The agent
+// reaches the console through a signed magic link emailed to SUPPORT_EMAIL_TO —
+// no agent login required. `visitorToken` is the widget's handle on the session.
+model SupportSession {
+  id           String   @id @default(cuid())
+  visitorToken String   @unique // random token held by the visitor's widget
+  name         String? // optional, from the escalation form
+  email        String? // optional; where the magic link + transcript go
+  language     String   @default("en") // chat language when escalating
+  status       String   @default("waiting") // waiting | active | closed
+  pageUrl      String? // where the visitor escalated from
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  messages     SupportMessage[]
+
+  @@index([status, updatedAt])
+}
+
+model SupportMessage {
+  id                 String   @id @default(cuid())
+  sessionId          String
+  role               String // visitor | agent | system
+  content            String
+  templateId         String? // set when the agent replied with a canned template
+  readByAgent        Boolean  @default(false)
+  readByVisitor      Boolean  @default(false)
+  createdAt          DateTime @default(now())
+  session            SupportSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+}
