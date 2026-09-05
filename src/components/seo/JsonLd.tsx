@@ -5,7 +5,7 @@ interface OrganizationJsonLdProps {
 }
 
 export function OrganizationJsonLd({
-  name = 'easecity',
+  name = 'EaseCity',
   url = 'https://easecity.hk',
   description = 'EaseCity Technologies Limited builds tools and services for connected teams. EC-Share is Android device mirroring for teams.',
 }: OrganizationJsonLdProps) {
@@ -43,7 +43,7 @@ interface WebSiteJsonLdProps {
 }
 
 export function WebSiteJsonLd({
-  name = 'easecity',
+  name = 'EaseCity',
   url = 'https://easecity.hk',
 }: WebSiteJsonLdProps) {
   const jsonLd = {

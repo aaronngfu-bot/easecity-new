@@ -35,7 +35,7 @@ export function AdminChrome({ children }: { children: React.ReactNode }) {
               </svg>
             </div>
             <span className="min-w-0 truncate font-display text-sm font-semibold tracking-[-0.03em] text-text-primary">
-              easecity{' '}
+              EaseCity{' '}
               <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-signal">
                 {t.admin.brand}
               </span>

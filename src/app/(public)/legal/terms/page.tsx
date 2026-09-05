@@ -9,8 +9,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: lang === 'zh-CN' ? '服务条款' : lang === 'zh' ? '服務條款' : 'Terms of Service',
     description:
       lang === 'zh'
-        ? 'easecity 服务条款 — 规范您使用我们的产品与服务平台的协议。'
-        : 'easecity Terms of Service — the agreement governing your use of our products and services platform.',
+        ? 'EaseCity 服务条款 — 规范您使用我们的产品与服务平台的协议。'
+        : 'EaseCity Terms of Service — the agreement governing your use of our products and services platform.',
     robots: { index: true, follow: true },
   }
 }

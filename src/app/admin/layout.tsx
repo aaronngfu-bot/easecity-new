@@ -4,7 +4,7 @@ import { AdminChrome } from '@/components/admin/AdminChrome'
 export const metadata: Metadata = {
   title: {
     default: 'Admin Dashboard',
-    template: '%s | Admin | easecity',
+    template: '%s | Admin | EaseCity',
   },
 }
 

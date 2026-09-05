@@ -271,21 +271,23 @@ export function ChatWidget() {
             aria-modal="false"
             aria-label={c.title}
           >
-            {/* header */}
+            {/* header — avatar carries the single online dot; the status line is
+                human copy, not a second dot + "ONLINE" repetition */}
             <div className="flex items-center justify-between gap-2 border-b border-border/60 bg-bg-base/40 px-4 py-3">
               <div className="flex min-w-0 items-center gap-2.5">
-                <div className="relative flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-signal/25 bg-signal/15">
-                  {mode === 'human-chat' ? <Headset size={15} className="text-signal" aria-hidden="true" /> : <Bot size={15} className="text-signal" aria-hidden="true" />}
-                  <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-bg-base bg-emerald-400 motion-safe:animate-pulse" aria-hidden="true" />
+                <div className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-signal/25 bg-signal/15">
+                  {mode === 'human-chat' ? <Headset size={16} className="text-signal" aria-hidden="true" /> : <Bot size={16} className="text-signal" aria-hidden="true" />}
+                  <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-bg-base bg-emerald-400" aria-hidden="true" />
                 </div>
                 <div className="min-w-0">
                   <p className="truncate text-sm font-semibold text-text-primary">
                     {mode === 'human-chat' ? c.human : c.title}
                     {mode !== 'human-chat' && <span className="ml-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-text-muted">AI</span>}
                   </p>
-                  <p className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-wider text-signal">
-                    <span className="h-1 w-1 animate-signal-pulse rounded-full bg-signal" aria-hidden="true" />
-                    {mode === 'human-chat' ? (isLoading || escalating ? c.agentTyping : c.online) : c.online}
+                  <p className="truncate text-[11px] leading-tight text-text-muted">
+                    {mode === 'human-chat'
+                      ? (isLoading || escalating ? c.agentTyping : c.humanReady)
+                      : c.tagline}
                   </p>
                 </div>
               </div>

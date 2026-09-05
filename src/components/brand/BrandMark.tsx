@@ -23,7 +23,7 @@ export function BrandMark({
     >
       <Image
         src="/images/easecity-logo-light-128.png"
-        alt="easecity"
+        alt="EaseCity"
         width={size}
         height={size}
         className="h-full w-full object-contain dark:hidden"
@@ -31,7 +31,7 @@ export function BrandMark({
       />
       <Image
         src="/images/easecity-logo-dark-128.png"
-        alt="easecity"
+        alt="EaseCity"
         width={size}
         height={size}
         className="hidden h-full w-full object-contain dark:block"

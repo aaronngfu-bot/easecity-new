@@ -814,7 +814,7 @@ const en = {
   },
 
   aboutPage: {
-    eyebrow: 'About easecity',
+    eyebrow: 'About EaseCity',
     heading: 'Building the Layer',
     headingHighlight: 'Beneath Everything',
     desc: "We are infrastructure engineers and systems thinkers. Our mission is to build the connective tissue of tomorrow's digital ecosystem — starting with control, expanding into intelligence.",
@@ -1158,8 +1158,10 @@ const en = {
   chat: {
     title: 'EC',
     online: 'Online',
-    welcome: "Hi! I'm EC, easecity's AI assistant. Pick a common question below, or ask me anything.",
-    placeholder: 'Ask anything about easecity...',
+    tagline: 'Here to help with EaseCity & EC-Share',
+    humanReady: 'A teammate will reply here',
+    welcome: "Hi! I'm EC, EaseCity's AI assistant. Pick a common question below, or ask me anything.",
+    placeholder: 'Ask anything about EaseCity...',
     error: 'Something went wrong. Please try again.',
     open: 'Open chat',
     close: 'Close chat',
@@ -2053,7 +2055,7 @@ const zh: typeof en = {
   },
 
   aboutPage: {
-    eyebrow: '關於 easecity',
+    eyebrow: '關於 EaseCity',
     heading: '打造萬物',
     headingHighlight: '之下的那一層',
     desc: '我們是基礎設施工程師和系統思考者。我們的使命是構建明日數位生態系統的連接組織——從控制開始，擴展至智能。',
@@ -2396,8 +2398,10 @@ const zh: typeof en = {
   chat: {
     title: 'EC',
     online: '在線',
-    welcome: '你好！我是 EC，easecity 的 AI 助手。可點選下方常見問題，或直接輸入你的問題。',
-    placeholder: '詢問任何關於 easecity 的問題…',
+    tagline: '為你解答 EaseCity 與 EC-Share 的問題',
+    humanReady: '客服會在此回覆你',
+    welcome: '你好！我是 EC，EaseCity 的 AI 助手。可點選下方常見問題，或直接輸入你的問題。',
+    placeholder: '詢問任何關於 EaseCity 的問題…',
     error: '出現錯誤，請重試。',
     open: '開啟對話',
     close: '關閉對話',
@@ -3291,7 +3295,7 @@ const zhCN = {
   },
 
   aboutPage: {
-    eyebrow: '关于 easecity',
+    eyebrow: '关于 EaseCity',
     heading: '打造万物',
     headingHighlight: '之下的那一层',
     desc: '我们是基础设施工程师和系统思考者。我们的使命是构建明日数字生态系统的连接组织——从控制开始，扩展至智能。',
@@ -3634,8 +3638,10 @@ const zhCN = {
   chat: {
     title: 'EC',
     online: '在线',
-    welcome: '你好！我是 EC，easecity 的 AI 助手。可点选下方常见问题，或直接输入你的问题。',
-    placeholder: '询问任何关于 easecity 的问题…',
+    tagline: '为你解答 EaseCity 与 EC-Share 的问题',
+    humanReady: '客服会在此回复你',
+    welcome: '你好！我是 EC，EaseCity 的 AI 助手。可点选下方常见问题，或直接输入你的问题。',
+    placeholder: '询问任何关于 EaseCity 的问题…',
     error: '出现错误，请重试。',
     open: '打开对话',
     close: '关闭对话',

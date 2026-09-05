@@ -9,8 +9,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: lang === 'zh-CN' ? '隐私政策' : lang === 'zh' ? '隱私權政策' : 'Privacy Policy',
     description:
       lang === 'zh'
-        ? 'easecity 隐私政策 — 我们如何收集、使用与保护您的个人资料。'
-        : 'easecity Privacy Policy — how we collect, use, and protect your personal data.',
+        ? 'EaseCity 隐私政策 — 我们如何收集、使用与保护您的个人资料。'
+        : 'EaseCity Privacy Policy — how we collect, use, and protect your personal data.',
     robots: { index: true, follow: true },
   }
 }
