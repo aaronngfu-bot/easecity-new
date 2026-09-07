@@ -129,6 +129,7 @@ export function ChatWidget() {
         headers: { 'Content-Type': 'application/json' },
         signal: controller.signal,
         body: JSON.stringify({
+          language,
           messages: [
             { id: 'welcome', role: 'assistant' as const, content: c.welcome },
             ...updated,
@@ -158,7 +159,7 @@ export function ChatWidget() {
     })
     setIsLoading(true)
     setError(null)
-  }, [c.welcome, c.error])
+  }, [c.welcome, c.error, language])
 
   /* ── Human session polling ── */
   useEffect(() => {
@@ -436,11 +437,11 @@ export function ChatWidget() {
                       <div className="flex h-6 w-6 items-center justify-center rounded-full border border-signal/25 bg-signal/15">
                         <Bot size={12} className="text-signal" aria-hidden="true" />
                       </div>
-                      <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md border border-border/50 bg-bg-base/70 px-3.5 py-2.5">
-                        <span className="flex gap-1" aria-hidden="true">
-                          <span className="h-1.5 w-1.5 rounded-full bg-signal/70 motion-safe:animate-bounce" />
-                          <span className="h-1.5 w-1.5 rounded-full bg-signal/70 motion-safe:animate-bounce [animation-delay:150ms]" />
-                          <span className="h-1.5 w-1.5 rounded-full bg-signal/70 motion-safe:animate-bounce [animation-delay:300ms]" />
+                      <div className="flex items-center gap-1 rounded-2xl rounded-bl-md border border-signal/25 bg-signal/10 px-4 py-3">
+                        <span className="flex gap-1.5" aria-hidden="true">
+                          <span className="h-2 w-2 rounded-full bg-signal motion-safe:animate-bounce" />
+                          <span className="h-2 w-2 rounded-full bg-signal motion-safe:animate-bounce [animation-delay:150ms]" />
+                          <span className="h-2 w-2 rounded-full bg-signal motion-safe:animate-bounce [animation-delay:300ms]" />
                         </span>
                         <span className="sr-only">{mode === 'human-chat' ? c.agentTyping : c.typing}</span>
                       </div>
