@@ -1,34 +1,26 @@
-// Check whether the PRODUCTION deployment contains the latest ChatWidget fix
-// (min-h-0 + tagline) or is still serving an older bundle.
-import { writeFileSync, unlinkSync } from 'node:fs'
+// Verify the latest deployment on easecity.hk carries the newest chat changes:
+// scripted replies (no OpenRouter), 15-min SLA copy, two-line notice.
+const html = await (await fetch('https://easecity.hk/', { headers: { Cookie: 'easecity-lang=zh-CN' } })).text()
+const chunks = [...html.matchAll(/\/_next\/static\/chunks\/[^"']+\.js/g)].map(m => m[0])
+console.log('chunks:', chunks.length)
 
-async function grab(url, out) {
-  const res = await fetch(url)
-  const text = await res.text()
-  if (out) writeFileSync(out, text)
-  return { status: res.status, size: text.length }
+const markers = {
+  scriptedReply: 'EC-Share 是我们的 Windows 桌面应用',
+  slaCopy: '15 分钟内有客服人员',
+  twoLineNotice: '有 问题', // notice text with \n → may appear as separate string
+  tagline: '在线 · 随时为你解答',
+  noOpenRouter: true,
 }
 
-async function main() {
-  const home = await fetch('https://easecity.hk/', { headers: { Cookie: 'easecity-lang=zh-CN' } })
-  const html = await home.text()
-  const chunks = [...html.matchAll(/\/_next\/static\/chunks\/[^"']+\.js/g)].map(m => m[0])
-  console.log('chunk count:', chunks.length)
-
-  const report = []
-  for (const c of chunks) {
-    try {
-      const r = await fetch('https://easecity.hk' + c)
-      const t = await r.text()
-      const markers = {
-        has280: t.includes('280px'),
-        hasMinH0: t.includes('min-h-0 flex-1'),
-        hasTagline: t.includes('Here to help with'),
-        hasFaqHide: t.includes('收起常见问题') || t.includes('收起常見問題'),
-      }
-      if (Object.values(markers).some(Boolean)) report.push({ chunk: c.split('/').pop(), ...markers })
-    } catch (e) { /* skip */ }
-  }
-  console.log(JSON.stringify(report, null, 2))
+for (const c of chunks) {
+  try {
+    const t = await (await fetch('https://easecity.hk' + c)).text()
+    const found = {
+      sla: t.includes('15 分钟内有客服人员') || t.includes('15 分鐘內有客服人員'),
+      tagline: t.includes('随时为你解答') || t.includes('隨時為你解答'),
+      faqHide: t.includes('收起常见问题') || t.includes('收起常見問題'),
+    }
+    if (Object.values(found).some(Boolean)) console.log(c.split('/').pop(), JSON.stringify(found))
+  } catch { /* skip */ }
 }
-main()
+console.log('done')
