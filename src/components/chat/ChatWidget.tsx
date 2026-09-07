@@ -16,10 +16,16 @@ interface ChatMessage {
 }
 
 const POLL_MS = 4000
-/** Fake "thinking" window so EC feels deliberate instead of instant. */
-const THINK_MIN_MS = 1600
-const THINK_MAX_MS = 2800
-const thinkDelay = () => THINK_MIN_MS + Math.random() * (THINK_MAX_MS - THINK_MIN_MS)
+/**
+ * Scripted EC composes instantly, so the widget owns the whole "thinking"
+ * feel: a base pause plus a little extra per character, capped, so short
+ * questions feel quick and long ones feel considered.
+ */
+const THINK_BASE_MS = 700
+const THINK_PER_CHAR_MS = 45
+const THINK_MAX_MS = 3200
+const thinkDelay = (question: string) =>
+  Math.min(THINK_BASE_MS + question.length * THINK_PER_CHAR_MS, THINK_MAX_MS)
 
 /** Common questions surfaced as one-tap chips above the input. */
 function useFaqs(): { q: string; a: string }[] {
@@ -89,7 +95,7 @@ export function ChatWidget() {
           setNoticeOpen(true)
           localStorage.setItem(key, String(Date.now()))
         }, 2500)
-        const hide = setTimeout(() => setNoticeOpen(false), 18_000)
+        const hide = setTimeout(() => setNoticeOpen(false), 30_000)
         return () => { clearTimeout(show); clearTimeout(hide) }
       }
     } catch { /* storage unavailable */ }
@@ -134,10 +140,11 @@ export function ChatWidget() {
           throw new Error(data.error || c.error)
         }
         const data = await res.json()
-        // Keep the typing indicator up for at least one think-window so the
-        // pause reads as "EC is thinking", not a network round-trip.
+        // The scripted backend composes instantly — the ENTIRE thinking pause
+        // happens here so EC reads as deliberate, then the bubble animates in
+        // (frame pops, text fades) instead of landing as a wall of text.
         const elapsed = Date.now() - started
-        const wait = Math.max(0, thinkDelay() - elapsed)
+        const wait = Math.max(0, thinkDelay(text) - elapsed)
         if (wait > 0) await new Promise(r => setTimeout(r, wait))
         if (controller.signal.aborted) return
         setMessages(prev2 => [...prev2, { id: data.id || `a-${Date.now()}`, role: 'assistant', content: data.content }])
@@ -397,7 +404,20 @@ export function ChatWidget() {
                             ? 'rounded-2xl rounded-br-md border border-border bg-bg-elevated text-text-primary'
                             : 'rounded-2xl rounded-bl-md border border-border/50 bg-bg-base/70 text-text-secondary'
                         )}>
-                          {msg.content}
+                          {msg.role === 'assistant' && !reduce ? (
+                            /* answer text fades in a beat after the bubble
+                               frame pops — reads as EC finishing the thought */
+                            <motion.span
+                              initial={{ opacity: 0 }}
+                              animate={{ opacity: 1 }}
+                              transition={{ duration: 0.35, delay: 0.18, ease: EASE_OUT }}
+                              className="block whitespace-pre-wrap"
+                            >
+                              {msg.content}
+                            </motion.span>
+                          ) : (
+                            msg.content
+                          )}
                         </div>
                       </motion.div>
                     )
@@ -411,18 +431,18 @@ export function ChatWidget() {
                       aria-live="polite"
                     >
                       <span className="sr-only">{c.typing}</span>
+                      {/* SHORT thinking bubble: avatar + bouncing dots only —
+                          no wide empty bubble before the answer exists */}
                       <div className="flex h-6 w-6 items-center justify-center rounded-full border border-signal/25 bg-signal/15">
                         <Bot size={12} className="text-signal" aria-hidden="true" />
                       </div>
-                      <div className="flex items-center gap-2.5 rounded-2xl rounded-bl-md border border-border/50 bg-bg-base/70 px-3.5 py-2.5">
+                      <div className="flex items-center gap-1.5 rounded-2xl rounded-bl-md border border-border/50 bg-bg-base/70 px-3.5 py-2.5">
                         <span className="flex gap-1" aria-hidden="true">
                           <span className="h-1.5 w-1.5 rounded-full bg-signal/70 motion-safe:animate-bounce" />
                           <span className="h-1.5 w-1.5 rounded-full bg-signal/70 motion-safe:animate-bounce [animation-delay:150ms]" />
                           <span className="h-1.5 w-1.5 rounded-full bg-signal/70 motion-safe:animate-bounce [animation-delay:300ms]" />
                         </span>
-                        <span className="font-mono text-[10px] uppercase tracking-[0.14em] text-text-muted">
-                          {mode === 'human-chat' ? c.agentTyping : c.typing}
-                        </span>
+                        <span className="sr-only">{mode === 'human-chat' ? c.agentTyping : c.typing}</span>
                       </div>
                     </motion.div>
                   )}
@@ -568,7 +588,7 @@ export function ChatWidget() {
                     {c.title}
                     <span className="ml-1.5 font-mono text-[9px] uppercase tracking-[0.14em] text-signal">AI</span>
                   </p>
-                  <p className="text-[13px] leading-relaxed text-text-secondary">{c.notice}</p>
+                  <p className="whitespace-pre-line text-[13px] leading-relaxed text-text-secondary">{c.notice}</p>
                 </div>
               </div>
               <button

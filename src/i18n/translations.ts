@@ -1158,7 +1158,7 @@ const en = {
   chat: {
     title: 'EC',
     online: 'Online',
-    tagline: 'Here to help with EaseCity & EC-Share',
+    tagline: 'Online — ready to help',
     humanReady: 'A teammate will reply here',
     welcome: "Hi! I'm EC, EaseCity's AI assistant. Pick a common question below, or ask me anything.",
     placeholder: 'Ask anything about EaseCity...',
@@ -1182,7 +1182,7 @@ const en = {
     agentTyping: 'Agent is typing',
     endChat: 'End conversation',
     ended: 'Conversation ended. Reopen the chat any time — a new session starts fresh.',
-    notice: 'Questions? Chat with EC or reach a human.',
+    notice: 'Have a question?\nChat with EC, or reach a human.',
     noticeCta: 'Chat now',
   },
 
@@ -2400,7 +2400,7 @@ const zh: typeof en = {
   chat: {
     title: 'EC',
     online: '在線',
-    tagline: '為你解答 EaseCity 與 EC-Share 的問題',
+    tagline: '在線 · 隨時為你解答',
     humanReady: '客服會在此回覆你',
     welcome: '你好！我是 EC，EaseCity 的 AI 助手。可點選下方常見問題，或直接輸入你的問題。',
     placeholder: '詢問任何關於 EaseCity 的問題…',
@@ -2424,7 +2424,7 @@ const zh: typeof en = {
     agentTyping: '客服正在輸入',
     endChat: '結束對話',
     ended: '對話已結束。隨時可重新打開對話，將開始新的工作階段。',
-    notice: '有問題？與 EC 對話或聯絡真人客服。',
+    notice: '有問題？\n與 EC 對話，或聯絡真人客服。',
     noticeCta: '立即對話',
   },
 
@@ -3642,7 +3642,7 @@ const zhCN = {
   chat: {
     title: 'EC',
     online: '在线',
-    tagline: '为你解答 EaseCity 与 EC-Share 的问题',
+    tagline: '在线 · 随时为你解答',
     humanReady: '客服会在此回复你',
     welcome: '你好！我是 EC，EaseCity 的 AI 助手。可点选下方常见问题，或直接输入你的问题。',
     placeholder: '询问任何关于 EaseCity 的问题…',
@@ -3666,7 +3666,7 @@ const zhCN = {
     agentTyping: '客服正在输入',
     endChat: '结束对话',
     ended: '对话已结束。随时可重新打开对话，将开始新的会话。',
-    notice: '有问题？与 EC 对话或联系真人客服。',
+    notice: '有问题？\n与 EC 对话，或联系真人客服。',
     noticeCta: '立即对话',
   },
 
