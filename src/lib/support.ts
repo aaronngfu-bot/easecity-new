@@ -167,8 +167,8 @@ export function escalationEmailHtml(opts: {
       <p style="margin:0; font-size:14px; color:#152726; line-height:1.7; white-space:pre-wrap;">${escapeHtml(question)}</p>
     </div>
     <p style="margin:0 0 16px; font-size:14px; color:#5f7370; line-height:1.6;">${zh
-      ? (cn ? '点击下方链接打开客服控制台，直接回复访客（回复会实时出现在其聊天框）。链接 7 天内有效。' : '點擊下方連結開啟客服控制台，直接回覆訪客（回覆會即時出現在其聊天框）。連結 7 天內有效。')
-      : 'Open the support console below to reply directly — your answer appears in the visitor\'s chat in real time. The link is valid for 7 days.'}</p>
+      ? (cn ? '点击下方链接打开客服控制台，直接回复访客（回复会实时出现在其聊天框）。访客已被告知一般 15 分钟内对接——请尽快处理。链接 7 天内有效。' : '點擊下方連結開啟客服控制台，直接回覆訪客（回覆會即時出現在其聊天框）。訪客已被告知一般 15 分鐘內對接——請盡快處理。連結 7 天內有效。')
+      : 'Open the support console below to reply directly — your answer appears in the visitor\'s chat in real time. The visitor has been told an agent usually connects within 15 minutes, so please prioritise. The link is valid for 7 days.'}</p>
     ${link}
   </td></tr>
 </table>
