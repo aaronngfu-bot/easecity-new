@@ -14,6 +14,9 @@ interface QueueItem {
   pageUrl: string | null
   updatedAt: string
   lastMessage: string
+  /** Signed magic-link token minted for THIS session — tokens are HMAC-bound
+   * to the session id, so each queue entry needs its own. */
+  token: string
 }
 
 interface Msg {
@@ -37,10 +40,20 @@ interface Template {
   body: Record<string, string>
 }
 
-export function SupportConsole({ templates }: { templates: Template[] }) {
+export function SupportConsole({
+  templates,
+  sessionOverride,
+  sessionToken,
+}: {
+  templates: Template[]
+  /** Admin-embedded mode: session id + signed token come from the server
+   * component instead of the magic-link URL. */
+  sessionOverride?: string
+  sessionToken?: string
+}) {
   const params = useSearchParams()
-  const sessionId = params.get('session') || ''
-  const token = params.get('token') || ''
+  const sessionId = sessionOverride || params.get('session') || ''
+  const token = sessionToken || params.get('token') || ''
 
   const [session, setSession] = useState<{
     name?: string | null; email?: string | null; language: string; status: string; pageUrl?: string | null
@@ -51,20 +64,25 @@ export function SupportConsole({ templates }: { templates: Template[] }) {
   const [showTemplates, setShowTemplates] = useState(false)
   const [sending, setSending] = useState(false)
   const [authed, setAuthed] = useState<boolean | null>(null)
+  const [visitorTyping, setVisitorTyping] = useState(false)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const lastTypingPing = useRef(0)
 
   const authQuery = `session=${encodeURIComponent(sessionId)}&token=${encodeURIComponent(token)}`
 
   const load = useCallback(async () => {
     if (!sessionId || !token) { setAuthed(false); return }
     try {
-      const res = await fetch(`/api/support/agent?${authQuery}`)
+      // no-store: the 4s poll repeats the same URL — never let HTTP cache
+      // serve a stale session (typing flags, new messages).
+      const res = await fetch(`/api/support/agent?${authQuery}`, { cache: 'no-store' })
       if (res.status === 401) { setAuthed(false); return }
       const d = await res.json()
       if (d.success) {
         setAuthed(true)
         setSession(d.data)
         setMessages(d.data.messages)
+        setVisitorTyping(!!d.data.visitorTyping)
       } else setAuthed(false)
     } catch { setAuthed(false) }
   }, [authQuery, sessionId, token])
@@ -72,7 +90,7 @@ export function SupportConsole({ templates }: { templates: Template[] }) {
   const loadQueue = useCallback(async () => {
     if (!sessionId || !token) return
     try {
-      const res = await fetch(`/api/support/agent?${authQuery}&list=1`)
+      const res = await fetch(`/api/support/agent?${authQuery}&list=1&_=${Date.now()}`, { cache: 'no-store' })
       const d = await res.json()
       if (d.success) setQueue(d.data.sessions)
     } catch { /* ignore */ }
@@ -103,6 +121,20 @@ export function SupportConsole({ templates }: { templates: Template[] }) {
       await load()
     } finally { setSending(false) }
   }
+
+  /* Agent typing ping — throttled to one PATCH per ~3s while keys flow. The
+     flag self-expires in ~6s on the server, so no explicit "stopped" signal
+     is needed: pings stop when the input empties and it quietly lapses. */
+  const pingAgentTyping = useCallback(() => {
+    const now = Date.now()
+    if (now - lastTypingPing.current < 3000) return
+    lastTypingPing.current = now
+    fetch('/api/support/agent', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session: sessionId, token, side: 'agent', typing: true }),
+    }).catch(() => { /* transient */ })
+  }, [sessionId, token])
 
   const close = async () => {
     await fetch(`/api/support/agent?${authQuery}`, { method: 'DELETE' })
@@ -173,7 +205,7 @@ export function SupportConsole({ templates }: { templates: Template[] }) {
                   {q.name || 'Visitor'} · {q.lastMessage.slice(0, 40)}
                 </span>
                 <a
-                  href={`/support/console?session=${q.id}&token=${encodeURIComponent(token)}`}
+                  href={`/support/console?session=${q.id}&token=${encodeURIComponent(q.token)}`}
                   className="shrink-0 font-mono text-[11px] text-signal hover:underline"
                 >
                   open →
@@ -209,6 +241,18 @@ export function SupportConsole({ templates }: { templates: Template[] }) {
               )}
             </div>
           ))}
+          {visitorTyping && !ended && (
+            <div className="flex justify-start" role="status" aria-live="polite">
+              <div className="flex items-center gap-1 rounded-xl rounded-bl-sm border border-border/60 bg-bg-base/60 px-4 py-3">
+                <span className="flex gap-1.5" aria-hidden="true">
+                  <span className="h-2 w-2 rounded-full bg-text-muted motion-safe:animate-bounce" />
+                  <span className="h-2 w-2 rounded-full bg-text-muted motion-safe:animate-bounce [animation-delay:150ms]" />
+                  <span className="h-2 w-2 rounded-full bg-text-muted motion-safe:animate-bounce [animation-delay:300ms]" />
+                </span>
+                <span className="sr-only">Visitor is typing</span>
+              </div>
+            </div>
+          )}
           {ended && messages[messages.length - 1]?.role !== 'system' && (
             <div className="flex justify-center">
               <span className="rounded-full border border-border bg-bg-elevated px-3 py-1 font-mono text-[10px] uppercase tracking-[0.14em] text-text-muted">
@@ -248,7 +292,7 @@ export function SupportConsole({ templates }: { templates: Template[] }) {
               </button>
               <input
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) => { setInput(e.target.value); pingAgentTyping() }}
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(input) } }}
                 placeholder={`Reply in ${lang === 'en' ? 'English' : lang === 'zh' ? '繁體中文' : '简体中文'}…`}
                 maxLength={4000}

@@ -124,10 +124,61 @@ model Order {
   currency               String   @default("usd")
   items                  String // JSON string
   metadata               String? // JSON string
+  quoteId                String? // set when the order originated from a confirmed Quote
+  quote                  Quote?  @relation(fields: [quoteId], references: [id])
   createdAt              DateTime @default(now())
   updatedAt              DateTime @updatedAt
 
   user User @relation(fields: [userId], references: [id])
+}
+
+// 報價：後台建立 → email magic link 發客戶 → 客戶確認 → 自動開 Order → 收據。
+// quoteToken 是客戶端隨機驗證 token（可 revoke、可重發）；登入客戶另可經
+// dashboard 以 clientEmail 匹配查看。
+model Quote {
+  id              String    @id @default(cuid())
+  number          String    @unique // EC-QUO-2026-XXXX
+  clientName      String
+  clientEmail     String?
+  clientPhone     String?
+  language        String    @default("en") // 客戶端頁面渲染語言
+  status          String    @default("draft") // draft|sent|confirmed|converted|paid|cancelled|expired
+  currency        String    @default("hkd")
+  items           String // JSON: [{ description, qty, unitPrice }]（unitPrice 為最小貨幣單位）
+  notes           String?
+  validUntil      DateTime?
+  paymentMode     String    @default("none") // none=線下收款 | stripe=附 Checkout 付款連結
+  stripeSessionId String?   @unique
+  sessionId       String?   // 來源支援對話（從聊天建立時記錄）
+  quoteToken      String    @unique // 客戶端 magic-link token，應用層生成（randomBytes 24 → base64url）
+  signedAt        DateTime? // 客戶手繪簽署時間
+  signerName      String? // 簽署人姓名（客戶填）
+  signaturePng    String? // 手繪簽名 data URI (PNG base64)
+  signedPdfUrl    String? // 客戶回傳的已簽 PDF（Vercel Blob URL）
+  signedPdfName   String? // 原始檔名
+  confirmedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  orders          Order[]
+}
+
+// 收據：Stripe 付款自動出（source=stripe）或線下收款後手動出（source=manual）。
+model Receipt {
+  id          String   @id @default(cuid())
+  number      String   @unique // EC-REC-2026-XXXX
+  orderId     String?  @unique
+  quoteId     String? // 線下收款時可直接掛報價
+  clientName  String
+  clientEmail String?
+  amount      Int // smallest currency unit
+  currency    String   @default("hkd")
+  status      String   @default("issued") // issued|void
+  source      String // stripe|manual
+  meta        String? // JSON（stripe payment intent id 等）
+  accessToken String   @unique // 客戶端 magic-link token，應用層生成
+  issuedAt    DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Subscription {
@@ -303,6 +354,11 @@ model SupportSession {
   pageUrl      String? // where the visitor escalated from
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
+  // Typing indicators: self-expiring timestamps (now + ~6s, refreshed while
+  // the side keeps typing). Null or past = not typing. The typing side pings
+  // PATCH every few keystrokes; both consoles read the flag on their 4s poll.
+  visitorTypingUntil DateTime?
+  agentTypingUntil   DateTime?
   messages     SupportMessage[]
 
   @@index([status, updatedAt])

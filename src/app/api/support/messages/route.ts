@@ -19,7 +19,8 @@ const postSchema = z.object({
 /**
  * Visitor-side message channel, authenticated by the visitorToken the widget
  * holds. GET returns messages after `after` (polling); POST appends a visitor
- * message and marks the session active; DELETE ends the conversation.
+ * message and marks the session active; PATCH is the typing-indicator ping;
+ * DELETE ends the conversation.
  */
 export const GET = withErrorHandler(async (req) => {
   const url = new URL(req.url)
@@ -43,6 +44,8 @@ export const GET = withErrorHandler(async (req) => {
 
   return apiSuccess({
     status: session.status,
+    // Self-expiring flag (now + ~6s, refreshed by the agent console's pings).
+    agentTyping: !!session.agentTypingUntil && session.agentTypingUntil > new Date(),
     messages: messages.map((m) => ({
       id: m.id,
       role: m.role,
@@ -68,20 +71,40 @@ export const POST = withErrorHandler(async (req) => {
     data: { sessionId: session.id, role: 'visitor', content },
   })
 
-  // A new visitor message means someone still needs a human.
+  // A new visitor message means someone still needs a human; their typing
+  // indicator is done the moment the message lands.
   if (session.status === 'waiting') {
     await prisma.supportSession.update({
       where: { id: session.id },
-      data: { status: 'waiting', updatedAt: new Date() },
+      data: { status: 'waiting', updatedAt: new Date(), visitorTypingUntil: null },
     })
   } else {
     await prisma.supportSession.update({
       where: { id: session.id },
-      data: { updatedAt: new Date() },
+      data: { updatedAt: new Date(), visitorTypingUntil: null },
     })
   }
 
   return apiSuccess({ id: message.id, createdAt: message.createdAt.toISOString() }, 201)
+})
+
+// Typing ping from the visitor's widget: sets the self-expiring
+// visitorTypingUntil flag the agent console reads on its 4s poll.
+const patchSchema = z.object({ token: z.string().min(10).max(120) })
+
+export const PATCH = withErrorHandler(async (req) => {
+  const { token } = patchSchema.parse(await req.json())
+  const session = await prisma.supportSession.findUnique({ where: { visitorToken: token } })
+  if (!session) throw new NotFoundError('Support session not found')
+  if (session.status === 'closed') {
+    return apiError('SESSION_CLOSED', 'This conversation has ended.', 409)
+  }
+
+  await prisma.supportSession.update({
+    where: { id: session.id },
+    data: { visitorTypingUntil: new Date(Date.now() + 6_000) },
+  })
+  return apiSuccess({ ok: true })
 })
 
 export const DELETE = withErrorHandler(async (req) => {

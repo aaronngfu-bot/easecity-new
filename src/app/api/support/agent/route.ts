@@ -1,7 +1,7 @@
 import { withErrorHandler, AuthError, NotFoundError } from '@/lib/api-handler'
 import { apiSuccess, apiError } from '@/lib/api-response'
 import { prisma } from '@/lib/db'
-import { verifyAgentToken } from '@/lib/support'
+import { verifyAgentToken, signAgentToken } from '@/lib/support'
 import { z } from 'zod'
 
 export const dynamic = 'force-dynamic'
@@ -10,6 +10,7 @@ export const dynamic = 'force-dynamic'
  * Agent console data. Authenticated by the signed magic-link token — no login.
  * GET ?session=&token=        → session + messages (optionally ?list=1 for the queue)
  * POST { session, token, content, templateId? } → agent reply
+ * PATCH { session, token, side, typing? }       → typing-indicator ping
  * DELETE ?session=&token=     → close the session
  */
 
@@ -58,6 +59,10 @@ export const GET = withErrorHandler(async (req) => {
         pageUrl: s.pageUrl,
         updatedAt: s.updatedAt.toISOString(),
         lastMessage: s.messages[0]?.content ?? '',
+        // Each queue entry carries its OWN signed token: agent tokens are
+        // HMAC-bound to the session id, so the current console's token cannot
+        // open another session (it 401s). One link per session, minted here.
+        token: signAgentToken(s.id),
       })),
     })
   }
@@ -78,6 +83,9 @@ export const GET = withErrorHandler(async (req) => {
     language: session.language,
     status: session.status === 'waiting' ? 'active' : session.status,
     pageUrl: session.pageUrl,
+    // Typing indicator flags — self-expiring timestamps, null/expired = not typing.
+    visitorTyping: !!session.visitorTypingUntil && session.visitorTypingUntil > new Date(),
+    agentTyping: !!session.agentTypingUntil && session.agentTypingUntil > new Date(),
     messages: session.messages.map((m) => ({
       id: m.id,
       role: m.role,
@@ -110,10 +118,33 @@ export const POST = withErrorHandler(async (req) => {
   })
   await prisma.supportSession.update({
     where: { id: sessionId },
-    data: { status: 'active', updatedAt: new Date() },
+    data: { status: 'active', updatedAt: new Date(), agentTypingUntil: null },
   })
 
   return apiSuccess({ id: message.id, createdAt: message.createdAt.toISOString() }, 201)
+})
+
+// Typing-indicator ping. `side: 'agent'` sets the agent's self-expiring
+// flag; `visitor` exists so one endpoint serves both consoles. Always sets;
+// clients simply stop pinging when their input empties, and the flag
+// expires on its own (~6s).
+const patchSchema = z.object({
+  session: z.string().min(1).max(64),
+  token: z.string().min(10).max(300),
+  side: z.enum(['agent', 'visitor']),
+  typing: z.boolean().default(true),
+})
+
+export const PATCH = withErrorHandler(async (req) => {
+  const { session: sessionId, token, side, typing } = patchSchema.parse(await req.json())
+  assertAgent(sessionId, token)
+
+  const until = typing ? new Date(Date.now() + 6_000) : null
+  await prisma.supportSession.update({
+    where: { id: sessionId },
+    data: side === 'agent' ? { agentTypingUntil: until } : { visitorTypingUntil: until },
+  })
+  return apiSuccess({ ok: true })
 })
 
 export const DELETE = withErrorHandler(async (req) => {

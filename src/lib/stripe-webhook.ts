@@ -267,6 +267,13 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
 }
 
 async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
+  // Quote payments: mark quote + order paid, auto-issue the receipt.
+  const quoteId = session.metadata?.quoteId
+  if (quoteId) {
+    await handleQuoteCheckoutCompleted(session, quoteId)
+    return
+  }
+
   const orderId = session.metadata?.orderId
   if (!orderId) return
 
@@ -280,6 +287,55 @@ async function handleCheckoutCompleted(session: Stripe.Checkout.Session) {
       currency: session.currency ?? 'usd',
     },
   })
+}
+
+/** Stripe payment for a confirmed quote → convert quote, pay order, auto receipt. */
+async function handleQuoteCheckoutCompleted(session: Stripe.Checkout.Session, quoteId: string) {
+  const quote = await prisma.quote.findUnique({ where: { id: quoteId } })
+  if (!quote) return
+
+  const paymentIntentId = (session.payment_intent as string) ?? null
+
+  // Receipt is idempotent on stripeSessionId-backed order.
+  const order = await prisma.order.findFirst({ where: { quoteId }, orderBy: { createdAt: 'desc' } })
+  if (order) {
+    await prisma.order.update({
+      where: { id: order.id },
+      data: {
+        status: 'paid',
+        stripeSessionId: session.id,
+        stripePaymentIntentId: paymentIntentId,
+        amount: session.amount_total ?? order.amount,
+        currency: session.currency ?? order.currency,
+      },
+    })
+  }
+
+  await prisma.quote.update({
+    where: { id: quote.id },
+    data: { status: 'paid', stripeSessionId: session.id },
+  })
+
+  if (order && !(await prisma.receipt.findUnique({ where: { orderId: order.id } }))) {
+    const { nextDocumentNumber } = await import('@/lib/doc-numbers')
+    const { randomBytes } = await import('node:crypto')
+    const number = await nextDocumentNumber('REC')
+    await prisma.receipt.create({
+      data: {
+        number,
+        orderId: order.id,
+        quoteId: quote.id,
+        clientName: quote.clientName,
+        clientEmail: quote.clientEmail,
+        amount: session.amount_total ?? order.amount,
+        currency: session.currency ?? order.currency,
+        source: 'stripe',
+        accessToken: randomBytes(24).toString('base64url'),
+        meta: JSON.stringify({ stripeSessionId: session.id, paymentIntentId }),
+      },
+    })
+    console.log(`[Stripe Webhook] Receipt ${number} issued for quote ${quote.number}`)
+  }
 }
 
 async function handleCheckoutExpired(session: Stripe.Checkout.Session) {

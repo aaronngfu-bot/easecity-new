@@ -78,9 +78,11 @@ export function ChatWidget() {
   const [escalating, setEscalating] = useState(false)
   const [sessionToken, setSessionToken] = useState<string | null>(null)
   const [sessionEnded, setSessionEnded] = useState(false)
+  const [agentTyping, setAgentTyping] = useState(false)
   const [faqOpen, setFaqOpen] = useState(true)
   const scrollRef = useRef<HTMLDivElement>(null)
   const abortRef = useRef<AbortController | null>(null)
+  const lastVisitorPing = useRef(0)
   const faqs = useFaqs()
 
   const c = t.chat
@@ -169,7 +171,9 @@ export function ChatWidget() {
 
     const poll = async () => {
       try {
-        const res = await fetch(`/api/support/messages?token=${encodeURIComponent(sessionToken)}${lastIso ? `&after=${encodeURIComponent(lastIso)}` : ''}`)
+        // no-store: same-URL polling must never be served from HTTP cache,
+        // or typing flags lag behind by the cache freshness window.
+        const res = await fetch(`/api/support/messages?token=${encodeURIComponent(sessionToken)}${lastIso ? `&after=${encodeURIComponent(lastIso)}` : ''}`, { cache: 'no-store' })
         if (!res.ok) return
         const d = await res.json()
         if (!alive || !d.success) return
@@ -178,6 +182,7 @@ export function ChatWidget() {
           setMessages(prev => [...prev, { id: `sys-${Date.now()}`, role: 'system', content: c.ended }])
           return
         }
+        setAgentTyping(!!d.data.agentTyping)
         const fresh: ChatMessage[] = (d.data.messages || [])
           .filter((m: { role: string }) => m.role === 'agent' || m.role === 'system')
           .map((m: { id: string; role: string; content: string }) => ({
@@ -239,6 +244,21 @@ export function ChatWidget() {
     } catch { setError(c.error) }
   }
 
+  /* Visitor typing ping — throttled to one PATCH per ~3s while keys flow.
+     The server flag self-expires in ~6s, so stopping the pings is all the
+     "stopped typing" signal the agent console needs. */
+  const pingVisitorTyping = useCallback(() => {
+    if (mode !== 'human-chat' || !sessionToken || sessionEnded) return
+    const now = Date.now()
+    if (now - lastVisitorPing.current < 3000) return
+    lastVisitorPing.current = now
+    fetch('/api/support/messages', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token: sessionToken }),
+    }).catch(() => { /* transient */ })
+  }, [mode, sessionToken, sessionEnded])
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim()) return
@@ -295,7 +315,7 @@ export function ChatWidget() {
                   </p>
                   <p className="truncate text-[11px] leading-tight text-text-muted">
                     {mode === 'human-chat'
-                      ? (isLoading || escalating ? c.agentTyping : c.humanReady)
+                      ? (agentTyping ? c.agentTyping : c.humanReady)
                       : c.tagline}
                   </p>
                 </div>
@@ -435,7 +455,9 @@ export function ChatWidget() {
                       {/* SHORT thinking bubble: avatar + bouncing dots only —
                           no wide empty bubble before the answer exists */}
                       <div className="flex h-6 w-6 items-center justify-center rounded-full border border-signal/25 bg-signal/15">
-                        <Bot size={12} className="text-signal" aria-hidden="true" />
+                        {mode === 'human-chat' && agentTyping
+                          ? <Headset size={12} className="text-signal" aria-hidden="true" />
+                          : <Bot size={12} className="text-signal" aria-hidden="true" />}
                       </div>
                       <div className="flex items-center gap-1 rounded-2xl rounded-bl-md border border-signal/25 bg-signal/10 px-4 py-3">
                         <span className="flex gap-1.5" aria-hidden="true">
@@ -444,6 +466,30 @@ export function ChatWidget() {
                           <span className="h-2 w-2 rounded-full bg-signal motion-safe:animate-bounce [animation-delay:300ms]" />
                         </span>
                         <span className="sr-only">{mode === 'human-chat' ? c.agentTyping : c.typing}</span>
+                      </div>
+                    </motion.div>
+                  )}
+                  {agentTyping && !isLoading && mode === 'human-chat' && (
+                    <motion.div
+                      initial={reduce ? { opacity: 0 } : { opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ duration: 0.2, ease: EASE_OUT }}
+                      className="flex items-center gap-2.5"
+                      role="status"
+                      aria-live="polite"
+                    >
+                      {/* Agent typing while the visitor has nothing pending:
+                          headset avatar + dots, mirroring the thinking bubble */}
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full border border-signal/30 bg-signal/20">
+                        <Headset size={12} className="text-signal" aria-hidden="true" />
+                      </div>
+                      <div className="flex items-center gap-1 rounded-2xl rounded-bl-md border border-signal/25 bg-signal/10 px-4 py-3">
+                        <span className="flex gap-1.5" aria-hidden="true">
+                          <span className="h-2 w-2 rounded-full bg-signal motion-safe:animate-bounce" />
+                          <span className="h-2 w-2 rounded-full bg-signal motion-safe:animate-bounce [animation-delay:150ms]" />
+                          <span className="h-2 w-2 rounded-full bg-signal motion-safe:animate-bounce [animation-delay:300ms]" />
+                        </span>
+                        <span className="sr-only">{c.agentTyping}</span>
                       </div>
                     </motion.div>
                   )}
@@ -532,7 +578,7 @@ export function ChatWidget() {
                 <form onSubmit={handleSubmit} className={cn('flex gap-2 border-t border-border/60 bg-bg-base/40 p-3', !showFaqChips && 'border-t-0')}>
                   <input
                     value={input}
-                    onChange={(e) => setInput(e.target.value)}
+                    onChange={(e) => { setInput(e.target.value); pingVisitorTyping() }}
                     placeholder={mode === 'human-chat' ? c.humanQuestion : c.placeholder}
                     maxLength={2000}
                     className="glass-input min-w-0 flex-1 !py-2 !text-sm"

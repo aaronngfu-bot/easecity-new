@@ -2578,3 +2578,23 @@
     --nudge: 0px !important;
   }
 }
+
+/* ─── Receipt print styles: only the document goes to paper/PDF ─────────── */
+@media print {
+  body * {
+    visibility: hidden;
+  }
+  .receipt-print,
+  .receipt-print * {
+    visibility: visible;
+  }
+  .receipt-print {
+    position: absolute;
+    inset: 0 auto auto 0;
+    width: 100%;
+    border: none !important;
+  }
+  .receipt-noprint {
+    display: none !important;
+  }
+}
