@@ -29,11 +29,14 @@ async function assertAdmin() {
   if (!session?.user || !isAdmin(session.user.role)) throw new Error('Unauthorized')
 }
 
-/** Manually issue a receipt for an offline-settled order or quote. */
+/** Manually issue a receipt for an offline-settled order or quote.
+ *  paymentMethod: how the money actually arrived — shown on the receipt PDF
+ *  and page. Defaults to 'bank'. */
 export async function issueManualReceipt(input: {
   orderId?: string
   quoteId?: string
   language?: Language
+  paymentMethod?: 'bank' | 'fps' | 'alipayhk' | 'wechatpay' | 'cash' | 'cheque' | 'stripe'
 }) {
   await assertAdmin()
 
@@ -72,8 +75,9 @@ export async function issueManualReceipt(input: {
       clientEmail,
       amount,
       currency,
-      source: 'manual',
+      source: input.paymentMethod === 'stripe' ? 'stripe' : 'manual',
       accessToken: randomBytes(24).toString('base64url'),
+      meta: JSON.stringify({ paymentMethod: input.paymentMethod || 'bank' }),
     },
   })
 

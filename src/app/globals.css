@@ -2598,3 +2598,34 @@
     display: none !important;
   }
 }
+
+/* Receipt sheet: the customer-facing document mirrors the formal PDF style —
+   light "paper" surface in BOTH themes, mono-print safe (no tint fills that
+   turn grey when printed black & white; dark key lines carry the structure). */
+.receipt-sheet {
+  background: #ffffff !important;
+  color: #0f1111;
+  border-color: #c9cdcd !important;
+}
+.receipt-sheet * {
+  color: inherit;
+}
+.receipt-sheet .text-signal {
+  color: #007a6f !important;
+}
+.receipt-sheet .text-signal-light {
+  color: #009382 !important;
+}
+.receipt-sheet .text-text-muted,
+.receipt-sheet .text-text-secondary {
+  color: #5e6a6a !important;
+}
+.receipt-sheet .text-text-primary {
+  color: #0f1111 !important;
+}
+.receipt-sheet .border-border {
+  border-color: #dfe3e3 !important;
+}
+.receipt-sheet .bg-bg-base\/50 {
+  background: #f5f7f8 !important;
+}

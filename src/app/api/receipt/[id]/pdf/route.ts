@@ -46,6 +46,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     }
   }
 
+  // Payment method from meta (manual receipts record how money arrived).
+  let paymentMethod: string | null = null
+  if (receipt.meta) {
+    try { paymentMethod = JSON.parse(receipt.meta).paymentMethod ?? null } catch {}
+  }
   const pdf = await buildReceiptPdf({
     number: receipt.number,
     clientName: receipt.clientName,
@@ -56,6 +61,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     issuedAt: receipt.issuedAt,
     validUntil: null,
     source: receipt.source,
+    paymentMethod: (paymentMethod || 'bank') as never,
     quoteNumber,
   })
 

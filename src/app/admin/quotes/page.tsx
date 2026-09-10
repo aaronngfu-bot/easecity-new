@@ -7,6 +7,7 @@ import { isAdmin } from '@/lib/permissions'
 import { prisma } from '@/lib/db'
 import Link from 'next/link'
 import { QuoteRowActions } from '@/components/admin/QuoteRowActions'
+import { IssueReceiptButton } from '@/components/admin/IssueReceiptButton'
 
 /**
  * Admin quotes list. The full quote funnel (create → send → confirm →
@@ -106,6 +107,9 @@ export default async function AdminQuotesPage() {
                   </td>
                   <td className="px-5 py-4 text-right">
                     <QuoteRowActions id={q.id} status={q.status} clientEmail={q.clientEmail} />
+                    {q.status === 'confirmed' && (
+                      <span className="ml-2"><IssueReceiptButton quoteId={q.id} /></span>
+                    )}
                   </td>
                 </tr>
               ))}

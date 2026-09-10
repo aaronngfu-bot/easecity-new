@@ -44,7 +44,7 @@ export function ReceiptView({ receipt, language }: { receipt: ReceiptViewData; l
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:py-16">
-      <div className="receipt-print rounded-2xl border border-border bg-bg-surface p-6 sm:p-10">
+      <div className="receipt-print receipt-sheet rounded-2xl border border-border bg-bg-surface p-6 sm:p-10">
         <div className="mb-8 flex items-start justify-between gap-4">
           <div>
             <p className="font-display text-xl font-bold text-signal">
@@ -68,7 +68,7 @@ export function ReceiptView({ receipt, language }: { receipt: ReceiptViewData; l
           {receipt.clientEmail && <p className="text-xs text-text-muted">{receipt.clientEmail}</p>}
         </div>
 
-        <div className="rounded-xl border border-signal/25 bg-signal/5 p-5">
+        <div className="rounded-xl border border-border bg-bg-base/50 p-5">
           <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-muted">{t.amount}</p>
           <p className="mt-1 font-display text-3xl font-bold text-signal">
             {money} <span className="text-sm font-medium text-text-secondary">{receipt.currency.toUpperCase()}</span>

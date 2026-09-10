@@ -18,9 +18,20 @@ const check = (name, ok, detail = '') => {
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${name}${detail ? ` — ${detail}` : ''}`)
   if (!ok) failures++
 }
-const BASE = 'http://localhost:3000'
+const BASE = process.env.SMOKE_BASE || 'http://localhost:3000'
 
 try {
+  // Idempotent: clear last run's leftovers first (a failed run leaves them).
+  for (const n of ['EC-QUO-1999-9999', 'EC-QUO-1999-9998']) {
+    const stale = await prisma.quote.findFirst({ where: { number: n } })
+    if (stale) {
+      await prisma.receipt.deleteMany({ where: { quoteId: stale.id } })
+      await prisma.order.deleteMany({ where: { quoteId: stale.id } })
+      await prisma.quote.delete({ where: { id: stale.id } })
+    }
+  }
+  await prisma.receipt.deleteMany({ where: { number: 'EC-REC-1999-9999' } })
+
   // 1. Quote page token auth: valid token renders, wrong token rejected.
   const quote = await prisma.quote.create({
     data: {

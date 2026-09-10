@@ -10,6 +10,15 @@ export const dynamic = 'force-dynamic'
 
 const settingsSchema = z.object({
   ecshare_logo_url: z.string().max(500).nullable().optional(),
+  // Company payment details for quotes/receipts (PDF letterhead & bank block)
+  'pay:companyName': z.string().max(200).nullable().optional(),
+  'pay:companyBrNo': z.string().max(60).nullable().optional(),
+  'pay:companyAddress': z.string().max(500).nullable().optional(),
+  'pay:bankName': z.string().max(200).nullable().optional(),
+  'pay:accountName': z.string().max(200).nullable().optional(),
+  'pay:accountNumber': z.string().max(60).nullable().optional(),
+  'pay:paymentTerms': z.string().max(300).nullable().optional(),
+  'pay:termsAndConditions': z.string().max(4000).nullable().optional(),
 })
 
 /** Read site settings (admin). */
