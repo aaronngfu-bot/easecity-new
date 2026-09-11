@@ -3,13 +3,13 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { ReceiptView } from '@/components/commerce/ReceiptView'
-import { ReceiptPdfButton } from '@/components/commerce/PdfButtons'
 
 /**
  * Customer-facing receipt page. Two access paths:
  *  1. Magic link  /receipt/{id}?token=…  (emailed, no login)
  *  2. Logged-in   /receipt/{id}          (only when session email matches)
- * Language follows the receipt record when set, else English.
+ * Thin server loader (auth + data); copy follows the site's live language
+ * inside ReceiptView (useLanguage).
  */
 export default async function ReceiptPage({
   params,
@@ -40,7 +40,9 @@ export default async function ReceiptPage({
   return (
     <div className="space-y-4">
       <ReceiptView
+        token={token || ''}
         receipt={{
+          id: receipt.id,
           number: receipt.number,
           clientName: receipt.clientName,
           clientEmail: receipt.clientEmail,
@@ -50,9 +52,7 @@ export default async function ReceiptPage({
           issuedAt: receipt.issuedAt.toISOString(),
           quoteId: receipt.quoteId,
         }}
-        language="en"
       />
-      <ReceiptPdfButton receiptId={receipt.id} token={token || ''} label="Download PDF receipt" />
     </div>
   )
 }

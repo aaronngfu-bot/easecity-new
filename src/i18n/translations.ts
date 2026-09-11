@@ -947,6 +947,7 @@ const en = {
   companyInfo: {
     title: 'Company Information',
     locLabel: 'Location', locValue: 'Hong Kong SAR', locSub: 'Asia Pacific',
+    phoneLabel: 'Hotline', phoneValue: '3997 1396', phoneSub: 'Mon–Fri, 10:00–18:00 HKT',
     emailLabel: 'Email', emailValue: 'admin@easecity.hk', emailSub: 'General enquiries',
     timeLabel: 'Response Time', timeValue: 'Usually within 1 business day', timeSub: 'HKT (UTC+8)',
     entLabel: 'Enterprise', entValue: 'admin@easecity.hk', entSub: 'Enterprise sales, security review, and on-prem discussions',
@@ -2192,6 +2193,7 @@ const zh: typeof en = {
   companyInfo: {
     title: '公司資訊',
     locLabel: '位置', locValue: '香港特別行政區', locSub: '亞太區',
+    phoneLabel: '服務熱線', phoneValue: '3997 1396', phoneSub: '星期一至五 10:00–18:00',
     emailLabel: '電郵', emailValue: 'admin@easecity.hk', emailSub: '一般查詢',
     timeLabel: '回覆時間', timeValue: '一般一個工作日內', timeSub: '香港時間（UTC+8）',
     entLabel: '企業', entValue: 'admin@easecity.hk', entSub: '企業銷售、安全審查及本地部署洽談',
@@ -3437,6 +3439,7 @@ const zhCN = {
   companyInfo: {
     title: '公司信息',
     locLabel: '位置', locValue: '香港特别行政区', locSub: '亚太区',
+    phoneLabel: '服务热线', phoneValue: '3997 1396', phoneSub: '星期一至五 10:00–18:00',
     emailLabel: '电邮', emailValue: 'admin@easecity.hk', emailSub: '一般查找',
     timeLabel: '回复时间', timeValue: '一般一个工作日内', timeSub: '香港时间（UTC+8）',
     entLabel: '企业', entValue: 'admin@easecity.hk', entSub: '企业销售、安全审查及本地部署洽谈',

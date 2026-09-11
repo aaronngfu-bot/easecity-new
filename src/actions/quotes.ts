@@ -169,6 +169,7 @@ export async function sendQuote(id: string) {
     const fromEmail = process.env.AUTH_EMAIL_FROM || 'EaseCity <onboarding@resend.dev>'
 
     // Print-and-sign copy: blank signature block, no online signature baked in.
+    // PDFs are English-only by default (pass language when a client asks).
     const pdfBytes = await buildQuotePdf({
       number: quote.number,
       clientName: quote.clientName,
@@ -236,6 +237,7 @@ export async function regenerateQuoteLink(id: string) {
 export async function confirmQuote(id: string, token: string, signature?: {
   pngDataUri: string
   signerName: string
+  signerTitle?: string
 }) {
   const quote = await prisma.quote.findUnique({ where: { id } })
   if (!quote || quote.quoteToken !== token) throw new Error('Invalid quote link')
@@ -245,8 +247,9 @@ export async function confirmQuote(id: string, token: string, signature?: {
   const expired = quote.validUntil && quote.validUntil < new Date()
   if (expired) throw new Error('Quote has expired')
 
-  // Validate signature payload early.
-  let sig: { pngDataUri: string; signerName: string } | null = null
+  // Validate signature payload early. signerTitle is optional — for B2B
+  // quotes it records the capacity in which the person signs (誰代表公司簽).
+  let sig: { pngDataUri: string; signerName: string; signerTitle?: string } | null = null
   if (signature?.pngDataUri) {
     if (!/^data:image\/png;base64,[A-Za-z0-9+/=]+$/.test(signature.pngDataUri)) {
       throw new Error('Invalid signature image')
@@ -254,7 +257,8 @@ export async function confirmQuote(id: string, token: string, signature?: {
     if (signature.pngDataUri.length > 400_000) throw new Error('Signature image too large')
     const name = signature.signerName?.trim()
     if (!name) throw new Error('Signer name required')
-    sig = { pngDataUri: signature.pngDataUri, signerName: name.slice(0, 120) }
+    const title = signature.signerTitle?.trim()
+    sig = { pngDataUri: signature.pngDataUri, signerName: name.slice(0, 120), ...(title && { signerTitle: title.slice(0, 120) }) }
   }
 
   // Already confirmed before → return existing checkout if stripe mode.
@@ -304,7 +308,11 @@ export async function confirmQuote(id: string, token: string, signature?: {
     data: {
       status: 'confirmed',
       confirmedAt: new Date(),
-      ...(sig && { signedAt: new Date(), signerName: sig.signerName, signaturePng: sig.pngDataUri }),
+      ...(sig && {
+        signedAt: new Date(),
+        signerName: sig.signerTitle ? `${sig.signerName}（${sig.signerTitle}）` : sig.signerName,
+        signaturePng: sig.pngDataUri,
+      }),
     },
   })
 

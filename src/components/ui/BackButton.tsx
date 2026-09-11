@@ -3,14 +3,15 @@
 import { usePathname, useRouter } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
-import { copyKey } from '@/i18n/translations'
 
 /**
  * Global "back" affordance for pages not reachable directly from the primary
- * nav. Hidden on the home page and on top-level nav destinations. Sits in flow
- * above the page content, dropped a little below the floating pill nav (mt-20)
- * so the two never read as one crowded strip. Uses history.back() so it
- * returns to wherever the visitor actually came from.
+ * nav. Hidden on the home page and on top-level nav destinations. Uses
+ * history.back() so it returns to wherever the visitor actually came from.
+ *
+ * Narrow-document routes (quote/receipt) align the button with the document
+ * column (max-w-2xl + px-4) instead of the site container, so it sits ABOVE
+ * the content it belongs to rather than at the far page edge.
  */
 const NAV_ROOTS = new Set(['/', '/ec-share', '/services', '/pricing', '/download'])
 
@@ -22,6 +23,24 @@ export function BackButton() {
   if (pathname === '/' || NAV_ROOTS.has(pathname)) return null
 
   const label = language === 'en' ? 'Back' : '返回'
+  const base = pathname.split('?')[0]
+  const narrow = base.startsWith('/quote') || base.startsWith('/receipt')
+
+  if (narrow) {
+    return (
+      <div className="mx-auto w-full max-w-2xl px-4 pt-24 sm:pt-28">
+        <button
+          type="button"
+          onClick={() => router.back()}
+          className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--text-muted)] transition-colors hover:text-[var(--signal)]"
+          aria-label={label}
+        >
+          <ArrowLeft size={15} />
+          {label}
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="mt-28">

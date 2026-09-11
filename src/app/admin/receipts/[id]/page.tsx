@@ -20,6 +20,7 @@ export default async function AdminReceiptPage({ params }: { params: Promise<{ i
     <div className="space-y-4">
       <ReceiptView
         receipt={{
+          id: receipt.id,
           number: receipt.number,
           clientName: receipt.clientName,
           clientEmail: receipt.clientEmail,

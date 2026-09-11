@@ -27,6 +27,11 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
   if (!authed) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const pdf = await buildQuotePdf({
+    // PDFs are English-only by default; pass language explicitly when a
+    // client specifically asks for another language version.
+    // Chop version (&chop=1): stamps the scanned company chop for clients
+    // whose procurement rules require a stamped copy (gov/edu common).
+    withChop: new URL(req.url).searchParams.get('chop') === '1',
     number: quote.number,
     clientName: quote.clientName,
     clientEmail: quote.clientEmail,

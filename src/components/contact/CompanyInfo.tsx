@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { MapPin, Mail, Clock, MessageSquare } from 'lucide-react'
+import { MapPin, Mail, Clock, MessageSquare, Phone } from 'lucide-react'
 import { useLanguage } from '@/context/LanguageContext'
 
 export function CompanyInfo() {
@@ -9,9 +9,10 @@ export function CompanyInfo() {
 
   const infoItems = [
     { icon: MapPin, label: t.companyInfo.locLabel, value: t.companyInfo.locValue, sub: t.companyInfo.locSub },
-    { icon: Mail, label: t.companyInfo.emailLabel, value: t.companyInfo.emailValue, sub: t.companyInfo.emailSub },
+    { icon: Phone, label: t.companyInfo.phoneLabel, value: t.companyInfo.phoneValue, sub: t.companyInfo.phoneSub, href: 'tel:+85239971396' },
+    { icon: Mail, label: t.companyInfo.emailLabel, value: t.companyInfo.emailValue, sub: t.companyInfo.emailSub, href: `mailto:${t.companyInfo.emailValue}` },
     { icon: Clock, label: t.companyInfo.timeLabel, value: t.companyInfo.timeValue, sub: t.companyInfo.timeSub },
-    { icon: MessageSquare, label: t.companyInfo.entLabel, value: t.companyInfo.entValue, sub: t.companyInfo.entSub },
+    { icon: MessageSquare, label: t.companyInfo.entLabel, value: t.companyInfo.entValue, sub: t.companyInfo.entSub, href: `mailto:${t.companyInfo.entValue}` },
   ]
 
   const faqs = [
@@ -37,23 +38,38 @@ export function CompanyInfo() {
             META
           </span>
         </div>
-        {infoItems.map((item, i) => (
-          <div key={item.label} className="flex items-start gap-3.5 group">
-            <div className="w-10 h-10 flex-shrink-0 rounded-lg bg-bg-base/40 border border-border group-hover:border-signal/25 group-hover:text-signal flex items-center justify-center text-text-muted transition-colors">
-              <item.icon size={16} />
-            </div>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 mb-0.5">
-                <p className="label-mono">{item.label}</p>
-                <span className="font-mono text-[10px] text-text-faint">
-                  {String(i + 1).padStart(2, '0')}
-                </span>
+        {infoItems.map((item, i) => {
+          const inner = (
+            <>
+              <div className="w-10 h-10 flex-shrink-0 rounded-lg bg-bg-base/40 border border-border group-hover:border-signal/25 group-hover:text-signal flex items-center justify-center text-text-muted transition-colors">
+                <item.icon size={16} />
               </div>
-              <p className="text-text-primary text-sm font-medium">{item.value}</p>
-              <p className="text-text-muted text-xs">{item.sub}</p>
+              <div className="flex-1">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <p className="label-mono">{item.label}</p>
+                  <span className="font-mono text-[10px] text-text-faint">
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                </div>
+                <p className="text-text-primary text-sm font-medium">{item.value}</p>
+                <p className="text-text-muted text-xs">{item.sub}</p>
+              </div>
+            </>
+          )
+          return item.href ? (
+            <a
+              key={item.label}
+              href={item.href}
+              className="flex items-start gap-3.5 group"
+            >
+              {inner}
+            </a>
+          ) : (
+            <div key={item.label} className="flex items-start gap-3.5 group">
+              {inner}
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       <div className="glass-prominent p-4 flex items-center gap-3">

@@ -80,3 +80,6 @@ wheel.png
 scripts/probe-*.ps1
 ec-share_logo.png
 logo.svg
+
+# PDF preview render output
+.preview/

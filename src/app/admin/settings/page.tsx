@@ -19,8 +19,11 @@ export default function AdminSettingsPage() {
     'pay:accountNumber': '',
     'pay:paymentTerms': '30 days from invoice date',
     'pay:termsAndConditions': '',
+    'pay:companyChopUrl': '',
   })
   const fileInput = { current: null as HTMLInputElement | null }
+  const chopInput = { current: null as HTMLInputElement | null }
+  const [chopUploading, setChopUploading] = useState(false)
 
   const PAY_FIELDS: { key: string; label: string; rows?: number }[] = [
     { key: 'pay:companyName', label: 'Company name (as on BR) 公司名稱' },
@@ -112,6 +115,37 @@ export default function AdminSettingsPage() {
       setMsg(e instanceof Error ? e.message : 'Upload failed')
     } finally {
       setUploading(false)
+    }
+  }
+
+  const onChopUpload = async (file: File) => {
+    setChopUploading(true)
+    setPayMsg('')
+    try {
+      const buf = await file.arrayBuffer()
+      const bytes = new Uint8Array(buf)
+      let binary = ''
+      const chunk = 0x8000
+      for (let i = 0; i < bytes.length; i += chunk) {
+        const end = Math.min(i + chunk, bytes.length)
+        let part = ''
+        for (let j = i; j < end; j++) part += String.fromCharCode(bytes[j])
+        binary += part
+      }
+      const data = btoa(binary)
+      const res = await fetch('/api/admin/blog/upload', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: file.name, contentType: file.type, data }),
+      })
+      const d = await res.json()
+      if (!res.ok || !d.success) throw new Error(d.error?.message || 'Upload failed')
+      setPay((prev) => ({ ...prev, 'pay:companyChopUrl': d.data.url }))
+      setPayMsg('Chop uploaded — click Save payment details to apply.')
+    } catch (e) {
+      setPayMsg(e instanceof Error ? e.message : 'Upload failed')
+    } finally {
+      setChopUploading(false)
     }
   }
 
@@ -228,6 +262,50 @@ export default function AdminSettingsPage() {
                 )}
               </label>
             ))}
+
+            {/* Company chop scan — optional; used on chop-version PDFs (&chop=1) */}
+            <div className="border-t border-border/60 pt-3">
+              <p className="font-mono text-[10px] uppercase tracking-[0.16em] text-text-muted">Company chop 公司印章（掃描版）</p>
+              <p className="mb-2 mt-1 text-xs leading-relaxed text-text-muted">
+                Upload a scan of the real company chop (PNG with transparent background works best). Quote/receipt PDF URLs with <code className="font-mono">&amp;chop=1</code> stamp it on the signature block — for clients whose procurement rules require a stamped copy.
+              </p>
+              <div className="flex items-center gap-3">
+                {pay['pay:companyChopUrl'] ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={pay['pay:companyChopUrl']} alt="Company chop" className="h-16 w-16 rounded-md border border-border object-contain" />
+                ) : (
+                  <div className="flex h-16 w-16 items-center justify-center rounded-md border border-dashed border-border text-xs text-text-muted">none</div>
+                )}
+                <div className="flex flex-col gap-2">
+                  <input
+                    type="file"
+                    accept="image/png,image/*"
+                    className="hidden"
+                    ref={(el) => { chopInput.current = el }}
+                    onChange={(e) => { const f = e.target.files?.[0]; if (f) onChopUpload(f) }}
+                  />
+                  <button
+                    type="button"
+                    disabled={chopUploading}
+                    onClick={() => chopInput.current?.click()}
+                    className="inline-flex items-center gap-2 rounded-md border border-border bg-bg-elevated px-3 py-2 text-sm text-text-primary transition-colors hover:border-signal disabled:opacity-60"
+                  >
+                    {chopUploading ? <Loader2 size={15} className="animate-spin" /> : <Upload size={15} />}
+                    {chopUploading ? 'Uploading…' : 'Upload chop'}
+                  </button>
+                  {pay['pay:companyChopUrl'] && (
+                    <button
+                      type="button"
+                      onClick={() => setPay((prev) => ({ ...prev, 'pay:companyChopUrl': '' }))}
+                      className="inline-flex items-center gap-1.5 text-xs text-text-muted transition-colors hover:text-status-danger"
+                    >
+                      <Trash2 size={12} /> Remove
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+
             <div className="flex items-center gap-3 pt-1">
               <button
                 type="button"

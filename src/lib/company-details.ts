@@ -25,6 +25,7 @@ export interface CompanyPayDetails {
   accountNumber: string | null
   paymentTerms: string
   termsAndConditions: string | null
+  companyChopUrl: string | null // scanned company chop (PNG, transparent) — drawn on chop-version PDFs
 }
 
 /** Fallbacks when admin settings are empty — clearly placeholder values. */
@@ -37,6 +38,7 @@ const DEFAULTS: CompanyPayDetails = {
   accountNumber: 'XXX-XXXXXX-XXX',
   paymentTerms: '30 days from invoice date',
   termsAndConditions: null,
+  companyChopUrl: null,
 }
 
 const KEYS: Record<keyof CompanyPayDetails, string> = {
@@ -48,6 +50,7 @@ const KEYS: Record<keyof CompanyPayDetails, string> = {
   accountNumber: 'pay:accountNumber',
   paymentTerms: 'pay:paymentTerms',
   termsAndConditions: 'pay:termsAndConditions',
+  companyChopUrl: 'pay:companyChopUrl',
 }
 
 export async function getCompanyPayDetails(): Promise<CompanyPayDetails> {

@@ -52,6 +52,10 @@ export async function GET(req: Request, { params }: { params: Promise<{ id: stri
     try { paymentMethod = JSON.parse(receipt.meta).paymentMethod ?? null } catch {}
   }
   const pdf = await buildReceiptPdf({
+    // PDFs are English-only by default; pass language explicitly when a
+    // client specifically asks for another language version.
+    // Chop version (&chop=1): stamps the scanned company chop.
+    withChop: new URL(req.url).searchParams.get('chop') === '1',
     number: receipt.number,
     clientName: receipt.clientName,
     clientEmail: receipt.clientEmail,

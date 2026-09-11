@@ -25,6 +25,7 @@ export function ConfirmQuoteButton({
     draw: string
     clear: string
     signerName: string
+    signerTitle: string
     signHint: string
     skipSignature: string
     addSignature: string
@@ -36,6 +37,7 @@ export function ConfirmQuoteButton({
   const [mode, setMode] = useState<'plain' | 'sign'>('plain')
   const [signature, setSignature] = useState<string | null>(null)
   const [signerName, setSignerName] = useState('')
+  const [signerTitle, setSignerTitle] = useState('')
 
   if (done) {
     return (
@@ -45,7 +47,7 @@ export function ConfirmQuoteButton({
     )
   }
 
-  const submit = (withSignature: { pngDataUri: string; signerName: string } | undefined) =>
+  const submit = (withSignature: { pngDataUri: string; signerName: string; signerTitle?: string } | undefined) =>
     startTransition(async () => {
       setError(null)
       try {
@@ -73,6 +75,13 @@ export function ConfirmQuoteButton({
             maxLength={120}
             className={inputCls}
           />
+          <input
+            value={signerTitle}
+            onChange={(e) => setSignerTitle(e.target.value)}
+            placeholder={labels.signerTitle}
+            maxLength={120}
+            className={inputCls}
+          />
           <SignaturePad onSignature={setSignature} labels={{ draw: labels.draw, clear: labels.clear }} />
           <p className="text-center text-[11px] leading-relaxed text-text-muted">{labels.signHint}</p>
         </div>
@@ -81,7 +90,7 @@ export function ConfirmQuoteButton({
       <button
         type="button"
         disabled={pending || (mode === 'sign' && (!signature || !signerName.trim()))}
-        onClick={() => submit(mode === 'sign' && signature ? { pngDataUri: signature, signerName } : undefined)}
+        onClick={() => submit(mode === 'sign' && signature ? { pngDataUri: signature, signerName, signerTitle: signerTitle.trim() || undefined } : undefined)}
         className="w-full rounded-lg bg-signal px-5 py-3 text-sm font-semibold text-bg-base transition-transform hover:scale-[1.01] active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 motion-safe:hover:-translate-y-px"
       >
         {pending ? labels.confirming : labels.confirm}
