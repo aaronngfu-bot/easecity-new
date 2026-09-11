@@ -8,7 +8,7 @@ export function CompanyInfo() {
   const { t } = useLanguage()
 
   const infoItems = [
-    { icon: MapPin, label: t.companyInfo.locLabel, value: t.companyInfo.locValue, sub: t.companyInfo.locSub },
+    { icon: MapPin, label: t.companyInfo.addrLabel, value: t.companyInfo.addrValue, sub: t.companyInfo.addrSub, href: 'https://maps.google.com/?q=Room+B7,+4/F,+Luen+Hing+Factory+Building,+109+King+Lam+Street,+Cheung+Sha+Wan,+Hong+Kong' },
     { icon: Phone, label: t.companyInfo.phoneLabel, value: t.companyInfo.phoneValue, sub: t.companyInfo.phoneSub, href: 'tel:+85239971396' },
     { icon: Mail, label: t.companyInfo.emailLabel, value: t.companyInfo.emailValue, sub: t.companyInfo.emailSub, href: `mailto:${t.companyInfo.emailValue}` },
     { icon: Clock, label: t.companyInfo.timeLabel, value: t.companyInfo.timeValue, sub: t.companyInfo.timeSub },

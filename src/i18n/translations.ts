@@ -946,7 +946,7 @@ const en = {
 
   companyInfo: {
     title: 'Company Information',
-    locLabel: 'Location', locValue: 'Hong Kong SAR', locSub: 'Asia Pacific',
+    addrLabel: 'Address', addrValue: 'Room B7, 4/F, Luen Hing Factory Building, 109 King Lam Street, Cheung Sha Wan, Hong Kong', addrSub: 'Visits by appointment',
     phoneLabel: 'Hotline', phoneValue: '3997 1396', phoneSub: 'Mon–Fri, 10:00–18:00 HKT',
     emailLabel: 'Email', emailValue: 'admin@easecity.hk', emailSub: 'General enquiries',
     timeLabel: 'Response Time', timeValue: 'Usually within 1 business day', timeSub: 'HKT (UTC+8)',
@@ -2192,7 +2192,7 @@ const zh: typeof en = {
 
   companyInfo: {
     title: '公司資訊',
-    locLabel: '位置', locValue: '香港特別行政區', locSub: '亞太區',
+    addrLabel: '地址', addrValue: '香港長沙灣 King Lam 街 109 號聯興工業大廈 4 樓 B7 室', addrSub: '到訪請先預約',
     phoneLabel: '服務熱線', phoneValue: '3997 1396', phoneSub: '星期一至五 10:00–18:00',
     emailLabel: '電郵', emailValue: 'admin@easecity.hk', emailSub: '一般查詢',
     timeLabel: '回覆時間', timeValue: '一般一個工作日內', timeSub: '香港時間（UTC+8）',
@@ -3438,7 +3438,7 @@ const zhCN = {
 
   companyInfo: {
     title: '公司信息',
-    locLabel: '位置', locValue: '香港特别行政区', locSub: '亚太区',
+    addrLabel: '地址', addrValue: '香港长沙湾 King Lam 街 109 号联兴工业大厦 4 楼 B7 室', addrSub: '到访请先预约',
     phoneLabel: '服务热线', phoneValue: '3997 1396', phoneSub: '星期一至五 10:00–18:00',
     emailLabel: '电邮', emailValue: 'admin@easecity.hk', emailSub: '一般查找',
     timeLabel: '回复时间', timeValue: '一般一个工作日内', timeSub: '香港时间（UTC+8）',
