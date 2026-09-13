@@ -57,6 +57,18 @@ const HAIR = rgb(0.72, 0.74, 0.74)
 const TEAL_ACCENT = rgb(0.0, 0.49, 0.44)
 const HAIR_DARK = rgb(0.15, 0.16, 0.16)
 
+// Line-weight system (three tiers, used consistently across both documents):
+//   HEAVY 1.4  — section closes that must anchor the eye (table end, total)
+//   STRUCT 0.9 — structural rules (table header/close, signature baselines)
+//   HAIRLINE 0.5 — separators (letterhead second line, section top rules,
+//                   footer) — anything that should recede
+//   FILL 0.6   — hand-fill lines (Name/Title/Date/Company) — slightly
+//                   heavier than hairlines so they read as writable
+const LINE_HEAVY = 1.4
+const LINE_STRUCT = 0.9
+const LINE_HAIR = 0.5
+const LINE_FILL = 0.6
+
 function money(cents: number): string {
   return (cents / 100).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
@@ -375,8 +387,8 @@ async function drawLetterhead(doc: PDFDocument, page: import('pdf-lib').PDFPage,
   ctx.draw(page, title, 595 - M, 800, 20, { bold: true, alignRight: 595 - M })
 
   // Double rule: 1.6pt dark + hairline — formal document staple, prints crisply in mono
-  page.drawLine({ start: { x: M, y: 696 }, end: { x: 595 - M, y: 696 }, thickness: 1.6, color: HAIR_DARK })
-  page.drawLine({ start: { x: M, y: 692 }, end: { x: 595 - M, y: 692 }, thickness: 0.5, color: HAIR })
+  page.drawLine({ start: { x: M, y: 696 }, end: { x: 595 - M, y: 696 }, thickness: LINE_HEAVY, color: HAIR_DARK })
+  page.drawLine({ start: { x: M, y: 692 }, end: { x: 595 - M, y: 692 }, thickness: LINE_HAIR, color: HAIR })
 }
 
 /** Formal footer: contact row (web / phone / email with icons) + one legal
@@ -385,7 +397,7 @@ async function drawLetterhead(doc: PDFDocument, page: import('pdf-lib').PDFPage,
 function drawFooter(ctx: Ctx, page: import('pdf-lib').PDFPage, noteEn: string, noteCjk: string) {
   const M = 54
   const centre = 595 / 2
-  page.drawLine({ start: { x: M, y: 82 }, end: { x: 595 - M, y: 82 }, thickness: 0.5, color: HAIR })
+  page.drawLine({ start: { x: M, y: 82 }, end: { x: 595 - M, y: 82 }, thickness: LINE_HAIR, color: HAIR })
   // Contact row centred under the rule, same treatment as the letterhead row
   drawContactRow(page, ctx, { centreAt: centre, baselineY: 66, size: 7.8, iconSize: 5.2, gapUnit: 10 })
   // Note line: EN + CJK two runs, centred as a group (mono-language docs
@@ -465,7 +477,7 @@ export async function buildQuotePdf(opts: BaseDoc & {
   ctx.labelRight(page, L(lang, 'unitPrice'), '', 460, y, 8.5)
   ctx.labelRight(page, L(lang, 'amount'), '', 541, y, 8.5)
   y -= 15
-  page.drawLine({ start: { x: M, y }, end: { x: 595 - M, y }, thickness: 0.9, color: HAIR_DARK })
+  page.drawLine({ start: { x: M, y }, end: { x: 595 - M, y }, thickness: LINE_STRUCT, color: HAIR_DARK })
 
   const cur = currency.toUpperCase() + ' '
   for (let i = 0; i < items.length; i++) {
@@ -487,7 +499,7 @@ export async function buildQuotePdf(opts: BaseDoc & {
     y = rowBottom
     // Last row's rule is drawn dark (table closing line)
     const last = i === items.length - 1
-    page.drawLine({ start: { x: M, y }, end: { x: 595 - M, y }, thickness: last ? 0.9 : 0.4, color: last ? HAIR_DARK : HAIR })
+    page.drawLine({ start: { x: M, y }, end: { x: 595 - M, y }, thickness: last ? LINE_STRUCT : LINE_HAIR, color: last ? HAIR_DARK : HAIR })
   }
 
   // Subtotal / Total block — right aligned column, dark rule above total.
@@ -497,7 +509,7 @@ export async function buildQuotePdf(opts: BaseDoc & {
   ctx.labelRight(page, L(lang, 'subtotal'), '', 400, y, 9)
   ctx.draw(page, cur + money(totalCents), 541, y, 10, { alignRight: 541, bold: true })
   y -= 16
-  page.drawLine({ start: { x: 310, y }, end: { x: 541, y }, thickness: 1.4, color: HAIR_DARK })
+  page.drawLine({ start: { x: 310, y }, end: { x: 541, y }, thickness: LINE_HEAVY, color: HAIR_DARK })
   ctx.labelRight(page, L(lang, 'totalDue'), '', 400, y - 12, 9)
   {
     const s = `${cur}${money(totalCents)}`
@@ -530,7 +542,7 @@ export async function buildQuotePdf(opts: BaseDoc & {
     ...(company.accountNumber ? [[L(lang, 'accountNumber'), company.accountNumber] as [string, string]] : []),
   ]
   const drawPaymentBlock = (p: import('pdf-lib').PDFPage, py0: number) => {
-    p.drawLine({ start: { x: M, y: py0 }, end: { x: 595 - M, y: py0 }, thickness: 0.5, color: HAIR })
+    p.drawLine({ start: { x: M, y: py0 }, end: { x: 595 - M, y: py0 }, thickness: LINE_HAIR, color: HAIR })
     let by = py0 - 20
     for (const [label, value] of paymentRows) {
       ctx.label(p, label, '', M, by, 8.5)
@@ -561,7 +573,7 @@ export async function buildQuotePdf(opts: BaseDoc & {
   const sigTop = 252
   {
     let sy = sigTop
-    page.drawLine({ start: { x: M, y: sy }, end: { x: 595 - M, y: sy }, thickness: 0.5, color: HAIR })
+    page.drawLine({ start: { x: M, y: sy }, end: { x: 595 - M, y: sy }, thickness: LINE_HAIR, color: HAIR })
     sy -= 22
     // Section labels — one per column, same baseline
     ctx.label(page, L(lang, 'accepted'), '', M, sy, 9)
@@ -585,8 +597,8 @@ export async function buildQuotePdf(opts: BaseDoc & {
     }
 
     // Both rules on the same baseline
-    page.drawLine({ start: { x: M, y: ruleY }, end: { x: M + 216, y: ruleY }, thickness: 0.9, color: HAIR_DARK })
-    page.drawLine({ start: { x: 340, y: ruleY }, end: { x: 541, y: ruleY }, thickness: 0.9, color: HAIR_DARK })
+    page.drawLine({ start: { x: M, y: ruleY }, end: { x: M + 216, y: ruleY }, thickness: LINE_STRUCT, color: HAIR_DARK })
+    page.drawLine({ start: { x: 340, y: ruleY }, end: { x: 541, y: ruleY }, thickness: LINE_STRUCT, color: HAIR_DARK })
     // Rule captions on one baseline
     ctx.label(page, L(lang, 'signature'), '', M, ruleY - 13, 7.5)
     ctx.label(page, L(lang, 'authorisedSignature'), '', 340, ruleY - 13, 7.5)
@@ -596,7 +608,9 @@ export async function buildQuotePdf(opts: BaseDoc & {
     const dateY = titleY - 15
     const companyY = dateY - 15
 
-    // "Label: value" with a hairline filler when the value is blank
+    // "Label: value" with a hairline filler when the value is blank.
+    // All four fill-in lines END at the same x so the column reads as one
+    // aligned block (date line included — earlier it was 56pt shorter).
     const fieldLine = (label: string, value: string | null, x: number, lineEndX: number, y: number, bold = false) => {
       const fLabel = ctx.hasCJK(label) ? ctx.cjk : ctx.helv
       page.drawText(label, { x, y, size: 8, font: fLabel, color: MUTED })
@@ -605,7 +619,7 @@ export async function buildQuotePdf(opts: BaseDoc & {
         const fVal = ctx.hasCJK(value) ? ctx.cjk : bold ? ctx.helvBold : ctx.helv
         page.drawText(value, { x: startX, y, size: 9, font: fVal, color: INK })
       } else {
-        page.drawLine({ start: { x: startX, y: y + 2 }, end: { x: lineEndX, y: y + 2 }, thickness: 0.6, color: HAIR })
+        page.drawLine({ start: { x: startX, y: y + 2 }, end: { x: lineEndX, y: y + 2 }, thickness: LINE_FILL, color: HAIR })
       }
     }
 
@@ -614,20 +628,21 @@ export async function buildQuotePdf(opts: BaseDoc & {
       // date prefilled, company pre-printed.
       fieldLine(L(lang, 'nameLine'), signature.signerName, M, M + 216, nameY, true)
       fieldLine(L(lang, 'titleLine'), null, M, M + 216, titleY)
-      fieldLine(L(lang, 'dateLine'), fmtDateByLang(signature.signedAt, lang), M, M + 160, dateY)
+      fieldLine(L(lang, 'dateLine'), fmtDateByLang(signature.signedAt, lang), M, M + 216, dateY)
       fieldLine(L(lang, 'companyLine'), clientName, M, M + 216, companyY)
     } else {
-      // Blank copy: four hand-fill lines
+      // Blank copy: four hand-fill lines, all the same length
       fieldLine(L(lang, 'nameLine'), null, M, M + 216, nameY)
       fieldLine(L(lang, 'titleLine'), null, M, M + 216, titleY)
-      fieldLine(L(lang, 'dateLine'), null, M, M + 160, dateY)
+      fieldLine(L(lang, 'dateLine'), null, M, M + 216, dateY)
       fieldLine(L(lang, 'companyLine'), null, M, M + 216, companyY)
     }
 
-    // OUR side — same four rows, always pre-printed from admin settings
-    fieldLine(L(lang, 'nameLine'), company.contactName ?? '____________', 340, 541, nameY, true)
-    fieldLine(L(lang, 'titleLine'), company.contactTitle ?? '____________', 340, 541, titleY)
-    fieldLine(L(lang, 'dateLine'), null, 340, 460, dateY) // we sign on paper copy by hand
+    // OUR side — same four rows, always pre-printed from admin settings.
+    // Unset fields draw a same-length fill-in line, not a placeholder string.
+    fieldLine(L(lang, 'nameLine'), company.contactName, 340, 541, nameY, true)
+    fieldLine(L(lang, 'titleLine'), company.contactTitle, 340, 541, titleY)
+    fieldLine(L(lang, 'dateLine'), null, 340, 541, dateY) // we sign the paper copy by hand
     fieldLine(L(lang, 'companyLine'), company.companyName, 340, 541, companyY)
 
     // Chop version (gov/edu procurement): the scanned REAL company chop
@@ -657,7 +672,7 @@ export async function buildQuotePdf(opts: BaseDoc & {
     let ty = fromIdx === 0 ? 780 : 800
     if (fromIdx === 0) {
       ctx.label(p, L(lang, 'terms'), '', M, ty, 12)
-      p.drawLine({ start: { x: M, y: ty - 14 }, end: { x: 595 - M, y: ty - 14 }, thickness: 1.2, color: HAIR_DARK })
+      p.drawLine({ start: { x: M, y: ty - 14 }, end: { x: 595 - M, y: ty - 14 }, thickness: LINE_STRUCT, color: HAIR_DARK })
       ty -= 40
     }
     let i = fromIdx
@@ -697,7 +712,7 @@ export async function buildQuotePdf(opts: BaseDoc & {
         p3.drawText(number, { x: M, y: 60, size: 8, font: ctx.helv, color: MUTED })
       } else {
         ctx.label(p2, L(lang, 'terms'), '', M, ty, 12)
-        p2.drawLine({ start: { x: M, y: ty - 14 }, end: { x: 595 - M, y: ty - 14 }, thickness: 1.2, color: HAIR_DARK })
+        p2.drawLine({ start: { x: M, y: ty - 14 }, end: { x: 595 - M, y: ty - 14 }, thickness: LINE_STRUCT, color: HAIR_DARK })
         ctx.wrap(p2, terms, M, ty - 26, 595 - M * 2, 10, { lineHeight: TC_LINE_H })
       }
     }
@@ -751,7 +766,7 @@ export async function buildReceiptPdf(opts: BaseDoc & {
   }
 
   partyBlock(ctx, page, 594, L(lang, 'receivedFrom'), clientName, clientEmail ?? null)
-  page.drawLine({ start: { x: M, y: 546 }, end: { x: 595 - M, y: 546 }, thickness: 0.5, color: HAIR })
+  page.drawLine({ start: { x: M, y: 546 }, end: { x: 595 - M, y: 546 }, thickness: LINE_HAIR, color: HAIR })
 
   // Being payment of — formal receipt wording
   let y = 520
@@ -783,7 +798,7 @@ export async function buildReceiptPdf(opts: BaseDoc & {
   ctx.label(page, L(lang, 'breakdown'), '', M, y, 8.5)
   ctx.labelRight(page, L(lang, 'amount'), '', 541, y, 8.5)
   y -= 6
-  page.drawLine({ start: { x: M, y }, end: { x: 595 - M, y }, thickness: 0.9, color: HAIR_DARK })
+  page.drawLine({ start: { x: M, y }, end: { x: 595 - M, y }, thickness: LINE_STRUCT, color: HAIR_DARK })
   y -= 18
   const bCur = currency.toUpperCase() + ' '
   for (const it of items) {
