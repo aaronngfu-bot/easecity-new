@@ -2,7 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib'
 import fontkit from '@pdf-lib/fontkit'
-import { getCompanyPayDetails, type CompanyPayDetails } from '@/lib/company-details'
+import { getCompanyPayDetails, type CompanyPayDetails, DEFAULT_TERMS_EN, DEFAULT_TERMS_ZH } from '@/lib/company-details'
 
 /**
  * Server-side PDF generation for quotes and receipts.
@@ -89,6 +89,7 @@ const COPY: Record<PdfLanguage, Record<string, string>> = {
     accepted: 'Accepted & Approved', onBehalf: 'For and on behalf of',
     signature: 'Signature', authorisedSignature: 'Authorised Signature',
     nameLine: 'Name:', authorisedRep: 'Authorised Representative',
+    titleLine: 'Title:', dateLine: 'Date:', companyLine: 'Company:',
     dateSlash: 'Date /',
     beingPaymentOf: 'Being payment of', amountReceived: 'Amount Received',
     breakdown: 'Breakdown', issuedBy: 'Issued by',
@@ -115,6 +116,7 @@ const COPY: Record<PdfLanguage, Record<string, string>> = {
     accepted: '客戶確認及批准', onBehalf: '公司授權代表',
     signature: '簽署', authorisedSignature: '授權簽署',
     nameLine: '姓名:', authorisedRep: '授權代表',
+    titleLine: '職銜:', dateLine: '日期:', companyLine: '公司名稱:',
     dateSlash: '日期:',
     beingPaymentOf: '款項性質', amountReceived: '已收金額',
     breakdown: '明細', issuedBy: '發出人',
@@ -145,10 +147,43 @@ interface Ctx {
   /** Right-aligned variant: whole run ends at xRight. */
   labelRight: (page: import('pdf-lib').PDFPage, en: string, cjkText: string, xRight: number, y: number, size?: number, color?: ReturnType<typeof rgb>) => void
   draw: (page: import('pdf-lib').PDFPage, text: string, x: number, y: number, size: number, opts?: { bold?: boolean; color?: ReturnType<typeof rgb>; alignRight?: number }) => void
+  /** Script-aware font picker — Helvetica for Latin, Noto for CJK runs. */
+  pick: (text: string, bold?: boolean) => import('pdf-lib').PDFFont
   wrap: (page: import('pdf-lib').PDFPage, text: string, x: number, y: number, maxWidth: number, size: number, opts?: { color?: ReturnType<typeof rgb>; lineHeight?: number }) => number
   /** Line count a wrap() call will produce, for layout budgeting. */
   measureLines: (text: string, maxWidth: number, size: number) => number
   hasCJK: (text: string) => boolean
+}
+
+/** Word-aware greedy wrap: Latin words are never split mid-word (a long
+ *  word wider than the column is hard-broken); CJK runs break per char.
+ *  Module-level so paginated sections (T&C) can reuse it with ctx.pick. */
+function splitTextLines(text: string, maxWidth: number, size: number, pick: (s: string) => import('pdf-lib').PDFFont): string[] {
+  const widthOf = (s: string) => pick(s).widthOfTextAtSize(s, size)
+  const lines: string[] = []
+  for (const para of text.split('\n')) {
+    let line = ''
+    for (const word of para.split(' ')) {
+      if (!word) continue
+      const candidate = line ? line + ' ' + word : word
+      if (widthOf(candidate) <= maxWidth) { line = candidate; continue }
+      if (widthOf(word) > maxWidth) {
+        // Single token wider than the column (URL / CJK run): hard-break.
+        if (line) { lines.push(line); line = '' }
+        let chunk = ''
+        for (const ch of word) {
+          if (widthOf(chunk + ch) > maxWidth) { lines.push(chunk); chunk = ch }
+          else chunk += ch
+        }
+        line = chunk
+      } else {
+        lines.push(line)
+        line = word
+      }
+    }
+    if (line) lines.push(line)
+  }
+  return lines
 }
 
 async function makeCtx(doc: PDFDocument): Promise<Ctx> {
@@ -198,35 +233,8 @@ async function makeCtx(doc: PDFDocument): Promise<Ctx> {
     if (cjkText) page.drawText(cjkText, { x: x + enW, y, size, font: cjk, color })
   }
 
-  const splitLines = (text: string, maxWidth: number, size: number): string[] => {
-    // Word-aware greedy wrap: Latin words are never split mid-word (a long
-    // word wider than the column is hard-broken); CJK runs break per char.
-    const widthOf = (s: string) => pick(s).widthOfTextAtSize(s, size)
-    const lines: string[] = []
-    for (const para of text.split('\n')) {
-      let line = ''
-      for (const word of para.split(' ')) {
-        if (!word) continue
-        const candidate = line ? line + ' ' + word : word
-        if (widthOf(candidate) <= maxWidth) { line = candidate; continue }
-        if (widthOf(word) > maxWidth) {
-          // Single token wider than the column (URL / CJK run): hard-break.
-          if (line) { lines.push(line); line = '' }
-          let chunk = ''
-          for (const ch of word) {
-            if (widthOf(chunk + ch) > maxWidth) { lines.push(chunk); chunk = ch }
-            else chunk += ch
-          }
-          line = chunk
-        } else {
-          lines.push(line)
-          line = word
-        }
-      }
-      if (line) lines.push(line)
-    }
-    return lines
-  }
+  const splitLines = (text: string, maxWidth: number, size: number): string[] =>
+    splitTextLines(text, maxWidth, size, pick)
 
   const wrap: Ctx['wrap'] = (page, text, x, y, maxWidth, size, opts = {}) => {
     let cursorY = y
@@ -241,7 +249,7 @@ async function makeCtx(doc: PDFDocument): Promise<Ctx> {
    *  before drawing (placement must never depend on render side effects). */
   const measureLines = (text: string, maxWidth: number, size: number) => splitLines(text, maxWidth, size).length
 
-  return { doc, cjk, helv, helvBold, label, labelRight, draw, wrap, measureLines, hasCJK }
+  return { doc, cjk, helv, helvBold, label, labelRight, draw, wrap, measureLines, pick, hasCJK }
 }
 
 /** Small vector contact icons (globe / phone / envelope) drawn as shapes —
@@ -339,14 +347,16 @@ async function drawCompanyChop(
  *  doc-language COPY table (single-language documents). */
 async function drawLetterhead(doc: PDFDocument, page: import('pdf-lib').PDFPage, ctx: Ctx, title: string, company: CompanyPayDetails) {
   const M = 54
+  // Vertical rhythm: top margin = footer bottom margin = 42pt
+  // (page 842 → content top 800; footer note baseline 42).
   try {
     const img = await doc.embedPng(logoBytes())
     const h = 32
     const w = (img.width / img.height) * h
-    // Align logo top with the doc title top (title cap-top ≈ 814)
-    page.drawImage(img, { x: M, y: 814 - h, width: w, height: h })
+    // Align logo top with the doc title top (title cap-top ≈ 800)
+    page.drawImage(img, { x: M, y: 800 - h, width: w, height: h })
   } catch {
-    ctx.draw(page, 'EaseCity', M, 792, 16, { bold: true })
+    ctx.draw(page, 'EaseCity', M, 778, 16, { bold: true })
   }
   // Company block under logo: registered name + address + contact row
   // (web / phone / email, each prefixed with a small glyph). Fixed budget
@@ -375,20 +385,20 @@ async function drawLetterhead(doc: PDFDocument, page: import('pdf-lib').PDFPage,
 function drawFooter(ctx: Ctx, page: import('pdf-lib').PDFPage, noteEn: string, noteCjk: string) {
   const M = 54
   const centre = 595 / 2
-  page.drawLine({ start: { x: M, y: 84 }, end: { x: 595 - M, y: 84 }, thickness: 0.5, color: HAIR })
+  page.drawLine({ start: { x: M, y: 82 }, end: { x: 595 - M, y: 82 }, thickness: 0.5, color: HAIR })
   // Contact row centred under the rule, same treatment as the letterhead row
-  drawContactRow(page, ctx, { centreAt: centre, baselineY: 68, size: 7.8, iconSize: 5.2, gapUnit: 10 })
+  drawContactRow(page, ctx, { centreAt: centre, baselineY: 66, size: 7.8, iconSize: 5.2, gapUnit: 10 })
   // Note line: EN + CJK two runs, centred as a group (mono-language docs
   // pass the whole note in one slot and leave the other empty)
   const fEn = ctx.hasCJK(noteEn) ? ctx.cjk : ctx.helv
   const enW = fEn.widthOfTextAtSize(noteEn + (noteCjk ? ' ' : ''), 7.5)
   const cjkW = ctx.cjk.widthOfTextAtSize(noteCjk, 7.5)
   const startX = centre - (enW + cjkW) / 2
-  page.drawText(noteEn + (noteCjk ? ' ' : ''), { x: startX, y: 55, size: 7.5, font: fEn, color: MUTED })
-  if (noteCjk) page.drawText(noteCjk, { x: startX + enW, y: 55, size: 7.5, font: ctx.cjk, color: MUTED })
+  page.drawText(noteEn + (noteCjk ? ' ' : ''), { x: startX, y: 42, size: 7.5, font: fEn, color: MUTED })
+  if (noteCjk) page.drawText(noteCjk, { x: startX + enW, y: 42, size: 7.5, font: ctx.cjk, color: MUTED })
 }
 
-function partyBlock(ctx: Ctx, page: import('pdf-lib').PDFPage, y: number, label: string, name: string, email: string | null) {
+function partyBlock(ctx: Ctx, page: import('pdf-lib').PDFPage, y: number, label: string, name: string, email: string | null, contactLine?: string | null) {
   const M = 54
   ctx.label(page, label, '', M, y)
   ctx.draw(page, name, M, y - 16, 12.5, { bold: true })
@@ -396,6 +406,13 @@ function partyBlock(ctx: Ctx, page: import('pdf-lib').PDFPage, y: number, label:
   if (email) {
     ctx.draw(page, email, M, y - 30, 9.5, { color: MUTED })
     bottom = y - 44
+  }
+  // Sales contact under the client's email — the person on OUR side handling
+  // this quote ("Frankie Lam frankielam@easecity.hk"), from admin settings.
+  if (contactLine) {
+    const f = ctx.hasCJK(contactLine) ? ctx.cjk : ctx.helv
+    page.drawText(contactLine, { x: M, y: bottom - 15, size: 8.5, font: f, color: MUTED })
+    bottom -= 15
   }
   return bottom
 }
@@ -428,10 +445,16 @@ export async function buildQuotePdf(opts: BaseDoc & {
     ctx.draw(page, fmtDateByLang(validUntil, lang), 190, 622, 9.5)
   }
 
-  // Client party (left, below references). No rule under it — the table's
-  // own top rule below serves as the separator (a second line here read as
-  // a double-line with the table rule).
-  partyBlock(ctx, page, 594, L(lang, 'preparedFor'), clientName, clientEmail ?? null)
+  // Client party (left, below references) + our sales contact underneath.
+  // No rule under it — the table's own top rule below serves as the separator
+  // (a second line here read as a double-line with the table rule).
+  const contactLine =
+    company.contactName
+      ? company.contactEmail
+        ? `${company.contactName}  ${company.contactEmail}`
+        : company.contactName
+      : null
+  partyBlock(ctx, page, 594, L(lang, 'preparedFor'), clientName, clientEmail ?? null, contactLine)
 
   // Items table — no top rule above the header (the party-block hairline
   // above already separates the sections); labels, dark rule under, then
@@ -447,25 +470,32 @@ export async function buildQuotePdf(opts: BaseDoc & {
   const cur = currency.toUpperCase() + ' '
   for (let i = 0; i < items.length; i++) {
     const it = items[i]
-    // Row band: first baseline 17pt under the rule above (≈ vertically
-    // centred for 10pt text), rule 9pt below the lowest text baseline.
+    // Row band: rule above → text → rule below (9pt under the lowest line).
+    // Qty/Unit/Amount are drawn AFTER wrap() at the band's VERTICAL CENTRE —
+    // with a 2-line description the figures must sit mid-row, not on top.
     y -= 17
-    const afterDesc = ctx.wrap(page, it.description, M + 2, y, 240, 10)
-    ctx.draw(page, String(it.qty), 330, y, 10, { alignRight: 330, color: MUTED })
-    ctx.draw(page, cur + money(it.unitPrice), 460, y, 10, { alignRight: 460, color: MUTED })
-    ctx.draw(page, cur + money(it.qty * it.unitPrice), 541, y, 10, { alignRight: 541, bold: true })
-    y = Math.min(afterDesc, y) - 9
+    const firstBaseline = y
+    const afterDesc = ctx.wrap(page, it.description, M + 2, firstBaseline, 240, 10)
+    const lastBaseline = Math.min(afterDesc, firstBaseline) // afterDesc already includes one lineHeight step
+    const rowBottom = lastBaseline - 9
+    const descLines = ctx.measureLines(it.description, 240, 10)
+    // Visual middle: if 1 line → the line itself; if 2 lines → between them
+    const centreY = descLines > 1 ? firstBaseline - 15.5 / 2 - 0.5 : firstBaseline
+    ctx.draw(page, String(it.qty), 330, centreY, 10, { alignRight: 330, color: MUTED })
+    ctx.draw(page, cur + money(it.unitPrice), 460, centreY, 10, { alignRight: 460, color: MUTED })
+    ctx.draw(page, cur + money(it.qty * it.unitPrice), 541, centreY, 10, { alignRight: 541 })
+    y = rowBottom
     // Last row's rule is drawn dark (table closing line)
     const last = i === items.length - 1
     page.drawLine({ start: { x: M, y }, end: { x: 595 - M, y }, thickness: last ? 0.9 : 0.4, color: last ? HAIR_DARK : HAIR })
   }
 
   // Subtotal / Total block — right aligned column, dark rule above total.
-  // Labels right-align at 400 (clear of the value column), values at 541.
+  // Subtotal is bold (it's the number to check); Total stays the visual peak.
   const totalCents = items.reduce((s, it) => s + it.qty * it.unitPrice, 0)
   y -= 12
   ctx.labelRight(page, L(lang, 'subtotal'), '', 400, y, 9)
-  ctx.draw(page, cur + money(totalCents), 541, y, 10, { alignRight: 541 })
+  ctx.draw(page, cur + money(totalCents), 541, y, 10, { alignRight: 541, bold: true })
   y -= 16
   page.drawLine({ start: { x: 310, y }, end: { x: 541, y }, thickness: 1.4, color: HAIR_DARK })
   ctx.labelRight(page, L(lang, 'totalDue'), '', 400, y - 12, 9)
@@ -510,7 +540,7 @@ export async function buildQuotePdf(opts: BaseDoc & {
     return by
   }
   const paymentEnd = Math.min(y, 360) - 6 - 20 - paymentRows.length * 17
-  const paymentFits = paymentEnd >= 248 // 12pt clear of the pinned sig top (236)
+  const paymentFits = paymentEnd >= 264 // 12pt clear of the pinned sig top (252)
   const paymentOnPage2 = !paymentFits
   if (paymentFits) {
     const py = Math.min(y, 360) - 6
@@ -521,11 +551,14 @@ export async function buildQuotePdf(opts: BaseDoc & {
   // block — see tcBlock call below drawFooter's position.)
 
   // ── Approval & signature block ──────────────────────────────────────────
-  // Formal two-column acceptance, PINNED: top rule at y=236, bottom
-  // (name/date rows) ends ~y=140, safely above the footer rule (y=84).
+  // Formal two-column acceptance, PINNED: top rule at y=252, bottom
+  // (Company row) ends ~y=162, safely above the footer rule (y=82).
   // Anything above that cannot fit moves to page 2 (notes / payment block).
   // Left column (client) x = M..270, right column (company) x = 340..541.
-  const sigTop = 236
+  // BOTH columns share the same four rows under the line — the person who
+  // requests the quote is often NOT the person who signs, so identity is
+  // recorded explicitly: Name / Title / Date / Company.
+  const sigTop = 252
   {
     let sy = sigTop
     page.drawLine({ start: { x: M, y: sy }, end: { x: 595 - M, y: sy }, thickness: 0.5, color: HAIR })
@@ -558,28 +591,44 @@ export async function buildQuotePdf(opts: BaseDoc & {
     ctx.label(page, L(lang, 'signature'), '', M, ruleY - 13, 7.5)
     ctx.label(page, L(lang, 'authorisedSignature'), '', 340, ruleY - 13, 7.5)
 
-    // Name + date rows — client column only; company column keeps pre-printed
-    // details on the same two baselines. Mixed-script lines are drawn as
-    // separate EN/CJK runs (Noto's Latin glyphs look wrong in body text).
-    const nameY = ruleY - 32
-    if (signature) {
-      ctx.draw(page, signature.signerName, M, nameY, 10.5, { bold: true })
-      ctx.label(page, L(lang, 'dateSlash'), '', M, nameY - 15, 8.5)
-      const dateLabel = L(lang, 'dateSlash')
-      const fDate = ctx.hasCJK(dateLabel) ? ctx.cjk : ctx.helv
-      const labelW = fDate.widthOfTextAtSize(dateLabel + '  ', 8.5)
-      ctx.draw(page, fmtDateByLang(signature.signedAt, lang), M + labelW + 4, nameY - 15, 8.5, { color: MUTED })
-      ctx.draw(page, `Doc ${number}`, M, nameY - 24, 7.5, { color: MUTED })
-    } else {
-      // Blank copy: label + rule lines to fill in by hand
-      ctx.draw(page, L(lang, 'nameLine'), M, nameY, 8.5, { color: MUTED })
-      page.drawLine({ start: { x: M + 62, y: nameY + 2 }, end: { x: M + 216, y: nameY + 2 }, thickness: 0.6, color: HAIR })
-      ctx.label(page, L(lang, 'dateSlash'), '', M, nameY - 15, 8.5)
-      page.drawLine({ start: { x: M + 62, y: nameY - 13 }, end: { x: M + 160, y: nameY - 13 }, thickness: 0.6, color: HAIR })
+    const nameY = ruleY - 30
+    const titleY = nameY - 15
+    const dateY = titleY - 15
+    const companyY = dateY - 15
+
+    // "Label: value" with a hairline filler when the value is blank
+    const fieldLine = (label: string, value: string | null, x: number, lineEndX: number, y: number, bold = false) => {
+      const fLabel = ctx.hasCJK(label) ? ctx.cjk : ctx.helv
+      page.drawText(label, { x, y, size: 8, font: fLabel, color: MUTED })
+      const startX = x + fLabel.widthOfTextAtSize(label, 8) + 4
+      if (value) {
+        const fVal = ctx.hasCJK(value) ? ctx.cjk : bold ? ctx.helvBold : ctx.helv
+        page.drawText(value, { x: startX, y, size: 9, font: fVal, color: INK })
+      } else {
+        page.drawLine({ start: { x: startX, y: y + 2 }, end: { x: lineEndX, y: y + 2 }, thickness: 0.6, color: HAIR })
+      }
     }
-    // Company pre-printed block, same baselines as client name/date rows
-    ctx.draw(page, 'EaseCity Technologies Limited', 340, nameY, 9, { bold: true })
-    ctx.draw(page, L(lang, 'authorisedRep'), 340, nameY - 15, 8.5, { color: MUTED })
+
+    if (signature) {
+      // Signed copy: online-signature name+title fills the name/title lines,
+      // date prefilled, company pre-printed.
+      fieldLine(L(lang, 'nameLine'), signature.signerName, M, M + 216, nameY, true)
+      fieldLine(L(lang, 'titleLine'), null, M, M + 216, titleY)
+      fieldLine(L(lang, 'dateLine'), fmtDateByLang(signature.signedAt, lang), M, M + 160, dateY)
+      fieldLine(L(lang, 'companyLine'), clientName, M, M + 216, companyY)
+    } else {
+      // Blank copy: four hand-fill lines
+      fieldLine(L(lang, 'nameLine'), null, M, M + 216, nameY)
+      fieldLine(L(lang, 'titleLine'), null, M, M + 216, titleY)
+      fieldLine(L(lang, 'dateLine'), null, M, M + 160, dateY)
+      fieldLine(L(lang, 'companyLine'), null, M, M + 216, companyY)
+    }
+
+    // OUR side — same four rows, always pre-printed from admin settings
+    fieldLine(L(lang, 'nameLine'), company.contactName ?? '____________', 340, 541, nameY, true)
+    fieldLine(L(lang, 'titleLine'), company.contactTitle ?? '____________', 340, 541, titleY)
+    fieldLine(L(lang, 'dateLine'), null, 340, 460, dateY) // we sign on paper copy by hand
+    fieldLine(L(lang, 'companyLine'), company.companyName, 340, 541, companyY)
 
     // Chop version (gov/edu procurement): the scanned REAL company chop
     // (uploaded in admin settings) over the company signature line —
@@ -597,7 +646,31 @@ export async function buildQuotePdf(opts: BaseDoc & {
     '')
 
   // ── Page 2: overflow (notes / payment block) + Terms & Conditions ───────
-  if (paymentOnPage2 || !notesFit || company.termsAndConditions) {
+  // Admin-configured T&C wins; otherwise the detailed default (per doc lang)
+  // applies — a formal quotation should always carry its terms.
+  const terms = company.termsAndConditions || (lang === 'zh' ? DEFAULT_TERMS_ZH : DEFAULT_TERMS_EN)
+  const TC_LINE_H = 15
+  const drawTermsPage = (p: import('pdf-lib').PDFPage, text: string, fromIdx: number) => {
+    // Paginated T&C: draw lines from fromIdx until the footer floor (y≈110),
+    // return the index of the first line that did NOT fit.
+    const all = splitTextLines(text, 595 - M * 2, 10, (s) => ctx.pick(s))
+    let ty = fromIdx === 0 ? 780 : 800
+    if (fromIdx === 0) {
+      ctx.label(p, L(lang, 'terms'), '', M, ty, 12)
+      p.drawLine({ start: { x: M, y: ty - 14 }, end: { x: 595 - M, y: ty - 14 }, thickness: 1.2, color: HAIR_DARK })
+      ty -= 40
+    }
+    let i = fromIdx
+    const lines = all
+    while (i < lines.length && ty > 100) {
+      const line = lines[i]
+      p.drawText(line, { x: M, y: ty, size: 10, font: ctx.pick(line), color: INK })
+      ty -= TC_LINE_H
+      i++
+    }
+    return i
+  }
+  if (paymentOnPage2 || !notesFit || terms) {
     const p2 = doc.addPage([595, 842])
     let ty = 780
     if (paymentOnPage2) {
@@ -610,17 +683,22 @@ export async function buildQuotePdf(opts: BaseDoc & {
       ty -= 18
       ty = ctx.wrap(p2, notes, M, ty, 595 - M * 2, 9.5, { lineHeight: 14.7 }) - 14
     }
-    if (company.termsAndConditions) {
+    if (terms) {
       if (paymentOnPage2 || !notesFit) {
+        // Overflow already used p2 — T&C gets its own page(s).
         const p3 = doc.addPage([595, 842])
-        ctx.label(p3, L(lang, 'terms'), '', M, 780, 12)
-        p3.drawLine({ start: { x: M, y: 766 }, end: { x: 595 - M, y: 766 }, thickness: 1.2, color: HAIR_DARK })
-        ctx.wrap(p3, company.termsAndConditions, M, 740, 595 - M * 2, 10, { lineHeight: 16 })
+        let drawn = drawTermsPage(p3, terms, 0)
+        while (drawn < ctx.measureLines(terms, 595 - M * 2, 10)) {
+          const pn = doc.addPage([595, 842])
+          drawn = drawTermsPage(pn, terms, drawn)
+          pn.drawText(number, { x: M, y: 60, size: 8, font: ctx.helv, color: MUTED })
+          if (drawn >= ctx.measureLines(terms, 595 - M * 2, 10)) break
+        }
         p3.drawText(number, { x: M, y: 60, size: 8, font: ctx.helv, color: MUTED })
       } else {
         ctx.label(p2, L(lang, 'terms'), '', M, ty, 12)
         p2.drawLine({ start: { x: M, y: ty - 14 }, end: { x: 595 - M, y: ty - 14 }, thickness: 1.2, color: HAIR_DARK })
-        ctx.wrap(p2, company.termsAndConditions, M, ty - 26, 595 - M * 2, 10, { lineHeight: 16 })
+        ctx.wrap(p2, terms, M, ty - 26, 595 - M * 2, 10, { lineHeight: TC_LINE_H })
       }
     }
     p2.drawText(number, { x: M, y: 60, size: 8, font: ctx.helv, color: MUTED })

@@ -20,6 +20,9 @@ export default function AdminSettingsPage() {
     'pay:paymentTerms': '30 days from invoice date',
     'pay:termsAndConditions': '',
     'pay:companyChopUrl': '',
+    'pay:contactName': '',
+    'pay:contactEmail': '',
+    'pay:contactTitle': '',
   })
   const fileInput = { current: null as HTMLInputElement | null }
   const chopInput = { current: null as HTMLInputElement | null }
@@ -29,6 +32,9 @@ export default function AdminSettingsPage() {
     { key: 'pay:companyName', label: 'Company name (as on BR) 公司名稱' },
     { key: 'pay:companyBrNo', label: 'BR number 商業登記號' },
     { key: 'pay:companyAddress', label: 'Registered address 註冊地址', rows: 2 },
+    { key: 'pay:contactName', label: 'Sales contact name 報價聯絡人' },
+    { key: 'pay:contactEmail', label: 'Sales contact email 聯絡人電郵' },
+    { key: 'pay:contactTitle', label: 'Sales contact title 聯絡人職銜' },
     { key: 'pay:bankName', label: 'Bank 銀行' },
     { key: 'pay:accountName', label: 'Account name (must match BR) 帳戶名稱' },
     { key: 'pay:accountNumber', label: 'Account number 帳戶號碼' },
